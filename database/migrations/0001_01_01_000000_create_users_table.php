@@ -16,35 +16,34 @@ return new class extends Migration
             $table->string('name');
             $table->timestamps();
         });
-        
+
         Schema::create('positions', function (Blueprint $table) {
             $table->id();
             $table->string('name');
             $table->timestamps();
-        });
-        
-        Schema::create('users', function (Blueprint $table) {
-            $table->id();
-            $table->string('prefix', 10);
-            $table->string('name', 100);
-            $table->string('employee_id', 20)->unique();
-            $table->string('password', 50);
-            $table->string('phone', 50);
-            $table->string('status', 20);
-            $table->string('email', 50)->unique();
-            $table->timestamp('email_verified_at')->nullable();
-            $table->rememberToken();
-            $table->timestamps();
-
-            $table->foreignId('department_id')->nullable()->constrained('departments')->nullOnDelete();
-            $table->foreignId('position_id')->nullable()->constrained('positions')->nullOnDelete();
-            $table->foreignId('password_reset_token_id')->nullable()->constrained('password_reset_tokens')->nullOnDelete();
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {
             $table->string('email')->primary();
             $table->string('token');
             $table->timestamp('created_at')->nullable();
+        });
+
+        Schema::create('users', function (Blueprint $table) {
+            $table->id();
+            $table->string('prefix', 10);
+            $table->string('name', 100);
+            $table->string('employee_id', 20)->unique();
+            $table->string('password');
+            $table->string('phone', 20)->nullable();
+            $table->boolean('status')->default(true);
+            $table->string('email')->unique();
+            $table->timestamp('email_verified_at')->nullable();
+            $table->rememberToken();
+            $table->timestamps();
+
+            $table->foreignId('department_id')->constrained('departments')->restrictOnDelete();
+            $table->foreignId('position_id')->constrained('positions')->restrictOnDelete();
         });
 
         Schema::create('sessions', function (Blueprint $table) {
@@ -62,10 +61,10 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('users');
-        Schema::dropIfExists('password_reset_tokens');
         Schema::dropIfExists('sessions');
-        Schema::dropIfExists('departments');
+        Schema::dropIfExists('password_reset_tokens');
+        Schema::dropIfExists('users');
         Schema::dropIfExists('positions');
+        Schema::dropIfExists('departments');
     }
 };
