@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use PhpParser\PrettyPrinter\Standard;
 
 class DatabaseSeeder extends Seeder
 {
@@ -18,6 +19,11 @@ class DatabaseSeeder extends Seeder
             DepartmentSeeder::class,
             UserSeeder::class,
             PasswordResetTokenSeeder::class,
+            StandardSeeder::class,
+            CategorieSeeder::class,
+            IndicatorsSeeder::class,
+            CriteriasSeeder::class,
+            EvidenceSeeder::class,
         ]);
     }
 }
