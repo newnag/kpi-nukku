@@ -16,6 +16,7 @@ class IndicatorsSeeder extends Seeder
         DB::table('indicators')->insert([
             //โครงสร้าง
             [
+                //id-1
                 'name' => 'ตัวบ่งชี้ที่ 1 คุณสมบัติของผู้บริหารสถาบันการศึกษาพยาบาล',
                 'year' => 2025,
                 'type' => 1,
@@ -33,6 +34,7 @@ class IndicatorsSeeder extends Seeder
                 'score_max' => 10.00,
             ],
             [
+                // id-2
                 'name' => 'ตัวบ่งชี้ที่ 2 อาจารย์ประจำที่มีคุณวุฒิปริญญาเอก',
                 'type' => 2,
                 'year' => 2025,
@@ -50,6 +52,7 @@ class IndicatorsSeeder extends Seeder
                 'score_max' => 10.00,
             ],
             [
+                // id-3
                 'name' => 'ตัวบ่งชี้ที่ 3 คุณสมบัติอาจารย์ประจำ',
                 'type' => 2,
                 'year' => 2025,
@@ -71,6 +74,7 @@ class IndicatorsSeeder extends Seeder
                 'score_max' => 10.00,
             ],
             [
+                // id-4
                 'name' => 'ตัวบ่งชี้ที่ 4 จำนวนและคุณสมบัติของอาจารย์ผู้รับผิดชอบหลักสูตร',
                 'type' => 3,
                 'year' => 2025,
@@ -89,6 +93,7 @@ class IndicatorsSeeder extends Seeder
                 'score_max' => 5.00,
             ],
             [
+                // id-5
                 'name' => 'ตัวบ่งชี้ที่ 5 สัดส่วนอาจารย์ประจำหลักสูตรต่ออาจารย์ประจำทั้งหมด',
                 'type' => 3,
                 'year' => 2025,
@@ -107,6 +112,7 @@ class IndicatorsSeeder extends Seeder
                 'score_max' => 15.00,
             ],
             [
+                // id-6
                 'name' => 'ตัวบ่งชี้ที่ 6 อัตราส่วนจำนวนอาจารย์ประจำต่อนิสิต/นักศึกษาเต็มเวลาเทียบเท่า',
                 'type' => 3,
                 'year' => 2025,
@@ -142,6 +148,7 @@ class IndicatorsSeeder extends Seeder
                 'score_max' => 15.00,
             ],
             [
+                // id-7
                 'name' => 'ตัวบ่งชี้ที่ 7 อัตราส่วนจำนวนอาจารย์ประจำหรือพยาบาลวิชาชีพ ที่ทำหน้าหน้าที่สอนภาคปฏิบัติต่อนิสิต/นักศึกษา',
                 'type' => 3,
                 'year' => 2025,
@@ -171,6 +178,7 @@ class IndicatorsSeeder extends Seeder
                 'score_acc' => 15.00, // คะแนนที่ได้รับ
                 'score_max' => 15.00,
             ],
+            // id-8
             [
                 'name' => 'ตัวบ่งชี้ที่ 8 สภาพแวดล้อมของสถาบันการศึกษา',
                 'type' => 3,
@@ -192,6 +200,7 @@ class IndicatorsSeeder extends Seeder
                 'score_max' => 15.00,
             ],
             [
+                // id-9
                 'name' => 'ตัวบ่งชี้ที่ 9 ทรัพยากรด้านเทคโนโลยีสารสนเทศ',
                 'type' => 3,
                 'year' => 2025,
@@ -220,6 +229,7 @@ class IndicatorsSeeder extends Seeder
                 'score_max' => 10.00,
             ],
             [
+                // id-10
                 'name' => 'ตัวบ่งชี้ที่ 10 ศูนย์การเรียนรู้การปฏิบัติการพยาบาลและห้องปฏิบัติการเสมือนจริง',
                 'type' => 3,
                 'year' => 2025,
@@ -244,6 +254,7 @@ class IndicatorsSeeder extends Seeder
                 'score_max' => 50.00,
             ],
             [
+                // id-11
                 'name' => 'ตัวบ่งชี้ที่ 11 หนังสือ ตำรา วารสาร ฐานข้อมูล',
                 'type' => 3,
                 'year' => 2025,
@@ -268,6 +279,7 @@ class IndicatorsSeeder extends Seeder
                 'score_max' => 25.00,
             ],
             [
+                // id-12
                 'name' => 'ตัวบ่งชี้ที่ 12 โครงสร้างการบริหารจัดการงานวิจัยและนวัตกรรม',
                 'type' => 4,
                 'year' => 2025,
@@ -287,6 +299,7 @@ class IndicatorsSeeder extends Seeder
                 'score_max' => 5.00,
             ],
             [
+                // id-13
                 'name' => 'ตัวบ่งชี้ที่ 13 โครงสร้างการบริหารจัดการงานบริการวิชาการ/วิชาชีพ/สังคม',
                 'type' => 5,
                 'year' => 2025,
@@ -306,7 +319,8 @@ class IndicatorsSeeder extends Seeder
                 'score_max' => 5.00,
             ],
             [
-                'name' => 'ตัวบ่งชี้ที่ 14 โครงสร้างการบริหารจัดการงานบริการวิชาการ/วิชาชีพ/สังคม',
+                // id-14
+                'name' => 'ตัวบ่งชี้ที่ 14 โครงสร้างการบริหารจัดการงานทำนุบำรุงศิลปวัฒนธรรม',
                 'type' => 6,
                 'year' => 2025,
                 'code' => 'NCS-14',
@@ -325,6 +339,7 @@ class IndicatorsSeeder extends Seeder
                 'score_max' => 5.00,
             ],
             [
+                // id-15
                 'name' => 'ตัวบ่งชี้ที่ 15  โครงสร้างการบริหารจัดการงานพัฒนานิสิต/นักศึกษา/ศิษย์เก่า',
                 'type' => 7,
                 'year' => 2025,
@@ -345,6 +360,7 @@ class IndicatorsSeeder extends Seeder
             ],
             //กระบวนการ
             [
+                // id-16
                 'name' => 'ตัวบ่งชี้ที่ 1 การนำองค์กร',
                 'type' => 8,
                 'year' => 2025,
@@ -365,6 +381,7 @@ class IndicatorsSeeder extends Seeder
                 'score_max' => 15.00,
             ],
             [
+                // id-17
                 'name' => 'ตัวบ่งชี้ที่ 2 ยุทธศาสตร์ ',
                 'type' => 8,
                 'year' => 2025,
@@ -388,7 +405,8 @@ class IndicatorsSeeder extends Seeder
                 'score_max' => 15.00,
             ],
             [
-                'name' => 'ตัวบ่งชี้ที่ 3 ยุทธศาสตร์ ',
+                // id-18
+                'name' => 'ตัวบ่งชี้ที่ 3 การประพฤติตามกฎหมายและจริยธรรม ',
                 'type' => 8,
                 'year' => 2025,
                 'code' => 'NCP-3',
@@ -430,6 +448,7 @@ class IndicatorsSeeder extends Seeder
                 'score_max' => 10.00,
             ],
             [
+                // id-19
                 'name' => 'ตัวบ่งชี้ที่ 4 การใช้ข้อมูลเพื่อการตัดสินใจ  ',
                 'type' => 8,
                 'year' => 2025,
@@ -458,6 +477,7 @@ class IndicatorsSeeder extends Seeder
                 'score_max' => 10.00,
             ],
             [
+                // id-20
                 'name' => 'ตัวบ่งชี้ที่ 5 การบริหารความเสี่ยง',
                 'type' => 8,
                 'year' => 2025,
@@ -480,6 +500,7 @@ class IndicatorsSeeder extends Seeder
                 'score_max' => 10.00,
             ],
             [
+                // id-21
                 'name' => 'ตัวบ่งชี้ที่ 6 การสร้างความร่วมมือ',
                 'type' => 8,
                 'year' => 2025,
@@ -500,6 +521,7 @@ class IndicatorsSeeder extends Seeder
                 'score_max' => 10.00,
             ],
             [
+                // id-22
                 'name' => 'ตัวบ่งชี้ที่ 7 ขีดความสามารถ และอัตรากำลัง',
                 'type' => 9,
                 'year' => 2025,
@@ -525,6 +547,7 @@ class IndicatorsSeeder extends Seeder
                 'score_max' => 10.00,
             ],
             [
+                // id-23
                 'name' => 'ตัวบ่งชี้ที่ 8 การบริหารงานบุคคล(HRM)',
                 'type' => 9,
                 'year' => 2025,
@@ -545,6 +568,7 @@ class IndicatorsSeeder extends Seeder
                 'score_max' => 15.00,
             ],
             [
+                // id-24
                 'name' => 'ตัวบ่งชี้ที่ 9 การพัฒนาบุคลากร(HRD)',
                 'type' => 9,
                 'year' => 2025,
@@ -567,6 +591,7 @@ class IndicatorsSeeder extends Seeder
                 'score_max' => 15.00,
             ],
             [
+                // id-25
                 'name' => 'ตัวบ่งชี้ที่ 10 การสร้างความผูกพัน',
                 'type' => 9,
                 'year' => 2025,
@@ -590,6 +615,7 @@ class IndicatorsSeeder extends Seeder
                 'score_max' => 10.00,
             ],
             [
+                // id-26
                 'name' => 'ตัวบ่งชี้ที่ 11 การบริหารหลักสูตร',
                 'type' => 10,
                 'year' => 2025,
@@ -612,6 +638,7 @@ class IndicatorsSeeder extends Seeder
                 'score_max' => 25.00,
             ],
             [
+                // id-27
                 'name' => 'ตัวบ่งชี้ที่ 12 การจัดกระบวนการเรียนรู้และการประเมินผล',
                 'type' => 10,
                 'year' => 2025,
@@ -634,6 +661,7 @@ class IndicatorsSeeder extends Seeder
                 'score_max' => 25.00,
             ],
             [
+                // id-28
                 'name' => 'ตัวบ่งชี้ที่ 13 กระบวนการรับนักศึกษา',
                 'type' => 10,
                 'year' => 2025,
@@ -654,6 +682,7 @@ class IndicatorsSeeder extends Seeder
                 'score_max' => 10.00,
             ],
             [
+                // id-29
                 'name' => 'ตัวบ่งชี้ที่ 14 กระบวนการจัดการสิ่งสนับสนุนการเรียนรู้',
                 'type' => 10,
                 'year' => 2025,
@@ -673,6 +702,7 @@ class IndicatorsSeeder extends Seeder
                 'score_max' => 10.00,
             ],
             [
+                // id-30
                 'name' => 'ตัวบ่งชี้ที่ 15 กระบวนการจัดการสิ่งสนับสนุนการเรียนรู้',
                 'type' => 11,
                 'year' => 2025,
@@ -697,6 +727,7 @@ class IndicatorsSeeder extends Seeder
                 'score_max' => 10.00,
             ],
             [
+                // id-31
                 'name' => 'ตัวบ่งชี้ที่ 16 กระบวนการเผยแพร่งานวิจัยและ/หรือทรัพย์สินทางปัญญา',
                 'type' => 11,
                 'year' => 2025,
@@ -716,6 +747,7 @@ class IndicatorsSeeder extends Seeder
                 'score_max' => 10.00,
             ],
             [
+                // id-32
                 'name' => 'ตัวบ่งชี้ที่ 17 การบริการวิชาการเพื่อชุมชน/สังคม',
                 'type' => 12,
                 'year' => 2025,
@@ -735,6 +767,7 @@ class IndicatorsSeeder extends Seeder
                 'score_max' => 15.00,
             ],
             [
+                // id-33
                 'name' => 'ตัวบ่งชี้ที่ 18 การปฏิบัติการพยาบาลของอาจารย์ (faculty pracitce)',
                 'type' => 12,
                 'year' => 2025,
@@ -755,6 +788,7 @@ class IndicatorsSeeder extends Seeder
                 'score_max' => 15.00,
             ],
             [
+                // id-34
                 'name' => 'ตัวบ่งชี้ที่ 19 การบูรณาการการทำนุบำรุงศิลปะและวัฒนธรรม กับ การเรียนการสอน/บริการวิชาการ/วิจัย',
                 'type' => 13,
                 'year' => 2025,
@@ -774,6 +808,7 @@ class IndicatorsSeeder extends Seeder
                 'score_max' => 10.00,
             ],
             [
+                // id-35
                 'name' => 'ตัวบ่งชี้ที่ 20 การพัฒนานักศึกษา',
                 'type' => 14,
                 'year' => 2025,
@@ -793,6 +828,7 @@ class IndicatorsSeeder extends Seeder
                 'score_max' => 20.00,
             ],
             [
+                // id-36
                 'name' => 'ตัวบ่งชี้ที่ 21 ความผูกพันของนักศึกษาและศิษย์เก่า',
                 'type' => 14,
                 'year' => 2025,
@@ -813,6 +849,7 @@ class IndicatorsSeeder extends Seeder
             ],
             //ผลลัพธ์
             [
+                // id-37
                 'name' => 'ตัวบ่งชี้ที่ 1 ผลการประเมินการบริหารงานของคณะผู้บริหารด้วยหลักธรรมาภิบาล หรือ การดำเนินการตามหลักคุณธรรมและความโปร่งใสของการดำเนินงาน',
                 'type' => 15,
                 'year' => 2025,
@@ -829,6 +866,7 @@ class IndicatorsSeeder extends Seeder
                 'score_max' => 5.00,
             ],
             [
+                // id-38
                 'name' => 'ตัวบ่งชี้ที่ 2 ผลลัพธ์ของความสำเร็จของความร่วมมือกับสถาบันอื่น ',
                 'type' => 15,
                 'year' => 2025,
@@ -847,6 +885,7 @@ class IndicatorsSeeder extends Seeder
                 'score_max' => 10.00,
             ],
             [
+                // id-39
                 'name' => 'ตัวบ่งชี้ที่ 3 ร้อยละของการดำเนินการที่บรรลุเป้าหมายตามแผนกลยุทธ์/ยุทธ์ศาสตร์ ',
                 'type' => 8,
                 'year' => 2025,
@@ -867,6 +906,7 @@ class IndicatorsSeeder extends Seeder
                 'score_max' => 5.00,
             ],
             [
+                // id-40
                 'name' => 'ตัวบ่งชี้ที่ 4 ร้อยละของการใช้จ่ายตามแผนการจัดสรรงบประมาณ  ',
                 'type' => 8,
                 'year' => 2025,
@@ -887,6 +927,7 @@ class IndicatorsSeeder extends Seeder
                 'score_max' => 10.00,
             ],
             [
+                // id-41
                 'name' => 'ตัวบ่งชี้ที่ 5 อัตราคงอยู่ของอาจารย์',
                 'type' => 16,
                 'year' => 2025,
@@ -905,6 +946,7 @@ class IndicatorsSeeder extends Seeder
                 'score_max' => 5.00,
             ],
             [
+                // id-42
                 'name' => 'ตัวบ่งชี้ที่ 6 อัตราการคงอยู่ของบุคลากรสายสนับสนุน',
                 'type' => 16,
                 'year' => 2025,
@@ -923,6 +965,7 @@ class IndicatorsSeeder extends Seeder
                 'score_max' => 5.00,
             ],
             [
+                // id-43
                 'name' => 'ตัวบ่งชี้ที่ 7 ผลลัพธ์การพัฒนาคุณภาพการจัดการเรียนการสอนของอาจารย์',
                 'type' => 16,
                 'year' => 2025,
@@ -956,6 +999,7 @@ class IndicatorsSeeder extends Seeder
                 'score_max' => 20.00,
             ],
             [
+                // id-44
                 'name' => 'ตัวบ่งชี้ที่ 8 ผลการประเมินผลลัพธ์การเรียนรู้ ',
                 'type' => 17,
                 'year' => 2025,
@@ -974,6 +1018,7 @@ class IndicatorsSeeder extends Seeder
                 'score_max' => 10.00,
             ],
             [
+                // id-45
                 'name' => 'ตัวบ่งชี้ที่ 9 ร้อยละของผู้สอบความรู้ขอขึ้นทะเบียนรับใบอนุญาตประกอบวิชาชีพการพยาบาลผ่านในครั้งแรก',
                 'type' => 17,
                 'year' => 2025,
@@ -998,6 +1043,7 @@ class IndicatorsSeeder extends Seeder
                 'score_max' => 40.00,
             ],
             [
+                // id-46
                 'name' => 'ตัวบ่งชี้ที่ 10 ร้อยละของผู้สอบความรู้ขอขึ้นทะเบียนรับใบอนุญาตประกอบวิชาชีพการพยาบาลผ่านในปีแรก ',
                 'type' => 17,
                 'year' => 2025,
@@ -1021,7 +1067,9 @@ class IndicatorsSeeder extends Seeder
                 'score_max' => 10.00,
             ],
             [
-                'name' => 'ตัวบ่งชี้ที่ 11 หลักสูตรได้รับการรับรองคุณภาพหลักสูตรตามมาตรฐานระดับสากล',
+                // id-47
+                'name' =>
+                 'ตัวบ่งชี้ที่ 11 หลักสูตรได้รับการรับรองคุณภาพหลักสูตรตามมาตรฐานระดับสากล',
                 'type' => 17,
                 'year' => 2025,
                 'code' => 'NCO-11',
@@ -1039,6 +1087,7 @@ class IndicatorsSeeder extends Seeder
                 'score_max' => 10.00,
             ],
             [
+                // id-48
                 'name' => 'ตัวบ่งชี้ที่ 12 ผลการประเมินสถานที่และการใช้สิ่งสนับสนุนการเรียนรู้',
                 'type' => 17,
                 'year' => 2025,
@@ -1060,6 +1109,7 @@ class IndicatorsSeeder extends Seeder
                 'score_max' => 5.00,
             ],
             [
+                // id-49
                 'name' => 'ตัวบ่งชี้ที่ 13  ผลงานวิจัยและผลงานวิชาการที่ตีพิมพ์เผยแพร่ต่ออาจารย์ประจำทั้งหมด',
                 'type' => 18,
                 'year' => 2025,
@@ -1077,6 +1127,7 @@ class IndicatorsSeeder extends Seeder
                 'score_max' => 25.00,
             ],
             [
+                // id-50
                 'name' => 'ตัวบ่งชี้ที่ 14 ผลลัพธ์การผลิตตำรา/หนังสือ',
                 'type' => 18,
                 'year' => 2025,
@@ -1099,6 +1150,7 @@ class IndicatorsSeeder extends Seeder
                 'score_max' => 10.00,
             ],
             [
+                // id-51
                 'name' => 'ตัวบ่งชี้ที่ 15 จำนวนทรัพย์สินทางปัญญา (สิทธิบัตรและอนุสิทธิบัตร)',
                 'type' => 18,
                 'year' => 2025,
@@ -1117,6 +1169,7 @@ class IndicatorsSeeder extends Seeder
                 'score_max' => 10.00,
             ],
             [
+                // id-52
                 'name' => 'ตัวบ่งชี้ที่ 16 ผลลัพธ์ของโครงการบริการวิชาการที่เป็นประโยชน์ต่อสังคมและประเทศ',
                 'type' => 19,
                 'year' => 2025,
@@ -1135,6 +1188,7 @@ class IndicatorsSeeder extends Seeder
                 'score_max' => 20.00,
             ],
             [
+                // id-53
                 'name' => 'ตัวบ่งชี้ที่ 17 ร้อยละของอาจารย์พยาบาลประจำที่ปฏิบัติการพยาบาลในสาขาวิชาที่รับผิดชอบ',
                 'type' => 19,
                 'year' => 2025,
@@ -1155,6 +1209,7 @@ class IndicatorsSeeder extends Seeder
                 'score_max' => 20.00,
             ],
             [
+                // id-54
                 'name' => 'ตัวบ่งชี้ที่ 18 การปฏิบัติการพยาบาลของอาจารย์ (faculty pracitce)',
                 'type' => 20,
                 'year' => 2025,
@@ -1175,6 +1230,7 @@ class IndicatorsSeeder extends Seeder
                 'score_max' => 15.00,
             ],
             [
+                // id-55
                 'name' => 'ตัวบ่งชี้ที่ 19 ร้อยละของบัณฑิตที่มีอัตลักษณ์/คุณลักษณะพิเศษตามที่สถาบันกำหนด ',
                 'type' => 21,
                 'year' => 2025,
@@ -1191,6 +1247,7 @@ class IndicatorsSeeder extends Seeder
                 'score_max' => 10.00,
             ],
             [
+                // id-56
                 'name' => 'ตัวบ่งชี้ที่ 20 การทำคุณประโยชน์ต่อสถาบันของศิษย์เก่า',
                 'type' => 21,
                 'year' => 2025,
