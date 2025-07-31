@@ -28,6 +28,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('year', 5)->nullable();
             $table->string('code', 100);
+            $table->string('type')->nullable();
             $table->text('description')->nullable();
             $table->text('condition')->nullable();
             $table->text('annotation')->nullable();
@@ -38,7 +39,7 @@ return new class extends Migration
             $table->float('max_score', 5, 2)->nullable();
             $table->timestamps();
 
-            $table->foreignId('type')->constrained('categories', 'id')->restrictOnDelete();
+            $table->foreignId('categorie_id')->constrained('categories', 'id')->restrictOnDelete();
         });
     }
 
