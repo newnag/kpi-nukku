@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Variable_formula extends Model
 {
     public $timestamps = false;
+
     protected $fillable = [
         'variable_id',
         'formula_id',

@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
@@ -14,9 +13,9 @@ class VariableSeeder extends Seeder
     public function run(): void
     {
         DB::table('variables')->insert([
-            //ตัวบ่งชี้ที่ 2
+            // ตัวบ่งชี้ที่ 2
             [
-                //id-1
+                // id-1
                 'indicator_id' => 2,
                 'label' => 'ร้อยละของอาจารย์ประจำที่มีคุณวุฒิปริญญาเอก',
                 'variable_name' => 'precent_doctor',
@@ -26,7 +25,7 @@ class VariableSeeder extends Seeder
 
             ],
             [
-                //id-2
+                // id-2
                 'indicator_id' => 2,
                 'label' => 'ร้อยละ 40',
                 'variable_name' => 'precent_40',
@@ -36,7 +35,7 @@ class VariableSeeder extends Seeder
 
             ],
             [
-                //id-3
+                // id-3
                 'indicator_id' => 2,
                 'label' => 'คะแนน',
                 'variable_name' => 'socre',
@@ -46,7 +45,7 @@ class VariableSeeder extends Seeder
 
             ],
             [
-                //id-4
+                // id-4
                 'indicator_id' => 2,
                 'label' => 'คะแนนที่ได้',
                 'variable_name' => 'score',
@@ -54,7 +53,7 @@ class VariableSeeder extends Seeder
                 'value' => null,
                 'TIMESTAMP' => now(),
             ],
-            //ตัวบ่งชี้ที่ 3
+            // ตัวบ่งชี้ที่ 3
             [
                 // id-5
                 'indicator_id' => 3,
@@ -95,8 +94,8 @@ class VariableSeeder extends Seeder
                 'TIMESTAMP' => now(),
 
             ],
-            
-            //ตัวบ่งชี้ที่ 5
+
+            // ตัวบ่งชี้ที่ 5
             [
                 // id-9
                 'indicator_id' => 5,
@@ -137,7 +136,7 @@ class VariableSeeder extends Seeder
                 'TIMESTAMP' => now(),
 
             ],
-            //ตัวบ่งชี้ที่ 6
+            // ตัวบ่งชี้ที่ 6
             [
                 // id-13
                 'indicator_id' => 6,
@@ -148,7 +147,7 @@ class VariableSeeder extends Seeder
                 'TIMESTAMP' => now(),
 
             ],
-            //ตัวบ่งชี้ที่ 7
+            // ตัวบ่งชี้ที่ 7
             [
                 // id-14
                 'indicator_id' => 7,
@@ -159,7 +158,7 @@ class VariableSeeder extends Seeder
                 'TIMESTAMP' => now(),
 
             ],
-            //ผลลัพธ์
+            // ผลลัพธ์
             [
                 // id-15
                 'indicator_id' => 37,
@@ -209,8 +208,8 @@ class VariableSeeder extends Seeder
                 'value' => null,
                 'TIMESTAMP' => now(),
             ],
-            //ตัวบ่งชี้ที่ 7
-           
+            // ตัวบ่งชี้ที่ 7
+
             [
                 // id-20
                 'indicator_id' => 43,
@@ -284,7 +283,7 @@ class VariableSeeder extends Seeder
                 'TIMESTAMP' => now(),
             ],
             [
-                //id-28
+                // id-28
                 'indicator_id' => 44,
                 'label' => 'ร้อยละนักศึกษาชั้นปีสุดท้ายที่มีผลลัพธ์การเรียนรู้ครบตามที่กำหนด',
                 'variable_name' => 'precent_outcome',
@@ -293,7 +292,7 @@ class VariableSeeder extends Seeder
                 'TIMESTAMP' => now(),
             ],
             [
-                //id-29
+                // id-29
                 'indicator_id' => 45,
                 'label' => 'ร้อยละของผู้สอบผ่านในครั้งแรก',
                 'variable_name' => 'precent_pass_first_attempt',
@@ -302,7 +301,7 @@ class VariableSeeder extends Seeder
                 'TIMESTAMP' => now(),
             ],
             [
-                //id-30
+                // id-30
                 'indicator_id' => 46,
                 'label' => 'ร้อยละของผู้สอบผ่านในปีแรก',
                 'variable_name' => 'precent_pass_first_year',
@@ -311,7 +310,7 @@ class VariableSeeder extends Seeder
                 'TIMESTAMP' => now(),
             ],
             [
-                //id-31
+                // id-31
                 'indicator_id' => 49,
                 'label' => 'ร้อยละของผลงานทางวิชาการ',
                 'variable_name' => 'precent_academic_work',
@@ -320,7 +319,7 @@ class VariableSeeder extends Seeder
                 'TIMESTAMP' => now(),
             ],
             [
-                //id-32
+                // id-32
                 'indicator_id' => 49,
                 'label' => 'ตัวแปร',
                 'variable_name' => 'score',
@@ -329,7 +328,7 @@ class VariableSeeder extends Seeder
                 'TIMESTAMP' => now(),
             ],
             [
-                //id-33
+                // id-33
                 'indicator_id' => 49,
                 'label' => 'ตัวแปร',
                 'variable_name' => 'score',
@@ -338,7 +337,7 @@ class VariableSeeder extends Seeder
                 'TIMESTAMP' => now(),
             ],
             [
-                //id-34
+                // id-34
                 'indicator_id' => 49,
                 'label' => 'คะแนนที่ได้',
                 'variable_name' => 'score',
@@ -347,7 +346,7 @@ class VariableSeeder extends Seeder
                 'TIMESTAMP' => now(),
             ],
             [
-                //id-35
+                // id-35
                 'indicator_id' => 53,
                 'label' => 'ร้อยละของอาจารย์พยาบาลประจำที่ปฏิบัติการพยาบาลย้อนหลัง3ปี',
                 'variable_name' => 'precent_nurse_practice',
@@ -356,7 +355,7 @@ class VariableSeeder extends Seeder
                 'TIMESTAMP' => now(),
             ],
             [
-                //id-36
+                // id-36
                 'indicator_id' => 55,
                 'label' => 'ร้อยละของบัณฑิตที่มีอัตลักษณ์/คุณลักษณะพิเศษตามที่สถาบันกำหนดต่อจำนวนบัณฑิตทั้งหมด',
                 'variable_name' => 'precent_graduate_identity',
@@ -364,11 +363,6 @@ class VariableSeeder extends Seeder
                 'value' => null,
                 'TIMESTAMP' => now(),
             ],
-    
-          
-
-
-
 
         ]);
     }

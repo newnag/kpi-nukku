@@ -17,11 +17,11 @@ return new class extends Migration
             $table->string('variable_name');
             $table->string('status');
             $table->float('value', 5, 2)->nullable();
-            
+
             $table->foreignId('indicator_id')
-            ->constrained('indicators')
-            ->cascadeOnDelete();
-            
+                ->constrained('indicators')
+                ->cascadeOnDelete();
+
             $table->timestamps();
         });
 

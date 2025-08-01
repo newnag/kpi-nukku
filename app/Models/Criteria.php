@@ -2,14 +2,15 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 class Criteria extends Model
 {
     use HasFactory;
-    
+
     public $timestamps = false;
+
     protected $fillable = [
         'name',
         'description',
@@ -26,4 +27,4 @@ class Criteria extends Model
     {
         return $this->hasMany(Evidence::class, 'criteria_id');
     }
-} 
+}

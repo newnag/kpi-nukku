@@ -2,9 +2,8 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Support\Facades\DB;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class Variable_formulasSeeder extends Seeder
 {
@@ -14,7 +13,7 @@ class Variable_formulasSeeder extends Seeder
     public function run(): void
     {
         DB::table('variable_formulas')->insert([
-            //ตัวบ่งชี้ที่ 2
+            // ตัวบ่งชี้ที่ 2
             [
                 'formula_id' => 1, // สูตรที่ 1
                 'variable_id' => 1, // ตัวแปรที่ 1
@@ -30,12 +29,12 @@ class Variable_formulasSeeder extends Seeder
                 'variable_id' => 3,
 
             ],
-            
+
             [
                 'formula_id' => 2, // สูตรที่ 2
-                'variable_id' => 4, // ตัวแปรที่ 
+                'variable_id' => 4, // ตัวแปรที่
             ],
-            //ตัวบ่งชี้ที่ 3
+            // ตัวบ่งชี้ที่ 3
             [
                 'formula_id' => 2,
                 'variable_id' => 5,
@@ -56,7 +55,7 @@ class Variable_formulasSeeder extends Seeder
                 'variable_id' => 8,
 
             ],
-            //ตัวบ่งชี้ที่ 5
+            // ตัวบ่งชี้ที่ 5
             [
                 'formula_id' => 3,
                 'variable_id' => 9,
@@ -77,22 +76,22 @@ class Variable_formulasSeeder extends Seeder
                 'variable_id' => 12,
 
             ],
-            //ตัวบ่งชี้ที่ 6
+            // ตัวบ่งชี้ที่ 6
             [
                 'formula_id' => 4,
                 'variable_id' => 13,
 
             ],
-            //ตัวบ่งชี้ที่ 7
+            // ตัวบ่งชี้ที่ 7
             [
                 'formula_id' => 5,
                 'variable_id' => 14,
             ],
 
-            //ผลลัพธ์
+            // ผลลัพธ์
             [
                 'formula_id' => 6, // สูตรที่ 6
-                'variable_id' => 15, // 
+                'variable_id' => 15, //
             ],
             [
                 'formula_id' => 7,
@@ -142,7 +141,7 @@ class Variable_formulasSeeder extends Seeder
                 'formula_id' => 11,
                 'variable_id' => 27, // ตัวแปรที่ 24
             ],
-           
+
             [
                 'formula_id' => 12,
                 'variable_id' => 28, // ตัวแปรที่ 25
@@ -179,11 +178,7 @@ class Variable_formulasSeeder extends Seeder
                 'formula_id' => 17,
                 'variable_id' => 36, // ตัวแปรที่ 32
             ],
-         
-            
-         
-            
-            
+
         ]);
     }
 }

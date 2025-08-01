@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
@@ -14,9 +13,9 @@ class IndicatorsSeeder extends Seeder
     public function run(): void
     {
         DB::table('indicators')->insert([
-            //โครงสร้าง
+            // โครงสร้าง
             [
-                //id-1
+                // id-1
                 'name' => 'ตัวบ่งชี้ที่ 1 คุณสมบัติของผู้บริหารสถาบันการศึกษาพยาบาล',
                 'year' => 2025,
                 'type' => 'สารสนับสนุน',
@@ -30,7 +29,7 @@ class IndicatorsSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now(),
                 'status' => 1,
-                'comment' => 'ตัวบ่งชี้นี้จะประเมินคุณสมบัติของผู้บริหารสถาบันการศึกษาพยาบาลและการผดุงครรภ์ โดยพิจารณาจากการมีคุณสมบัติตามที่กำหนดไว้ในข้อ 1 ถึง 4', //ผู้ประเมินcomment
+                'comment' => 'ตัวบ่งชี้นี้จะประเมินคุณสมบัติของผู้บริหารสถาบันการศึกษาพยาบาลและการผดุงครรภ์ โดยพิจารณาจากการมีคุณสมบัติตามที่กำหนดไว้ในข้อ 1 ถึง 4', // ผู้ประเมินcomment
                 'score_acc' => 10.00, // คะแนนที่ได้รับ
                 'score_max' => 10.00,
             ],
@@ -373,7 +372,7 @@ class IndicatorsSeeder extends Seeder
                 'score_acc' => 5.00, // คะแนนที่ได้รับ
                 'score_max' => 5.00,
             ],
-            //กระบวนการ
+            // กระบวนการ
             [
                 // id-16
                 'name' => 'ตัวบ่งชี้ที่ 1 การนำองค์กร',
@@ -883,7 +882,7 @@ class IndicatorsSeeder extends Seeder
                 'score_acc' => 20.00, // คะแนนที่ได้รับ
                 'score_max' => 20.00,
             ],
-            //ผลลัพธ์
+            // ผลลัพธ์
             [
                 // id-37
                 'name' => 'ตัวบ่งชี้ที่ 1 ผลการประเมินการบริหารงานของคณะผู้บริหารด้วยหลักธรรมาภิบาล หรือ การดำเนินการตามหลักคุณธรรมและความโปร่งใสของการดำเนินงาน',
@@ -1116,8 +1115,7 @@ class IndicatorsSeeder extends Seeder
             ],
             [
                 // id-47
-                'name' =>
-                'ตัวบ่งชี้ที่ 11 หลักสูตรได้รับการรับรองคุณภาพหลักสูตรตามมาตรฐานระดับสากล',
+                'name' => 'ตัวบ่งชี้ที่ 11 หลักสูตรได้รับการรับรองคุณภาพหลักสูตรตามมาตรฐานระดับสากล',
                 'category_id' => 17,
 
                 'year' => 2025,
