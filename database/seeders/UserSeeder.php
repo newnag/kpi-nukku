@@ -1,5 +1,4 @@
 <?php
-
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
@@ -15,11 +14,11 @@ class UserSeeder extends Seeder
             [
                 'prefix' => 'นาย',
                 'name' => 'สมชาย ตัวอย่าง',
-                'Employee_id' => 'EMP001',
+                'employee_id' => 'EMP001',
                 'password' => Hash::make('password123'),
                 'email' => 'somchai@example.com',
                 'phone' => '0800000001',
-                'status' => 'active',
+                'status' => 'true',
                 'department_id' => 1,
                 'position_id' => 1,
                 'remember_token' => Str::random(10),
@@ -29,11 +28,11 @@ class UserSeeder extends Seeder
             [
                 'prefix' => 'นาย',
                 'name' => 'สมสี ตัวอย่าง',
-                'Employee_id' => 'EMP002',
+                'employee_id' => 'EMP002',
                 'password' => Hash::make('password123'),
                 'email' => 'somchi@example.com',
                 'phone' => '0800000002',
-                'status' => 'active',
+                'status' => 'true',
                 'department_id' => 1,
                 'position_id' => 1,
                 'remember_token' => Str::random(10),
@@ -43,11 +42,11 @@ class UserSeeder extends Seeder
             [
                 'prefix' => 'นาย',
                 'name' => 'สมพงษ์ ตัวอย่าง',
-                'Employee_id' => 'EMP003',
+                'employee_id' => 'EMP003',
                 'password' => Hash::make('password123'),
                 'email' => 'sompong@example.com',
                 'phone' => '0800000003',
-                'status' => 'active',
+                'status' => 'true',
                 'department_id' => 1,
                 'position_id' => 1,
                 'remember_token' => Str::random(10),

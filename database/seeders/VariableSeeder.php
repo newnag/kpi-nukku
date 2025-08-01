@@ -1,5 +1,4 @@
 <?php
-
 namespace Database\Seeders;
 
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -22,7 +21,7 @@ class VariableSeeder extends Seeder
                 'variable_name' => 'precent_doctor',
                 'type' => 'input,',
                 'value' => null,
-                'TIMESTAMP' => now(),
+                // 'TIMESTAMP' => now(),
 
             ],
             [
@@ -32,7 +31,7 @@ class VariableSeeder extends Seeder
                 'variable_name' => 'precent_40',
                 'type' => 'static',
                 'value' => 40.00,
-                'TIMESTAMP' => now(),
+                // 'TIMESTAMP' => now(),
 
             ],
             [
@@ -42,7 +41,7 @@ class VariableSeeder extends Seeder
                 'variable_name' => 'socre',
                 'type' => 'static',
                 'value' => 10.00,
-                'TIMESTAMP' => now(),
+                // 'TIMESTAMP' => now(),
 
             ],
             [
@@ -52,7 +51,7 @@ class VariableSeeder extends Seeder
                 'variable_name' => 'score',
                 'type' => 'output',
                 'value' => null,
-                'TIMESTAMP' => now(),
+                // 'TIMESTAMP' => now(),
             ],
             //ตัวบ่งชี้ที่ 3
             [
@@ -62,7 +61,7 @@ class VariableSeeder extends Seeder
                 'variable_name' => 'qualified_nurse',
                 'type' => 'input',
                 'value' => null,
-                'TIMESTAMP' => now(),
+                // 'TIMESTAMP' => now(),
 
             ],
             [
@@ -72,7 +71,7 @@ class VariableSeeder extends Seeder
                 'variable_name' => 'total_nurse',
                 'type' => 'input',
                 'value' => null,
-                'TIMESTAMP' => now(),
+                // 'TIMESTAMP' => now(),
 
             ],
             [
@@ -82,7 +81,7 @@ class VariableSeeder extends Seeder
                 'variable_name' => 'socre',
                 'type' => 'static',
                 'value' => 100.00,
-                'TIMESTAMP' => now(),
+                // 'TIMESTAMP' => now(),
 
             ],
             [
@@ -92,7 +91,7 @@ class VariableSeeder extends Seeder
                 'variable_name' => 'socre',
                 'type' => 'output',
                 'value' => null,
-                'TIMESTAMP' => now(),
+                // 'TIMESTAMP' => now(),
 
             ],
             
@@ -104,7 +103,7 @@ class VariableSeeder extends Seeder
                 'variable_name' => 'precent_teacher',
                 'type' => 'input',
                 'value' => null,
-                'TIMESTAMP' => now(),
+                // 'TIMESTAMP' => now(),
 
             ],
             [
@@ -114,7 +113,7 @@ class VariableSeeder extends Seeder
                 'variable_name' => 'precent_100',
                 'type' => 'static',
                 'value' => 100.00,
-                'TIMESTAMP' => now(),
+                // 'TIMESTAMP' => now(),
 
             ],
             [
@@ -124,7 +123,7 @@ class VariableSeeder extends Seeder
                 'variable_name' => 'score',
                 'type' => 'static',
                 'value' => 15.00,
-                'TIMESTAMP' => now(),
+                // 'TIMESTAMP' => now(),
 
             ],
             [
@@ -134,7 +133,7 @@ class VariableSeeder extends Seeder
                 'variable_name' => 'score',
                 'type' => 'output',
                 'value' => null,
-                'TIMESTAMP' => now(),
+                // 'TIMESTAMP' => now(),
 
             ],
             //ตัวบ่งชี้ที่ 6
@@ -145,7 +144,7 @@ class VariableSeeder extends Seeder
                 'variable_name' => 'input',
                 'type' => 'input',
                 'value' => null,
-                'TIMESTAMP' => now(),
+                // 'TIMESTAMP' => now(),
 
             ],
             //ตัวบ่งชี้ที่ 7
@@ -156,7 +155,7 @@ class VariableSeeder extends Seeder
                 'variable_name' => 'input',
                 'type' => 'input',
                 'value' => null,
-                'TIMESTAMP' => now(),
+                // 'TIMESTAMP' => now(),
 
             ],
             //ผลลัพธ์
@@ -167,7 +166,7 @@ class VariableSeeder extends Seeder
                 'variable_name' => 'average_score',
                 'type' => 'input',
                 'value' => null,
-                'TIMESTAMP' => now(),
+                // 'TIMESTAMP' => now(),
 
             ],
 
@@ -178,7 +177,7 @@ class VariableSeeder extends Seeder
                 'variable_name' => 'precent_100',
                 'type' => 'input',
                 'value' => null,
-                'TIMESTAMP' => now(),
+                // 'TIMESTAMP' => now(),
 
             ],
             [
@@ -188,7 +187,7 @@ class VariableSeeder extends Seeder
                 'variable_name' => 'precent_budget',
                 'type' => 'input',
                 'value' => null,
-                'TIMESTAMP' => now(),
+                // 'TIMESTAMP' => now(),
 
             ],
             [
@@ -198,7 +197,7 @@ class VariableSeeder extends Seeder
                 'variable_name' => 'retention_rate',
                 'type' => 'input',
                 'value' => null,
-                'TIMESTAMP' => now(),
+                // 'TIMESTAMP' => now(),
             ],
             [
                 // id-19
@@ -207,7 +206,7 @@ class VariableSeeder extends Seeder
                 'variable_name' => 'retention_support_staff',
                 'type' => 'input',
                 'value' => null,
-                'TIMESTAMP' => now(),
+                // 'TIMESTAMP' => now(),
             ],
             //ตัวบ่งชี้ที่ 7
            
@@ -218,7 +217,7 @@ class VariableSeeder extends Seeder
                 'variable_name' => 'quality_management_level_1',
                 'type' => 'input',
                 'value' => null,
-                'TIMESTAMP' => now(),
+                // 'TIMESTAMP' => now(),
             ],
             [
                 // id-21
@@ -227,7 +226,7 @@ class VariableSeeder extends Seeder
                 'variable_name' => 'quality_management_level_1_percent',
                 'type' => 'input',
                 'value' => null,
-                'TIMESTAMP' => now(),
+                // 'TIMESTAMP' => now(),
             ],
             [
                 // id-22
@@ -236,7 +235,7 @@ class VariableSeeder extends Seeder
                 'variable_name' => 'quality_management_level_2',
                 'type' => 'input',
                 'value' => null,
-                'TIMESTAMP' => now(),
+                // 'TIMESTAMP' => now(),
             ],
             [
                 // id-23
@@ -245,7 +244,7 @@ class VariableSeeder extends Seeder
                 'variable_name' => 'quality_management_level_2_percent',
                 'type' => 'input',
                 'value' => null,
-                'TIMESTAMP' => now(),
+                // 'TIMESTAMP' => now(),
             ],
             [
                 // id-24
@@ -254,7 +253,7 @@ class VariableSeeder extends Seeder
                 'variable_name' => 'quality_management_level_3',
                 'type' => 'input',
                 'value' => null,
-                'TIMESTAMP' => now(),
+                // 'TIMESTAMP' => now(),
             ],
             [
                 // id-25
@@ -263,7 +262,7 @@ class VariableSeeder extends Seeder
                 'variable_name' => 'quality_management_level_3_percent',
                 'type' => 'input',
                 'value' => null,
-                'TIMESTAMP' => now(),
+                // 'TIMESTAMP' => now(),
             ],
             [
                 // id-26
@@ -272,7 +271,7 @@ class VariableSeeder extends Seeder
                 'variable_name' => 'quality_management_level_4',
                 'type' => 'input',
                 'value' => null,
-                'TIMESTAMP' => now(),
+                // 'TIMESTAMP' => now(),
             ],
             [
                 // id-27
@@ -281,7 +280,7 @@ class VariableSeeder extends Seeder
                 'variable_name' => 'quality_management_level_4_percent',
                 'type' => 'input',
                 'value' => null,
-                'TIMESTAMP' => now(),
+                // 'TIMESTAMP' => now(),
             ],
             [
                 //id-28
@@ -290,7 +289,7 @@ class VariableSeeder extends Seeder
                 'variable_name' => 'precent_outcome',
                 'type' => 'input',
                 'value' => null,
-                'TIMESTAMP' => now(),
+                // 'TIMESTAMP' => now(),
             ],
             [
                 //id-29
@@ -299,7 +298,7 @@ class VariableSeeder extends Seeder
                 'variable_name' => 'precent_pass_first_attempt',
                 'type' => 'input',
                 'value' => null,
-                'TIMESTAMP' => now(),
+                // 'TIMESTAMP' => now(),
             ],
             [
                 //id-30
@@ -308,7 +307,7 @@ class VariableSeeder extends Seeder
                 'variable_name' => 'precent_pass_first_year',
                 'type' => 'input',
                 'value' => null,
-                'TIMESTAMP' => now(),
+                // 'TIMESTAMP' => now(),
             ],
             [
                 //id-31
@@ -317,7 +316,7 @@ class VariableSeeder extends Seeder
                 'variable_name' => 'precent_academic_work',
                 'type' => 'input',
                 'value' => null,
-                'TIMESTAMP' => now(),
+                // 'TIMESTAMP' => now(),
             ],
             [
                 //id-32
@@ -326,7 +325,7 @@ class VariableSeeder extends Seeder
                 'variable_name' => 'score',
                 'type' => 'static',
                 'value' => 70.00,
-                'TIMESTAMP' => now(),
+                // 'TIMESTAMP' => now(),
             ],
             [
                 //id-33
@@ -335,7 +334,7 @@ class VariableSeeder extends Seeder
                 'variable_name' => 'score',
                 'type' => 'static',
                 'value' => 25.00,
-                'TIMESTAMP' => now(),
+                // 'TIMESTAMP' => now(),
             ],
             [
                 //id-34
@@ -344,7 +343,7 @@ class VariableSeeder extends Seeder
                 'variable_name' => 'score',
                 'type' => 'output',
                 'value' => null,
-                'TIMESTAMP' => now(),
+                // 'TIMESTAMP' => now(),
             ],
             [
                 //id-35
@@ -353,7 +352,7 @@ class VariableSeeder extends Seeder
                 'variable_name' => 'precent_nurse_practice',
                 'type' => 'input',
                 'value' => null,
-                'TIMESTAMP' => now(),
+                // 'TIMESTAMP' => now(),
             ],
             [
                 //id-36
@@ -362,7 +361,7 @@ class VariableSeeder extends Seeder
                 'variable_name' => 'precent_graduate_identity',
                 'type' => 'input',
                 'value' => null,
-                'TIMESTAMP' => now(),
+                // 'TIMESTAMP' => now(),
             ],
     
           

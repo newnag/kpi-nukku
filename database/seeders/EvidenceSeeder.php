@@ -1,5 +1,4 @@
 <?php
-
 namespace Database\Seeders;
 
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -13,7 +12,7 @@ class EvidenceSeeder extends Seeder
      */
     public function run(): void
     {
-        DB::table('evidences')->insert([
+        DB::table('evidence')->insert([
             [
                 'name' => 'หลักฐานตัวอย่าง 1',
                 'path' => 'uploads/evidence1.pdf',

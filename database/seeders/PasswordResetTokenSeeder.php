@@ -1,5 +1,4 @@
 <?php
-
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
@@ -12,7 +11,7 @@ class PasswordResetTokenSeeder extends Seeder
     {
         DB::table('password_reset_tokens')->insert([
             [
-                'email' => 'somchai@example.com',
+                'email' => 'admin@example.com',
                 'token' => Str::random(64),
                 'created_at' => now(),
             ],
