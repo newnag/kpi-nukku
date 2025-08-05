@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('label');
             $table->string('variable_name');
-            $table->string('status');
+            $table->string('type', 50);
             $table->float('value', 5, 2)->nullable();
 
             $table->foreignId('indicator_id')
