@@ -17,12 +17,6 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        Schema::create('positions', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->timestamps();
-        });
-
         Schema::create('password_reset_tokens', function (Blueprint $table) {
             $table->string('email')->primary();
             $table->string('token');
@@ -43,7 +37,6 @@ return new class extends Migration
             $table->timestamps();
 
             $table->foreignId('department_id')->constrained('departments')->restrictOnDelete();
-            $table->foreignId('position_id')->constrained('positions')->restrictOnDelete();
         });
 
         Schema::create('sessions', function (Blueprint $table) {
@@ -62,9 +55,8 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('sessions');
-        Schema::dropIfExists('password_reset_tokens');
         Schema::dropIfExists('users');
-        Schema::dropIfExists('positions');
+        Schema::dropIfExists('password_reset_tokens');
         Schema::dropIfExists('departments');
     }
 };
