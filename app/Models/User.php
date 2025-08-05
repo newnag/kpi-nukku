@@ -42,11 +42,6 @@ class User extends Authenticatable
         return $this->belongsTo(Department::class);
     }
 
-    public function position()
-    {
-        return $this->belongsTo(Position::class);
-    }
-
     public function assignments()
     {
         return $this->hasMany(Assignment::class, 'collector');
