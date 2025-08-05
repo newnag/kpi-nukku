@@ -2,11 +2,7 @@
 @section('title', 'จัดการข้อมูลหน่วยงาน')
 @section('content')
 
-    @if (session('success'))
-        <div class="alert alert-success">
-            {{ session('success') }}
-        </div>
-    @endif
+
 
     <div class="department-container">
         <div class="department-containers">
@@ -42,9 +38,9 @@
                         <span class="department-name">{{ $department->name ?? 'ชื่อหน่วยงาน' }}</span>
                         <div class="department-actions">
                             <button class="edit-btn"
-                                onclick="openEditModal({{ $department->id ?? 1 }}, '{{ $department->name ?? 'ชื่อหน่วยงาน' }}')">แก้ไข</button>
+                                onclick="openEditModal({{ $department->id }}, '{{ $department->name ?? 'ชื่อหน่วยงาน' }}')">แก้ไข</button>
                             <button class="delete-btn"
-                                onclick="openDeleteModal({{ $department->id ?? 1 }}, '{{ $department->name ?? 'ชื่อหน่วยงาน' }}')">ลบ</button>
+                                onclick="openDeleteModal({{ $department->id }}, '{{ $department->name ?? 'ชื่อหน่วยงาน' }}')">ลบ</button>
                         </div>
                     </div>
                 @endforeach
@@ -57,20 +53,24 @@
     <!-- Edit Modal -->
     <div id="editModal" class="modal-overlay">
         <div class="modal-content">
-          
+
             <h2 class="modal-title">แก้ไขชื่อหน่วยงาน</h2>
             <div class="modal-section-title">แก้ไขชื่อหน่วยงานที่ต้องการแล้วกดบันทึกเพื่อบันทึกผลที่ต้องการ
                 <p>ชื่อหน่วยงานเดิม : <span id="currentDepartmentName"></span></p>
             </div>
 
-            <form id="editForm" method="POST">
+            <form id="editForm" method="POST"
+                action="{{ session('edit_department_id') ? url('/departments/' . session('edit_department_id')) : '' }}">
                 @csrf
                 @method('PUT')
                 <div class="modal-form-group">
                     <label class="modal-form-label">ชื่อหน่วยงาน <span class="required">*</span></label>
-                    <input type="text" id="editName" name="name" class="modal-form-input" required>
+                    <input type="text" id="editName" name="name" class="modal-form-input" required
+                        value="{{ old('name') }}">
                 </div>
-
+                @error('name')
+                    <div class="alert alert-danger mt-2">{{ $message }}</div>
+                @enderror
                 <div class="modal-buttons">
                     <button type="button" class="modal-btn modal-btn-secondary" onclick="closeModal('editModal')">
                         <i data-lucide="undo-2" style="margin-right: 6px;"></i>กลับ</button>
@@ -78,6 +78,7 @@
                         <i data-lucide="save" style="margin-right: 6px;"></i>บันทึก</button>
                 </div>
             </form>
+
         </div>
     </div>
 
@@ -140,6 +141,13 @@
 
         lucide.createIcons();
     </script>
+    @if ($errors->any())
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                document.getElementById('editModal').classList.add('active');
+            });
+        </script>
+    @endif
     <style>
         .department-container {
             max-width: 900px;

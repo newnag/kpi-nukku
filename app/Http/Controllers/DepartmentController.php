@@ -9,7 +9,7 @@ class DepartmentController extends Controller
 {
     public function index()
     {
-        $departments = Department::all();
+        $departments = Department::orderBy('id', 'asc')->get();
         return view('departments.app', compact('departments'));
     }
     public function store(Request $request)
@@ -30,6 +30,27 @@ class DepartmentController extends Controller
         //     'message' => 'หน่วยงานถูกสร้างเรียบร้อยแล้ว',
         //     'data' => $request->name
         // ], 201);
-        return redirect()->route('departments.index')->with('success','สร้างหน่วยงานเรียบร้อย');
+        return redirect()->route('departments.index')->with('success', 'สร้างหน่วยงานเรียบร้อย');
+    }
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255'
+        ]);
+        //ตรวจสอบชิ่อหน่วยงานซ้ำ (ยกเว้นตัวเอง)
+        $existingDepartment = Department::where('name', $request->name)
+            ->where('id', '!=', $id)
+            ->first();
+        if ($existingDepartment) {
+            return redirect()->back()
+                ->withInput()
+                ->withErrors(['name' => 'ชื่อหน่วยงานนี้มีอยู่ในระบบ กรุณาใช้ชื่ออื่น'])
+                ->with('edit_department_id', $id);
+        }
+        $departments = Department::findOrFail($id);
+        $departments->update([
+            'name' => $request->name
+        ]);
+        return redirect()->route('departments.index')->with('success', 'อัปเดตข้อมูลเรียบร้อยแล้ว');
     }
 }

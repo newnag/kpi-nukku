@@ -18,7 +18,7 @@
     <style>
         body {
             font-family: 'Prompt', sans-serif;
-        background-color: #f8f9fa;
+            background-color: #f8f9fa;
         }
 
         .navbar-custom {
@@ -103,6 +103,7 @@
 </head>
 
 <body>
+
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-custom">
         <div class="container-fluid">
