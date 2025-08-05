@@ -20,7 +20,6 @@ class User extends Authenticatable
         'status',
         'email',
         'department_id',
-        'position_id',
         'password_reset_token_id',
     ];
 
