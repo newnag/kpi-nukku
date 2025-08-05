@@ -86,8 +86,8 @@
     <div id="deleteModal" class="modal-overlay">
         <div class="modal-content">
             <button class="modal-close" onclick="closeModal('deleteModal')">&times;</button>
-            <h2 class="modal-title">หน่วยงาน</h2>
-            <div class="modal-section-title">ลบข้อมูล</div>
+            <h2 class="modal-title">ลบชิ่อหน่วยงาน</h2>
+            <div class="modal-section-title">คำเตือน : การลบชื่อหน่วยงานที่ถูกนำมาใช้แล้วจะไม่สามารถลบได้</div>
 
             <div class="delete-message">
                 คุณต้องการลบข้อมูลหน่วยงาน "<span id="deleteName"></span>" หรือไม่?
@@ -97,9 +97,9 @@
                 @csrf
                 @method('DELETE')
                 <div class="modal-buttons">
-                    <button type="button" class="modal-btn modal-btn-secondary"
-                        onclick="closeModal('deleteModal')">ยกเลิก</button>
-                    <button type="submit" class="modal-btn modal-btn-danger">ลบข้อมูล</button>
+                    <button type="button" class="modal-btn modal-btn-secondary" onclick="closeModal('editModal')">
+                        <i data-lucide="undo-2" style="margin-right: 6px;"></i>กลับ</button>
+                    <button type="submit" class="modal-btn modal-btn-danger"><i data-lucide="x" style="margin-right: 6px;"></i>ยืนยันการลบ</button>
                 </div>
             </form>
         </div>
@@ -456,16 +456,20 @@
         }
 
         .modal-btn-secondary:hover {
-            background: #f0f2f3;
+            background: #398ECA;
+             color: white;
         }
 
         .modal-btn-danger {
-            background: #f44336;
-            color: white;
+            background: #FFFFFF;
+            color:#FF0004;
+            border: 1px solid #FF0004;
         }
 
         .modal-btn-danger:hover {
-            background: #d32f2f;
+           
+            background: #db0a0d;
+             color: white;
         }
 
         .delete-message {
