@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\DepartmentController;
+use App\Http\Controllers\CategorieController;
+use App\Models\Category;
 use App\Models\Department;
 use Faker\Guesser\Name;
 use Illuminate\Support\Facades\Route;
@@ -15,4 +17,8 @@ Route::prefix('departments')->name('departments.')->group(function () {
     Route::put('/{id}',[DepartmentController::class,'update'])->name('updete');
     Route::delete('/{id}',[DepartmentController::class,'destroy'])->name('destroy');
     // Add other routes for departments here
+});
+
+Route::prefix('categories')->name('categories.')->group(function(){
+    Route::get('/',[CategorieController::class,'index'])->name('index');
 });
