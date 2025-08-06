@@ -60,23 +60,23 @@
                 </table>
 
             </div>
+            
             <!-- Edit Modal Standards-->
-            <div id="editModal" class="modal-overlay">
+            <div id="editModalStandards" class="modal-overlay">
                 <div class="modal-content">
 
                     <h2 class="modal-title">แก้ไขชื่อมาตรฐานการประเมิน</h2>
                     <div class="modal-section-title">แก้ไขชื่อมาตรฐานการประเมินที่ต้องการแล้วกดบันทึกเพื่อบันทึกผลที่ต้องการ
                         <p>ชื่อด้านการประเมินเดิม : <span id="currentstandardsName"></span></p>
 
-
                     </div>
 
-                    <form id="editForm" method="POST" action="">
+                    <form id="editFormStandards" method="POST" action="">
                         @csrf
                         @method('PUT')
                         <div class="modal-form-group">
                             <label class="modal-form-label">ชื่อมาตรฐานการประเมิน <span class="required">*</span></label>
-                            <input type="text" id="editName" name="name" class="modal-form-input" required
+                            <input type="text" id="editNameStandards" name="name" class="modal-form-input" required
                                 value="{{ old('name') }}">
                         </div>
                         @error('name')
@@ -84,7 +84,7 @@
                         @enderror
 
                         <div class="modal-buttons">
-                            <button type="button" class="modal-btn modal-btn-secondary" onclick="closeModal('editModal')">
+                            <button type="button" class="modal-btn modal-btn-secondary" onclick="closeModal('editModalStandards')">
                                 <i data-lucide="undo-2" style="margin-right: 6px;"></i>กลับ</button>
                             <button type="submit" class="modal-btn modal-btn-primary">
                                 <i data-lucide="save" style="margin-right: 6px;"></i>บันทึก</button>
@@ -93,24 +93,25 @@
 
                 </div>
             </div>
+            
             <!-- Delete Modal Standards -->
-            <div id="deleteModal" class="modal-overlay">
+            <div id="deleteModalStandards" class="modal-overlay">
                 <div class="modal-content">
-                    <button class="modal-close" onclick="closeModal('deleteModal')">&times;</button>
+                    <button class="modal-close" onclick="closeModal('deleteModalStandards')">&times;</button>
                     <h2 class="modal-title">ลบชิ่อมาตรฐานการประเมิน</h2>
                     <div class="modal-section-title">คำเตือน : การลบชื่อมาตรฐานการประเมินที่ถูกนำมาใช้แล้วจะไม่สามารถลบได้
                     </div>
 
                     <div class="delete-message">
-                        คุณต้องการลบข้อมูลด้านการประเมิน "<span id="deleteName"></span>" <br>
+                        คุณต้องการลบข้อมูลด้านการประเมิน "<span id="deleteNameStandards"></span>" <br>
                         หรือไม่?
                     </div>
-                    <form id="deleteForm" method="POST">
+                    <form id="deleteFormStandards" method="POST">
                         @csrf
                         @method('DELETE')
                         <div class="modal-buttons">
                             <button type="button" class="modal-btn modal-btn-secondary"
-                                onclick="closeModal('deleteModal')">
+                                onclick="closeModal('deleteModalStandards')">
                                 <i data-lucide="undo-2" style="margin-right: 6px;"></i>กลับ</button>
                             <button type="submit" class="modal-btn modal-btn-danger"><i data-lucide="x"
                                     style="margin-right: 6px;"></i>ยืนยันการลบ</button>
@@ -195,7 +196,7 @@
 
 
     <!-- Edit Modal Categories-->
-    <div id="editModal" class="modal-overlay">
+    <div id="editModalCategories" class="modal-overlay">
         <div class="modal-content">
 
             <h2 class="modal-title">แก้ไขชื่อด้านการประเมิน</h2>
@@ -206,12 +207,12 @@
 
             </div>
 
-            <form id="editForm" method="POST" action="">
+            <form id="editFormCategories" method="POST" action="">
                 @csrf
                 @method('PUT')
                 <div class="modal-form-group">
                     <label class="modal-form-label">ชื่อด้านการประเมิน <span class="required">*</span></label>
-                    <input type="text" id="editName" name="name" class="modal-form-input" required
+                    <input type="text" id="editNameCategories" name="name" class="modal-form-input" required
                         value="{{ old('name') }}">
                 </div>
                 @error('name')
@@ -238,7 +239,7 @@
                     <div class="alert alert-danger mt-2">{{ $message }}</div>
                 @enderror
                 <div class="modal-buttons">
-                    <button type="button" class="modal-btn modal-btn-secondary" onclick="closeModal('editModal')">
+                    <button type="button" class="modal-btn modal-btn-secondary" onclick="closeModal('editModalCategories')">
                         <i data-lucide="undo-2" style="margin-right: 6px;"></i>กลับ</button>
                     <button type="submit" class="modal-btn modal-btn-primary">
                         <i data-lucide="save" style="margin-right: 6px;"></i>บันทึก</button>
@@ -249,23 +250,23 @@
     </div>
 
     <!-- Delete Modal Categories -->
-    <div id="deleteModal" class="modal-overlay">
+    <div id="deleteModalCategories" class="modal-overlay">
         <div class="modal-content">
-            <button class="modal-close" onclick="closeModal('deleteModal')">&times;</button>
+            <button class="modal-close" onclick="closeModal('deleteModalCategories')">&times;</button>
             <h2 class="modal-title">ลบชิ่อด้านการประเมิน</h2>
             <div class="modal-section-title">คำเตือน : การลบชื่อด้านการประเมินที่ถูกนำมาใช้แล้วจะไม่สามารถลบได้</div>
 
             <div class="delete-message">
-                คุณต้องการลบข้อมูลด้านการประเมิน "<span id="deleteName"></span>" <br>
-                (คะแนนเต็ม: <span id="deleteMaxScore"></span>) <br>
-                มาตรฐาน: <span id="deleteStandardName"></span> <br>
+                คุณต้องการลบข้อมูลด้านการประเมิน "<span id="deleteNameCategories"></span>" <br>
+                (คะแนนเต็ม: <span id="deleteMaxScoreCategories"></span>) <br>
+                มาตรฐาน: <span id="deleteStandardNameCategories"></span> <br>
                 หรือไม่?
             </div>
-            <form id="deleteForm" method="POST">
+            <form id="deleteFormCategories" method="POST">
                 @csrf
                 @method('DELETE')
                 <div class="modal-buttons">
-                    <button type="button" class="modal-btn modal-btn-secondary" onclick="closeModal('deleteModal')">
+                    <button type="button" class="modal-btn modal-btn-secondary" onclick="closeModal('deleteModalCategories')">
                         <i data-lucide="undo-2" style="margin-right: 6px;"></i>กลับ</button>
                     <button type="submit" class="modal-btn modal-btn-danger"><i data-lucide="x"
                             style="margin-right: 6px;"></i>ยืนยันการลบ</button>
@@ -275,40 +276,41 @@
     </div>
 
     <script>
+        // Standards Modal Functions
         function openEditModalStandards(id, name) {
-            document.getElementById('editName').value = name;
-            document.getElementById('editForm').action = `/standards/${id}`; // ต้องตรงกับ route PUT /standards/{id}
-            document.getElementById('editModal').classList.add('active');
+            document.getElementById('editNameStandards').value = name;
+            document.getElementById('editFormStandards').action = `/standards/${id}`;
+            document.getElementById('editModalStandards').classList.add('active');
             document.getElementById('currentstandardsName').innerText = name;
-
         }
 
         function openDeleteModalStandards(id, name) {
-            document.getElementById('deleteName').textContent = name;
-            document.getElementById('deleteForm').action = `/standards/${id}`;
-            document.getElementById('deleteModal').classList.add('active');
+            document.getElementById('deleteNameStandards').textContent = name;
+            document.getElementById('deleteFormStandards').action = `/standards/${id}`;
+            document.getElementById('deleteModalStandards').classList.add('active');
         }
 
+        // Categories Modal Functions
         function openEditModalCat(id, name, max_score, standard_id, standard_name) {
-            document.getElementById('editName').value = name;
+            document.getElementById('editNameCategories').value = name;
             document.getElementById('editMaxScore').value = max_score;
             document.getElementById('editStandardId').value = standard_id;
-            document.getElementById('editForm').action = `/categories/${id}`; // ต้องตรงกับ route PUT /categories/{id}
-            document.getElementById('editModal').classList.add('active');
+            document.getElementById('editFormCategories').action = `/categories/${id}`;
+            document.getElementById('editModalCategories').classList.add('active');
             document.getElementById('currentcategoriesName').innerText = name;
             document.getElementById('currentcategoriesMaxScore').innerText = max_score;
             document.getElementById('currentcategoriesStandardName').innerText = standard_name;
         }
 
         function openDeleteModalCat(id, name, max_score, standard_name) {
-            document.getElementById('deleteName').textContent = name;
-            document.getElementById('deleteMaxScore').textContent = max_score;
-            document.getElementById('deleteStandardName').textContent = standard_name;
-            document.getElementById('deleteForm').action = `/categories/${id}`;
-            document.getElementById('deleteModal').classList.add('active');
+            document.getElementById('deleteNameCategories').textContent = name;
+            document.getElementById('deleteMaxScoreCategories').textContent = max_score;
+            document.getElementById('deleteStandardNameCategories').textContent = standard_name;
+            document.getElementById('deleteFormCategories').action = `/categories/${id}`;
+            document.getElementById('deleteModalCategories').classList.add('active');
         }
 
-
+        // Universal Modal Close Function
         function closeModal(modalId) {
             document.getElementById(modalId).classList.remove('active');
         }
@@ -334,7 +336,8 @@
     @if ($errors->any())
         <script>
             document.addEventListener('DOMContentLoaded', function() {
-                document.getElementById('editModal').classList.add('active');
+                // You might need to adjust this to show the correct modal based on which form had errors
+                document.getElementById('editModalCategories').classList.add('active');
             });
         </script>
     @endif
