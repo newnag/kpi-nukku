@@ -33,7 +33,7 @@
                 <div class="list-title">รายชื่อหน่วยงานที่มี</div>
 
 
-                @foreach ($departments as $department)
+                {{-- @foreach ($departments as $department)
                     <div class="department-item">
                         <span class="department-name">{{ $department->name ?? 'ชื่อหน่วยงาน' }}</span>
                         <div class="department-actions">
@@ -48,7 +48,37 @@
                         </div>
                     </div>
                 @endforeach
+                 --}}
+                <table class="datatable" id="table3">
+                    <thead>
+                        <tr>
+                            <th>ลำดับ</th>
+                            <th>ชื่อมาตรฐานการประเมิน</th>
+                            <th>จัดการ</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($departments as $index => $item)
+                            <tr>
+                                <td>{{ $index + 1 }}</td>
+                                <td>{{ $item->name }}</td>
+                                <td>
+                                    <div class="categories-actions">
+                                        <button class="btn-edit"
+                                            onclick="openEditModal({{ $item->id }}, '{{ $item->name }}')">
+                                            <i data-lucide="edit-3" style="margin-right: 1px;"></i> แก้ไข
+                                        </button>
 
+                                        <button class="btn-delete"
+                                            onclick="openDeleteModal({{ $item->id }}, '{{ $item->name }}')">
+                                            <i data-lucide="trash-2" style="margin-right: 5px;"></i> ลบ
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
@@ -155,7 +185,7 @@
     @endif
     <style>
         .department-container {
-            max-width: 900px;
+            max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
 
@@ -163,7 +193,7 @@
 
         .department-containers {
             width: 100%;
-            max-width: 900px;
+            max-width: 1200px;
             margin: 0 auto;
             background: white;
             border-radius: 10px;
@@ -484,6 +514,11 @@
             font-size: 16px;
         }
 
+        .categories-actions {
+            display: flex;
+            gap: 10px;
+        }
+
         .btn-edit {
             background-color: white;
             border: 1px solid #398ECA;
@@ -506,7 +541,7 @@
         .btn-delete {
             background-color: white;
             color: #e53935;
-            border:  1px solid  #e53935;
+            border: 1px solid #e53935;
             padding: 8px 16px;
             font-size: 14px;
             border-radius: 6px;
