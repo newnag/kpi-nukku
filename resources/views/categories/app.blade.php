@@ -20,7 +20,7 @@
                     </div>
 
                     <button type="submit" class="submit-btn">
-                        <i class="fas fa-save"></i> บันทึก
+                        <i data-lucide="save" class="btn-icon"></i> บันทึก
                     </button>
                 </form>
             </div>
@@ -144,9 +144,8 @@
                         </select>
                     </div>
 
-
                     <button type="submit" class="submit-btn">
-                        <i class="fas fa-save"></i> บันทึก
+                        <i data-lucide="save" class="btn-icon"></i> บันทึก
                     </button>
                 </form>
             </div>
@@ -447,17 +446,26 @@
             background: #2196f3;
             color: white;
             border: none;
-            padding: 12px 30px;
+            padding: 12px 16px;
             border-radius: 5px;
             font-size: 16px;
             cursor: pointer;
-            display: block;
-            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            /* ระยะห่างระหว่างไอคอนและข้อความ */
             transition: background-color 0.3s;
+            margin: 0 auto;
         }
 
         .submit-btn:hover {
             background: #1976d2;
+        }
+
+        .btn-icon {
+            width: 20px;
+            height: 20px;
         }
 
         .categories-list {

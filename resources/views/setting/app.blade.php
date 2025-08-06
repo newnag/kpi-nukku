@@ -7,7 +7,6 @@
             <div class="header-contatainers">
                 ตั้งค่าการแจ้งเตือน
             </div>
-
             <!-- ฟอร์มsetting-->
             <div class="Setting-form">
 
@@ -17,11 +16,12 @@
                     @csrf
                     <div class="form-group">
                         <label class="form-label">ชื่อเว็บไซต์ <span class="required">*</span></label>
-                        <input type="text" name="title" class="form-input" required>
+                        <input type="text" name="title" class="form-input" required value="{{ old('title', $setting->title ?? '') }}">
+                        
                     </div>
                     <div class="form-group">
                         <label class="form-label">จำนวนวันก่อนถึงกำหนดการแจ้งเตือน <span class="required">*</span></label>
-                        <input type="text" name="day_notify" class="form-input2" required>
+                        <input type="text" name="day_notify" class="form-input2" required value="{{ old('day_notify', $setting->day_notify ?? '') }}">
                         <i data-lucide="alarm-clock" class="lucide-icon"></i>
                     </div>
 
@@ -32,8 +32,6 @@
             </div>
         </div>
     </div>
-
-
 
 
     <script>

@@ -10,7 +10,7 @@ class Setting extends Model
         'title',
         'day_notify',
     ];
-
+    public $timestamps = false;
     protected $casts = [
         'day_notify' => 'integer',
     ];

@@ -23,7 +23,7 @@
                     </div>
 
                     <button type="submit" class="submit-btn">
-                        <i class="fas fa-save"></i> บันทึก
+                        <i data-lucide="save" class="btn-icon"></i> บันทึก
                     </button>
                 </form>
             </div>
@@ -32,23 +32,6 @@
             <div class="department-list">
                 <div class="list-title">รายชื่อหน่วยงานที่มี</div>
 
-
-                {{-- @foreach ($departments as $department)
-                    <div class="department-item">
-                        <span class="department-name">{{ $department->name ?? 'ชื่อหน่วยงาน' }}</span>
-                        <div class="department-actions">
-                            <button class="btn-edit"
-                                onclick="openEditModal({{ $department->id }}, '{{ $department->name ?? 'ชื่อหน่วยงาน' }}')">
-                                <i data-lucide="edit-3" style="margin-right: 1px;"></i> แก้ไข
-                            </button>
-                            <button class="btn-delete"
-                                onclick="openDeleteModal({{ $department->id }}, '{{ $department->name ?? 'ชื่อหน่วยงาน' }}')">
-                                <i data-lucide="trash-2" style="margin-right: 5px;"></i> ลบ
-                            </button>
-                        </div>
-                    </div>
-                @endforeach
-                 --}}
                 <table class="datatable" id="table3">
                     <thead>
                         <tr>
@@ -291,17 +274,26 @@
             background: #2196f3;
             color: white;
             border: none;
-            padding: 12px 30px;
+            padding: 12px 16px;
             border-radius: 5px;
             font-size: 16px;
             cursor: pointer;
-            display: block;
-            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            /* ระยะห่างระหว่างไอคอนและข้อความ */
             transition: background-color 0.3s;
+            margin: 0 auto;
         }
 
         .submit-btn:hover {
             background: #1976d2;
+        }
+
+        .btn-icon {
+            width: 20px;
+            height: 20px;
         }
 
         .department-list {

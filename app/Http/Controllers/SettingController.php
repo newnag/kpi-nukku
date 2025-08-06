@@ -9,47 +9,27 @@ class SettingController extends Controller
 {
     public function index()
     {
-        $settings = Setting::all();
-        return view('setting.app', compact('settings'));
+        $setting = Setting::first();  // หรือ Setting::find(1) ถ้ามีแค่ 1 record
+        return view('setting.app', compact('setting'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
+            'title' => 'required|string|max:255',
             'day_notify' => 'required|integer|min:1',
-        ]);
-        $existingsetting = Setting::where('name', $request->name)->first();
-        if ($existingsetting) {
-            return redirect()->route('setting.index')->with('error', 'มาตรฐานนี้มีอยู่แล้ว');
-        }
-        Setting::create([
-            'name' => $request->name,
-        ]);
-        return redirect()->route('setting.index')->with('success', 'สร้างมาตรฐานนี้เรียบร้อย');
-    }
-    public function update(Request $request, $id)
-    {
-        $request->validate([
-            'name' => 'required|string|max:255',
+
         ]);
 
-        // ตรวจสอบชื่อซ้ำ (ไม่รวมตัวเอง)
-        $existingSetting = Setting::where('name', $request->name)
-            ->where('id', '!=', $id)
-            ->first();
+        // สมมติว่า settings มีแค่ 1 record (id=1) เก็บ config เดียว
+        $data = $request->only(['title', 'day_notify',]);
 
-        if ($existingSetting) {
-            return redirect()->back()
-                ->withInput()
-                ->withErrors(['name' => 'ชื่อมาตรฐานนี้มีอยู่ในระบบ กรุณาใช้ชื่ออื่น']);
-        }
+        // updateOrCreate จะค้นหา id=1 ถ้ามีอัปเดต ถ้าไม่มีสร้างใหม่
+        $setting = Setting::updateOrCreate(
+            ['id' => 1],
+            $data
+        );
 
-        $setting = Setting::findOrFail($id);
-        $setting->update([
-            'name' => $request->name,
-        ]);
-
-        return redirect()->route('setting.index')->with('success', 'อัปเดตข้อมูลเรียบร้อยแล้ว');
+        return redirect()->route('settings.index')->with('success', 'บันทึกข้อมูลสำเร็จ!');
     }
 }
