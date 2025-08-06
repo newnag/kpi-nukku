@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\CategorieController;
+use App\Http\Controllers\SettingController;
 use App\Http\Controllers\StandardController;
 use App\Models\Category;
 use App\Models\Department;
@@ -33,4 +34,11 @@ Route::prefix('standards')->name('standards.')->group(function(){
     Route::post('/store', [StandardController::class, 'store'])->name('store');
     Route::put('/{id}',[StandardController::class,'update'])->name('update');
     Route::delete('/{id}',[StandardController::class,'destroy'])->name('destroy');
+});
+
+Route::prefix('settings')->name('settings.')->group(function(){
+    Route::get('/',[SettingController::class,'index'])->name('index');
+    Route::post('/store', [SettingController::class, 'store'])->name('store');
+    Route::put('/{id}',[SettingController::class,'update'])->name('update');
+    Route::delete('/{id}',[SettingController::class,'destroy'])->name('destroy');
 });
