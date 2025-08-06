@@ -12,6 +12,7 @@
 
     <!-- Google Fonts: Prompt -->
     <link href="https://fonts.googleapis.com/css2?family=Prompt&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
 
     <!-- Custom CSS -->
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -78,8 +79,9 @@
             border-radius: 50%;
             border: 2px solid rgba(255, 255, 255, 0.3);
         }
+
         .logo {
-           
+
             width: 50px;
             height: 50px;
             border-radius: 50%;
@@ -117,7 +119,7 @@
             <!-- Logo and Brand -->
             <a class="navbar-brand d-flex align-items-center " href=""style="margin-left: 50px;">
                 <div class="logo-icon">
-                     <img src="/uploads/logonuthaiS-2.png" alt="User" class="logo me-2 rounded-circle">
+                    <img src="/uploads/logonuthaiS-2.png" alt="User" class="logo me-2 rounded-circle">
                 </div>
                 <span class="d-none d-md-inline">ระบบบริหารจัดการข้อมูลการรับรองสถาบันจากสภาการพยาบาล</span>
                 <span class="d-md-none">ระบบจัดการข้อมูล</span>
@@ -324,6 +326,27 @@
             });
         });
     </script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#myTable').DataTable({
+                language: {
+                    search: "ค้นหา:",
+                    lengthMenu: "แสดง _MENU_ รายการต่อหน้า",
+                    info: "แสดง _START_ ถึง _END_ จาก _TOTAL_ รายการ",
+                    paginate: {
+                        first: "หน้าแรก",
+                        last: "หน้าสุดท้าย",
+                        next: "ถัดไป",
+                        previous: "ก่อนหน้า"
+                    },
+                    zeroRecords: "ไม่พบข้อมูลที่ค้นหา",
+                }
+            });
+        });
+    </script>
+
 </body>
 
 </html>
