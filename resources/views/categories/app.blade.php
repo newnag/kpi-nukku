@@ -1,30 +1,141 @@
 @extends('layouts.app')
-@section('title', 'จัดการข้อมูลมาตรฐานและด้าน')
+@section('title', 'จัดการข้อมูลมาตรฐานและด้านการประเมิน')
 @section('content')
 
     <div class="categories-container">
         <div class="categories-containers">
             <div class="header-contatainers">
-                มาตรฐานและด้าน
+                มาตรฐานและด้านการประเมิน
+            </div>
+            <!-- ฟอร์มเพิ่มด้านการประเมิน -->
+            <div class="category-form">
+
+                <div class="add-section-title">เพิ่มมาตรฐานการประเมิน</div>
+
+                <form action="{{ route('standards.store') }}" method="POST">
+                    @csrf
+                    <div class="form-group">
+                        <label class="form-label">ชื่อมาตรฐานการประเมิน <span class="required">*</span></label>
+                        <input type="text" name="name" class="form-input" required>
+                    </div>
+
+                    <button type="submit" class="submit-btn">
+                        <i class="fas fa-save"></i> บันทึก
+                    </button>
+                </form>
+            </div>
+            <!-- รายการมาตรฐานการประเมิน -->
+            <div class="categories-list">
+                <div class="list-title">รายชื่อมาตรฐานการประเมินที่มี</div>
+
+                <table class="datatable" id="table1">
+                    <thead>
+                        <tr>
+                            <th>ลำดับ</th>
+                            <th>ชื่อมาตรฐานการประเมิน</th>
+                            <th>จัดการ</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($standards as $index => $item)
+                            <tr>
+                                <td>{{ $index + 1 }}</td>
+                                <td>{{ $item->name }}</td>
+                                <td>
+                                    <div class="categories-actions">
+                                        <button class="btn-edit"
+                                            onclick="openEditModalStandards({{ $item->id }}, '{{ $item->name }}')">
+                                            <i data-lucide="edit-3" style="margin-right: 1px;"></i> แก้ไข
+                                        </button>
+
+                                        <button class="btn-delete"
+                                            onclick="openDeleteModalStandards({{ $item->id }}, '{{ $item->name }}')">
+                                            <i data-lucide="trash-2" style="margin-right: 5px;"></i> ลบ
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+
+            </div>
+            <!-- Edit Modal Standards-->
+            <div id="editModal" class="modal-overlay">
+                <div class="modal-content">
+
+                    <h2 class="modal-title">แก้ไขชื่อมาตรฐานการประเมิน</h2>
+                    <div class="modal-section-title">แก้ไขชื่อมาตรฐานการประเมินที่ต้องการแล้วกดบันทึกเพื่อบันทึกผลที่ต้องการ
+                        <p>ชื่อด้านการประเมินเดิม : <span id="currentstandardsName"></span></p>
+
+
+                    </div>
+
+                    <form id="editForm" method="POST" action="">
+                        @csrf
+                        @method('PUT')
+                        <div class="modal-form-group">
+                            <label class="modal-form-label">ชื่อมาตรฐานการประเมิน <span class="required">*</span></label>
+                            <input type="text" id="editName" name="name" class="modal-form-input" required
+                                value="{{ old('name') }}">
+                        </div>
+                        @error('name')
+                            <div class="alert alert-danger mt-2">{{ $message }}</div>
+                        @enderror
+
+                        <div class="modal-buttons">
+                            <button type="button" class="modal-btn modal-btn-secondary" onclick="closeModal('editModal')">
+                                <i data-lucide="undo-2" style="margin-right: 6px;"></i>กลับ</button>
+                            <button type="submit" class="modal-btn modal-btn-primary">
+                                <i data-lucide="save" style="margin-right: 6px;"></i>บันทึก</button>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+            <!-- Delete Modal Standards -->
+            <div id="deleteModal" class="modal-overlay">
+                <div class="modal-content">
+                    <button class="modal-close" onclick="closeModal('deleteModal')">&times;</button>
+                    <h2 class="modal-title">ลบชิ่อมาตรฐานการประเมิน</h2>
+                    <div class="modal-section-title">คำเตือน : การลบชื่อมาตรฐานการประเมินที่ถูกนำมาใช้แล้วจะไม่สามารถลบได้
+                    </div>
+
+                    <div class="delete-message">
+                        คุณต้องการลบข้อมูลด้านการประเมิน "<span id="deleteName"></span>" <br>
+                        หรือไม่?
+                    </div>
+                    <form id="deleteForm" method="POST">
+                        @csrf
+                        @method('DELETE')
+                        <div class="modal-buttons">
+                            <button type="button" class="modal-btn modal-btn-secondary"
+                                onclick="closeModal('deleteModal')">
+                                <i data-lucide="undo-2" style="margin-right: 6px;"></i>กลับ</button>
+                            <button type="submit" class="modal-btn modal-btn-danger"><i data-lucide="x"
+                                    style="margin-right: 6px;"></i>ยืนยันการลบ</button>
+                        </div>
+                    </form>
+                </div>
             </div>
 
-            <!-- ฟอร์มเพิ่มหน่วยงาน -->
-            <div class="categories-form">
+            <!-- ฟอร์มเพิ่มด้านการประเมิน -->
+            <div class="category-form">
 
-                <div class="add-section-title">เพิ่มด้าน คะแนนเต็มและเลือก</div>
+                <div class="add-section-title">เพิ่มด้าน และคะแนนเต็มการประเมิน</div>
 
                 <form action="{{ route('categories.store') }}" method="POST">
                     @csrf
                     <div class="form-group">
-                        <label class="form-label">ชื่อด้าน <span class="required">*</span></label>
+                        <label class="form-label">ชื่อด้านการประเมิน <span class="required">*</span></label>
                         <input type="text" name="name" class="form-input" required>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">ตะแนนเต็มของด้าน <span class="required">*</span></label>
+                        <label class="form-label">ตะแนนเต็มของด้านการประเมิน <span class="required">*</span></label>
                         <input type="text" name="max_score" class="form-input" required>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">เลือกมาตรของด้าน <span class="required">*</span></label>
+                        <label class="form-label">เลือกมาตรของด้านการประเมิน <span class="required">*</span></label>
                         <select name="standard_id" class="form-input" required>
                             <option value="">-- เลือกมาตรฐาน --</option>
                             @foreach ($standards as $standard)
@@ -40,15 +151,15 @@
                 </form>
             </div>
 
-            <!-- รายการหน่วยงาน -->
+            <!-- รายการด้านการประเมิน -->
             <div class="categories-list">
-                <div class="list-title">รายชื่อด้านที่มี</div>
+                <div class="list-title">รายชื่อด้านการประเมินที่มี</div>
 
-                <table id="myTable" class="display">
+                <table class="datatable" id="table2">
                     <thead>
                         <tr>
                             <th>ลำดับ</th>
-                            <th>ชื่อด้าน</th>
+                            <th>ชื่อด้านการประเมิน</th>
                             <th>คะแนนเต็ม</th>
                             <th>มาตรฐาน</th>
                             <th>จัดการ</th>
@@ -64,12 +175,12 @@
                                 <td>
                                     <div class="categories-actions">
                                         <button class="btn-edit"
-                                            onclick="openEditModal({{ $cat->id }}, '{{ $cat->name }}', '{{ $cat->max_score }}', '{{ $cat->standard_id }}', '{{ $cat->standard->name }}')">
+                                            onclick="openEditModalCat({{ $cat->id }}, '{{ $cat->name }}', '{{ $cat->max_score }}', '{{ $cat->standard_id }}', '{{ $cat->standard->name }}')">
                                             <i data-lucide="edit-3" style="margin-right: 1px;"></i> แก้ไข
                                         </button>
 
                                         <button class="btn-delete"
-                                            onclick="openDeleteModal({{ $cat->id }}, '{{ $cat->name }}', '{{ $cat->max_score }}', '{{ $cat->standard->name }}')">
+                                            onclick="openDeleteModalCat({{ $cat->id }}, '{{ $cat->name }}', '{{ $cat->max_score }}', '{{ $cat->standard->name }}')">
                                             <i data-lucide="trash-2" style="margin-right: 5px;"></i> ลบ
                                         </button>
                                     </div>
@@ -84,13 +195,13 @@
     </div>
 
 
-    <!-- Edit Modal -->
+    <!-- Edit Modal Categories-->
     <div id="editModal" class="modal-overlay">
         <div class="modal-content">
 
-            <h2 class="modal-title">แก้ไขชื่อด้าน</h2>
-            <div class="modal-section-title">แก้ไขชื่อด้านที่ต้องการแล้วกดบันทึกเพื่อบันทึกผลที่ต้องการ
-                <p>ชื่อด้านเดิม : <span id="currentcategoriesName"></span></p>
+            <h2 class="modal-title">แก้ไขชื่อด้านการประเมิน</h2>
+            <div class="modal-section-title">แก้ไขชื่อด้านการประเมินที่ต้องการแล้วกดบันทึกเพื่อบันทึกผลที่ต้องการ
+                <p>ชื่อด้านการประเมินเดิม : <span id="currentcategoriesName"></span></p>
                 <p>คะแนนเต็มเดิม : <span id="currentcategoriesMaxScore"></span></p>
                 <p>มาตรฐานเดิม : <span id="currentcategoriesStandardName"></span></p>
 
@@ -100,7 +211,7 @@
                 @csrf
                 @method('PUT')
                 <div class="modal-form-group">
-                    <label class="modal-form-label">ชื่อด้าน <span class="required">*</span></label>
+                    <label class="modal-form-label">ชื่อด้านการประเมิน <span class="required">*</span></label>
                     <input type="text" id="editName" name="name" class="modal-form-input" required
                         value="{{ old('name') }}">
                 </div>
@@ -138,15 +249,15 @@
         </div>
     </div>
 
-    <!-- Delete Modal -->
+    <!-- Delete Modal Categories -->
     <div id="deleteModal" class="modal-overlay">
         <div class="modal-content">
             <button class="modal-close" onclick="closeModal('deleteModal')">&times;</button>
-            <h2 class="modal-title">ลบชิ่อด้าน</h2>
-            <div class="modal-section-title">คำเตือน : การลบชื่อด้านที่ถูกนำมาใช้แล้วจะไม่สามารถลบได้</div>
+            <h2 class="modal-title">ลบชิ่อด้านการประเมิน</h2>
+            <div class="modal-section-title">คำเตือน : การลบชื่อด้านการประเมินที่ถูกนำมาใช้แล้วจะไม่สามารถลบได้</div>
 
             <div class="delete-message">
-                คุณต้องการลบข้อมูลด้าน "<span id="deleteName"></span>" <br>
+                คุณต้องการลบข้อมูลด้านการประเมิน "<span id="deleteName"></span>" <br>
                 (คะแนนเต็ม: <span id="deleteMaxScore"></span>) <br>
                 มาตรฐาน: <span id="deleteStandardName"></span> <br>
                 หรือไม่?
@@ -165,7 +276,21 @@
     </div>
 
     <script>
-        function openEditModal(id, name, max_score, standard_id, standard_name) {
+        function openEditModalStandards(id, name) {
+            document.getElementById('editName').value = name;
+            document.getElementById('editForm').action = `/standards/${id}`; // ต้องตรงกับ route PUT /standards/{id}
+            document.getElementById('editModal').classList.add('active');
+            document.getElementById('currentstandardsName').innerText = name;
+
+        }
+
+        function openDeleteModalStandards(id, name) {
+            document.getElementById('deleteName').textContent = name;
+            document.getElementById('deleteForm').action = `/standards/${id}`;
+            document.getElementById('deleteModal').classList.add('active');
+        }
+
+        function openEditModalCat(id, name, max_score, standard_id, standard_name) {
             document.getElementById('editName').value = name;
             document.getElementById('editMaxScore').value = max_score;
             document.getElementById('editStandardId').value = standard_id;
@@ -176,7 +301,7 @@
             document.getElementById('currentcategoriesStandardName').innerText = standard_name;
         }
 
-        function openDeleteModal(id, name, max_score, standard_name) {
+        function openDeleteModalCat(id, name, max_score, standard_name) {
             document.getElementById('deleteName').textContent = name;
             document.getElementById('deleteMaxScore').textContent = max_score;
             document.getElementById('deleteStandardName').textContent = standard_name;
@@ -246,7 +371,7 @@
             color: #222;
         }
 
-        .categories-form {
+        .category-form {
 
             margin-bottom: 30px;
             position: relative;
