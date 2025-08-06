@@ -330,19 +330,21 @@
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script>
         $(document).ready(function() {
-            $('#myTable').DataTable({
-                language: {
-                    search: "ค้นหา:",
-                    lengthMenu: "แสดง _MENU_ รายการต่อหน้า",
-                    info: "แสดง _START_ ถึง _END_ จาก _TOTAL_ รายการ",
-                    paginate: {
-                        first: "หน้าแรก",
-                        last: "หน้าสุดท้าย",
-                        next: "ถัดไป",
-                        previous: "ก่อนหน้า"
-                    },
-                    zeroRecords: "ไม่พบข้อมูลที่ค้นหา",
-                }
+            $('.datatable').each(function() {
+                $(this).DataTable({
+                    language: {
+                        search: "ค้นหา:",
+                        lengthMenu: "แสดง _MENU_ รายการต่อหน้า",
+                        info: "แสดง _START_ ถึง _END_ จาก _TOTAL_ รายการ",
+                        paginate: {
+                            first: "หน้าแรก",
+                            last: "หน้าสุดท้าย",
+                            next: "ถัดไป",
+                            previous: "ก่อนหน้า"
+                        },
+                        zeroRecords: "ไม่พบข้อมูลที่ค้นหา",
+                    }
+                });
             });
         });
     </script>

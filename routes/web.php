@@ -2,8 +2,10 @@
 
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\CategorieController;
+use App\Http\Controllers\StandardController;
 use App\Models\Category;
 use App\Models\Department;
+use App\Models\Standard;
 use Faker\Guesser\Name;
 use Illuminate\Support\Facades\Route;
 
@@ -24,4 +26,11 @@ Route::prefix('categories')->name('categories.')->group(function(){
     Route::post('/store', [CategorieController::class, 'store'])->name('store');
     Route::put('/{id}',[CategorieController::class,'update'])->name('update');
     Route::delete('/{id}',[CategorieController::class,'destroy'])->name('destroy');
+});
+
+Route::prefix('standards')->name('standards.')->group(function(){
+    Route::get('/',[StandardController::class,'index'])->name('index');
+    Route::post('/store', [StandardController::class, 'store'])->name('store');
+    Route::put('/{id}',[StandardController::class,'update'])->name('update');
+    Route::delete('/{id}',[StandardController::class,'destroy'])->name('destroy');
 });
