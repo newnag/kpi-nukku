@@ -37,10 +37,14 @@
                     <div class="department-item">
                         <span class="department-name">{{ $department->name ?? 'ชื่อหน่วยงาน' }}</span>
                         <div class="department-actions">
-                            <button class="edit-btn"
-                                onclick="openEditModal({{ $department->id }}, '{{ $department->name ?? 'ชื่อหน่วยงาน' }}')">แก้ไข</button>
-                            <button class="delete-btn"
-                                onclick="openDeleteModal({{ $department->id }}, '{{ $department->name ?? 'ชื่อหน่วยงาน' }}')">ลบ</button>
+                            <button class="btn-edit"
+                                onclick="openEditModal({{ $department->id }}, '{{ $department->name ?? 'ชื่อหน่วยงาน' }}')">
+                                <i data-lucide="edit-3" style="margin-right: 1px;"></i> แก้ไข
+                            </button>
+                            <button class="btn-delete"
+                                onclick="openDeleteModal({{ $department->id }}, '{{ $department->name ?? 'ชื่อหน่วยงาน' }}')">
+                                <i data-lucide="trash-2" style="margin-right: 5px;"></i> ลบ
+                            </button>
                         </div>
                     </div>
                 @endforeach
@@ -97,9 +101,10 @@
                 @csrf
                 @method('DELETE')
                 <div class="modal-buttons">
-                    <button type="button" class="modal-btn modal-btn-secondary" onclick="closeModal('editModal')">
+                    <button type="button" class="modal-btn modal-btn-secondary" onclick="closeModal('deleteModal')">
                         <i data-lucide="undo-2" style="margin-right: 6px;"></i>กลับ</button>
-                    <button type="submit" class="modal-btn modal-btn-danger"><i data-lucide="x" style="margin-right: 6px;"></i>ยืนยันการลบ</button>
+                    <button type="submit" class="modal-btn modal-btn-danger"><i data-lucide="x"
+                            style="margin-right: 6px;"></i>ยืนยันการลบ</button>
                 </div>
             </form>
         </div>
@@ -307,7 +312,7 @@
         }
 
         .department-name::before {
-            content: "• ";
+            content: " ";
             color: #333;
             margin-right: 8px;
         }
@@ -457,19 +462,19 @@
 
         .modal-btn-secondary:hover {
             background: #398ECA;
-             color: white;
+            color: white;
         }
 
         .modal-btn-danger {
             background: #FFFFFF;
-            color:#FF0004;
+            color: #FF0004;
             border: 1px solid #FF0004;
         }
 
         .modal-btn-danger:hover {
-           
+
             background: #db0a0d;
-             color: white;
+            color: white;
         }
 
         .delete-message {
@@ -477,6 +482,44 @@
             margin: 20px 0;
             color: #333;
             font-size: 16px;
+        }
+
+        .btn-edit {
+            background-color: white;
+            border: 1px solid #398ECA;
+            color: #398ECA;
+            padding: 8px 16px;
+            font-size: 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .btn-edit:hover {
+            background-color: #398ECA;
+            color: white;
+        }
+
+        .btn-delete {
+            background-color: white;
+            color: #e53935;
+            border:  1px solid  #e53935;
+            padding: 8px 16px;
+            font-size: 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .btn-delete:hover {
+            background-color: #c62828;
+            color: white;
         }
     </style>
 @endsection

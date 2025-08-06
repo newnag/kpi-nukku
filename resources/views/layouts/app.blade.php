@@ -78,6 +78,13 @@
             border-radius: 50%;
             border: 2px solid rgba(255, 255, 255, 0.3);
         }
+        .logo {
+           
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
 
         .breadcrumb-custom {
             background: white;
@@ -108,9 +115,9 @@
     <nav class="navbar navbar-expand-lg navbar-custom">
         <div class="container-fluid">
             <!-- Logo and Brand -->
-            <a class="navbar-brand d-flex align-items-center" href="">
+            <a class="navbar-brand d-flex align-items-center " href=""style="margin-left: 50px;">
                 <div class="logo-icon">
-                    <i class="fas fa-hospital-alt text-primary"></i>
+                     <img src="/uploads/logonuthaiS-2.png" alt="User" class="logo me-2 rounded-circle">
                 </div>
                 <span class="d-none d-md-inline">ระบบบริหารจัดการข้อมูลการรับรองสถาบันจากสภาการพยาบาล</span>
                 <span class="d-md-none">ระบบจัดการข้อมูล</span>
@@ -126,25 +133,25 @@
                 <ul class="navbar-nav mx-auto">
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}" href="">
-                            <i class="fas fa-tachometer-alt me-1"></i>
+                            {{-- <i class="fas fa-tachometer-alt me-1"></i> --}}
                             Dashboard
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('standards*') ? 'active' : '' }}" href="">
-                            <i class="fas fa-clipboard-list me-1"></i>
+                            {{-- <i class="fas fa-clipboard-list me-1"></i> --}}
                             Standards
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('indicators*') ? 'active' : '' }}" href="">
-                            <i class="fas fa-chart-line me-1"></i>
+                            {{-- <i class="fas fa-chart-line me-1"></i> --}}
                             Indicators
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('reports*') ? 'active' : '' }}" href="">
-                            <i class="fas fa-file-alt me-1"></i>
+                            {{-- <i class="fas fa-file-alt me-1"></i> --}}
                             Reports
                         </a>
                     </li>
@@ -153,7 +160,7 @@
                             data-bs-toggle="dropdown">
                             {{-- <img src="https://via.placeholder.com/35x35/6c757d/ffffff?text=U" alt="User" class="user-avatar me-2"> --}}
                             <span class="d-none d-md-inline">Settings</span>
-                            <i class="fas fa-cog ms-1"></i>
+                            {{-- <i class="fas fa-cog ms-1"></i> --}}
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
                             <li><a class="dropdown-item" href="">
