@@ -22,6 +22,7 @@ class Indicator extends Model
         'score_acc',
         'max_score',
         'type',
+        'categorie_id',
     ];
 
     protected $hidden = [
@@ -31,13 +32,13 @@ class Indicator extends Model
 
     protected $casts = [
         'deadline' => 'datetime:Y-m-d',
-        'score_acc' => 'decimal:5,2',
-        'max_score' => 'decimal:5,2',
+        'score_acc' => 'decimal:2',
+        'max_score' => 'decimal:2',
     ];
 
     public function category()
     {
-        return $this->belongsTo(Category::class, 'type');
+        return $this->belongsTo(Category::class, 'categorie_id');
     }
 
     public function criterias()

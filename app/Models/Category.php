@@ -18,7 +18,7 @@ class Category extends Model
     ];
 
     protected $casts = [
-        'max_score' => 'decimal:5,2',
+        'max_score' => 'decimal:2',
     ];
 
     public function standard()
@@ -28,6 +28,6 @@ class Category extends Model
 
     public function indicators()
     {
-        return $this->hasMany(Indicator::class, 'type');
+        return $this->hasMany(Indicator::class, 'categorie_id');
     }
 }
