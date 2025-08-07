@@ -122,7 +122,9 @@
                 <div class="logo-icon">
                     <img src="/uploads/logonuthaiS-2.png" alt="User" class="logo me-2 rounded-circle">
                 </div>
-                <span class="d-none d-md-inline">ระบบบริหารจัดการข้อมูลการรับรองสถาบันจากสภาการพยาบาล</span>
+                <span class="d-none d-md-inline">
+                    {{ $global_setting->title ?? 'ระบบบริหารจัดการข้อมูลการรับรองสถาบันจากสภาการพยาบาล' }}
+                </span>
                 <span class="d-md-none">ระบบจัดการข้อมูล</span>
             </a>
 
