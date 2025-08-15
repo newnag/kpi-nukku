@@ -9,13 +9,17 @@
 
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
     <!-- Google Fonts: Prompt -->
     <link href="https://fonts.googleapis.com/css2?family=Prompt&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <!-- Custom CSS -->
+
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         body {
@@ -329,12 +333,14 @@
             });
         });
     </script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-    <script>
+    {{-- <script>
         $(document).ready(function() {
             $('.datatable').each(function() {
-                $(this).DataTable({
+                const table = $(this).DataTable({
                     language: {
                         search: "ค้นหา:",
                         lengthMenu: "แสดง _MENU_ รายการต่อหน้า",
@@ -346,14 +352,31 @@
                             previous: "ก่อนหน้า"
                         },
                         zeroRecords: "ไม่พบข้อมูลที่ค้นหา",
+                    },
+                    initComplete: function() {
+                        this.api().columns().every(function() {
+                            var column = this;
+                            var select = $(
+                                    '<select><option value="">ทั้งหมด</option></select>'
+                                    )
+                                .appendTo($(column.footer()).empty())
+                                .on('change', function() {
+                                    var val = $.fn.dataTable.util.escapeRegex($(
+                                        this).val());
+                                    column.search(val ? '^' + val + '$' : '', true,
+                                        false).draw();
+                                });
+
+                            column.data().unique().sort().each(function(d) {
+                                select.append('<option value="' + d + '">' + d +
+                                    '</option>');
+                            });
+                        });
                     }
                 });
             });
         });
-        document.addEventListener("DOMContentLoaded", function() {
-            lucide.createIcons();
-        });
-    </script>
+    </script> --}}
 
 </body>
 
