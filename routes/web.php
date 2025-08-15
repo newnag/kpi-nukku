@@ -4,6 +4,7 @@ use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\CategorieController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\StandardController;
+use App\Http\Controllers\UserController;
 use App\Models\Category;
 use App\Models\Department;
 use App\Models\Standard;
@@ -41,4 +42,13 @@ Route::prefix('settings')->name('settings.')->group(function(){
     Route::post('/store', [SettingController::class, 'store'])->name('store');
     Route::put('/{id}',[SettingController::class,'update'])->name('update');
     Route::delete('/{id}',[SettingController::class,'destroy'])->name('destroy');
+});
+
+ Route::prefix('users')->name('users.')->group(function () {
+    Route::get('/', [UserController::class, 'index'])->name('index');
+    Route::get('/create', [UserController::class, 'create'])->name('create'); 
+    Route::get('/edit', [UserController::class, 'edit'])->name('edit'); 
+    Route::post('/', [UserController::class, 'store'])->name('store');
+    Route::put('/{user}', [UserController::class, 'update'])->name('update');
+    Route::delete('/{user}', [UserController::class, 'destroy'])->name('destroy');
 });

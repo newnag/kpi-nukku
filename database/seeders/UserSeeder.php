@@ -1,16 +1,17 @@
 <?php
+
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use App\Models\User;
 
 class UserSeeder extends Seeder
 {
     public function run(): void
     {
-        DB::table('users')->insert([
+        $users = [
             [
                 'prefix' => 'นาย',
                 'name' => 'สมชาย ตัวอย่าง',
@@ -21,8 +22,7 @@ class UserSeeder extends Seeder
                 'status' => 'true',
                 'department_id' => 1,
                 'remember_token' => Str::random(10),
-                'created_at' => now(),
-                'updated_at' => now(),
+                'role' => 'Super Admin',
             ],
             [
                 'prefix' => 'นาย',
@@ -34,8 +34,7 @@ class UserSeeder extends Seeder
                 'status' => 'true',
                 'department_id' => 1,
                 'remember_token' => Str::random(10),
-                'created_at' => now(),
-                'updated_at' => now(),
+                'role' => 'QA Admin',
             ],
             [
                 'prefix' => 'นาย',
@@ -47,9 +46,16 @@ class UserSeeder extends Seeder
                 'status' => 'true',
                 'department_id' => 1,
                 'remember_token' => Str::random(10),
-                'created_at' => now(),
-                'updated_at' => now(),
+                'role' => 'User',
             ],
-        ]);
+        ];
+
+        foreach ($users as $userData) {
+            $role = $userData['role'];
+            unset($userData['role']); // ลบ key 'role' ก่อน insert
+
+            $user = User::create($userData);
+            $user->assignRole($role); // กำหนดบทบาทให้ผู้ใช้
+        }
     }
 }

@@ -1,11 +1,9 @@
-@import 'tailwindcss';
-@import url('https://fonts.googleapis.com/css2?family=Prompt&display=swap');
-@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
-@source '../../storage/framework/views/*.php';
-@source '../**/*.blade.php';
-@source '../**/*.js';
 
-@theme {
-  --font-sans: 'Prompt', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-    'Segoe UI Symbol', 'Noto Color Emoji';
+@import "tailwindcss";
+@import url("https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700&display=swap");
+
+/* Removed unsupported @theme block. */
+
+body {
+  font-family: 'Prompt', ui-sans-serif, system-ui, sans-serif;
 }
