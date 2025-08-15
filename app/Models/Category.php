@@ -28,6 +28,6 @@ class Category extends Model
 
     public function indicators()
     {
-        return $this->hasMany(Indicator::class, 'type');
+        return $this->hasMany(Indicator::class, 'categorie_id');
     }
 }
