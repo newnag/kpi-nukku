@@ -2,114 +2,107 @@
 @section('title', 'จัดการข้อมูลหน่วยงาน')
 @section('content')
 
+    <!-- ========== HTML (ใช้ CSS ด้านบน) ========== -->
     <div class="user-container">
-        <h1>
+        <h1>รายชื่อผู้ใช้งาน</h1>
 
-            รายชื่อผู้ใช้งาน
-
-        </h1>
-
-        <!-- Search & Filter Controls Group -->
-        <div class="flex flex-wrap gap-2 mt-4 mb-4 items-center">
-            <div class="relative w-full sm:w-auto bg-white  rounded-lg shadow-sm">
-                <div class="absolute inset-y-0 left-3 flex items-center pointer-events-none">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
+        <!-- Controls -->
+        <div class="controls">
+            <!-- Search -->
+            <div class="search-box" style="width:100%; max-width:420px;">
+                <div class="icon">
+                    <!-- search icon -->
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor" style="color:#9ca3af;">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
                 </div>
-                <input type="text" id="custom-search"
-                    class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none w-full"
-                    placeholder="ค้นหารายการชื่อผู้ใช้">
+                <input type="text" id="custom-search" class="search-input" placeholder="ค้นหารายการชื่อผู้ใช้">
             </div>
-            <!-- Sort Button with Dropdown -->
-            <div class="relative inline-block text-left  " id="sort-dropdown-container">
-                <button id="sort-button"
-                  class="h-fit border border-gray-300 rounded-lg  px-4 py-2 bg-white text-gray-700 hover:bg-gray-100 flex items-center gap-2">
+
+            <!-- Sort -->
+            <div class="dropdown" id="sort-dropdown-container">
+                <button id="sort-button" class="btn">
                     <span>เรียงลำดับ</span>
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
                     </svg>
                 </button>
-                <div id="sort-dropdown"
-                    class="hidden absolute left-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-10">
-                    <div class="py-1" role="menu" aria-orientation="vertical">
-                        <button class="sort-option text-left block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                            data-column="0" data-order="asc" role="menuitem">ปี (น้อยไปมาก)</button>
-                        <button class="sort-option text-left block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                            data-column="0" data-order="desc" role="menuitem">ปี (มากไปน้อย)</button>
-                        <button class="sort-option text-left block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                            data-column="1" data-order="asc" role="menuitem">ชื่อผู้ใช้งาน (A-Z)</button>
-                        <button class="sort-option text-left block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                            data-column="1" data-order="desc" role="menuitem">ชื่อผู้ใช้งาน (Z-A)</button>
-
-                        <button id="clear-sort"type="button"
-                            class=" text-left block w-full px-4 py-2 text-sm text-gray-600 hover:bg-gray-100">ล้างตัวเรียงลำดับ</button>
-                    </div>
+                <div id="sort-dropdown" class="dropdown-menu hidden" role="menu" aria-orientation="vertical">
+                    <button class="dropdown-item sort-option" data-column="0" data-order="asc" role="menuitem">ปี
+                        (น้อยไปมาก)</button>
+                    <button class="dropdown-item sort-option" data-column="0" data-order="desc" role="menuitem">ปี
+                        (มากไปน้อย)</button>
+                    <button class="dropdown-item sort-option" data-column="1" data-order="asc" role="menuitem">ชื่อผู้ใช้งาน
+                        (A-Z)</button>
+                    <button class="dropdown-item sort-option" data-column="1" data-order="desc"
+                        role="menuitem">ชื่อผู้ใช้งาน (Z-A)</button>
+                    <div class="dropdown-divider"></div>
+                    <button id="clear-sort" type="button" class="dropdown-item"
+                        style="color:#4b5563;">ล้างตัวเรียงลำดับ</button>
                 </div>
             </div>
-            <!-- Filter Button with Dropdown -->
-            <div class="relative inline-block text-left" id="filter-dropdown-container">
-                <button id="filter-button"
-                 class="h-fit border border-gray-300 rounded-lg px-4 py-2 bg-white text-gray-700 hover:bg-gray-100 flex items-center gap-2">
+
+            <!-- Filter -->
+            <div class="dropdown" id="filter-dropdown-container">
+                <button id="filter-button" class="btn">
                     <span>กรองข้อมูล</span>
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
                     </svg>
                 </button>
-                <div id="filter-dropdown"
-                    class="hidden absolute left-0 mt-2 w-64 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-10">
-                    <div class="py-2 px-3">
-                        <h3 class="text-sm font-medium text-gray-900 mb-2">หน่วยงาน</h3>
-                        <div id="department-options" class="space-y-2">
+
+                <div id="filter-dropdown" class="dropdown-menu hidden">
+                    <div style="padding:12px 12px;">
+                        <h3 class="dropdown-title">หน่วยงาน</h3>
+                        <div id="department-options" style="display:grid; gap:8px;">
                             @foreach ($departments as $dep)
-                                <label class="inline-flex items-center">
-                                    <input type="checkbox" class="filter-option rounded text-blue-600" data-column="3"
+                                <label style="display:inline-flex; align-items:center;">
+                                    <input type="checkbox" class="filter-option" data-column="3"
                                         data-value="{{ $dep }}">
-                                    <span class="ml-2 text-sm text-gray-700">{{ $dep }}</span>
-                                </label><br>
+                                    <span style="margin-left:8px; font-size:14px; color:#374151;">{{ $dep }}</span>
+                                </label>
                             @endforeach
                         </div>
 
-                        <div class="border-t border-gray-200 my-3"></div>
+                        <div class="dropdown-divider"></div>
 
-                        <h3 class="text-sm font-medium text-gray-900 mb-2">บทบาท</h3>
-                        <div id="role-options" class="space-y-2">
+                        <h3 class="dropdown-title">บทบาท</h3>
+                        <div id="role-options" style="display:grid; gap:8px;">
                             @foreach ($roles as $role)
-                                <label class="inline-flex items-center">
-                                    <input type="checkbox" class="filter-option rounded text-blue-600" data-column="5"
+                                <label style="display:inline-flex; align-items:center;">
+                                    <input type="checkbox" class="filter-option" data-column="5"
                                         data-value="{{ $role }}">
-                                    <span class="ml-2 text-sm text-gray-700">{{ $role }}</span>
-                                </label><br>
+                                    <span style="margin-left:8px; font-size:14px; color:#374151;">{{ $role }}</span>
+                                </label>
                             @endforeach
                         </div>
 
+                        <div class="dropdown-divider"></div>
 
-                        <div class="border-t border-gray-200 my-3"></div>
-
-                        <div class="flex justify-between">
-                            <button id="clear-filters"
-                                class="text-sm text-gray-600 hover:text-gray-900">ล้างตัวกรอง</button>
-                            <button id="apply-filters"
-                                class="text-sm text-white bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded">ใช้ตัวกรอง</button>
+                        <div style="display:flex; justify-content:space-between; gap:12px;">
+                            <button id="clear-filters" class="btn" style="padding:6px 10px;">ล้างตัวกรอง</button>
+                            <button id="apply-filters" class="btn btn-primary" style="padding:6px 10px;">ใช้ตัวกรอง</button>
                         </div>
                     </div>
                 </div>
             </div>
-            <!-- Action Buttons Group -->
+
+            <!-- Action Buttons -->
+            <button id="add-user-button" type="button" class="btn btn-primary"
+                style="--blue-600:#398ECA; --blue-700:#2f7ab1;">
+                <i data-lucide="circle-plus" style="margin-right:6px;"></i> เพิ่มข้อมูลผู้ใช้งาน
+            </button>
 
         </div>
 
-
+        <!-- ตารางผู้ใช้งาน -->
         <div class="user-containers">
-
-
-            <!-- รายการหน่วยงาน -->
             <div class="user-list">
                 <table class="table" id="table3">
                     <thead>
@@ -132,16 +125,15 @@
                                 <td>{{ $item->department->name ?? '-' }}</td>
                                 <td>{{ $item->phone }}</td>
                                 <td>{{ $item->getRoleNames()->implode(', ') ?: '-' }}</td>
-
                                 <td>
                                     <div class="categories-actions">
                                         <button class="btn-edit"
                                             onclick="openEditModal({{ $item->id }}, '{{ $item->name }}')">
-                                            <i data-lucide="edit-3" style="margin-right: 1px;"></i> แก้ไข
+                                            <i data-lucide="edit-3" style="margin-right:4px;"></i> แก้ไข
                                         </button>
                                         <button class="btn-delete"
                                             onclick="openDeleteModal({{ $item->id }}, '{{ $item->name }}')">
-                                            <i data-lucide="trash-2" style="margin-right: 5px;"></i> ลบ
+                                            <i data-lucide="trash-2" style="margin-right:4px;"></i> ลบ
                                         </button>
                                     </div>
                                 </td>
@@ -149,8 +141,6 @@
                         @endforeach
                     </tbody>
                 </table>
-
-
             </div>
         </div>
     </div>
@@ -213,38 +203,38 @@
             });
 
             // --- Sorting ---
-            // ใช้ delegated handler แค่ตัวเดียวพอ
-            // 3) คลิกตัวเลือกเรียงลำดับ (ตัวเดียวพอ)
-            $('#sort-dropdown').on('click', '.sort-option', function() {
+            // กดตัวเลือกเรียงลำดับ
+            $('#sort-dropdown').on('click', '.sort-option', function(e) {
+                e.stopPropagation(); // กัน event ไปถึง document แล้วปิด dropdown ทันที
                 const col = Number($(this).data('column'));
                 const order = String($(this).data('order')); // 'asc' | 'desc'
-                table.order([col, order]).draw(false);
+                table.order([
+                    [col, order]
+                ]).draw(false); // <-- ต้องเป็น [[col, order]]
 
                 $('#sort-button span').text('เรียงลำดับ: ' + $(this).text().trim());
                 $('#sort-dropdown').addClass('hidden');
             });
 
-            // 4) ล้างการเรียงลำดับ — ใช้ fallback ให้กลับไปที่คอลัมน์ "ลำดับ" (คอลัมน์ 0)
+            // ล้างการเรียงลำดับ
             $('#clear-sort').on('click', function(e) {
                 e.preventDefault();
                 e.stopPropagation();
 
-                // เคลียร์ state เผื่อเคยเปิด stateSave ที่อื่น
                 if (table.state && typeof table.state.clear === 'function') {
                     table.state.clear();
                 }
 
-                // วิธีที่ควรพอ: ล้าง order
                 table.order([]).draw(false);
+                // ถ้าต้องการ fallback ให้กลับไปเรียงคอลัมน์ "ลำดับ" จากน้อยไปมาก
+                table.order([
+                    [0, 'asc']
+                ]).draw(false); // <-- ต้องเป็น [[0, 'asc']]
 
-                // Fallback (ให้ได้ผลตรงใจแน่ ๆ): บังคับเรียงตามคอลัมน์ลำดับ (0) จากน้อยไปมาก
-                // ถ้าคุณอยาก "ไม่เรียง" จริง ๆ ให้คอมเมนต์สองบรรทัดนี้ออก
-                table.order([0, 'asc']).draw(false);
-
-                // รีเซ็ตข้อความปุ่ม + ปิด dropdown
                 $('#sort-button span').text('เรียงลำดับ');
                 $('#sort-dropdown').addClass('hidden');
             });
+
 
             // --- Filtering (Department + Role) ---
             let activeFilters = {}; // { '3': ['แผนก A','แผนก B'], '5': ['Admin'] }
@@ -311,6 +301,247 @@
     <script>
         lucide.createIcons();
     </script>
+    <!-- ========== CSS (แทน Tailwind) ========== -->
+    <style>
+        :root {
+            --blue-600: #2563eb;
+            /* ใกล้เคียง Tailwind */
+            --blue-700: #1d4ed8;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-700: #374151;
+            --ring: #3b82f6;
+            --white: #fff;
+            --shadow: 0 1px 2px rgba(0, 0, 0, .06), 0 1px 3px rgba(0, 0, 0, .1);
+            --radius: 8px;
+            --gap-2: 8px;
+            --gap-3: 12px;
+            --pad-2: 8px;
+            --pad-3: 12px;
+            --pad-4: 16px;
+        }
+
+        /* Utilities ที่ใช้แทน hidden/sr-only ฯลฯ */
+        .hidden {
+            display: none !important;
+        }
+
+        .push-right {
+            margin-left: auto;
+        }
+
+        .hide-sm {
+            display: none;
+        }
+
+        @media (min-width:640px) {
+            .hide-sm {
+                display: inline;
+            }
+        }
+
+        /* Layout พื้นฐาน */
+        .user-container h1 {
+            margin: 0 0 8px;
+            font-size: 24px;
+            color: #111827;
+        }
+
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--gap-2);
+            align-items: center;
+            margin: 16px 0;
+        }
+
+        .actions {
+            display: flex;
+            width: 100%;
+            gap: var(--gap-3);
+        }
+
+        /* Search box */
+        .search-box {
+            position: relative;
+            background: var(--white);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+        }
+
+        .search-box .icon {
+            position: absolute;
+            inset: 0 auto 0 12px;
+            display: flex;
+            align-items: center;
+            pointer-events: none;
+        }
+
+        .search-input {
+            padding: 8px 16px 8px 40px;
+            width: 100%;
+            outline: 0;
+            border: 1px solid var(--gray-300);
+            border-radius: var(--radius);
+        }
+
+        .search-input:focus {
+            border-color: var(--ring);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, .2);
+        }
+
+        /* ปุ่ม */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: var(--radius);
+            font: inherit;
+            cursor: pointer;
+            border: 0;
+            background: var(--white);
+            color: var(--gray-700);
+            border: 1px solid var(--gray-300);
+            transition: .15s background-color ease;
+        }
+
+        .btn:hover {
+            background: var(--gray-100);
+        }
+
+        .btn-primary {
+            background: var(--blue-600);
+            color: var(--white);
+            border-color: transparent;
+        }
+
+        .btn-primary:hover {
+            background: var(--blue-700);
+        }
+
+        /* Dropdown */
+        .dropdown {
+            position: relative;
+            display: inline-block;
+            text-align: left;
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            left: 0;
+            top: 100%;
+            margin-top: 8px;
+            width: 192px;
+            background: var(--white);
+            border-radius: 6px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, .1), 0 4px 6px -2px rgba(0, 0, 0, .05);
+            border: 1px solid rgba(0, 0, 0, .05);
+            z-index: 9999;
+            /* เพิ่ม z-index ให้สูงขึ้น */
+            padding: 4px 0;
+            display: block;
+        }
+
+        .dropdown-menu.hidden {
+            display: none !important;
+        }
+
+        .dropdown-item {
+            display: block;
+            width: 100%;
+            text-align: left;
+            padding: 8px 16px;
+            font-size: 14px;
+            color: #374151;
+            background: transparent;
+            border: 0;
+        }
+
+        .dropdown-item:hover {
+            background: var(--gray-100);
+        }
+
+        .dropdown-divider {
+            height: 1px;
+            background: var(--gray-200);
+            margin: 12px 0;
+        }
+
+        .dropdown-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 8px;
+        }
+
+        /* Checkbox ฟิลเตอร์ */
+        .filter-option {
+            accent-color: var(--blue-600);
+        }
+
+        /* ตาราง */
+        .table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        .table thead th {
+            text-align: left;
+            font-weight: 600;
+            background: var(--gray-50);
+            border-bottom: 1px solid var(--gray-200);
+            padding: 12px;
+        }
+
+        .table tbody td {
+            padding: 12px;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .categories-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-edit,
+        .btn-delete {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 10px;
+            border-radius: 6px;
+            border: 1px solid var(--gray-300);
+            background: var(--white);
+            cursor: pointer;
+        }
+
+        .btn-edit:hover {
+            background: var(--gray-100);
+        }
+
+        .btn-delete:hover {
+            background: #fee2e2;
+            border-color: #fecaca;
+        }
+
+        /* กล่องหัวข้อ/รายการ */
+        .user-containers {
+            margin-top: 12px;
+        }
+
+        .user-list {
+            background: var(--white);
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: var(--pad-3);
+        }
+    </style>
 
     <style>
         .user-container {
@@ -698,6 +929,39 @@
         .dataTables_length,
         .dataTables_filter {
             display: none;
+        }
+
+        /* เดิมมี flex-wrap: wrap; อยู่ — เก็บไว้สำหรับจอเล็ก */
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--gap-2);
+            align-items: center;
+        }
+
+        /* จอกว้าง: บังคับให้อยู่บรรทัดเดียว แล้วดันปุ่มไปขวา */
+        @media (min-width: 768px) {
+            .controls {
+                flex-wrap: nowrap;
+            }
+
+            .controls .search-box {
+                flex: 1 1 420px;
+                /* ให้ช่องค้นหายืดได้ */
+                max-width: none;
+                /* เอา max-width เดิมออกเมื่อจอกว้าง */
+            }
+
+            #add-user-button {
+                margin-left: auto;
+            }
+
+            /* ดันปุ่มไปชิดขวา */
+        }
+
+        /* กันองค์ประกอบโดนบีบจน wrap โดยไม่ตั้งใจ */
+        .controls>* {
+            flex-shrink: 0;
         }
     </style>
 
