@@ -21,15 +21,17 @@ class UserController extends Controller
 
     public function create()
     {
-        return view('users.create');
+         $roles = Role::orderBy('name')->pluck('name');
+         $users = User::with('department', 'roles')->orderBy('id', 'asc')->get();
+            $departments = Department::orderBy('name')->get(['id','name']);
+        return view('users.management.create', compact('departments','roles'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'prefix' => 'required|string|max:10',
+            
             'name' => 'required|string|max:100',
-            'employee_id' => 'required|string|max:20|unique:users',
             'password' => 'required|string|min:6',
             'email' => 'required|email|max:50|unique:users',
             'phone' => 'required|string|max:20',
@@ -39,9 +41,8 @@ class UserController extends Controller
         ]);
 
         $user = User::create([
-            'prefix' => $request->prefix,
+          
             'name' => $request->name,
-            'employee_id' => $request->employee_id,
             'password' => Hash::make($request->password),
             'email' => $request->email,
             'phone' => $request->phone,

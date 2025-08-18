@@ -13,9 +13,8 @@ class User extends Authenticatable
     use HasFactory, Notifiable;
     use HasRoles;
     protected $fillable = [
-        'prefix',
+   
         'name',
-        'employee_id',
         'password',
         'phone',
         'status',

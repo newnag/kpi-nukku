@@ -13,9 +13,9 @@ class UserSeeder extends Seeder
     {
         $users = [
             [
-                'prefix' => 'นาย',
+                // 'prefix' => 'นาย',
                 'name' => 'สมชาย ตัวอย่าง',
-                'employee_id' => 'EMP001',
+                // 'employee_id' => 'EMP001',
                 'password' => Hash::make('password123'),
                 'email' => 'somchai@example.com',
                 'phone' => '0800000001',
@@ -25,9 +25,9 @@ class UserSeeder extends Seeder
                 'role' => 'Super Admin',
             ],
             [
-                'prefix' => 'นาย',
+                // 'prefix' => 'นาย',
                 'name' => 'สมสี ตัวอย่าง',
-                'employee_id' => 'EMP002',
+                // 'employee_id' => 'EMP002',
                 'password' => Hash::make('password123'),
                 'email' => 'somchi@example.com',
                 'phone' => '0800000002',
@@ -37,9 +37,9 @@ class UserSeeder extends Seeder
                 'role' => 'QA Admin',
             ],
             [
-                'prefix' => 'นาย',
+                // 'prefix' => 'นาย',
                 'name' => 'สมพงษ์ ตัวอย่าง',
-                'employee_id' => 'EMP003',
+                // 'employee_id' => 'EMP003',
                 'password' => Hash::make('password123'),
                 'email' => 'sompong@example.com',
                 'phone' => '0800000003',
