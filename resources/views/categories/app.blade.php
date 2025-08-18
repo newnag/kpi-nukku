@@ -29,55 +29,99 @@
             <div class="categories-list">
                 <div class="list-title">รายชื่อมาตรฐานการประเมินที่มี</div>
                 <!-- Search & Filter Controls Group -->
-                <div class="flex flex-wrap gap-2 mt-4 mb-4 items-center">
-                    <div class="relative w-full sm:w-auto bg-white  rounded-lg shadow-sm">
-                        <div class="absolute inset-y-0 left-3 flex items-center pointer-events-none">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none"
-                                viewBox="0 0 24 24" stroke="currentColor">
+                <div class="controls">
+                    <div class="search-box" style="width:100%; max-width:420px;">
+                        <div class="icon">
+                            <!-- search icon -->
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor" style="color:#9ca3af;">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                             </svg>
                         </div>
-                        <input type="text" id="custom-search-standards"
-                            class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none w-full"
+                        <input type="text" id="custom-search-standards" class="search-input"
                             placeholder="ค้นหารายการชื่อผู้ใช้">
                     </div>
                     <!-- Sort Button with Dropdown -->
-                    <div class="relative inline-block text-left  " id="sort-dropdown-container">
-                        <button id="sort-button-standards"
-                            class="h-fit border border-gray-300 rounded-lg  px-4 py-2 bg-white text-gray-700 hover:bg-gray-100 flex items-center gap-2">
+                    <!-- Sort -->
+                    <div class="dropdown" id="sort-dropdown-container">
+                        <button id="sort-button-standards" class="btn">
                             <span>เรียงลำดับ</span>
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
                             </svg>
                         </button>
-                        <div id="sort-dropdown-standards"
-                            class="hidden absolute left-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-10">
-                            <div class="py-1" role="menu" aria-orientation="vertical">
-                                <button
-                                    class="sort-option text-left block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                                    data-column="0" data-order="asc" role="menuitem">ปี (น้อยไปมาก)</button>
-                                <button
-                                    class="sort-option text-left block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                                    data-column="0" data-order="desc" role="menuitem">ปี (มากไปน้อย)</button>
-                                <button
-                                    class="sort-option text-left block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                                    data-column="1" data-order="asc" role="menuitem">ชื่อมาตรฐานการประเมิน (A-Z)</button>
-                                <button
-                                    class="sort-option text-left block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                                    data-column="1" data-order="desc" role="menuitem">ชื่อมาตรฐานการประเมิน (Z-A)</button>
-
-                                <button id="clear-sort-standards"type="button"
-                                    class=" text-left block w-full px-4 py-2 text-sm text-gray-600 hover:bg-gray-100">ล้างตัวเรียงลำดับ</button>
-                            </div>
+                        <div id="sort-dropdown-standards" class="dropdown-menu hidden" role="menu"
+                            aria-orientation="vertical">
+                            <button class="dropdown-item sort-option" data-column="0" data-order="asc" role="menuitem">ลำดับ
+                                (น้อยไปมาก)</button>
+                            <button class="dropdown-item sort-option" data-column="0" data-order="desc" role="menuitem">ลำดับ
+                                (มากไปน้อย)</button>
+                            <button class="dropdown-item sort-option" data-column="1" data-order="asc"
+                                role="menuitem">ชื่อผู้ใช้งาน
+                                (A-Z)</button>
+                            <button class="dropdown-item sort-option" data-column="1" data-order="desc"
+                                role="menuitem">ชื่อผู้ใช้งาน (Z-A)</button>
+                            <div class="dropdown-divider"></div>
+                            <button id="clear-sort-standards" type="button" class="dropdown-item"
+                                style="color:#4b5563;">ล้างตัวเรียงลำดับ</button>
                         </div>
                     </div>
 
 
                 </div>
 
+                {{-- <!-- Filter -->
+                <div class="dropdown" id="filter-dropdown-container">
+                    <button id="filter-button" class="btn">
+                        <span>กรองข้อมูล</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+                        </svg>
+                    </button>
+
+                    <div id="filter-dropdown" class="dropdown-menu hidden">
+                        <div style="padding:12px 12px;">
+                            <h3 class="dropdown-title">หน่วยงาน</h3>
+                            <div id="department-options" style="display:grid; gap:8px;">
+                                @foreach ($departments as $dep)
+                                    <label style="display:inline-flex; align-items:center;">
+                                        <input type="checkbox" class="filter-option" data-column="3"
+                                            data-value="{{ $dep }}">
+                                        <span
+                                            style="margin-left:8px; font-size:14px; color:#374151;">{{ $dep }}</span>
+                                    </label>
+                                @endforeach
+                            </div>
+
+                            <div class="dropdown-divider"></div>
+
+                            <h3 class="dropdown-title">บทบาท</h3>
+                            <div id="role-options" style="display:grid; gap:8px;">
+                                @foreach ($roles as $role)
+                                    <label style="display:inline-flex; align-items:center;">
+                                        <input type="checkbox" class="filter-option" data-column="5"
+                                            data-value="{{ $role }}">
+                                        <span
+                                            style="margin-left:8px; font-size:14px; color:#374151;">{{ $role }}</span>
+                                    </label>
+                                @endforeach
+                            </div>
+
+                            <div class="dropdown-divider"></div>
+
+                            <div style="display:flex; justify-content:space-between; gap:12px;">
+                                <button id="clear-filters" class="btn" style="padding:6px 10px;">ล้างตัวกรอง</button>
+                                <button id="apply-filters" class="btn btn-primary"
+                                    style="padding:6px 10px;">ใช้ตัวกรอง</button>
+                            </div>
+                        </div>
+                    </div>
+                </div> --}}
                 <table class="table" id="table1">
                     <thead>
                         <tr>
@@ -206,53 +250,52 @@
             <!-- รายการด้านการประเมิน -->
             <div class="categories-list">
                 <div class="list-title">รายชื่อด้านการประเมินที่มี</div>
-                <div class="flex flex-wrap gap-2 mt-4 mb-4 items-center">
-                    <div class="relative w-full sm:w-auto bg-white  rounded-lg shadow-sm">
-                        <div class="absolute inset-y-0 left-3 flex items-center pointer-events-none">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none"
-                                viewBox="0 0 24 24" stroke="currentColor">
+                <div class="controls">
+
+
+                    <!-- Search -->
+                    <div class="search-box" style="width:100%; max-width:420px;">
+                        <div class="icon">
+                            <!-- search icon -->
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor" style="color:#9ca3af;">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                             </svg>
                         </div>
-                        <input type="text" id="custom-search-categories"
-                            class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none w-full"
+                        <input type="text" id="custom-search-categories" class="search-input"
                             placeholder="ค้นหารายการชื่อผู้ใช้">
                     </div>
                     <!-- Sort Button with Dropdown -->
-                    <div class="relative inline-block text-left  " id="sort-dropdown-container">
-                        <button id="sort-button-categories"
-                            class="h-fit border border-gray-300 rounded-lg  px-4 py-2 bg-white text-gray-700 hover:bg-gray-100 flex items-center gap-2">
+
+
+                    <div class="dropdown" id="sort-dropdown-container">
+                        <button id="sort-button-categories" class="btn">
                             <span>เรียงลำดับ</span>
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
                             </svg>
                         </button>
-                        <div id="sort-dropdown-categories"
-                            class="hidden absolute left-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-10">
-                            <div class="py-1" role="menu" aria-orientation="vertical">
-                                <button
-                                    class="sort-option text-left block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                                    data-column="0" data-order="asc" role="menuitem">ปี (น้อยไปมาก)</button>
-                                <button
-                                    class="sort-option text-left block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                                    data-column="0" data-order="desc" role="menuitem">ปี (มากไปน้อย)</button>
-                                <button
-                                    class="sort-option text-left block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                                    data-column="1" data-order="asc" role="menuitem">ชื่อด้านการประเมิน (A-Z)</button>
-                                <button
-                                    class="sort-option text-left block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                                    data-column="1" data-order="desc" role="menuitem">ชื่อด้านการประเมิน (Z-A)</button>
-
-                                <button id="clear-sort-categories"type="button"
-                                    class=" text-left block w-full px-4 py-2 text-sm text-gray-600 hover:bg-gray-100">ล้างตัวเรียงลำดับ</button>
-                            </div>
+                        <div id="sort-dropdown-categories" class="dropdown-menu hidden" role="menu"
+                            aria-orientation="vertical">
+                            <button class="dropdown-item sort-option" data-column="0" data-order="asc"
+                                role="menuitem">ลำดับ
+                                (น้อยไปมาก)</button>
+                            <button class="dropdown-item sort-option" data-column="0" data-order="desc"
+                                role="menuitem">ลำดับ
+                                (มากไปน้อย)</button>
+                            <button class="dropdown-item sort-option" data-column="1" data-order="asc"
+                                role="menuitem">ชื่อผู้ใช้งาน
+                                (A-Z)</button>
+                            <button class="dropdown-item sort-option" data-column="1" data-order="desc"
+                                role="menuitem">ชื่อผู้ใช้งาน (Z-A)</button>
+                            <div class="dropdown-divider"></div>
+                            <button id="clear-sort-categories" type="button" class="dropdown-item"
+                                style="color:#4b5563;">ล้างตัวเรียงลำดับ</button>
                         </div>
                     </div>
-
-                    <!-- Action Buttons Group -->
 
                 </div>
 
@@ -436,6 +479,12 @@
 
         lucide.createIcons();
     </script>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <!-- DataTables JS -->
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script>
         // ---------- Helper: init ตาราง + event ชุดเดียว ----------
         function initTableControls({
@@ -567,8 +616,249 @@
         </script>
     @endif
     <style>
+        :root {
+            --blue-600: #2563eb;
+            /* ใกล้เคียง Tailwind */
+            --blue-700: #1d4ed8;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-700: #374151;
+            --ring: #3b82f6;
+            --white: #fff;
+            --shadow: 0 1px 2px rgba(0, 0, 0, .06), 0 1px 3px rgba(0, 0, 0, .1);
+            --radius: 8px;
+            --gap-2: 8px;
+            --gap-3: 12px;
+            --pad-2: 8px;
+            --pad-3: 12px;
+            --pad-4: 16px;
+        }
+
+        /* Utilities ที่ใช้แทน hidden/sr-only ฯลฯ */
+        .hidden {
+            display: none !important;
+        }
+
+        .push-right {
+            margin-left: auto;
+        }
+
+        .hide-sm {
+            display: none;
+        }
+
+        @media (min-width:640px) {
+            .hide-sm {
+                display: inline;
+            }
+        }
+
+        /* Layout พื้นฐาน */
+        .user-container h1 {
+            margin: 0 0 8px;
+            font-size: 24px;
+            color: #111827;
+        }
+
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--gap-2);
+            align-items: center;
+            margin: 16px 0;
+        }
+
+        .actions {
+            display: flex;
+            width: 100%;
+            gap: var(--gap-3);
+        }
+
+        /* Search box */
+        .search-box {
+            position: relative;
+            background: var(--white);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+        }
+
+        .search-box .icon {
+            position: absolute;
+            inset: 0 auto 0 12px;
+            display: flex;
+            align-items: center;
+            pointer-events: none;
+        }
+
+        .search-input {
+            padding: 8px 16px 8px 40px;
+            width: 100%;
+            outline: 0;
+            border: 1px solid var(--gray-300);
+            border-radius: var(--radius);
+        }
+
+        .search-input:focus {
+            border-color: var(--ring);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, .2);
+        }
+
+        /* ปุ่ม */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: var(--radius);
+            font: inherit;
+            cursor: pointer;
+            border: 0;
+            background: var(--white);
+            color: var(--gray-700);
+            border: 1px solid var(--gray-300);
+            transition: .15s background-color ease;
+        }
+
+        .btn:hover {
+            background: var(--gray-100);
+        }
+
+        .btn-primary {
+            background: var(--blue-600);
+            color: var(--white);
+            border-color: transparent;
+        }
+
+        .btn-primary:hover {
+            background: var(--blue-700);
+        }
+
+        /* Dropdown */
+        .dropdown {
+            position: relative;
+            display: inline-block;
+            text-align: left;
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            left: 0;
+            top: 100%;
+            margin-top: 8px;
+            width: 192px;
+            background: var(--white);
+            border-radius: 6px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, .1), 0 4px 6px -2px rgba(0, 0, 0, .05);
+            border: 1px solid rgba(0, 0, 0, .05);
+            z-index: 9999;
+            /* เพิ่ม z-index */
+            padding: 4px 0;
+            display: block;
+            /* default เป็น block */
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .dropdown-item {
+            display: block;
+            width: 100%;
+            text-align: left;
+            padding: 8px 16px;
+            font-size: 14px;
+            color: #374151;
+            background: transparent;
+            border: 0;
+        }
+
+        .dropdown-item:hover {
+            background: var(--gray-100);
+        }
+
+        .dropdown-divider {
+            height: 1px;
+            background: var(--gray-200);
+            margin: 12px 0;
+        }
+
+        .dropdown-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 8px;
+        }
+
+        /* Checkbox ฟิลเตอร์ */
+        .filter-option {
+            accent-color: var(--blue-600);
+        }
+
+        /* ตาราง */
+        .table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        .table thead th {
+            text-align: left;
+            font-weight: 600;
+            background: var(--gray-50);
+            border-bottom: 1px solid var(--gray-200);
+            padding: 12px;
+        }
+
+        .table tbody td {
+            padding: 12px;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .categories-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-edit,
+        .btn-delete {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 10px;
+            border-radius: 6px;
+            border: 1px solid var(--gray-300);
+            background: var(--white);
+            cursor: pointer;
+        }
+
+        .btn-edit:hover {
+            background: var(--gray-100);
+        }
+
+        .btn-delete:hover {
+            background: #fee2e2;
+            border-color: #fecaca;
+        }
+
+        /* กล่องหัวข้อ/รายการ */
+        .user-containers {
+            margin-top: 12px;
+        }
+
+        .user-list {
+            background: var(--white);
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: var(--pad-3);
+        }
+    </style>
+    <style>
         .categories-container {
-            max-width: 1200px;
+            max-width: 1500px;
             margin: 0 auto;
             padding: 20px;
 
@@ -576,7 +866,7 @@
 
         .categories-containers {
             width: 100%;
-            max-width: 1200px;
+            max-width: 1500px;
             margin: 0 auto;
             background: white;
             border-radius: 10px;

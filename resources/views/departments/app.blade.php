@@ -168,7 +168,7 @@
     @endif
     <style>
         .department-container {
-            max-width: 1200px;
+            max-width: 1500px;
             margin: 0 auto;
             padding: 20px;
 
@@ -176,7 +176,7 @@
 
         .department-containers {
             width: 100%;
-            max-width: 1200px;
+            max-width: 1500px;
             margin: 0 auto;
             background: white;
             border-radius: 10px;

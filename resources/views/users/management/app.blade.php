@@ -2,7 +2,6 @@
 @section('title', 'จัดการข้อมูลหน่วยงาน')
 @section('content')
 
-    <!-- ========== HTML (ใช้ CSS ด้านบน) ========== -->
     <div class="user-container">
         <h1>รายชื่อผู้ใช้งาน</h1>
 
@@ -32,9 +31,9 @@
                     </svg>
                 </button>
                 <div id="sort-dropdown" class="dropdown-menu hidden" role="menu" aria-orientation="vertical">
-                    <button class="dropdown-item sort-option" data-column="0" data-order="asc" role="menuitem">ปี
+                    <button class="dropdown-item sort-option" data-column="0" data-order="asc" role="menuitem">ลำดับ
                         (น้อยไปมาก)</button>
-                    <button class="dropdown-item sort-option" data-column="0" data-order="desc" role="menuitem">ปี
+                    <button class="dropdown-item sort-option" data-column="0" data-order="desc" role="menuitem">ลำดับ
                         (มากไปน้อย)</button>
                     <button class="dropdown-item sort-option" data-column="1" data-order="asc" role="menuitem">ชื่อผู้ใช้งาน
                         (A-Z)</button>
@@ -145,9 +144,18 @@
         </div>
     </div>
 
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <!-- DataTables JS -->
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
     <script>
         let table;
-
+        document.getElementById('add-user-button').addEventListener('click', function() {
+            window.location.href = "{{ route('users.create') }}";
+        });
         $(function() {
             // --- DataTable init ---
             table = $('#table3').DataTable({
@@ -545,7 +553,7 @@
 
     <style>
         .user-container {
-            max-width: 1200px;
+            max-width: 1500px;
             margin: 0 auto;
             padding: 20px;
 
@@ -553,7 +561,7 @@
 
         .user-containers {
             width: 100%;
-            max-width: 1200px;
+            max-width: 1500px;
             margin: 0 auto;
             background: white;
             border-radius: 10px;
