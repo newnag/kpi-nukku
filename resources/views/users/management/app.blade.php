@@ -96,7 +96,7 @@
             <!-- Action Buttons -->
             <button id="add-user-button" type="button" class="btn btn-primary"
                 style="--blue-600:#398ECA; --blue-700:#2f7ab1;">
-                <i data-lucide="circle-plus" style="margin-right:6px;"></i> เพิ่มข้อมูลผู้ใช้งาน
+                <i data-lucide="circle-plus" style="margin-right:6px;"></i> เพิ่มผู้ใช้งาน
             </button>
 
         </div>
