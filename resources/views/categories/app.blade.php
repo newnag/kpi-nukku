@@ -73,55 +73,6 @@
 
                 </div>
 
-                {{-- <!-- Filter -->
-                <div class="dropdown" id="filter-dropdown-container">
-                    <button id="filter-button" class="btn">
-                        <span>กรองข้อมูล</span>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none"
-                            viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
-                        </svg>
-                    </button>
-
-                    <div id="filter-dropdown" class="dropdown-menu hidden">
-                        <div style="padding:12px 12px;">
-                            <h3 class="dropdown-title">หน่วยงาน</h3>
-                            <div id="department-options" style="display:grid; gap:8px;">
-                                @foreach ($departments as $dep)
-                                    <label style="display:inline-flex; align-items:center;">
-                                        <input type="checkbox" class="filter-option" data-column="3"
-                                            data-value="{{ $dep }}">
-                                        <span
-                                            style="margin-left:8px; font-size:14px; color:#374151;">{{ $dep }}</span>
-                                    </label>
-                                @endforeach
-                            </div>
-
-                            <div class="dropdown-divider"></div>
-
-                            <h3 class="dropdown-title">บทบาท</h3>
-                            <div id="role-options" style="display:grid; gap:8px;">
-                                @foreach ($roles as $role)
-                                    <label style="display:inline-flex; align-items:center;">
-                                        <input type="checkbox" class="filter-option" data-column="5"
-                                            data-value="{{ $role }}">
-                                        <span
-                                            style="margin-left:8px; font-size:14px; color:#374151;">{{ $role }}</span>
-                                    </label>
-                                @endforeach
-                            </div>
-
-                            <div class="dropdown-divider"></div>
-
-                            <div style="display:flex; justify-content:space-between; gap:12px;">
-                                <button id="clear-filters" class="btn" style="padding:6px 10px;">ล้างตัวกรอง</button>
-                                <button id="apply-filters" class="btn btn-primary"
-                                    style="padding:6px 10px;">ใช้ตัวกรอง</button>
-                            </div>
-                        </div>
-                    </div>
-                </div> --}}
                 <table class="table" id="table1">
                     <thead>
                         <tr>

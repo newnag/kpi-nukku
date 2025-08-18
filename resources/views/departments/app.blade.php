@@ -31,12 +31,56 @@
             <!-- รายการหน่วยงาน -->
             <div class="department-list">
                 <div class="list-title">รายชื่อหน่วยงานที่มี</div>
+                <!-- Controls -->
+                <div class="controls">
+                    <!-- Search -->
+                    <div class="search-box" style="width:100%; max-width:420px;">
+                        <div class="icon">
+                            <!-- search icon -->
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor" style="color:#9ca3af;">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                        </div>
+                        <input type="text" id="custom-search" class="search-input" placeholder="ค้นหารายการชื่อผู้ใช้">
+                    </div>
 
-                <table class="datatable" id="table3">
+                    <!-- Sort -->
+                    <div class="dropdown" id="sort-dropdown-container">
+                        <button id="sort-button" class="btn">
+                            <span>เรียงลำดับ</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
+                            </svg>
+                        </button>
+                        <div id="sort-dropdown" class="dropdown-menu hidden" role="menu" aria-orientation="vertical">
+                            <button class="dropdown-item sort-option" data-column="0" data-order="asc" role="menuitem">ลำดับ
+                                (น้อยไปมาก)</button>
+                            <button class="dropdown-item sort-option" data-column="0" data-order="desc"
+                                role="menuitem">ลำดับ
+                                (มากไปน้อย)</button>
+                            <button class="dropdown-item sort-option" data-column="1" data-order="asc"
+                                role="menuitem">ชื่อผู้ใช้งาน
+                                (A-Z)</button>
+                            <button class="dropdown-item sort-option" data-column="1" data-order="desc"
+                                role="menuitem">ชื่อผู้ใช้งาน (Z-A)</button>
+                            <div class="dropdown-divider"></div>
+                            <button id="clear-sort" type="button" class="dropdown-item"
+                                style="color:#4b5563;">ล้างตัวเรียงลำดับ</button>
+                        </div>
+                    </div>
+
+
+
+                </div>
+                <table class="table" id="table1">
                     <thead>
                         <tr>
                             <th>ลำดับ</th>
-                            <th>ชื่อมาตรฐานการประเมิน</th>
+                            <th>ชื่อหน่วยงาน</th>
                             <th>จัดการ</th>
                         </tr>
                     </thead>
@@ -122,43 +166,144 @@
             </form>
         </div>
     </div>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <!-- DataTables JS -->
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 
     <script>
-        function openEditModal(id, name) {
-            document.getElementById('editName').value = name;
-            document.getElementById('editForm').action = `/departments/${id}`;
-            document.getElementById('editModal').classList.add('active');
-            document.getElementById('currentDepartmentName').innerText = name; //แสดงชื่อเดิม
+        // กัน error ถ้าไม่ได้โหลด lucide
+        if (window.lucide && typeof lucide.createIcons === 'function') {
+            lucide.createIcons();
         }
 
-        function openDeleteModal(id, name) {
-            document.getElementById('deleteName').textContent = name;
-            document.getElementById('deleteForm').action = `/departments/${id}`;
-            document.getElementById('deleteModal').classList.add('active');
-        }
+        let table;
 
+        // รอ DOM พร้อมก่อนเสมอ
+        $(function() {
+            // กัน error ปุ่มที่ไม่มีใน DOM
+            const addBtn = document.getElementById('add-user-button');
+            if (addBtn) {
+                addBtn.addEventListener('click', function() {
+                    window.location.href = "{{ route('users.create') }}";
+                });
+            }
+
+            // --- DataTable init ---
+            table = $('#table1').DataTable({
+                searching: true,
+                lengthChange: false,
+                dom: 'rtip',
+                order: [], // ไม่กำหนด default order
+                stateSave: false,
+                language: {
+                    paginate: {
+                        previous: 'ก่อนหน้า',
+                        next: 'ถัดไป'
+                    },
+                    info: "แสดง _START_ ถึง _END_ จากทั้งหมด _TOTAL_ รายการ",
+                    emptyTable: "ไม่พบข้อมูล",
+                    zeroRecords: "ไม่พบข้อมูลที่ตรงกับการค้นหา"
+                }
+            });
+
+            // --- Custom search ---
+            // แนะนำให้เปลี่ยน input เป็น type="search" (ดูโค้ด HTML ข้างล่าง)
+            let timer;
+            $('#custom-search').on('input', function() {
+                clearTimeout(timer);
+                const val = this.value;
+                timer = setTimeout(() => table.search(val).draw(), 150);
+            });
+
+            // ถ้าอยากให้คลิกปุ่ม (x) แล้วเคลียร์ผล ให้ฟังอีเวนต์ 'search' ด้วย (ทำงานกับ type="search")
+            $('#custom-search').on('search', function() {
+                if (this.value === '') table.search('').draw();
+            });
+
+            // --- Dropdown toggles ---
+            $('#sort-button').on('click', function(e) {
+                e.stopPropagation();
+                $('#sort-dropdown').toggleClass('hidden');
+                $('#filter-dropdown').addClass('hidden'); // ถ้าไม่มี #filter-dropdown ก็ไม่เป็นไร
+            });
+
+            $(document).on('click', function(e) {
+                if (!$(e.target).closest('#sort-dropdown-container, #filter-dropdown-container').length) {
+                    $('#sort-dropdown, #filter-dropdown').addClass('hidden');
+                }
+            });
+
+            // --- Sorting ---
+            $('#sort-dropdown').on('click', '.sort-option', function(e) {
+                e.stopPropagation();
+                const col = Number($(this).data('column'));
+                const order = String($(this).data('order')); // 'asc' | 'desc'
+                table.order([
+                    [col, order]
+                ]).draw(false);
+
+                $('#sort-button span').text('เรียงลำดับ: ' + $(this).text().trim());
+                $('#sort-dropdown').addClass('hidden');
+            });
+
+            $('#clear-sort').on('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                // ล้าง order ปัจจุบัน
+                table.order([]).draw(false);
+
+                // (ถ้าต้องการ) ให้กลับมาที่คอลัมน์ลำดับจากน้อยไปมาก
+                table.order([
+                    [0, 'asc']
+                ]).draw(false);
+
+                $('#sort-button span').text('เรียงลำดับ');
+                $('#sort-dropdown').addClass('hidden');
+            });
+        });
+
+        // Modal helpers
         function closeModal(modalId) {
             document.getElementById(modalId).classList.remove('active');
         }
-
-        // ปิด modal เมื่อคลิกนอก modal content
         document.addEventListener('click', function(e) {
             if (e.target.classList.contains('modal-overlay')) {
                 e.target.classList.remove('active');
             }
         });
-
-        // ปิด modal เมื่อกด ESC
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
-                document.querySelectorAll('.modal-overlay.active').forEach(modal => {
-                    modal.classList.remove('active');
-                });
+                document.querySelectorAll('.modal-overlay.active').forEach(modal => modal.classList.remove(
+                    'active'));
             }
         });
 
-        lucide.createIcons();
+        // Expose functions to window (ถ้าเรียกจาก inline onclick)
+        window.openEditModal = function(id, name) {
+            document.getElementById('editName').value = name;
+            document.getElementById('editForm').action = `/departments/${id}`;
+            document.getElementById('currentDepartmentName').innerText = name;
+            document.getElementById('editModal').classList.add('active');
+        }
+        window.openDeleteModal = function(id, name) {
+            document.getElementById('deleteName').textContent = name;
+            document.getElementById('deleteForm').action = `/departments/${id}`;
+            document.getElementById('deleteModal').classList.add('active');
+        }
     </script>
+
+    @if ($errors->any())
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                document.getElementById('editModal').classList.add('active');
+            });
+        </script>
+    @endif
+
     @if ($errors->any())
         <script>
             document.addEventListener('DOMContentLoaded', function() {
@@ -547,6 +692,247 @@
         .btn-delete:hover {
             background-color: #c62828;
             color: white;
+        }
+    </style>
+    <!-- ========== CSS (แทน Tailwind) ========== -->
+    <style>
+        :root {
+            --blue-600: #2563eb;
+            /* ใกล้เคียง Tailwind */
+            --blue-700: #1d4ed8;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-700: #374151;
+            --ring: #3b82f6;
+            --white: #fff;
+            --shadow: 0 1px 2px rgba(0, 0, 0, .06), 0 1px 3px rgba(0, 0, 0, .1);
+            --radius: 8px;
+            --gap-2: 8px;
+            --gap-3: 12px;
+            --pad-2: 8px;
+            --pad-3: 12px;
+            --pad-4: 16px;
+        }
+
+        /* Utilities ที่ใช้แทน hidden/sr-only ฯลฯ */
+        .hidden {
+            display: none !important;
+        }
+
+        .push-right {
+            margin-left: auto;
+        }
+
+        .hide-sm {
+            display: none;
+        }
+
+        @media (min-width:640px) {
+            .hide-sm {
+                display: inline;
+            }
+        }
+
+        /* Layout พื้นฐาน */
+        .user-container h1 {
+            margin: 0 0 8px;
+            font-size: 24px;
+            color: #111827;
+        }
+
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--gap-2);
+            align-items: center;
+            margin: 16px 0;
+        }
+
+        .actions {
+            display: flex;
+            width: 100%;
+            gap: var(--gap-3);
+        }
+
+        /* Search box */
+        .search-box {
+            position: relative;
+            background: var(--white);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+        }
+
+        .search-box .icon {
+            position: absolute;
+            inset: 0 auto 0 12px;
+            display: flex;
+            align-items: center;
+            pointer-events: none;
+        }
+
+        .search-input {
+            padding: 8px 16px 8px 40px;
+            width: 100%;
+            outline: 0;
+            border: 1px solid var(--gray-300);
+            border-radius: var(--radius);
+        }
+
+        .search-input:focus {
+            border-color: var(--ring);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, .2);
+        }
+
+        /* ปุ่ม */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: var(--radius);
+            font: inherit;
+            cursor: pointer;
+            border: 0;
+            background: var(--white);
+            color: var(--gray-700);
+            border: 1px solid var(--gray-300);
+            transition: .15s background-color ease;
+        }
+
+        .btn:hover {
+            background: var(--gray-100);
+        }
+
+        .btn-primary {
+            background: var(--blue-600);
+            color: var(--white);
+            border-color: transparent;
+        }
+
+        .btn-primary:hover {
+            background: var(--blue-700);
+        }
+
+        /* Dropdown */
+        .dropdown {
+            position: relative;
+            display: inline-block;
+            text-align: left;
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            left: 0;
+            top: 100%;
+            margin-top: 8px;
+            width: 192px;
+            background: var(--white);
+            border-radius: 6px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, .1), 0 4px 6px -2px rgba(0, 0, 0, .05);
+            border: 1px solid rgba(0, 0, 0, .05);
+            z-index: 9999;
+            /* เพิ่ม z-index ให้สูงขึ้น */
+            padding: 4px 0;
+            display: block;
+        }
+
+        .dropdown-menu.hidden {
+            display: none !important;
+        }
+
+        .dropdown-item {
+            display: block;
+            width: 100%;
+            text-align: left;
+            padding: 8px 16px;
+            font-size: 14px;
+            color: #374151;
+            background: transparent;
+            border: 0;
+        }
+
+        .dropdown-item:hover {
+            background: var(--gray-100);
+        }
+
+        .dropdown-divider {
+            height: 1px;
+            background: var(--gray-200);
+            margin: 12px 0;
+        }
+
+        .dropdown-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 8px;
+        }
+
+        /* Checkbox ฟิลเตอร์ */
+        .filter-option {
+            accent-color: var(--blue-600);
+        }
+
+        /* ตาราง */
+        .table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        .table thead th {
+            text-align: left;
+            font-weight: 600;
+            background: var(--gray-50);
+            border-bottom: 1px solid var(--gray-200);
+            padding: 12px;
+        }
+
+        .table tbody td {
+            padding: 12px;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .categories-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-edit,
+        .btn-delete {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 10px;
+            border-radius: 6px;
+            border: 1px solid var(--gray-300);
+            background: var(--white);
+            cursor: pointer;
+        }
+
+        .btn-edit:hover {
+            background: var(--gray-100);
+        }
+
+        .btn-delete:hover {
+            background: #fee2e2;
+            border-color: #fecaca;
+        }
+
+        /* กล่องหัวข้อ/รายการ */
+        .user-containers {
+            margin-top: 12px;
+        }
+
+        .user-list {
+            background: var(--white);
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: var(--pad-3);
         }
     </style>
 @endsection
