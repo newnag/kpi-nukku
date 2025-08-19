@@ -126,16 +126,27 @@
                                 <td>{{ $item->getRoleNames()->implode(', ') ?: '-' }}</td>
                                 <td>
                                     <div class="categories-actions">
-                                        <button class="btn-edit"
-                                            onclick="openEditModal({{ $item->id }}, '{{ $item->name }}')">
+                                        {{-- ถ้าใช้ Route Model Binding --}}
+                                        <a href="{{ route('users.edit', ['id' => $item->id]) }}" class="btn-edit"
+                                            style="text-decoration:none;">
                                             <i data-lucide="edit-3" style="margin-right:4px;"></i> แก้ไข
-                                        </button>
-                                        <button class="btn-delete"
-                                            onclick="openDeleteModal({{ $item->id }}, '{{ $item->name }}')">
-                                            <i data-lucide="trash-2" style="margin-right:4px;"></i> ลบ
-                                        </button>
+                                        </a>
+
+                                        <form action="{{ route('users.destroy', ['id' => $item->id]) }}" method="POST"
+                                            style="display:inline;">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn-delete"
+                                                onclick="return confirm('ต้องการลบผู้ใช้งาน {{ $item->name }} หรือไม่?')">
+                                                <i data-lucide="trash-2" style="margin-right:4px;"></i> ลบ
+                                            </button>
+                                        </form>
+
+
+
                                     </div>
                                 </td>
+
                             </tr>
                         @endforeach
                     </tbody>
@@ -304,6 +315,7 @@
             });
         });
     </script>
+
 
 
     <script>
@@ -518,6 +530,10 @@
 
         .btn-edit,
         .btn-delete {
+            text-decoration: none;
+            /* ตัดเส้นใต้ */
+            color: #398ECA;
+            /* กำหนดสีข้อความ */
             display: inline-flex;
             align-items: center;
             gap: 6px;
