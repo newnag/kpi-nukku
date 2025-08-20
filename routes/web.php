@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\CategorieController;
+use App\Http\Controllers\EvidenceController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\StandardController;
 use App\Http\Controllers\UserController;
@@ -47,10 +48,19 @@ Route::prefix('settings')->name('settings.')->group(function () {
 Route::prefix('users')->name('users.')->group(function () {
     Route::get('/',        [UserController::class, 'index'])->name('index');
     Route::get('/create',  [UserController::class, 'create'])->name('create');
-    Route::get('/{id}/edit',[UserController::class, 'edit'])->name('edit');   // ใช้ {id}
+    Route::get('/{id}/edit', [UserController::class, 'edit'])->name('edit');   // ใช้ {id}
     Route::post('/',       [UserController::class, 'store'])->name('store');
     Route::put('/{id}',    [UserController::class, 'update'])->name('update');
     Route::delete('/{id}', [UserController::class, 'destroy'])->name('destroy');
+});
+Route::prefix('evidences')->name('evidences.')->group(function () {
+    Route::get('/', [EvidenceController::class, 'index'])->name('index');
+    Route::post('/store', [EvidenceController::class, 'store'])->name('store');
+    Route::put('/{id}', [EvidenceController::class, 'update'])->name('update');
+    Route::delete('/{id}', [EvidenceController::class, 'destroy'])->name('destroy');
+    Route::get('/{id}/download', [EvidenceController::class, 'download']);
+    Route::get('criteria/{criteriaId}/evidences', [EvidenceController::class, 'getByCriteria']);
+    Route::patch('/{id}/toggle-status', [EvidenceController::class, 'toggleStatus']);
 });
 
 
