@@ -39,10 +39,10 @@
                         (A-Z)</button>
                     <button class="dropdown-item sort-option" data-column="1" data-order="desc" role="menuitem">ชื่อไฟล์
                         (Z-A)</button>
-                    <button class="dropdown-item sort-option" data-column="3" data-order="desc"
+                    <button class="dropdown-item sort-option" data-column="4" data-order="desc"
                         role="menuitem">วันที่อัปโหลด
                         (ใหม่ล่าสุด)</button>
-                    <button class="dropdown-item sort-option" data-column="3" data-order="asc" role="menuitem">วันที่อัปโหลด
+                    <button class="dropdown-item sort-option" data-column="4" data-order="asc" role="menuitem">วันที่อัปโหลด
                         (เก่าล่าสุด)</button>
                     <div class="dropdown-divider"></div>
                     <button id="clear-sort" type="button" class="dropdown-item"
@@ -67,7 +67,7 @@
                         <div id="type-options" style="display:grid; gap:8px;">
                             @foreach ($fileTypes as $type)
                                 <label style="display:inline-flex; align-items:center;">
-                                    <input type="checkbox" class="filter-option" data-column="2"
+                                    <input type="checkbox" class="filter-option" data-column="3"
                                         data-value="{{ $type }}">
                                     <span style="margin-left:8px; font-size:14px; color:#374151;">{{ $type }}</span>
                                 </label>
@@ -76,24 +76,9 @@
 
                         <div class="dropdown-divider"></div>
 
-                        <h3 class="dropdown-title">สถานะ</h3>
-                        <div id="status-options" style="display:grid; gap:8px;">
-                            <label style="display:inline-flex; align-items:center;">
-                                <input type="checkbox" class="filter-option" data-column="4" data-value="เปิดใช้งาน">
-                                <span style="margin-left:8px; font-size:14px; color:#374151;">เปิดใช้งาน</span>
-                            </label>
-                            <label style="display:inline-flex; align-items:center;">
-                                <input type="checkbox" class="filter-option" data-column="4" data-value="ปิดใช้งาน">
-                                <span style="margin-left:8px; font-size:14px; color:#374151;">ปิดใช้งาน</span>
-                            </label>
-                        </div>
-
-                        <div class="dropdown-divider"></div>
-
                         <div style="display:flex; justify-content:space-between; gap:12px;">
                             <button id="clear-filters" class="btn" style="padding:6px 10px;">ล้างตัวกรอง</button>
-                            <button id="apply-filters" class="btn btn-primary"
-                                style="padding:6px 10px;">ใช้ตัวกรอง</button>
+                            <button id="apply-filters" class="btn btn-primary" style="padding:6px 10px;">ใช้ตัวกรอง</button>
                         </div>
                     </div>
                 </div>
@@ -108,9 +93,9 @@
                         <tr>
                             <th>ลำดับ</th>
                             <th>ชื่อไฟล์</th>
+                            <th>ขนาดไฟล์</th>
                             <th>ประเภทไฟล์</th>
                             <th>วันที่อัปโหลด</th>
-                            <th>สถานะ</th>
                             <th>จัดการ</th>
                         </tr>
                     </thead>
@@ -121,15 +106,17 @@
                                 <td>
                                     <div class="file-info">
                                         <div class="file-icon">
-                                            @if (str_ends_with($evidence->name, '.pdf'))
+                                            @if (str_ends_with($evidence->type, 'pdf'))
                                                 <i data-lucide="file-text" style="color:#dc2626;"></i>
-                                            @elseif(str_ends_with($evidence->name, '.doc') || str_ends_with($evidence->name, '.docx'))
+                                            @elseif(str_ends_with($evidence->type, 'docx') || str_ends_with($evidence->type, '.docx'))
                                                 <i data-lucide="file-text" style="color:#2563eb;"></i>
-                                            @elseif(str_ends_with($evidence->name, '.png') ||
-                                                    str_ends_with($evidence->name, '.jpg') ||
-                                                    str_ends_with($evidence->name, '.jpeg'))
+                                            @elseif(str_ends_with($evidence->type, 'pptx') || str_ends_with($evidence->type, '.pptx'))
+                                                <i data-lucide="file-text" style="color:#eb7e25;"></i>
+                                            @elseif(str_ends_with($evidence->type, 'image') ||
+                                                    str_ends_with($evidence->type, 'jpg') ||
+                                                    str_ends_with($evidence->type, 'jpeg'))
                                                 <i data-lucide="image" style="color:#16a34a;"></i>
-                                            @elseif(str_ends_with($evidence->name, '.xlsx') || str_ends_with($evidence->name, '.xls'))
+                                            @elseif(str_ends_with($evidence->type, 'excel') || str_ends_with($evidence->name, '.xls'))
                                                 <i data-lucide="file-spreadsheet" style="color:#059669;"></i>
                                             @else
                                                 <i data-lucide="file" style="color:#6b7280;"></i>
@@ -143,16 +130,12 @@
                                         </div>
                                     </div>
                                 </td>
+                                 <td>{{ $evidence->file_size ?? '2.8 MB' }}</td>
                                 <td data-search="{{ $evidence->type }}">{{ $evidence->type }}</td>
                                 <td data-order="{{ optional($evidence->created_at)->timestamp }}">
                                     {{ $evidence->created_at ? $evidence->created_at->format('M d, Y') : 'Dec 13, 2022' }}
                                 </td>
-                                <td data-search="{{ $evidence->status ? 'เปิดใช้งาน' : 'ปิดใช้งาน' }}">
-                                    <span
-                                        class="status-badge {{ $evidence->status ? 'status-active' : 'status-inactive' }}">
-                                        {{ $evidence->status ? 'เปิดใช้งาน' : 'ปิดใช้งาน' }}
-                                    </span>
-                                </td>
+                    
                                 <td>
                                     <div class="evidence-actions">
                                         <button class="btn-download" onclick="downloadFile({{ $evidence->id }})"
@@ -175,7 +158,7 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
     <!-- DataTables JS -->
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/lucide@0.469.0/dist/umd/lucide.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lucide@0.469.0/dist/umd/lucide.min.js"></script>
 
     <script>
         let table;
