@@ -283,8 +283,13 @@
                         <td class="px-4 py-3 text-sm text-gray-900 text-center">
                             {{ number_format($indicator['max_score'], 2) ?? '0.00' }}
                         </td>
-                        <td class="px-4 py-3 text-sm">
-                            @switch($indicator['status'])
+                        @php
+                            $statusCode = (int) ($indicator['status'] ?? -1); // 0,1,2 or -1 (unknown)
+                        @endphp
+
+                        <td class="px-4 py-3 text-sm" data-search="{{ $statusCode }}" {{-- DataTables will use this for searching --}}
+                            data-order="{{ $statusCode }}"> {{-- DataTables will use this for ordering --}}
+                            @switch($statusCode)
                                 @case(0)
                                     <div
                                         class="flex justify-center items-center w-6 h-6 mx-auto rounded-full bg-green-100 text-green-600">
@@ -325,18 +330,19 @@
                                     </span>
                             @endswitch
                         </td>
-                        <td class="px-4 py-3 text-sm">
+
+                        <td class="px-4 py-3 text-sm"
+                            data-search="{{ $indicator['evidences']->isNotEmpty() ? 'รอดำเนินการ' : 'ไม่ครบ' }}"
+                            data-order="{{ $indicator['evidences']->isNotEmpty() ? 1 : 0 }}">
                             @if ($indicator['evidences']->isNotEmpty())
                                 <span
-                                    class="flex justify-center text-center px-2 py-1 text-xs font-medium rounded-full 
-                                            bg-gray-100 text-gray-800">รอดำเนินการ
-
+                                    class="flex justify-center text-center px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-800">
+                                    รอดำเนินการ
                                 </span>
                             @else
                                 <span
-                                    class="flex justify-center text-center px-2 py-1 text-xs font-medium rounded-full 
-                                            bg-red-100 text-red-800">ไม่ครบ
-
+                                    class="flex justify-center text-center px-2 py-1 text-xs font-medium rounded-full bg-red-100 text-red-800">
+                                    ไม่ครบ
                                 </span>
                             @endif
                         </td>
@@ -420,10 +426,6 @@
                 background-color: #1d4ed8 !important;
                 border-color: #1d4ed8;
             }
-
-            /* .dataTables_filter {
-                                                                                                                                        display: none;
-                                                                                                                                    } */
 
             @media (max-width: 768px) {
 
@@ -570,7 +572,7 @@
                 });
 
                 $('#add_indicator_button').on('click', function() {
-                    alert('add indicator functionality will be implemented here');
+                    window.location.href = "{{ route('indicator.create') }}";
                 });
 
                 // Sorting dropdown functionality
@@ -634,52 +636,49 @@
                     }
                 });
 
-                // Apply filters button
-                $('#apply-filters').on('click', function() {
-                    // Clear existing filters
-                    table.columns().search('').draw();
+                // helper: escape regex
+                const escapeRegex = s => s.toString().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                // helper: multiple exact choices
+                const makeExactRegex = (values) => `^(?:${values.map(escapeRegex).join('|')})$`;
 
-                    // Count active filters
+                $('#apply-filters').on('click', function() {
+                    // clear previous
+                    table.columns().search('');
+
                     let filterCount = 0;
 
-                    // Apply each filter
                     for (const column in activeFilters) {
                         if (activeFilters[column].length > 0) {
                             filterCount += activeFilters[column].length;
 
-                            // Create regex filter for multiple values
-                            const regex = activeFilters[column].map(v => {
-                                // For status columns (using icons or special text)
-                                if (column == 7) {
-                                    // Map numeric status to visual indicator to filter by
-                                    if (v === 0) return '✓'; // สมบูรณ์
-                                    if (v === 1) return '✕'; // ไม่สมบูรณ์ 
-                                    if (v === 2) return '⚠'; // อยู่ระหว่างดำเนินการ
-                                    return v;
-                                }
+                            if (column == 7) {
+                                // activeFilters['7'] already contains ["0","1","2"] from checkboxes
+                                const regex = makeExactRegex(activeFilters[column].map(String));
+                                table.column(7).search(regex, true, false); // regex = true, smart = false
+                                continue;
+                            }
 
-                                // Escape special regex characters
-                                return v.toString().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-                            }).join('|');
+                            if (column == 8) {
+                                // you kept text values ("รอดำเนินการ","ไม่ครบ") for column 8
+                                const regex = makeExactRegex(activeFilters[column].map(String));
+                                table.column(8).search(regex, true, false);
+                                continue;
+                            }
 
-                            // Apply the filter to this column
-                            table.column(column).search(regex, true, false);
+                            // (future other columns)
+                            const regex = makeExactRegex(activeFilters[column].map(String));
+                            table.column(Number(column)).search(regex, true, false);
                         }
                     }
 
-                    // Update button text to show filter count
-                    if (filterCount > 0) {
-                        $('#filter-button span').text('กรองข้อมูล (' + filterCount + ')');
-                    } else {
-                        $('#filter-button span').text('กรองข้อมูล');
-                    }
+                    $('#filter-button span').text(filterCount > 0 ? `กรองข้อมูล (${filterCount})` :
+                        'กรองข้อมูล');
 
-                    // Draw table with new filters
                     table.draw();
-
-                    // Close dropdown
                     $('#filter-dropdown').addClass('hidden');
                 });
+
+
 
                 // Clear filters button
                 $('#clear-filters').on('click', function() {
@@ -707,7 +706,7 @@
                     // $('.sort-icon').removeClass('sorting_asc sorting_desc').addClass('sorting');
                     // $('.sort-icon').css('opacity', '0.3');
                     // $('.sort-icon').css('transform', 'rotate(0deg)');
-                    
+
 
                 });
 
