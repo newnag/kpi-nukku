@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Criteria;
 use App\Models\Evidence;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Gate;
 
 class EvidenceController extends Controller
 {
@@ -61,56 +64,181 @@ class EvidenceController extends Controller
     /**
      * Store a newly created evidence in storage.
      */
-    public function store(Request $request): JsonResponse
+    public function create()
     {
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255',
-            'file' => 'required|file|max:10240', // 10MB max
-            'type' => 'required|string|max:100',
-            'detail' => 'nullable|string',
-            'status' => 'boolean',
-            'criteria_id' => 'required|exists:criteria,id',
-        ]);
+        // 1) ตรวจสิทธิ์
+        // Gate::authorize('create',Evidence::class);
 
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation failed',
-                'errors' => $validator->errors()
-            ], 422);
+        // 2) ดึงรายการเกณฑ์ที่ใช้งานอยู่
+        $criterias = Criteria::orderBy('name')->get(['id', 'name']);
+
+        // 3) เคสไม่มีเกณฑ์ให้เลือก
+        if ($criterias->isEmpty()) {
+            return redirect()
+                ->route('criterias.index') // หรือ evidences.index ตาม UX
+                ->with('warning', 'ยังไม่มีเกณฑ์ที่ใช้งานอยู่ กรุณาเพิ่ม/เปิดใช้งานเกณฑ์ก่อน');
         }
 
+        // 4) คืน view (ไม่ต้องส่ง user ไปก็ได้)
+        return view('evidences.create', [
+            'criterias' => $criterias,
+        ]);
+    }
+    /**
+     * Store a newly created evidence in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function store(Request $request)
+    {
+        // Validation rules
+        $request->validate([
+            'files.*' => 'nullable|file|mimes:pdf,jpg,jpeg,png,doc,docx|max:10240', // 10MB max per file
+            'url' => 'nullable|url|max:2048',
+            'additional_url' => 'nullable|url|max:2048',
+            'detail' => 'nullable|string|max:65535',
+        ], [
+            'files.*.mimes' => 'ไฟล์ต้องเป็นประเภท: pdf, jpg, jpeg, png, doc, docx เท่านั้น',
+            'files.*.max' => 'ไฟล์ต้องมีขนาดไม่เกิน 10MB',
+            'url.url' => 'รูปแบบ URL ไม่ถูกต้อง',
+            'additional_url.url' => 'รูปแบบ URL เพิ่มเติมไม่ถูกต้อง',
+            'detail.max' => 'รายละเอียดต้องมีความยาวไม่เกิน 65,535 ตัวอักษร'
+        ]);
+
         try {
-            $file = $request->file('file');
-            $filename = time() . '_' . $file->getClientOriginalName();
-            $path = $file->storeAs('evidence', $filename, 'public');
+            // Check if at least one input is provided
+            if (!$request->hasFile('files') && !$request->filled('url') && !$request->filled('additional_url') && !$request->filled('detail')) {
+                return redirect()->back()
+                    ->withInput()
+                    ->withErrors(['general' => 'กรุณาระบุข้อมูลอย่างน้อย 1 รายการ (ไฟล์, URL, หรือรายละเอียด)']);
+            }
 
-            $evidence = Evidence::create([
-                'name' => $request->name,
-                'path' => $path,
-                'type' => $request->type,
-                'detail' => $request->detail,
-                'status' => $request->boolean('status', true),
-                'criteria_id' => $request->criteria_id,
-                'user_id' => Auth::id(),
-            ]);
+            // Create new evidence record
+            $evidence = new Evidence();
 
-            $evidence->load(['criteria', 'user']);
+            // Handle file uploads
+            if ($request->hasFile('files')) {
+                $uploadedFiles = [];
+                foreach ($request->file('files') as $file) {
+                    // Generate unique filename
+                    $originalName = $file->getClientOriginalName();
+                    $extension = $file->getClientOriginalExtension();
+                    $filename = time() . '_' . Str::random(10) . '.' . $extension;
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Evidence created successfully',
-                'data' => $evidence
-            ], 201);
+                    // Store file in storage/app/public/evidences
+                    $path = $file->storeAs('evidences', $filename, 'public');
+
+                    $uploadedFiles[] = [
+                        'original_name' => $originalName,
+                        'stored_name' => $filename,
+                        'path' => $path,
+                        'size' => $file->getSize(),
+                        'mime_type' => $file->getMimeType()
+                    ];
+                }
+
+                // Store file information as JSON
+                $evidence->path = json_encode($uploadedFiles);
+                $evidence->type = 'file';
+                $evidence->name = 'หลักฐานไฟล์ - ' . count($uploadedFiles) . ' ไฟล์';
+            }
+
+            // Handle URL input
+            $urls = [];
+            if ($request->filled('url')) {
+                $urls[] = $request->url;
+            }
+            if ($request->filled('additional_url')) {
+                $urls[] = $request->additional_url;
+            }
+
+            if (!empty($urls)) {
+                if ($request->hasFile('files')) {
+                    // If files exist, store URLs separately or combine
+                    $evidence->path = json_encode(array_merge(
+                        json_decode($evidence->path, true),
+                        ['urls' => $urls]
+                    ));
+                } else {
+                    $evidence->path = json_encode(['urls' => $urls]);
+                    $evidence->type = 'url';
+                    $evidence->name = 'หลักฐาน URL - ' . count($urls) . ' ลิงก์';
+                }
+            }
+
+            // Handle mixed content name
+            if ($request->hasFile('files') && !empty($urls)) {
+                $fileCount = count($request->file('files'));
+                $urlCount = count($urls);
+                $evidence->name = "หลักฐานรวม - {$fileCount} ไฟล์, {$urlCount} ลิงก์";
+                $evidence->type = 'mixed';
+            }
+
+            // Set other fields
+            $evidence->detail = $request->detail;
+            $evidence->status = true; // Default status as active
+
+            // Set foreign keys (adjust based on your requirements)
+            $evidence->criteria_id = $request->criteria_id ?? null;
+            $evidence->user_id = auth()->id(); // Current authenticated user
+
+            // Save to database
+            $evidence->save();
+
+            // Redirect with success message
+            return redirect()->route('evidences.index')
+                ->with('success', 'บันทึกหลักฐานเรียบร้อยแล้ว');
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to create evidence',
-                'error' => $e->getMessage()
-            ], 500);
+            // Handle errors
+            \Log::error('Evidence store error: ' . $e->getMessage());
+
+            // Clean up uploaded files if database save failed
+            if (isset($uploadedFiles)) {
+                foreach ($uploadedFiles as $fileInfo) {
+                    Storage::disk('public')->delete($fileInfo['path']);
+                }
+            }
+
+            return redirect()->back()
+                ->withInput()
+                ->withErrors(['general' => 'เกิดข้อผิดพลาดในการบันทึกข้อมูล กรุณาลองใหม่อีกครั้ง']);
         }
     }
 
+    /**
+     * Get file type icon class for display
+     */
+    private function getFileTypeIcon($mimeType)
+    {
+        switch ($mimeType) {
+            case 'application/pdf':
+                return 'file-pdf';
+            case 'image/jpeg':
+            case 'image/jpg':
+            case 'image/png':
+                return 'image';
+            case 'application/msword':
+            case 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
+                return 'file-text';
+            default:
+                return 'file';
+        }
+    }
+
+    /**
+     * Format file size for human readable format
+     */
+    private function formatFileSize($bytes)
+    {
+        $units = ['B', 'KB', 'MB', 'GB'];
+        $bytes = max($bytes, 0);
+        $pow = floor(($bytes ? log($bytes) : 0) / log(1024));
+        $pow = min($pow, count($units) - 1);
+        $bytes /= pow(1024, $pow);
+
+        return round($bytes, 2) . ' ' . $units[$pow];
+    }
     /**
      * Display the specified evidence.
      */
