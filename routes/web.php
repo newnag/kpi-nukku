@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\CategorieController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EvidenceController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\StandardController;
@@ -62,6 +63,11 @@ Route::prefix('evidences')->name('evidences.')->group(function () {
     Route::get('/{id}/download', [EvidenceController::class, 'download']);
     Route::get('criteria/{criteriaId}/evidences', [EvidenceController::class, 'getByCriteria']);
     Route::patch('/{id}/toggle-status', [EvidenceController::class, 'toggleStatus']);
+});
+
+Route::prefix('dashboard')->name('dashboard.')->group(function () {
+    Route::get('/', [DashboardController::class, 'index'])->name('index');
+
 });
 
 

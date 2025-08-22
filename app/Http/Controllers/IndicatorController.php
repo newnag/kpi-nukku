@@ -12,7 +12,7 @@ class IndicatorController extends Controller
     {
         $indicators = IndicatorModel::with([
             'category.standard',
-            'assignments.collector.department',
+            'assignments.collectorUser.department',
             'evidences'
         ])->get()->map(function ($indicator) {
             // Add custom properties or modify existing ones
@@ -41,16 +41,13 @@ class IndicatorController extends Controller
                     'name' => $indicator->category->standard->name,
                 ] : null,
                 'assignments' => $indicator->assignments->map(function ($assignment) {
-                    $user = User::find($assignment->collector);
+                    $user = $assignment->collectorUser;
                     return [
                         'user' => $user ? [
                             'id' => $user->id,
                             'name' => $user->name,
-                            // 'employee_id' => $user->employee_id,
-                            // 'phone' => $user->phone,
-                            // 'email' => $user->email,
                             'department_id' => $user->department_id,
-                            'department_name' => $user->department ? $user->department->name : null,
+                            'department_name' => optional($user->department)->name,
                         ] : null,
                     ];
                 }),
