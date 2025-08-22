@@ -7,10 +7,10 @@ use Illuminate\Database\Eloquent\Model;
 class Assignment extends Model
 {
     public $timestamps = false;
-    
+
     protected $fillable = [
         'indicator_id',
-        'collector',
+        'collector', // <- เก็บ user_id ไว้ในคอลัมน์ชื่อ collector
     ];
 
     public function indicator()
@@ -18,8 +18,9 @@ class Assignment extends Model
         return $this->belongsTo(Indicator::class);
     }
 
-    public function collector()
+    // ความสัมพันธ์ไปยังผู้ใช้ที่เป็นผู้รวบรวมข้อมูล (rename เพื่อเลี่ยงชนกับคอลัมน์ collector)
+    public function collectorUser()
     {
-        return $this->belongsTo(User::class, 'collector');
+        return $this->belongsTo(User::class, 'collector', 'id');
     }
 }

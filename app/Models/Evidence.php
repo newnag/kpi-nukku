@@ -9,6 +9,9 @@ class Evidence extends Model
 {
     use HasFactory;
 
+    // ชื่อตารางจริงเป็นเอกพจน์
+    protected $table = 'evidence';
+
     protected $fillable = [
         'name',
         'path',
@@ -18,10 +21,12 @@ class Evidence extends Model
         'criteria_id',
         'user_id',
     ];
+
     protected $hidden = [
         'created_at',
         'updated_at',
     ];
+
     protected $casts = [
         'status' => 'boolean',
     ];
@@ -35,5 +40,4 @@ class Evidence extends Model
     {
         return $this->belongsTo(User::class, 'user_id');
     }
-
 }

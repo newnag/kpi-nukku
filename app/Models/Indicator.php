@@ -9,6 +9,8 @@ class Indicator extends Model
 {
     use HasFactory;
 
+    protected $table = 'indicators';
+
     protected $fillable = [
         'name',
         'year',
@@ -25,13 +27,10 @@ class Indicator extends Model
         'categorie_id',
     ];
 
-    protected $hidden = [
-        'created_at',
-        'updated_at',
-    ];
+    protected $hidden = ['created_at', 'updated_at'];
 
     protected $casts = [
-        'deadline' => 'datetime:Y-m-d',
+        'deadline'  => 'datetime',   // จัดรูปแบบใน view จะยืดหยุ่นกว่า
         'score_acc' => 'decimal:2',
         'max_score' => 'decimal:2',
     ];
@@ -66,9 +65,16 @@ class Indicator extends Model
         return $this->hasMany(Assignment::class);
     }
 
+    // สำคัญ: กัน ambiguous column โดยเลือก evidence.* ชัดเจน
     public function evidences()
     {
-        return $this->hasManyThrough(Evidence::class, Criteria::class);
+        return $this->hasManyThrough(
+            Evidence::class,
+            Criteria::class,
+            'indicator_id', // foreign key ใน criterias
+            'criteria_id',  // foreign key ใน evidence
+            'id',           // local key ใน indicators
+            'id'            // local key ใน criterias
+        );
     }
-
 }
