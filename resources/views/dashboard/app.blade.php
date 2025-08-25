@@ -73,24 +73,25 @@
         <div class="score-card">
             <div class="score-header">
                 <span class="label">ปีการประเมิน</span>
-                <span class="year">{{ $year ?? 'ทั้งหมด' }}</span>
+                <span class="year" id="display-year">{{ $displayYear }}</span>
             </div>
             <hr />
             <div class="score-body">
                 <span class="label-left">คะแนนที่ได้</span>
                 <div class="score-value">
-                    {{ number_format($totalScore) }}
+                    <span id="display-total">{{ number_format($totalScore) }}</span>
                     <span class="divider">/</span>
-                    {{ number_format($maxScore) }}
+                    <span id="display-max">{{ number_format($maxScore) }}</span>
                 </div>
                 <span class="label-right">คะแนนเต็ม</span>
             </div>
         </div>
 
+
         <!-- Stats Cards -->
         <div class="stat-title">
             <h3>สถานะทั้งหมดของตัวชี้วัดต่อปี</h3>
-            <span class="sub">(04/08/2025 up to date)</span>
+            <span class="year"id="display-years">{{ $displayYear }}</span>
         </div>
         <div class="stats-grid">
 
@@ -119,51 +120,37 @@
 
                 <div class="stat-body">
                     <div class="chart-wrap">
-                        <canvas id="satisfactionChart" width="260" height="260"></canvas>
+                        <canvas id="satisfactionChart" width="310px" height="260"></canvas>
                     </div>
 
                     <div class="legend-wrap">
-                        <div class="legend-item">
-                            <div class="legend-left">
-                                <span class="dot" style="background:#22c55e"></span>
-                                <div class="legend-text">
-                                    <div class="label">ผลการดำเนินการครบถ้วนตามเกณฑ์มาตรฐาน</div>
-                                    <div class="subtext"><strong>15</strong> indicator</div>
-                                </div>
-                            </div>
-                            <div class="legend-right">
-                                <div class="bar" style="background:#22c55e"></div>
-                                <div class="pct">26.79%</div>
-                            </div>
-                        </div>
 
-                        <div class="legend-item">
-                            <div class="legend-left">
-                                <span class="dot" style="background:#f59e0b"></span>
-                                <div class="legend-text">
-                                    <div class="label">อยู่ระหว่างดำเนินการ</div>
-                                    <div class="subtext"><strong>35</strong> indicator</div>
-                                </div>
-                            </div>
-                            <div class="legend-right">
-                                <div class="bar" style="background:#f59e0b"></div>
-                                <div class="pct">62.50%</div>
-                            </div>
-                        </div>
+                        @php $totalStatus = array_sum($statusCounts); @endphp
 
-                        <div class="legend-item">
-                            <div class="legend-left">
-                                <span class="dot" style="background:#ef4444"></span>
-                                <div class="legend-text">
-                                    <div class="label">ผลการดำเนินงานยังไม่ครบถ้วนตามเกณฑ์</div>
-                                    <div class="subtext"><strong>6</strong> indicator</div>
+                        @foreach ($legendConfig as $item)
+                            @php
+                                $count = $statusCounts[$item['key']] ?? 0;
+                                $pct = $totalStatus > 0 ? number_format(($count / $totalStatus) * 100, 2) : '0.00';
+                            @endphp
+                            <div class="legend-item" data-key="{{ $item['key'] }}">
+                                <div class="legend-left">
+                                    <span class="dot" style="background:{{ $item['color'] }}"></span>
+                                    <div class="legend-text">
+                                        <div class="label">{{ $item['label'] }}</div>
+                                        <div class="subtext">
+                                            <strong class="legend-count">{{ $count }}</strong> indicator
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="legend-right">
+                                    <div class="bar"
+                                        style="background:{{ $item['color'] }}; width: {{ $pct }}%;"></div>
+                                    <div class="pct legend-pct">{{ $pct }}%</div>
                                 </div>
                             </div>
-                            <div class="legend-right">
-                                <div class="bar" style="background:#ef4444"></div>
-                                <div class="pct">10.71%</div>
-                            </div>
-                        </div>
+                        @endforeach
+
+
                     </div>
                 </div>
             </div>
@@ -241,15 +228,24 @@
                             <th>ผลลัพธ์</th>
                             <th>คะแนนรวม</th>
                             <th>สถานะตัวชี้วัด</th>
-                            <th>สถานะเอกสาร</th>
+                            {{-- <th>สถานะเอกสาร</th> --}}
                         </tr>
                     </thead>
                     <tbody>
 
                         @foreach ($indicators as $index => $indicator)
+                            @php
+                                $statusKey = match ((int) $indicator->status) {
+                                    2, 3 => 'complete', // ✅ รองรับทั้ง 2 และ 3
+                                    1 => 'incomplete',
+                                    0 => 'pending',
+                                    default => 'pending',
+                                };
+                            @endphp
                             <tr data-standard="{{ $indicator->category->standard->name ?? '' }}"
                                 data-dimension="{{ $indicator->category->name ?? '' }}"
-                                data-collector="{{ $indicator->assignments->first()->collectorUser->name ?? '' }}">
+                                data-collector="{{ $indicator->assignments->first()->collectorUser->name ?? '' }}"
+                                data-status="{{ $statusKey }}">
                                 <td class="status-cell">{{ $index + 1 }}</td>
                                 <td class="status-cell">{{ $indicator->year }}</td>
                                 <td class="status-cell">{{ $indicator->name }}</td>
@@ -280,7 +276,7 @@
                                             </span>
                                         @break
 
-                                        @case(3)
+                                        @case(2)
                                             <span class="tip" data-tip="ผลการดำเนินงานครบถ้วนตามเกณฑ์มาตรฐาน"
                                                 aria-label="ผลการดำเนินงานครบถ้วนตามเกณฑ์มาตรฐาน" tabindex="0">
                                                 <i data-lucide="check-circle" class="status-icon text-success"></i>
@@ -288,10 +284,10 @@
                                         @break
                                     @endswitch
                                 </td>
-
+                                {{-- 
                                 <td class="status-cell">
                                     {{ $indicator->status_doc }}
-                                </td>
+                                </td> --}}
 
                             </tr>
                         @endforeach
@@ -318,46 +314,55 @@
             if (window.lucide?.createIcons) lucide.createIcons();
 
             // ===== Doughnut: Satisfaction =====
-            const donutCanvas = document.getElementById('satisfactionChart');
-            if (donutCanvas) {
-                const donutCtx = donutCanvas.getContext('2d');
-                const dataValues = [15, 35, 6];
-                const colors = ["#22c55e", "#f59e0b", "#ef4444"];
+            // const donutCanvas = document.getElementById('satisfactionChart');
+            // if (donutCanvas) {
+            //     const donutCtx = donutCanvas.getContext('2d');
 
-                new Chart(donutCtx, {
-                    type: 'doughnut',
-                    data: {
-                        labels: ["ครบถ้วน", "ระหว่างดำเนินการ", "ยังไม่ครบถ้วน"],
-                        datasets: [{
-                            data: dataValues,
-                            backgroundColor: colors,
-                            borderColor: "#ffffff",
-                            borderWidth: 4,
-                            hoverOffset: 4,
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        cutout: '72%',
-                        plugins: {
-                            legend: {
-                                display: false
-                            },
-                            tooltip: {
-                                callbacks: {
-                                    label: (context) => {
-                                        const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                                        const val = context.parsed;
-                                        const pct = (val / total * 100).toFixed(2);
-                                        return ` ${val} (${pct}%)`;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                });
-            }
+            //     // ดึง arrays จาก Blade ให้ตรงลำดับกับ legendConfig
+            //     const chartLabels = @json(array_column($legendConfig, 'label'));
+            //     const chartColors = @json(array_column($legendConfig, 'color'));
+            //     const chartKeys = @json(array_column($legendConfig, 'key'));
+
+            //     // map key -> count
+            //     const countsMap = @json($statusCounts);
+            //     const dataValues = chartKeys.map(k => Number(countsMap[k] ?? 0));
+
+            //     new Chart(donutCtx, {
+            //         type: 'doughnut',
+            //         data: {
+            //             labels: chartLabels,
+            //             datasets: [{
+            //                 data: dataValues,
+            //                 backgroundColor: chartColors,
+            //                 borderColor: "#ffffff",
+            //                 borderWidth: 4,
+            //                 hoverOffset: 4,
+            //             }]
+            //         },
+            //         options: {
+            //             responsive: true,
+            //             maintainAspectRatio: false,
+            //             cutout: '72%',
+            //             plugins: {
+            //                 legend: {
+            //                     display: false
+            //                 },
+            //                 tooltip: {
+            //                     callbacks: {
+            //                         title: () => '',
+            //                         label: (ctx) => {
+            //                             const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
+            //                             const val = ctx.parsed;
+            //                             const pct = total > 0 ? (val / total * 100).toFixed(2) : '0.00';
+            //                             // แสดง "ฉลาก: 10 (12.34%)"
+            //                             return ` ${ctx.label}: ${val} (${pct}%)`;
+            //                         }
+            //                     }
+            //                 }
+            //             }
+            //         }
+            //     });
+            // }
 
             // ===== Visits (ตัวอย่าง 3 ชุดข้อมูล) =====
             const visitsCanvas = document.getElementById('visitsChart');
@@ -551,13 +556,14 @@
     </script>
     <script>
         (function($) {
-            let table;
+            let table, donutChart;
 
             const stripHtml = (s) => {
                 const d = document.createElement('div');
                 d.innerHTML = String(s ?? '');
                 return (d.textContent || d.innerText || '').trim();
             };
+            const numberFormat = (n) => (isNaN(n) ? 0 : Number(n)).toLocaleString('th-TH');
 
             $(function() {
                 // 1) Init DataTable
@@ -591,6 +597,7 @@
                 const idxYear = findCol(['ปีการประเมิน']);
                 const idxCode = findCol(['รหัส']);
                 const idxDept = findCol(['หน่วยงานที่รับผิดชอบ']);
+                const idxScore = findCol(['คะแนนรวม']); // ใช้รวมเป็น total
 
                 // 3) Select element
                 const $year = $('#filter-year'),
@@ -608,12 +615,15 @@
                     const uniq = [...new Set(vals)].sort((a, b) => a.localeCompare(b, 'th'));
                     uniq.forEach(v => $sel.append(`<option value="${v}">${v}</option>`));
                 };
-
                 populateFromColumn($year, idxYear);
                 populateFromColumn($code, idxCode);
                 populateFromColumn($dept, idxDept);
 
                 // 5) เติม option จาก data-* (มาตรฐาน, ด้าน, ผู้รับผิดชอบ)
+                window.ALL_STANDARDS = @json($allStandards->pluck('name'));
+                window.ALL_DIMENSIONS = @json($dimensionNames);
+                window.ALL_DEPARTMENTS = @json($departments);
+
                 const populateFromData = ($sel, attr) => {
                     $sel.find('option:not([value=""])').remove();
                     const vals = [];
@@ -625,12 +635,34 @@
                     uniq.forEach(v => $sel.append(`<option value="${v}">${v}</option>`));
                 };
 
-                populateFromData($std, 'standard');
-                populateFromData($dim, 'dimension');
+                function fillSelect($sel, items) {
+                    $sel.find('option:not([value=""])').remove();
+                    (items || []).forEach(v => $sel.append(`<option value="${v}">${v}</option>`));
+                }
+                fillSelect($('#filter-standard'), window.ALL_STANDARDS);
+                fillSelect($('#filter-dimension'), window.ALL_DIMENSIONS);
+                fillSelect($('#filter-dept'), window.ALL_DEPARTMENTS);
                 populateFromData($collector, 'collector');
 
-                // 6) ฟังก์ชันกรอง
-                const applyFilters = () => {
+                // 6) การ์ดสรุป
+                function updateSummary() {
+                    const selectedYear = $year.val();
+                    $('#display-year').text(selectedYear || 'ทั้งหมด');
+                    $('#display-years').text(selectedYear || 'ทั้งหมด');
+
+                    let total = 0;
+                    $('#dashboardTable tbody tr:visible').each(function() {
+                        if (idxScore === -1) return;
+                        const cell = $(this).children().eq(idxScore);
+                        const val = parseFloat(stripHtml(cell.text())) || 0;
+                        total += val;
+                    });
+                    $('#display-total').text(numberFormat(total));
+                    // #display-max เป็น fix จาก Blade
+                }
+
+                // 7) ฟิลเตอร์แถว
+                function applyFilters() {
                     table.rows().every(function() {
                         let show = true;
                         const row = this.node();
@@ -642,39 +674,144 @@
                         const vDept = $dept.val();
                         const vCollector = $collector.val();
 
-                        if (vYear && stripHtml(this.data()[idxYear]) != vYear) show = false;
-                        if (vCode && stripHtml(this.data()[idxCode]) != vCode) show = false;
-                        if (vDept && stripHtml(this.data()[idxDept]) != vDept) show = false;
+                        if (idxYear !== -1 && vYear && stripHtml(this.data()[idxYear]) != vYear) show =
+                            false;
+                        if (idxCode !== -1 && vCode && stripHtml(this.data()[idxCode]) != vCode) show =
+                            false;
+                        if (idxDept !== -1 && vDept && stripHtml(this.data()[idxDept]) != vDept) show =
+                            false;
 
                         if (vStd && row.dataset.standard != vStd) show = false;
                         if (vDim && row.dataset.dimension != vDim) show = false;
                         if (vCollector && row.dataset.collector != vCollector) show = false;
 
-                        if (show) $(row).show();
-                        else $(row).hide();
+                        $(row).toggle(show);
                     });
-                };
 
-                // 7) bind event
+                    updateSummary();
+                    updateDonutAndLegend();
+                }
+
+                // 8) Chart.js
+                const donutCanvas = document.getElementById('satisfactionChart');
+                let chartKeys = [],
+                    chartLabels = [],
+                    chartColors = [];
+                if (donutCanvas) {
+                    const donutCtx = donutCanvas.getContext('2d');
+                    chartLabels = @json(array_column($legendConfig, 'label'));
+                    chartColors = @json(array_column($legendConfig, 'color'));
+                    chartKeys = @json(array_column($legendConfig, 'key'));
+
+                    const countsMap = @json($statusCounts);
+                    const dataValues = chartKeys.map(k => Number(countsMap[k] ?? 0));
+
+                    donutChart = new Chart(donutCtx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: chartLabels,
+                            datasets: [{
+                                data: dataValues,
+                                backgroundColor: chartColors,
+                                borderColor: "#ffffff",
+                                borderWidth: 4,
+                                hoverOffset: 4,
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            cutout: '72%',
+                            plugins: {
+                                legend: {
+                                    display: false
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        title: () => '',
+                                        label: (ctx) => {
+                                            const total = ctx.dataset.data.reduce((a, b) => a + b,
+                                                0);
+                                            const val = ctx.parsed;
+                                            const pct = total > 0 ? (val / total * 100).toFixed(2) :
+                                                '0.00';
+                                            return ` ${ctx.label}: ${val} (${pct}%)`;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+
+                // 9) นับสถานะจากแถวที่มองเห็น
+                function computeStatusCountsFromVisible() {
+                    const counts = Object.fromEntries(chartKeys.map(k => [k, 0]));
+                    $('#dashboardTable tbody tr:visible').each(function() {
+                        const key = this.dataset.status; // ต้องตรง legendConfig[*].key
+                        if (key && counts.hasOwnProperty(key)) counts[key] += 1;
+                    });
+                    return counts;
+                }
+
+                // 10) อัปเดต legend
+                function updateLegend(counts) {
+                    const total = Object.values(counts).reduce((a, b) => a + b, 0);
+                    chartKeys.forEach((k) => {
+                        const c = counts[k] ?? 0;
+                        const pct = total > 0 ? (c / total * 100) : 0;
+                        const $item = $(`.legend-item[data-key="${k}"]`);
+                        $item.find('.legend-count').text(c);
+                        $item.find('.legend-pct').text(pct.toFixed(2) + '%');
+                        $item.find('.bar').css('width', pct + '%');
+                    });
+                }
+
+                // 11) อัปเดตกราฟ + legend
+                function updateDonutAndLegend() {
+                    if (!donutChart) return;
+                    const counts = computeStatusCountsFromVisible();
+                    const newData = chartKeys.map(k => counts[k] ?? 0);
+                    donutChart.data.datasets[0].data = newData;
+                    donutChart.update();
+                    updateLegend(counts);
+                }
+
+                // 12) Bind events
+                // $('.filter-card select').on('change', applyFilters);
                 $('#apply-filters').on('click', applyFilters);
-                $('.filter-card select').on('change', applyFilters);
 
                 $('#reset-filters').on('click', function() {
                     $('.filter-card select').val('');
                     $('#dashboardTable tbody tr').show();
+                    table.search('').draw();
+                    updateSummary();
+                    updateDonutAndLegend();
                 });
 
-                // 8) ช่องค้นหาอิสระ
                 let timer;
                 $('#custom-search')
                     .on('input', function() {
                         clearTimeout(timer);
                         const val = this.value;
-                        timer = setTimeout(() => table.search(val).draw(), 150);
+                        timer = setTimeout(() => {
+                            table.search(val).draw();
+                            // ใช้ :visible ในการรวมค่า/นับสถานะอยู่แล้ว
+                            updateSummary();
+                            updateDonutAndLegend();
+                        }, 150);
                     })
                     .on('search', function() {
-                        if (this.value === '') table.search('').draw();
+                        if (this.value === '') {
+                            table.search('').draw();
+                            updateSummary();
+                            updateDonutAndLegend();
+                        }
                     });
+
+                // 13) อัปเดตครั้งแรก
+                updateSummary();
+                updateDonutAndLegend();
             });
         })(jQuery);
     </script>
@@ -1096,7 +1233,7 @@
         }
 
         /* ตัวเลือก: วาง tooltip ด้านล่าง (ถ้าพื้นที่ด้านบนไม่พอ)
-                               <span class="tip" data-tip="..." data-pos="bottom"> */
+                                                                                           <span class="tip" data-tip="..." data-pos="bottom"> */
         .tip[data-pos="bottom"]::after {
             top: calc(100% + 10px);
             bottom: auto;
@@ -1109,7 +1246,6 @@
             border-top: 1px solid #e5e7eb;
         }
     </style>
-
     <style>
         :root {
             --card-radius: 18px;
