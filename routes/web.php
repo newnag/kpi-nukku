@@ -67,6 +67,7 @@ Route::prefix('evidences')->name('evidences.')->group(function () {
 
 Route::prefix('dashboard')->name('dashboard.')->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('index');
+    Route::get('/result', [DashboardController::class, 'getData'])->name('getData');
 
 });
 

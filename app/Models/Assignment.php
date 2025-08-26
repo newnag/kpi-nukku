@@ -6,8 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class Assignment extends Model
 {
+    protected $table = 'assignments';
     public $timestamps = false;
-
+    // ถ้าไม่มี primary key จริง ๆ และใช้เพื่อ "อ่าน" อย่างเดียว
+    protected $primaryKey = null;
+    public $incrementing = false;
     protected $fillable = [
         'indicator_id',
         'collector', // <- เก็บ user_id ไว้ในคอลัมน์ชื่อ collector
