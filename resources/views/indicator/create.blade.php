@@ -78,8 +78,11 @@
                     broadcast() {
                         const inputs = Array.from($el.querySelectorAll('[data-criteria-title]'));
                         this.titles = inputs.map(el => el.value || '');
-                        window.__criteriaTitles = this.titles.slice(); // 🔹 global cache
-                        $dispatch('criteria-updated', { titles: this.titles }); // 🔹 global event
+                        window.__criteriaTitles = this.titles.slice();
+                        $dispatch('criteria-updated', { titles: this.titles }); // local
+                        window.dispatchEvent(new CustomEvent('criteria-updated', { // global ✅
+                            detail: { titles: this.titles }
+                        }));
                     }
                 }" x-init="$nextTick(() => broadcast())" {{-- 🔸 LOCAL listeners: no .window --}}
                     @criteria-remove="remove($event.detail.index-1)" @criteria-move-up="up($event.detail.index-1)"
@@ -117,69 +120,49 @@
                 <x-input name="max_score" type="number" label="คะแนนเต็มทั้งหมดของตัวชี้วัด" />
             </x-card-box>
 
-            <x-card-box title="เกณฑ์ให้คะแนนแบบหลายตัวเลือก" icon="📋">
+            {{-- แบบตามจำนวนข้อที่เลือก (COUNT) --}}
+            <x-card-box title="เกณฑ์ให้คะแนนแบบหลายตัวเลือก-ตามจำนวนข้อที่เลือก" icon="📋">
+                {{-- unique prefix to avoid collisions --}}
+                <x-multichoice-score-count name-prefix="multiCounts[0]" :index="1" />
+            </x-card-box>
+
+            {{-- แบบคะแนนตามข้อที่เลือก (SELECTED) --}}
+            <x-card-box title="เกณฑ์ให้คะแนนแบบหลายตัวเลือก-คะแนนตามข้อที่เลือก" icon="📋">
+                {{-- unique prefix to avoid collisions --}}
                 <div x-data="{
                     items: [{ id: Date.now() }],
-                    add() {
-                        this.items = [...this.items, { id: Date.now() + this.items.length }];
-                        this.$nextTick(() => {
-                            // 🔹 ping all multichoice instances (including the brand-new one)
-                            window.dispatchEvent(new CustomEvent('criteria-updated', {
-                                detail: { titles: window.__criteriaTitles || [] }
-                            }));
-                        });
-                    },
+                    add() { this.items = [...this.items, { id: Date.now() + this.items.length }] },
                     remove(i) {
                         const a = [...this.items];
                         a.splice(i, 1);
-                        this.items = a
-                    },
-                    up(i) {
-                        if (i > 0) {
-                            const a = [...this.items];
-                            [a[i - 1], a[i]] = [a[i], a[i - 1]];
-                            this.items = a
-                        }
-                    },
-                    down(i) {
-                        if (i < this.items.length - 1) {
-                            const a = [...this.items];
-                            [a[i + 1], a[i]] = [a[i], a[i + 1]];
-                            this.items = a
-                        }
-                    },
-                }" {{-- LOCAL listeners here as well --}} @criteria-remove="remove($event.detail.index-1)"
-                    @criteria-move-up="up($event.detail.index-1)" @criteria-move-down="down($event.detail.index-1)"
-                    class="space-y-4">
+                        this.items = a.length ? a : [{ id: Date.now() }]; // keep at least one
+                    }
+                }" @criteria-remove="remove($event.detail.index - 1)" class="space-y-4">
                     <template x-for="(it, i) in items" :key="it.id">
-                        <div x-data="{ order: i + 1, prefix: 'multiScores[' + i + ']' }" x-effect="order = i+1; prefix = 'multiScores['+i+']'">
-                            <x-multichoice-score :options="$criteriaOptions ?? []" :show-controls="true" />
+                        <div x-data="{ order: i + 1, prefix: 'multiSelected[' + i + ']' }" x-effect="order = i + 1; prefix = 'multiSelected[' + i + ']'">
+                            <x-multichoice-score-selected :options="$criteriaOptions ?? []" />
                         </div>
                     </template>
 
-                    <div class="pt-2">
-                        <button type="button" @click="add()"
-                            class="inline-flex items-center gap-2 rounded-xl bg-blue-600 text-white px-4 py-2 hover:bg-blue-700">
-                            เพิ่มเกณฑ์ <span class="text-xl leading-none">＋</span>
-                        </button>
-                    </div>
+                    <button type="button" @click="add()"
+                        class="inline-flex items-center gap-2 rounded-xl bg-blue-600 text-white px-4 py-2 hover:bg-blue-700">
+                        เพิ่มเกณฑ์ <span class="text-xl leading-none">＋</span>
+                    </button>
                 </div>
             </x-card-box>
+
 
             <x-card-box title="เกณฑ์ให้คะแนนแบบปรับแต่งอิสระ" icon="📋">
                 <x-variable-formula prefix="scoring" />
             </x-card-box>
         </x-card>
 
+
+
         <x-card number="6" title="หมายเหตุ">
-            <x-richtext name="description" placeholder="กรอกคำอธิบายตัวชี้วัด" />
+            <x-richtext name="note" placeholder="กรอกหมายเหตุ" />
         </x-card>
 
-        <div class="flex items-center justify-end gap-3">
-            <a class="px-4 py-2 rounded-xl border border-slate-300 text-slate-700 hover:bg-slate-50">ยกเลิก</a>
-            <button type="submit"
-                class="px-4 py-2 rounded-xl bg-blue-600 text-white hover:bg-blue-700">บันทึกตัวชี้วัด</button>
-        </div>
     </form>
 @endsection
 
