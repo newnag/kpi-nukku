@@ -15,7 +15,7 @@
 @once
     @push('styles')
         <style>
-            /* สไตล์คอนเทนต์ในพรีวิว */
+            /* Preview content styles */
             .rte-content {
                 font-size: .9375rem;
             }
@@ -48,7 +48,6 @@
             .rte-content th,
             .rte-content td {
                 border: 1px solid #e5e7eb;
-                /* slate-200 */
             }
 
             .rte-content th,
@@ -56,7 +55,73 @@
                 padding: .5rem .625rem;
             }
 
-            /* ป้องกัน FOUC เวลา x-cloak ยังไม่พร้อม */
+            /* Editor area typography */
+            .trumbowyg-box .trumbowyg-editor {
+                font-size: .9375rem;
+                min-height: var(--rte-min-h, 260px);
+                position: relative;
+                /* needed for placeholder overlay */
+            }
+
+            /* Toolbar button states: focus/active */
+            .trumbowyg-box .trumbowyg-button-pane button {
+                border-radius: .5rem;
+                outline: none;
+            }
+
+            .trumbowyg-box .trumbowyg-button-pane button:focus-visible {
+                box-shadow: 0 0 0 3px rgba(59, 130, 246, .3);
+                background: #eff6ff;
+            }
+
+            .trumbowyg-box .trumbowyg-button-pane button:active {
+                transform: translateY(0.5px);
+                background: #e2e8f0;
+            }
+
+            .trumbowyg-box .trumbowyg-button-pane button.trumbowyg-active,
+            .trumbowyg-box .trumbowyg-button-pane button.trumbowyg-active-btn {
+                background: #dbeafe;
+            }
+
+            /* Editor tables: full width + inherit font size immediately */
+            .trumbowyg-box .trumbowyg-editor table {
+                width: 100%;
+                border-collapse: collapse;
+                font-size: inherit;
+            }
+
+            .trumbowyg-box .trumbowyg-editor th,
+            .trumbowyg-box .trumbowyg-editor td {
+                font-size: inherit;
+                padding: .5rem .625rem;
+                border: 1px solid #e5e7eb;
+                vertical-align: top;
+            }
+
+            /* Fallback (kept): placeholder when truly empty */
+            .trumbowyg-box .trumbowyg-editor[contenteditable="true"][placeholder]:empty::before {
+                content: attr(placeholder);
+                color: #94a3b8;
+                opacity: .9;
+            }
+
+            /* Primary: class-based placeholder (works even with <p><br>) */
+            .trumbowyg-box .trumbowyg-editor.rte-empty::before {
+                content: attr(placeholder);
+                position: absolute;
+                left: .75rem;
+                /* align with editor padding */
+                top: .75rem;
+                color: #94a3b8;
+                /* slate-400 */
+                opacity: .9;
+                pointer-events: none;
+                /* don't block typing/clicks */
+                user-select: none;
+            }
+
+            /* Prevent FOUC for Alpine */
             [x-cloak] {
                 display: none !important;
             }
@@ -64,13 +129,12 @@
     @endpush
 @endonce
 
-
-<div x-data="{ html: @js(old($name, $value)), showPreview: true }" class="block">
+<div x-data="{ html: @js(old($name, $value)), showPreview: false }" class="block">
     @if ($label)
         <span class="text-sm font-medium text-slate-700 mb-1 block">{{ $label }}</span>
     @endif
 
-    <input id="{{ $inputId }}" type="hidden" name="{{ $name }}" x-model="html" x-ref="input"
+    <input id="{{ $inputId }}" type="hidden" name="{{ $name }}" x-model="html"
         value="{{ old($name, $value) }}">
 
     <div id="{{ $editorId }}"
@@ -87,32 +151,69 @@
                 </label>
             </div>
 
-            <!-- ใช้ x-effect อัปเดต innerHTML ทุกครั้งที่ html เปลี่ยน -->
             <div x-show="showPreview" x-cloak
                 class="rte-content rounded-xl border border-slate-200 bg-slate-50 p-3 min-h-[2.5rem] max-w-none"
-                x-effect="
-                $el.innerHTML = (html && html.trim().length)
-                  ? html
-                  : `<span class=&quot;text-slate-400&quot;>${placeholder}</span>`;
-             ">
+                x-html="(html && html.trim().length)
+             ? html
+             : `<span class='text-slate-400'>${placeholder}</span>`">
             </div>
         </div>
     @endif
 
-
     @push('scripts')
         <script>
             (function() {
-                function run() {
-                    var $host = $('#{{ $editorId }}');
-                    if (!$host.length || typeof $host.trumbowyg !== 'function') return;
+                function initOne(editorId, inputId, initialHtml, placeholder) {
+                    var $host = $('#' + editorId);
+                    if (!$host.length || $host.data('rteInited')) return; // guard against double init
+                    $host.data('rteInited', true);
 
-                    var initialHtml = @json(old($name, $value)) || '';
-                    var placeholder = @json($placeholder);
+                    var raf = null,
+                        editorEl = null,
+                        normalizing = false;
+
+                    function visuallyEmpty(html) {
+                        return (html || '')
+                            .replace(/<p>(?:\s|&nbsp;|<br\s*\/?>)*<\/p>/gi, '')
+                            .replace(/<br\s*\/?>/gi, '')
+                            .replace(/&nbsp;/gi, ' ')
+                            .replace(/<\/?p[^>]*>/gi, '')
+                            .trim() === '';
+                    }
+
+                    function normalizeTables() {
+                        if (!editorEl) return;
+                        $(editorEl).find('table').not('[data-rte-fixed]').each(function() {
+                            var $t = $(this);
+                            $t.css({
+                                width: '100%'
+                            });
+                            $t.find('th,td').css({
+                                'font-size': 'inherit'
+                            });
+                            $t.attr('data-rte-fixed', '1');
+                        });
+                    }
+
+                    // Keep the editor truly empty when there's only filler nodes,
+                    // AND toggle a class so placeholder shows even if Trumbowyg re-inserts <p><br>.
+                    function updatePlaceholderState() {
+                        if (!editorEl) return;
+                        var html = $host.trumbowyg('html') || '';
+                        var isEmptyVisual = visuallyEmpty(html);
+                        // make DOM empty so :empty fallback can work
+                        if (!normalizing && html !== '' && isEmptyVisual) {
+                            normalizing = true;
+                            $host.trumbowyg('html', '');
+                            normalizing = false;
+                        }
+                        // class-based placeholder (always works, even when not :empty)
+                        editorEl.classList.toggle('rte-empty', isEmptyVisual);
+                    }
 
                     function sync() {
-                        var html = $host.trumbowyg('html');
-                        var input = document.getElementById('{{ $inputId }}');
+                        var html = $host.trumbowyg('html') || '';
+                        var input = document.getElementById(inputId);
                         if (input) {
                             input.value = html;
                             input.dispatchEvent(new Event('input', {
@@ -121,12 +222,20 @@
                         }
                     }
 
+                    function scheduleUpdate() {
+                        if (raf) cancelAnimationFrame(raf);
+                        raf = requestAnimationFrame(function() {
+                            normalizeTables();
+                            updatePlaceholderState();
+                            sync();
+                        });
+                    }
+
                     $host.trumbowyg({
                         autogrow: true,
                         btns: [
                             ['undo', 'redo'],
                             ['strong', 'em', 'del'],
-                            ['superscript', 'subscript'],
                             ['link'],
                             ['table'],
                             ['unorderedList', 'orderedList'],
@@ -139,48 +248,41 @@
                     });
 
                     $host.on('tbwinit', function() {
-                        if (initialHtml.trim().length) {
+                        if ((initialHtml || '').trim().length) {
                             $host.trumbowyg('html', initialHtml);
-                        } else if (placeholder) {
-                            // show UI-only placeholder (won't be submitted)
-                            $host.attr('placeholder', placeholder);
                         }
-                        sync();
 
-                        // ---- Robust live sync ----
-                        var editorEl =
-                            $host.closest('.trumbowyg-box').find('.trumbowyg-editor')[0] ||
-                            $host.siblings('.trumbowyg-editor')[0] ||
-                            $host.find('.trumbowyg-editor')[0];
-
+                        editorEl = $host.closest('.trumbowyg-box').find('.trumbowyg-editor')[0];
                         if (editorEl) {
-                            // Direct DOM events (catch toolbar actions that don't emit tbwchange)
-                            $(editorEl).on('input keyup paste blur', sync);
+                            var ph = placeholder || 'พิมพ์เพื่อเริ่มต้น…';
+                            editorEl.setAttribute('placeholder', ph);
+                            editorEl.setAttribute('aria-label', ph);
 
-                            // Observe any DOM mutations (e.g., bold/italic wraps)
-                            var rafId = null;
-                            var observer = new MutationObserver(function() {
-                                if (rafId) cancelAnimationFrame(rafId);
-                                rafId = requestAnimationFrame(sync);
-                            });
-                            observer.observe(editorEl, {
-                                childList: true,
-                                characterData: true,
-                                attributes: true,
-                                subtree: true
-                            });
-
-                            // Extra Trumbowyg events for good measure
-                            $host.on('tbwchange tbwblur tbwfocus tbwkeyup tbwpaste', sync);
+                            $(editorEl).on('input paste blur keyup', scheduleUpdate);
+                            $host.on('tbwchange', scheduleUpdate);
                         }
-                    });
 
-                    var form = $host.closest('form')[0];
-                    if (form) form.addEventListener('submit', sync);
+                        // first pass (normalize + placeholder + sync)
+                        scheduleUpdate();
+
+                        // ensure final sync on submit
+                        var form = $host.closest('form')[0];
+                        if (form) form.addEventListener('submit', sync);
+                    });
                 }
 
-                if (document.readyState !== 'loading') run();
-                else document.addEventListener('DOMContentLoaded', run);
+                function ready(fn) {
+                    if (document.readyState !== 'loading') fn();
+                    else document.addEventListener('DOMContentLoaded', fn);
+                }
+                ready(function check() {
+                    if (window.jQuery && $.fn.trumbowyg) {
+                        initOne(@json($editorId), @json($inputId),
+                            @json(old($name, $value) ?? ''), @json($placeholder ?? ''));
+                        return;
+                    }
+                    setTimeout(check, 30);
+                });
             })();
         </script>
     @endpush
