@@ -28,6 +28,7 @@ class DatabaseSeeder extends Seeder
             VariableSeeder::class,
             Variable_formulasSeeder::class,
             Checklist_itemSeeder::class,
+            AssignmentSeeder::class, 
         ]);
     }
 }

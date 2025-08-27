@@ -14,11 +14,13 @@ class CategorieSeeder extends Seeder
     {
         DB::table('categories')->insert([
             [
+                // id-1
                 'standard_id' => 1,
                 'name' =>'ด้านองค์กรและการบริหารองค์กร',
                 'max_score' => 10.00,
             ],
            [
+                // id-2
                 'standard_id' => 1,
                 'name' => 'ด้านบุคลากร',
                 'max_score' => 20.00,

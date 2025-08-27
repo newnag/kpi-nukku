@@ -15,21 +15,57 @@ use Illuminate\Support\Facades\Log;
 class DashboardController extends Controller
 {
 
+
+
     public function index(Request $request)
     {
-        $year = $request->input('year');
-
-        // ====== ดึง indicators ของตารางหลัก (ของเดิม) ======
-        $indicators = Indicator::with([
-            'category:id,name,standard_id',
-            'category.standard:id,name',
-            'assignments.collectorUser' => fn($q) => $q->select('id', 'name', 'department_id'),
-            'assignments.collectorUser.department:id,name',
-            'evidences' => fn($q) => $q->select('evidence.id', 'evidence.criteria_id', 'evidence.name', 'evidence.created_at'),
-        ])
-            ->withCount(['criterias as criteria_count', 'evidences as evidence_count'])
+        // ====== 1) ปีทั้งหมดสำหรับ Filter ======
+        $yearsForFilter = Indicator::query()
             ->whereHas('assignments')
-            ->when($year, fn($q) => $q->where('year', $year))
+            ->whereNotNull('year')
+            ->selectRaw('DISTINCT CAST(year AS INT) AS y')
+            ->orderBy('y')
+            ->pluck('y');   // [2024,2025,...] เป็น int
+
+        // ====== 2) Summary รวมคะแนนตามปี ======
+        $yearlyTotals = Indicator::query()
+            ->whereHas('assignments')
+            ->whereNotNull('year')
+            ->selectRaw('CAST(year AS INT) as year, SUM(score_acc) AS total_score, SUM(max_score) AS max_score')
+            ->groupBy('year')
+            ->orderBy('year')
+            ->get();
+
+        // ปีล่าสุด: ใช้จาก summary ถ้ามี ไม่งั้น fallback ไปที่ปีทั้งหมด
+        $latestFromTotals = $yearlyTotals->max('year');
+        $latestFromAll    = $yearsForFilter->max();
+        $latestYear       = $latestFromTotals ?? $latestFromAll;
+
+        // ====== 3) ปีที่จะแสดงผล ======
+        $displayYear = $request->filled('year')
+            ? (int) $request->input('year')
+            : (int) $latestYear;
+
+        // หาข้อมูลคะแนนของปีที่เลือก
+        $currentYearData = $displayYear !== null
+            ? $yearlyTotals->firstWhere('year', (int) $displayYear)
+            : null;
+
+        $totalScore      = (float)($currentYearData->total_score ?? 0);
+        $maxScore        = (float)($currentYearData->max_score ?? 0);
+        $displayYearText = $displayYear !== null ? (string) $displayYear : 'ไม่มีข้อมูล';
+
+        // ====== 4) Indicators สำหรับแสดงในตาราง (โหลดทั้งหมด ให้กรองที่ฝั่ง client)
+        $indicators = Indicator::query()
+            ->whereHas('assignments')
+            ->with([
+                'category:id,name,standard_id',
+                'category.standard:id,name',
+                'assignments.collectorUser' => fn($q) => $q->select('id', 'name', 'department_id'),
+                'assignments.collectorUser.department:id,name',
+                'evidences' => fn($q) => $q->select('evidence.id', 'evidence.criteria_id', 'evidence.name', 'evidence.created_at'),
+            ])
+            ->withCount(['criterias as criteria_count', 'evidences as evidence_count'])
             ->get()
             ->map(function ($indicator) {
                 $criteriaCount = (int)($indicator->criteria_count ?? 0);
@@ -40,195 +76,100 @@ class DashboardController extends Controller
                 return $indicator;
             });
 
-        // ====== คะแนน/สรุป (ของเดิม) ======
-        $maxScore    = Category::sum('max_score');
-        $totalScore  = $indicators->sum('score_acc');
-        $displayYear = $year ?? 'ทั้งหมด';
+        // ====== 5) นับสถานะตัวชี้วัด (รวมทั้งหมด ให้ client เป็นคนกรอง)
+        $indicatorsForStatus = Indicator::query()
+            ->whereHas('assignments')
+            ->whereNotNull('year')
+            ->get();
 
         $statusCounts = [
-            'complete'   => $indicators->whereIn('status', [2, 3])->count(), // <- แก้เป็น whereIn
-            'incomplete' => $indicators->where('status', 1)->count(),
-            'pending'    => $indicators->where('status', 0)->count(),
+            'complete'   => $indicatorsForStatus->whereIn('status', [2, 3])->count(),
+            'incomplete' => $indicatorsForStatus->where('status', 1)->count(),
+            'pending'    => $indicatorsForStatus->where('status', 0)->count(),
         ];
 
+        // ====== 6) Config ของ Chart/Legend ======
         $legendConfig = [
-            ['key' => 'complete', 'label' => 'ผลการดำเนินงานครบถ้วนตามเกณฑ์มาตรฐาน', 'color' => '#22c55e'],
-            ['key' => 'incomplete', 'label' => 'ผลการดำเนินงานยังไม่ครบถ้วนตามเกณฑ์', 'color' => '#f59e0b'],
-            ['key' => 'pending', 'label' => 'อยู่ระหว่างดำเนินการ', 'color' => '#ef4444'],
+            ['key' => 'complete',   'label' => 'ผลการดำเนินงานครบถ้วนตามเกณฑ์มาตรการ', 'color' => '#22c55e'],
+            ['key' => 'incomplete', 'label' => 'ผลการดำเนินงานยังไม่ครบถ้วนตามเกณฑ์',  'color' => '#f59e0b'],
+            ['key' => 'pending',    'label' => 'อยู่ระหว่างดำเนินการ',                    'color' => '#ef4444'],
         ];
 
-        // ====== (ใหม่) รายการ “มาตรฐาน/ด้าน” แบบครบทุกค่าเสมอ ======
+        // ====== 7) Dropdown filters อื่น ๆ ======
         $allStandards   = Standard::orderBy('name')->get(['id', 'name']);
-        $departments = Department::orderBy('name')->pluck('name');                  // มาตรฐานทั้งหมด
+        $departments    = Department::orderBy('name')->pluck('name');
+        $collectors     = User::query()
+            ->whereIn('id', function ($q) {
+                $q->select('collector')->from('assignments');
+            })
+            ->orderBy('name')
+            ->pluck('name');
         $dimensionNames = Category::query()
-            ->select('name')          // หรือ ->selectRaw('DISTINCT TRIM(name) AS name')
+            ->select('name')
             ->distinct()
             ->orderBy('name')
-            ->pluck('name');          // Collection ของชื่อด้านไม่ซ้ำ
-        $dimensionCount = $dimensionNames->count();
+            ->pluck('name');
+
+        $standardCount   = $allStandards->count();
         $departmentCount = $departments->count();
-        $standardCount  = $allStandards->count();                                           // จำนวนมาตรฐาน
+        $collectorCount  = $collectors->count();
+        $dimensionCount  = $dimensionNames->count();
 
-
-        // (ถ้าต้องการตัวเลขจำนวนรายการต่อ "ด้าน" โดยนับ 0 ได้ ใช้ withCount + เงื่อนไขเดียวกับตารางหลัก)
         $dimensionStats = Category::select('id', 'name', 'standard_id')
             ->with('standard:id,name')
-            ->withCount(['indicators as total_items' => function ($q) use ($year) {
-                $q->when($year, fn($qq) => $qq->where('year', $year))
-                    ->whereHas('assignments');
-            }])
+            ->withCount([
+                'indicators as total_items' => function ($q) {
+                    $q->whereHas('assignments');
+                }
+            ])
             ->orderBy('name')
             ->get();
+
+        // ====== 8) DEBUG LOG ======
+        Log::info('==== DASHBOARD DEBUG ====');
+        Log::info('Selected Year param: ' . ($request->input('year') ?? 'NULL'));
+        Log::info('Latest Year: ' . ($latestYear ?? 'NULL'));
+        Log::info('Display Year (int): ' . ($displayYear ?? 'NULL'));
+        Log::info('Indicators Count (filtered): ' . $indicators->count());
+        Log::info('Total Score: ' . $totalScore . ' / Max: ' . $maxScore);
+        Log::info('Status Counts: ' . json_encode($statusCounts));
+        Log::info('==========================');
 
         return view('dashboard.app', compact(
             'indicators',
             'totalScore',
             'maxScore',
-            'year',
             'displayYear',
+            'displayYearText',
             'statusCounts',
             'legendConfig',
-            // ส่งของใหม่ไปให้ Blade
             'allStandards',
             'standardCount',
             'dimensionNames',
             'dimensionCount',
             'departments',
             'departmentCount',
+            'collectors',
+            'collectorCount',
+            'dimensionStats',
+            'yearlyTotals',
+            'yearsForFilter',
         ));
     }
 
-    // public function getData()
-    // {
-    //     // เอาเฉพาะหัวข้อมาตรฐานไว้ loop ส่วนหน้า
-    //     $standards = Standard::select('id', 'name')->get();
 
-    //     // รวมข้อมูลที่ต้องใช้กรอง: standard, category (ชื่อ/ID), indicator (code/type), year, total_score
-    //     $rows = Indicator::query()
-    //         ->join('categories', 'categories.id', '=', 'indicators.categorie_id')
-    //         ->join('standards',  'standards.id',  '=', 'categories.standard_id')
-    //         ->whereHas('assignments') // ต้องมี assignments
-    //         ->selectRaw('
-    //         standards.id   as standard_id,
-    //         standards.name as standard_name,
-    //         categories.id  as category_id,
-    //         categories.name as category_name,
-    //         indicators.id  as indicator_id,
-    //         indicators.name as indicator_name,
-    //         indicators.code as indicator_code,
-    //         indicators.type as indicator_type,
-    //         indicators.year,
-    //         SUM(indicators.score_acc) as total_score
-    //     ')
-    //         ->groupBy(
-    //             'standards.id',
-    //             'standards.name',
-    //             'categories.id',
-    //             'categories.name',
-    //             'indicators.id',
-    //             'indicators.name',
-    //             'indicators.code',
-    //             'indicators.type',
-    //             'indicators.year'
-    //         )
-    //         ->orderBy('standards.id')
-    //         ->orderBy('indicator_name')
-    //         ->orderBy('indicators.year')
-    //         ->get();
-
-    //     // จัดกลุ่ม: มาตรฐาน → [กราฟของแต่ละตัวชี้วัด]
-    //     $chartsByStandard = [];
-    //     $allYears = [];
-    //     $allCodes = [];
-    //     $allStandards = [];
-    //     $allDimensions = []; // ใช้ชื่อ category เป็น "ด้าน"
-    //     $allTypes = [];
-
-    //     foreach ($rows as $r) {
-    //         $sid = $r->standard_id;
-    //         $iid = $r->indicator_id;
-
-    //         if (!isset($chartsByStandard[$sid])) {
-    //             $chartsByStandard[$sid] = [
-    //                 'standard_id'   => $sid,
-    //                 'standard_name' => $r->standard_name,
-    //                 'indicators'    => []
-    //             ];
-    //             $allStandards[$sid] = $r->standard_name;
-    //         }
-
-    //         if (!isset($chartsByStandard[$sid]['indicators'][$iid])) {
-    //             $chartsByStandard[$sid]['indicators'][$iid] = [
-    //                 'indicator_id'   => $iid,
-    //                 'indicator_name' => $r->indicator_name,
-    //                 'indicator_code' => $r->indicator_code,
-    //                 'indicator_type' => $r->indicator_type,
-    //                 'category_id'    => $r->category_id,
-    //                 'category_name'  => $r->category_name, // = dimension
-    //                 'years'          => [],
-    //                 'values'         => [],
-    //             ];
-    //         }
-
-    //         $chartsByStandard[$sid]['indicators'][$iid]['years'][]  = (string) $r->year;
-    //         $chartsByStandard[$sid]['indicators'][$iid]['values'][] = (float) $r->total_score;
-
-    //         // เก็บ option สำหรับตัวกรอง
-    //         if ($r->year) {
-    //             $allYears[$r->year] = (string) $r->year;
-    //         }
-    //         if ($r->indicator_code) {
-    //             $allCodes[$r->indicator_code] = $r->indicator_code;
-    //         }
-    //         if ($r->category_name) {
-    //             $allDimensions[$r->category_name] = $r->category_name;
-    //         }
-    //         if ($r->indicator_type) {
-    //             $allTypes[$r->indicator_type] = $r->indicator_type;
-    //         }
-    //     }
-
-    //     // ทำให้ indicators เป็น array ธรรมดา
-    //     foreach ($chartsByStandard as $sid => $bucket) {
-    //         $chartsByStandard[$sid]['indicators'] = array_values($bucket['indicators']);
-    //     }
-
-    //     // เตรียม option list
-    //     $filters = [
-    //         'years'     => array_values($allYears),
-    //         'codes'     => array_values($allCodes),
-    //         'standards' => array_map(fn($id, $name) => ['id' => $id, 'name' => $name], array_keys($allStandards), $allStandards),
-    //         'dimensions' => array_values($allDimensions),
-    //         'types'     => array_values($allTypes),
-    //     ];
-
-    //     // ถ้าขอ JSON (เช่น fetch/Ajax) ก็ส่ง JSON
-    //     // if (request()->wantsJson()) {
-    //     //     return response()->json([
-    //     //         'chartsByStandard' => $chartsByStandard,
-    //     //         'filters'          => $filters,
-    //     //     ]);
-    //     // }
-
-    //     // ส่งให้ Blade
-    //     return view('dashboard.result', [
-    //         'standards'         => $standards,
-    //         'chartsByStandard'  => $chartsByStandard,
-    //         'filters'           => $filters,
-    //     ]);
-    // }
     public function getData()
-{
-    // -----------------------------
-    // 1) DATASET สำหรับกราฟ (ผูก assignments)
-    // -----------------------------
-    $standards = Standard::select('id', 'name')->get();
+    {
+        // -----------------------------
+        // 1) DATASET สำหรับกราฟ (ผูก assignments)
+        // -----------------------------
+        $standards = Standard::select('id', 'name')->get();
 
-    $rows = Indicator::query()
-        ->join('categories', 'categories.id', '=', 'indicators.categorie_id')
-        ->join('standards',  'standards.id',  '=', 'categories.standard_id')
-        ->whereHas('assignments')
-        ->selectRaw('
+        $rows = Indicator::query()
+            ->join('categories', 'categories.id', '=', 'indicators.categorie_id')
+            ->join('standards',  'standards.id',  '=', 'categories.standard_id')
+            ->whereHas('assignments')
+            ->selectRaw('
             standards.id   as standard_id,
             standards.name as standard_name,
             categories.id  as category_id,
@@ -240,141 +181,147 @@ class DashboardController extends Controller
             indicators.year,
             SUM(indicators.score_acc) as total_score
         ')
-        ->groupBy(
-            'standards.id','standards.name',
-            'categories.id','categories.name',
-            'indicators.id','indicators.name','indicators.code','indicators.type',
-            'indicators.year'
-        )
-        ->orderBy('standards.id')
-        ->orderBy('indicator_name')
-        ->orderBy('indicators.year')
-        ->get();
+            ->groupBy(
+                'standards.id',
+                'standards.name',
+                'categories.id',
+                'categories.name',
+                'indicators.id',
+                'indicators.name',
+                'indicators.code',
+                'indicators.type',
+                'indicators.year'
+            )
+            ->orderBy('standards.id')
+            ->orderBy('indicator_name')
+            ->orderBy('indicators.year')
+            ->get();
 
-    // กลุ่มกราฟ: มาตรฐาน -> indicators (กราฟละตัวชี้วัด)
-    $chartsByStandard = [];
-    foreach ($rows as $r) {
-        $sid = $r->standard_id;
-        $iid = $r->indicator_id;
+        // กลุ่มกราฟ: มาตรฐาน -> indicators (กราฟละตัวชี้วัด)
+        $chartsByStandard = [];
+        foreach ($rows as $r) {
+            $sid = $r->standard_id;
+            $iid = $r->indicator_id;
 
-        if (!isset($chartsByStandard[$sid])) {
-            $chartsByStandard[$sid] = [
-                'standard_id'   => $sid,
-                'standard_name' => $r->standard_name,
-                'indicators'    => [],
-            ];
+            if (!isset($chartsByStandard[$sid])) {
+                $chartsByStandard[$sid] = [
+                    'standard_id'   => $sid,
+                    'standard_name' => $r->standard_name,
+                    'indicators'    => [],
+                ];
+            }
+            if (!isset($chartsByStandard[$sid]['indicators'][$iid])) {
+                $chartsByStandard[$sid]['indicators'][$iid] = [
+                    'indicator_id'   => $iid,
+                    'indicator_name' => $r->indicator_name,
+                    'indicator_code' => $r->indicator_code,
+                    'indicator_type' => $r->indicator_type,
+                    'category_id'    => $r->category_id,
+                    'category_name'  => $r->category_name,
+                    'years'          => [],
+                    'values'         => [],
+                ];
+            }
+            $chartsByStandard[$sid]['indicators'][$iid]['years'][]  = (string) $r->year;
+            $chartsByStandard[$sid]['indicators'][$iid]['values'][] = (float)  $r->total_score;
         }
-        if (!isset($chartsByStandard[$sid]['indicators'][$iid])) {
-            $chartsByStandard[$sid]['indicators'][$iid] = [
-                'indicator_id'   => $iid,
-                'indicator_name' => $r->indicator_name,
-                'indicator_code' => $r->indicator_code,
-                'indicator_type' => $r->indicator_type,
-                'category_id'    => $r->category_id,
-                'category_name'  => $r->category_name,
-                'years'          => [],
-                'values'         => [],
-            ];
+        foreach ($chartsByStandard as $sid => $bucket) {
+            $chartsByStandard[$sid]['indicators'] = array_values($bucket['indicators']);
         }
-        $chartsByStandard[$sid]['indicators'][$iid]['years'][]  = (string) $r->year;
-        $chartsByStandard[$sid]['indicators'][$iid]['values'][] = (float)  $r->total_score;
+
+        // -----------------------------
+        // 2) FILTERS จาก “ข้อมูลทั้งหมด” (ไม่ผูก assignments) + ลบซ้ำ
+        // -----------------------------
+
+        // Years (ทั้งหมด, ไม่ซ้ำ)
+        $allYears = Indicator::query()
+            ->whereNotNull('year')
+            ->distinct()
+            ->orderBy('year')
+            ->pluck('year')
+            ->map(fn($y) => (string) $y)
+            ->toArray();
+
+        // Standards (ทั้งหมด)
+        $allStandards = Standard::query()
+            ->select('id', 'name')
+            ->orderBy('name')
+            ->get()
+            ->map(fn($s) => ['id' => $s->id, 'name' => trim($s->name)])
+            ->toArray();
+
+        // Dimensions = ชื่อ Category (ไม่ซ้ำ)
+        $allDimensions = Category::query()
+            ->whereNotNull('name')
+            ->pluck('name')
+            ->map(fn($n) => trim($n))
+            ->filter()
+            ->unique()
+            ->sort()
+            ->values()
+            ->toArray();
+
+        // Types (ทั้งหมด, ไม่ซ้ำ)
+        $allTypes = Indicator::query()
+            ->whereNotNull('type')
+            ->pluck('type')
+            ->map(fn($t) => trim($t))
+            ->filter()
+            ->unique()
+            ->sort()
+            ->values()
+            ->toArray();
+
+        // Codes (ทั้งหมด, ลบซ้ำ + เรียง NCS -> NCP -> NCO -> อื่น ๆ โดยเรียงตัวเลขในกลุ่ม)
+        $codesRaw = Indicator::query()
+            ->whereNotNull('code')
+            ->pluck('code')
+            ->toArray();
+
+        // normalize code เช่น "nco 01" -> "NCO-1"
+        $normalize = function ($c) {
+            $c = strtoupper(trim((string)$c));
+            $c = preg_replace('/\s+/', '', $c);
+            if (preg_match('/^([A-Z]+)[\s_\-]?0*(\d+)$/', $c, $m)) {
+                return $m[1] . '-' . (int)$m[2];
+            }
+            return $c;
+        };
+
+        $codesNormalized = array_map($normalize, $codesRaw);
+        $codesUnique     = array_values(array_unique(array_filter($codesNormalized)));
+
+        // sort by prefix order and numeric part
+        $prefixOrder = ['NCS' => 0, 'NCP' => 1, 'NCO' => 2];
+        usort($codesUnique, function ($a, $b) use ($prefixOrder) {
+            preg_match('/^([A-Z]+)-(\d+)$/', $a, $ma);
+            preg_match('/^([A-Z]+)-(\d+)$/', $b, $mb);
+            $pa = $ma[1] ?? $a;
+            $pb = $mb[1] ?? $b;
+            $ra = $prefixOrder[$pa] ?? 999;
+            $rb = $prefixOrder[$pb] ?? 999;
+            if ($ra !== $rb) return $ra <=> $rb;
+            if ($pa !== $pb) return strcmp($pa, $pb);
+            $na = isset($ma[2]) ? (int)$ma[2] : PHP_INT_MAX;
+            $nb = isset($mb[2]) ? (int)$mb[2] : PHP_INT_MAX;
+            return $na <=> $nb;
+        });
+
+        $filters = [
+            'years'      => array_values($allYears),
+            'codes'      => $codesUnique,
+            'standards'  => array_values($allStandards), // [{id,name}]
+            'dimensions' => $allDimensions,
+            'types'      => $allTypes,
+        ];
+
+        // -----------------------------
+        // 3) ส่งให้ View (หรือจะ wantsJson() ก็ได้)
+        // -----------------------------
+        return view('dashboard.result', [
+            'standards'         => $standards,
+            'chartsByStandard'  => $chartsByStandard,
+            'filters'           => $filters,
+        ]);
     }
-    foreach ($chartsByStandard as $sid => $bucket) {
-        $chartsByStandard[$sid]['indicators'] = array_values($bucket['indicators']);
-    }
-
-    // -----------------------------
-    // 2) FILTERS จาก “ข้อมูลทั้งหมด” (ไม่ผูก assignments) + ลบซ้ำ
-    // -----------------------------
-
-    // Years (ทั้งหมด, ไม่ซ้ำ)
-    $allYears = Indicator::query()
-        ->whereNotNull('year')
-        ->distinct()
-        ->orderBy('year')
-        ->pluck('year')
-        ->map(fn($y) => (string) $y)
-        ->toArray();
-
-    // Standards (ทั้งหมด)
-    $allStandards = Standard::query()
-        ->select('id','name')
-        ->orderBy('name')
-        ->get()
-        ->map(fn($s) => ['id' => $s->id, 'name' => trim($s->name)])
-        ->toArray();
-
-    // Dimensions = ชื่อ Category (ไม่ซ้ำ)
-    $allDimensions = Category::query()
-        ->whereNotNull('name')
-        ->pluck('name')
-        ->map(fn($n) => trim($n))
-        ->filter()
-        ->unique()
-        ->sort()
-        ->values()
-        ->toArray();
-
-    // Types (ทั้งหมด, ไม่ซ้ำ)
-    $allTypes = Indicator::query()
-        ->whereNotNull('type')
-        ->pluck('type')
-        ->map(fn($t) => trim($t))
-        ->filter()
-        ->unique()
-        ->sort()
-        ->values()
-        ->toArray();
-
-    // Codes (ทั้งหมด, ลบซ้ำ + เรียง NCS -> NCP -> NCO -> อื่น ๆ โดยเรียงตัวเลขในกลุ่ม)
-    $codesRaw = Indicator::query()
-        ->whereNotNull('code')
-        ->pluck('code')
-        ->toArray();
-
-    // normalize code เช่น "nco 01" -> "NCO-1"
-    $normalize = function ($c) {
-        $c = strtoupper(trim((string)$c));
-        $c = preg_replace('/\s+/', '', $c);
-        if (preg_match('/^([A-Z]+)[\s_\-]?0*(\d+)$/', $c, $m)) {
-            return $m[1] . '-' . (int)$m[2];
-        }
-        return $c;
-    };
-
-    $codesNormalized = array_map($normalize, $codesRaw);
-    $codesUnique     = array_values(array_unique(array_filter($codesNormalized)));
-
-    // sort by prefix order and numeric part
-    $prefixOrder = ['NCS' => 0, 'NCP' => 1, 'NCO' => 2];
-    usort($codesUnique, function ($a, $b) use ($prefixOrder) {
-        preg_match('/^([A-Z]+)-(\d+)$/', $a, $ma);
-        preg_match('/^([A-Z]+)-(\d+)$/', $b, $mb);
-        $pa = $ma[1] ?? $a;  $pb = $mb[1] ?? $b;
-        $ra = $prefixOrder[$pa] ?? 999;
-        $rb = $prefixOrder[$pb] ?? 999;
-        if ($ra !== $rb) return $ra <=> $rb;
-        if ($pa !== $pb) return strcmp($pa, $pb);
-        $na = isset($ma[2]) ? (int)$ma[2] : PHP_INT_MAX;
-        $nb = isset($mb[2]) ? (int)$mb[2] : PHP_INT_MAX;
-        return $na <=> $nb;
-    });
-
-    $filters = [
-        'years'      => array_values($allYears),
-        'codes'      => $codesUnique,
-        'standards'  => array_values($allStandards), // [{id,name}]
-        'dimensions' => $allDimensions,
-        'types'      => $allTypes,
-    ];
-
-    // -----------------------------
-    // 3) ส่งให้ View (หรือจะ wantsJson() ก็ได้)
-    // -----------------------------
-    return view('dashboard.result', [
-        'standards'         => $standards,
-        'chartsByStandard'  => $chartsByStandard,
-        'filters'           => $filters,
-    ]);
-}
 }

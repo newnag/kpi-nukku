@@ -14,54 +14,63 @@
         <div class="filter-card card">
             <h2 class="card-title">กรองข้อมูลการประเมิน</h2>
 
-            <div class="form-grid">
-                <div class="field">
-                    <label>ปีการประเมิน</label>
-                    <select id="filter-year">
-                        <option value="">ทั้งหมด</option>
-                    </select>
+            <form id="filter-form" method="GET" action="{{ route('dashboard.index') }}">
+                <div class="form-grid">
+                    <div class="field">
+                        <label>ปีการประเมิน</label>
+                        <select id="filter-year" name="year">
+                            <option value="">ทั้งหมด</option>
+                            @foreach ($yearsForFilter as $y)
+                                <option value="{{ $y }}"
+                                    {{ (string) $displayYear === (string) $y ? 'selected' : '' }}>
+                                    {{ $y }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="field">
+                        <label>รหัสตัวชี้วัด</label>
+                        <select id="filter-code" name="code">
+                            <option value="">ทั้งหมด</option>
+                        </select>
+                    </div>
+
+                    <div class="field">
+                        <label>มาตรฐานตัวชี้วัด</label>
+                        <select id="filter-standard" name="standard">
+                            <option value="">ทั้งหมด</option>
+                        </select>
+                    </div>
+
+                    <div class="field">
+                        <label>ด้านตัวชี้วัด</label>
+                        <select id="filter-dimension" name="dimension">
+                            <option value="">ทั้งหมด</option>
+                        </select>
+                    </div>
+
+                    <div class="field">
+                        <label>หน่วยงานที่รับผิดชอบ</label>
+                        <select id="filter-dept" name="dept">
+                            <option value="">ทั้งหมด</option>
+                        </select>
+                    </div>
+
+                    <div class="field">
+                        <label>ผู้รับผิดชอบในการรวบรวมข้อมูล</label>
+                        <select id="filter-collector" name="collector">
+                            <option value="">ทั้งหมด</option>
+                        </select>
+                    </div>
                 </div>
 
-                <div class="field">
-                    <label>รหัสตัวชี้วัด</label>
-                    <select id="filter-code">
-                        <option value="">ทั้งหมด</option>
-                    </select>
+                <div class="card-actions">
+                    <button type="button" id="reset-filters" class="btn btn-outline">ล้างค่า</button>
+                    <button type="button" id="apply-filters" class="btn btn-primary">กรองข้อมูล</button>
                 </div>
+            </form>
 
-                <div class="field">
-                    <label>มาตรฐานตัวชี้วัด</label>
-                    <select id="filter-standard">
-                        <option value="">ทั้งหมด</option>
-                    </select>
-                </div>
-
-                <div class="field">
-                    <label>ด้านตัวชี้วัด</label>
-                    <select id="filter-dimension">
-                        <option value="">ทั้งหมด</option>
-                    </select>
-                </div>
-
-                <div class="field">
-                    <label>หน่วยงานที่รับผิดชอบ</label>
-                    <select id="filter-dept">
-                        <option value="">ทั้งหมด</option>
-                    </select>
-                </div>
-
-                <div class="field">
-                    <label>ผู้รับผิดชอบในการรวบรวมข้อมูล</label>
-                    <select id="filter-collector">
-                        <option value="">ทั้งหมด</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="card-actions">
-                <button type="button" id="reset-filters" class="btn btn-outline">ล้างค่า</button>
-                <button type="button" id="apply-filters" class="btn btn-primary">กรองข้อมูล</button>
-            </div>
         </div>
 
         <!-- Score Card -->
@@ -73,7 +82,7 @@
         <div class="score-card">
             <div class="score-header">
                 <span class="label">ปีการประเมิน</span>
-                <span class="year" id="display-year">{{ $displayYear }}</span>
+                <span class="year" id="display-year">{{ $displayYearText }}</span>
             </div>
             <hr />
             <div class="score-body">
@@ -91,7 +100,7 @@
         <!-- Stats Cards -->
         <div class="stat-title">
             <h3>สถานะทั้งหมดของตัวชี้วัดต่อปี</h3>
-            <span class="year"id="display-years">{{ $displayYear }}</span>
+            <span class="year"id="display-years">{{ $displayYearText }}</span>
         </div>
         <div class="stats-grid">
 
@@ -242,7 +251,8 @@
                                     default => 'pending',
                                 };
                             @endphp
-                            <tr data-standard="{{ $indicator->category->standard->name ?? '' }}"
+                            <tr data-max="{{ (float) $indicator->max_score }}"
+                                data-standard="{{ $indicator->category->standard->name ?? '' }}"
                                 data-dimension="{{ $indicator->category->name ?? '' }}"
                                 data-collector="{{ $indicator->assignments->first()->collectorUser->name ?? '' }}"
                                 data-status="{{ $statusKey }}">
@@ -406,7 +416,7 @@
                 });
             }
 
-          
+
 
 
         });
@@ -421,6 +431,25 @@
                 return (d.textContent || d.innerText || '').trim();
             };
             const numberFormat = (n) => (isNaN(n) ? 0 : Number(n)).toLocaleString('th-TH');
+            // แผนที่คะแนนรวม/คะแนนเต็มต่อปีจากเซิร์ฟเวอร์ เพื่อใช้คำนวณสรุปแบบไม่ปนปี
+            const YEARLY_TOTALS_ARRAY = @json($yearlyTotals);
+            const YEARLY_TOTALS_MAP = Array.isArray(YEARLY_TOTALS_ARRAY)
+                ? YEARLY_TOTALS_ARRAY.reduce((acc, item) => {
+                    const y = String(item.year ?? '');
+                    acc[y] = {
+                        total: Number(item.total_score ?? 0),
+                        max: Number(item.max_score ?? 0),
+                    };
+                    return acc;
+                }, {})
+                : {};
+            const getLatestYear = () => {
+                const years = Array.isArray(window.ALL_YEARS) ? window.ALL_YEARS : [];
+                const nums = years
+                    .map((y) => Number(String(y).replace(/[^0-9-]/g, '')))
+                    .filter((n) => !isNaN(n));
+                return nums.length ? Math.max(...nums).toString() : '';
+            };
 
             $(function() {
                 // 1) Init DataTable
@@ -435,17 +464,17 @@
                             previous: 'ก่อนหน้า',
                             next: 'ถัดไป'
                         },
-                        info: "แสดง _START_ ถึง _END_ จากทั้งหมด _TOTAL_ รายการ",
-                        emptyTable: "ไม่พบข้อมูล",
-                        zeroRecords: "ไม่พบข้อมูลที่ตรงกับการค้นหา"
-                    }
+                        info: 'แสดง _START_ ถึง _END_ จากทั้งหมด _TOTAL_ รายการ',
+                        emptyTable: 'ไม่พบข้อมูล',
+                        zeroRecords: 'ไม่พบข้อมูลที่ตรงกับการค้นหา',
+                    },
                 });
 
                 // 2) หาคอลัมน์จริง
                 const heads = $('#dashboardTable thead th').map((i, th) => $(th).text().trim()).get();
                 const findCol = (cands) => {
                     for (const kw of cands) {
-                        const idx = heads.findIndex(h => h.includes(kw));
+                        const idx = heads.findIndex((h) => h.includes(kw));
                         if (idx !== -1) return idx;
                     }
                     return -1;
@@ -464,22 +493,23 @@
                     $dept = $('#filter-dept'),
                     $collector = $('#filter-collector');
 
-                // 4) เติม option จากคอลัมน์จริง
+                // 4) เติม option …
                 const populateFromColumn = ($sel, colIdx) => {
                     $sel.find('option:not([value=""])').remove();
                     if (colIdx === -1) return;
                     const vals = table.column(colIdx).data().toArray().map(stripHtml).filter(Boolean);
                     const uniq = [...new Set(vals)].sort((a, b) => a.localeCompare(b, 'th'));
-                    uniq.forEach(v => $sel.append(`<option value="${v}">${v}</option>`));
+                    uniq.forEach((v) => $sel.append(`<option value="${v}">${v}</option>`));
                 };
                 populateFromColumn($year, idxYear);
                 populateFromColumn($code, idxCode);
                 populateFromColumn($dept, idxDept);
 
-                // 5) เติม option จาก data-* (มาตรฐาน, ด้าน, ผู้รับผิดชอบ)
+                window.ALL_YEARS = @json($yearsForFilter);
+                window.ALL_DEPARTMENTS = @json($departments);
+                window.ALL_COLLECTORS = @json($collectors);
                 window.ALL_STANDARDS = @json($allStandards->pluck('name'));
                 window.ALL_DIMENSIONS = @json($dimensionNames);
-                window.ALL_DEPARTMENTS = @json($departments);
 
                 const populateFromData = ($sel, attr) => {
                     $sel.find('option:not([value=""])').remove();
@@ -489,67 +519,123 @@
                         if (v) vals.push(v);
                     });
                     const uniq = [...new Set(vals)].sort((a, b) => a.localeCompare(b, 'th'));
-                    uniq.forEach(v => $sel.append(`<option value="${v}">${v}</option>`));
+                    uniq.forEach((v) => $sel.append(`<option value="${v}">${v}</option>`));
                 };
 
                 function fillSelect($sel, items) {
                     $sel.find('option:not([value=""])').remove();
-                    (items || []).forEach(v => $sel.append(`<option value="${v}">${v}</option>`));
+                    (items || []).forEach((v) => $sel.append(`<option value="${v}">${v}</option>`));
                 }
+                fillSelect($('#filter-year'), window.ALL_YEARS);
+                fillSelect($('#filter-dept'), window.ALL_DEPARTMENTS);
+                fillSelect($('#filter-collector'), window.ALL_COLLECTORS);
                 fillSelect($('#filter-standard'), window.ALL_STANDARDS);
                 fillSelect($('#filter-dimension'), window.ALL_DIMENSIONS);
-                fillSelect($('#filter-dept'), window.ALL_DEPARTMENTS);
+
                 populateFromData($collector, 'collector');
 
                 // 6) การ์ดสรุป
+                function parseNumberCell(s) {
+                    const t = stripHtml(String(s)).replace(/[^0-9.,-]/g, '').replace(/,/g, '');
+                    const n = Number(t);
+                    return isNaN(n) ? 0 : n;
+                }
+
                 function updateSummary() {
-                    const selectedYear = $year.val();
-                    $('#display-year').text(selectedYear || 'ทั้งหมด');
-                    $('#display-years').text(selectedYear || 'ทั้งหมด');
+                    const selectedYear = ($year.val() || '').toString();
+
+                    // ปีที่ใช้คำนวณจริง: ปีที่เลือก หรือปีล่าสุด
+                    const latestFromMap = Object.keys(YEARLY_TOTALS_MAP)
+                        .map((k) => Number(k))
+                        .filter((n) => !isNaN(n))
+                        .sort((a, b) => b - a)[0];
+                    const latestYear = latestFromMap ? String(latestFromMap) : (getLatestYear() || '');
+                    const effectiveYear = selectedYear || latestYear;
+
+                    if (!effectiveYear) {
+                        $('#display-year').text('ไม่มีข้อมูล');
+                        $('#display-years').text('ไม่มีข้อมูล');
+                        $('#display-total').text('0');
+                        $('#display-max').text('0');
+                        return;
+                    }
+
+                    // อัปเดตปีที่แสดง
+                    $('#display-year').text(effectiveYear);
+                    $('#display-years').text(effectiveYear);
+
+                    if (idxScore === -1) {
+                        $('#display-total').text('0');
+                        $('#display-max').text('0');
+                        return;
+                    }
+
+                    // รวมจากแถวที่ "ผ่านการกรองอื่น ๆ" และอยู่ในปี effectiveYear เท่านั้น
+                    const data = table
+                        .column(idxScore, { search: 'applied', page: 'all' })
+                        .data()
+                        .toArray();
 
                     let total = 0;
-                    $('#dashboardTable tbody tr:visible').each(function() {
-                        if (idxScore === -1) return;
-                        const cell = $(this).children().eq(idxScore);
-                        const val = parseFloat(stripHtml(cell.text())) || 0;
-                        total += val;
+                    let maxSum = 0;
+
+                    table.rows({ search: 'applied', page: 'all' }).every(function(rowIdx) {
+                        // คอลัมน์คะแนนรวม
+                        const rowData = this.data();
+                        const rowScoreCell = idxScore !== -1 ? rowData[idxScore] : '0';
+                        // ปีของแถวนี้
+                        const rowYear = idxYear !== -1 ? stripHtml(rowData[idxYear]) : '';
+
+                        if (rowYear === effectiveYear) {
+                            total += parseNumberCell(rowScoreCell);
+                            const val = Number(this.node().dataset.max || 0);
+                            maxSum += isNaN(val) ? 0 : val;
+                        }
                     });
+
                     $('#display-total').text(numberFormat(total));
-                    // #display-max เป็น fix จาก Blade
+                    $('#display-max').text(numberFormat(maxSum));
                 }
 
-                // 7) ฟิลเตอร์แถว
+
+                // >>>>>>>>>>>>> เพิ่ม Custom Filter ของ DataTables <<<<<<<<<<<<<<
+                $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
+                    if (settings.nTable !== document.getElementById('dashboardTable')) return true;
+
+                    const vYear = $year.val();
+                    const vCode = $code.val();
+                    const vDept = $dept.val();
+                    const vStd = $std.val();
+                    const vDim = $dim.val();
+                    const vCollector = $collector.val();
+
+                    const yearVal = idxYear !== -1 ? stripHtml(data[idxYear]) : '';
+                    const codeVal = idxCode !== -1 ? stripHtml(data[idxCode]) : '';
+                    const deptVal = idxDept !== -1 ? stripHtml(data[idxDept]) : '';
+
+                    // อ่านค่า data-* จาก DOM ของแถว
+                    const node = table.row(dataIndex).node();
+                    const stdVal = node?.dataset?.standard || '';
+                    const dimVal = node?.dataset?.dimension || '';
+                    const colVal = node?.dataset?.collector || '';
+
+                    if (vYear && yearVal !== vYear) return false;
+                    if (vCode && codeVal !== vCode) return false;
+                    if (vDept && deptVal !== vDept) return false;
+                    if (vStd && stdVal !== vStd) return false;
+                    if (vDim && dimVal !== vDim) return false;
+                    if (vCollector && colVal !== vCollector) return false;
+
+                    return true;
+                });
+
+                // 7) ฟิลเตอร์แถว (ให้ DataTables เป็นคนกรองเอง)
                 function applyFilters() {
-                    table.rows().every(function() {
-                        let show = true;
-                        const row = this.node();
-
-                        const vYear = $year.val();
-                        const vCode = $code.val();
-                        const vStd = $std.val();
-                        const vDim = $dim.val();
-                        const vDept = $dept.val();
-                        const vCollector = $collector.val();
-
-                        if (idxYear !== -1 && vYear && stripHtml(this.data()[idxYear]) != vYear) show =
-                            false;
-                        if (idxCode !== -1 && vCode && stripHtml(this.data()[idxCode]) != vCode) show =
-                            false;
-                        if (idxDept !== -1 && vDept && stripHtml(this.data()[idxDept]) != vDept) show =
-                            false;
-
-                        if (vStd && row.dataset.standard != vStd) show = false;
-                        if (vDim && row.dataset.dimension != vDim) show = false;
-                        if (vCollector && row.dataset.collector != vCollector) show = false;
-
-                        $(row).toggle(show);
-                    });
-
-                    updateSummary();
-                    updateDonutAndLegend();
+                    // กรองทั้งหมดแบบ client-side
+                    table.draw();
                 }
 
-                // 8) Chart.js
+                // 8) Chart.js (คงเดิม)
                 const donutCanvas = document.getElementById('satisfactionChart');
                 let chartKeys = [],
                     chartLabels = [],
@@ -561,7 +647,7 @@
                     chartKeys = @json(array_column($legendConfig, 'key'));
 
                     const countsMap = @json($statusCounts);
-                    const dataValues = chartKeys.map(k => Number(countsMap[k] ?? 0));
+                    const dataValues = chartKeys.map((k) => Number(countsMap[k] ?? 0));
 
                     donutChart = new Chart(donutCtx, {
                         type: 'doughnut',
@@ -570,10 +656,10 @@
                             datasets: [{
                                 data: dataValues,
                                 backgroundColor: chartColors,
-                                borderColor: "#ffffff",
+                                borderColor: '#ffffff',
                                 borderWidth: 4,
                                 hoverOffset: 4,
-                            }]
+                            }],
                         },
                         options: {
                             responsive: true,
@@ -590,33 +676,46 @@
                                             const total = ctx.dataset.data.reduce((a, b) => a + b,
                                                 0);
                                             const val = ctx.parsed;
-                                            const pct = total > 0 ? (val / total * 100).toFixed(2) :
-                                                '0.00';
+                                            const pct = total > 0 ? ((val / total) * 100).toFixed(
+                                                2) : '0.00';
                                             return ` ${ctx.label}: ${val} (${pct}%)`;
-                                        }
-                                    }
-                                }
-                            }
-                        }
+                                        },
+                                    },
+                                },
+                            },
+                        },
                     });
                 }
 
-                // 9) นับสถานะจากแถวที่มองเห็น
-                function computeStatusCountsFromVisible() {
-                    const counts = Object.fromEntries(chartKeys.map(k => [k, 0]));
-                    $('#dashboardTable tbody tr:visible').each(function() {
-                        const key = this.dataset.status; // ต้องตรง legendConfig[*].key
+                // 9) นับสถานะจาก "ผลกรองแล้ว"
+                function computeStatusCountsFiltered() {
+                    const counts = Object.fromEntries(chartKeys.map((k) => [k, 0]));
+                    const selectedYear = ($('#filter-year').val() || '').toString();
+                    const fallbackYear = getLatestYear();
+                    const effectiveYear = selectedYear || fallbackYear || '';
+
+                    table.rows({ search: 'applied', page: 'all' }).every(function() {
+                        const key = this.node().dataset.status;
+
+                        let rowYear = '';
+                        try {
+                            const rowData = this.data();
+                            rowYear = idxYear !== -1 ? stripHtml(rowData[idxYear]) : '';
+                        } catch (e) { /* noop */ }
+
+                        if (effectiveYear && rowYear && rowYear !== effectiveYear) return;
+
                         if (key && counts.hasOwnProperty(key)) counts[key] += 1;
                     });
                     return counts;
                 }
 
-                // 10) อัปเดต legend
+                // 10-11) อัปเดต legend + chart จากข้อมูลที่กรองแล้ว
                 function updateLegend(counts) {
                     const total = Object.values(counts).reduce((a, b) => a + b, 0);
                     chartKeys.forEach((k) => {
                         const c = counts[k] ?? 0;
-                        const pct = total > 0 ? (c / total * 100) : 0;
+                        const pct = total > 0 ? (c / total) * 100 : 0;
                         const $item = $(`.legend-item[data-key="${k}"]`);
                         $item.find('.legend-count').text(c);
                         $item.find('.legend-pct').text(pct.toFixed(2) + '%');
@@ -624,27 +723,40 @@
                     });
                 }
 
-                // 11) อัปเดตกราฟ + legend
                 function updateDonutAndLegend() {
                     if (!donutChart) return;
-                    const counts = computeStatusCountsFromVisible();
-                    const newData = chartKeys.map(k => counts[k] ?? 0);
+                    const counts = computeStatusCountsFiltered();
+                    const newData = chartKeys.map((k) => counts[k] ?? 0);
                     donutChart.data.datasets[0].data = newData;
                     donutChart.update();
                     updateLegend(counts);
                 }
 
                 // 12) Bind events
-                // $('.filter-card select').on('change', applyFilters);
-                $('#apply-filters').on('click', applyFilters);
+                $('#filter-form').on('submit', function(e) { e.preventDefault(); });
+                $('#apply-filters').on('click', function(e){ e.preventDefault(); applyFilters(); });
 
-                $('#reset-filters').on('click', function() {
-                    $('.filter-card select').val('');
-                    $('#dashboardTable tbody tr').show();
-                    table.search('').draw();
-                    updateSummary();
-                    updateDonutAndLegend();
-                });
+                $(document).off('click.reset', '#reset-filters').on('click.reset', '#reset-filters', function(
+                e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    // เคลียร์ select ทั้งหมดก่อน
+                    $('.filter-card select').each(function() {
+                        $(this).prop('selectedIndex', 0).val('').trigger('change');
+                    });
+
+                    // ไม่ตั้งค่าเป็นปีล่าสุด ให้คงไว้ที่ "ทั้งหมด"
+
+                    // เคลียร์ค้นหา + redraw
+                    $('#custom-search').val('');
+                    table.search('');
+                    table.columns().every(function() {
+                        this.search('');
+                    });
+                    table.page('first').draw('page'); // จะไปเรียก updateSummary()/updateDonutAndLegend() ให้อัตโนมัติ
+                })
+
 
                 let timer;
                 $('#custom-search')
@@ -653,18 +765,19 @@
                         const val = this.value;
                         timer = setTimeout(() => {
                             table.search(val).draw();
-                            // ใช้ :visible ในการรวมค่า/นับสถานะอยู่แล้ว
-                            updateSummary();
-                            updateDonutAndLegend();
                         }, 150);
                     })
                     .on('search', function() {
                         if (this.value === '') {
                             table.search('').draw();
-                            updateSummary();
-                            updateDonutAndLegend();
                         }
                     });
+
+                // ให้สรุป/กราฟอัปเดตทุกครั้งที่ DataTables คำนวณใหม่
+                table.on('draw', function() {
+                    updateSummary();
+                    updateDonutAndLegend();
+                });
 
                 // 13) อัปเดตครั้งแรก
                 updateSummary();
@@ -1090,7 +1203,7 @@
         }
 
         /* ตัวเลือก: วาง tooltip ด้านล่าง (ถ้าพื้นที่ด้านบนไม่พอ)
-                                                                                           <span class="tip" data-tip="..." data-pos="bottom"> */
+                                                                                                                                                   <span class="tip" data-tip="..." data-pos="bottom"> */
         .tip[data-pos="bottom"]::after {
             top: calc(100% + 10px);
             bottom: auto;
