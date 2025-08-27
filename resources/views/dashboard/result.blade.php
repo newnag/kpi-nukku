@@ -69,16 +69,15 @@
                 @if ($bucket && !empty($bucket['indicators']))
                     <div class="charts-of-standard" data-standard-id="{{ $standard->id }}"
                         style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px;">
-                        @foreach ($bucket['indicators'] as $c)
+                        @foreach ($bucket['indicators'] as $i => $c)
                             <div class="chart-card" data-standard="{{ $standard->id }}"
                                 data-dimension="{{ $c['category_name'] }}" data-type="{{ $c['indicator_type'] }}"
                                 data-code="{{ $c['indicator_code'] }}" data-years='@json($c['years'])'
-                                style="background:#fff;border-radius:16px;padding:16px;box-shadow:0 2px 10px rgba(0,0,0,.06);">
+                                data-index="{{ $i }}"
+                                style="{{ $i >= 10 ? 'display:none;' : '' }};background:#fff;border-radius:16px;padding:16px;box-shadow:0 2px 10px rgba(0,0,0,.06);">
                                 <div class="subtitle" style="font-weight:600;margin-bottom:8px;">
-                                    {{ $c['indicator_code'] ? '[' . $c['indicator_code'] . '] ' : '' }}ตัวบ่งชี้
+                                    {{ $c['indicator_code'] ? '[' . $c['indicator_code'] . '] ' : '' }}
                                     {{ $c['indicator_name'] }}
-                                    <div style="font-weight:400;color:#6b7280;">ด้าน: {{ $c['category_name'] }} | ประเภท:
-                                        {{ $c['indicator_type'] ?? '-' }}</div>
                                 </div>
                                 <canvas id="chart-{{ $standard->id }}-{{ $c['indicator_id'] }}" height="180"></canvas>
                                 <script id="data-{{ $standard->id }}-{{ $c['indicator_id'] }}" type="application/json">
@@ -87,6 +86,13 @@
                             </div>
                         @endforeach
                     </div>
+
+                    @if (count($bucket['indicators']) > 10)
+                        <button type="button" class="btn-show-more" data-standard-id="{{ $standard->id }}"
+                            style="margin-top:10px;display:block;">
+                            แสดงเพิ่มเติม
+                        </button>
+                    @endif
                 @else
                     <div style="color:#6b7280;margin-bottom:16px;">ไม่มีข้อมูลตัวชี้วัดที่มีการบันทึกผลลัพธ์</div>
                 @endif
@@ -145,7 +151,26 @@
             }
 
             fillSelect($year, (FILTERS.years || []).sort());
-            fillSelect($code, (FILTERS.codes || []).sort());
+
+            function sortCodes(codes) {
+                return codes.sort((a, b) => {
+                    const ma = a.match(/^([A-Za-z]+)[- ]?(\d+)$/i);
+                    const mb = b.match(/^([A-Za-z]+)[- ]?(\d+)$/i);
+
+                    const prefixA = ma ? ma[1].toUpperCase() : a;
+                    const prefixB = mb ? mb[1].toUpperCase() : b;
+                    const numA = ma ? parseInt(ma[2], 10) : 0;
+                    const numB = mb ? parseInt(mb[2], 10) : 0;
+
+                    if (prefixA === prefixB) {
+                        return numA - numB;
+                    }
+                    return prefixA.localeCompare(prefixB);
+                });
+            }
+
+            fillSelect($code, sortCodes(FILTERS.codes || []));
+
             fillSelect($std, (FILTERS.standards || []).sort((a, b) => a.name.localeCompare(b.name, 'th')), it => ({
                 value: String(it.id),
                 label: it.name
@@ -158,52 +183,31 @@
             const chartOriginals = {}; // key = canvasId -> { years:[], values:[] }
 
             function renderAllCharts() {
-                document.querySelectorAll('[id^="data-"][type="application/json"]').forEach(script => {
-                    const payload = JSON.parse(script.textContent || '{}'); // {years, values}
-                    const canvasId = script.id.replace('data', 'chart');
-                    const canvas = document.getElementById(canvasId);
-                    if (!canvas) return;
+                document.querySelectorAll('.btn-show-more').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const sid = this.dataset.standardId;
+                        const container = document.querySelector(
+                            `.charts-of-standard[data-standard-id="${sid}"]`);
+                        const cards = container.querySelectorAll('.chart-card[data-index]');
+                        const isExpanded = this.classList.contains('expanded');
 
-                    // เก็บต้นฉบับครั้งเดียว
-                    if (!chartOriginals[canvasId]) {
-                        chartOriginals[canvasId] = {
-                            years: Array.isArray(payload.years) ? [...payload.years] : [],
-                            values: Array.isArray(payload.values) ? [...payload.values] : []
-                        };
-                    }
-
-                    if (!chartInstances[canvasId]) {
-                        chartInstances[canvasId] = new Chart(canvas.getContext('2d'), {
-                            type: 'bar',
-                            data: {
-                                labels: payload.years || [],
-                                datasets: [{
-                                    data: payload.values || [],
-                                    borderWidth: 1,
-                                    borderRadius: 12
-                                }]
-                            },
-                            options: {
-                                responsive: true,
-                                plugins: {
-                                    legend: {
-                                        display: false
-                                    }
-                                },
-                                scales: {
-                                    y: {
-                                        beginAtZero: true
-                                    }
-                                }
-                            }
-                        });
-                    } else {
-                        const inst = chartInstances[canvasId];
-                        inst.data.labels = payload.years || [];
-                        inst.data.datasets[0].data = payload.values || [];
-                        inst.update();
-                    }
+                        if (!isExpanded) {
+                            // แสดงทั้งหมด
+                            cards.forEach(c => c.style.display = '');
+                            this.textContent = 'แสดงน้อยลง';
+                            this.classList.add('expanded');
+                        } else {
+                            // ซ่อนเกิน 10
+                            cards.forEach(c => {
+                                const idx = parseInt(c.dataset.index, 10);
+                                c.style.display = idx < 10 ? '' : 'none';
+                            });
+                            this.textContent = 'แสดงเพิ่มเติม';
+                            this.classList.remove('expanded');
+                        }
+                    });
                 });
+
             }
             renderAllCharts();
 
@@ -457,14 +461,14 @@
             }
         }
 
-      
+
         .chart-content {
             position: relative;
             height: 420px;
         }
 
-    
- 
+
+
 
         /* Responsive */
         @media (max-width: 768px) {
@@ -504,7 +508,7 @@
             }
         }
     </style>
-  
+
     <style>
         /* ---- Base ---- */
         :root {
@@ -670,6 +674,6 @@
             background: var(--blue-600);
         }
     </style>
-   
+
 
 @endsection

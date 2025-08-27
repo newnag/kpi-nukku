@@ -12,9 +12,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('settings', function (Blueprint $table) {
-            $table->id();
-            $table->string('title')->nullable();
-            $table->integer('day_notify');
+            $table->id(); // PK, Auto Increment
+            $table->string('title', 255)->nullable(); // ชื่อการแจ้งเตือน
+            $table->integer('day_notify')->nullable(); // จำนวนวันล่วงหน้า
+            $table->date('notify_date')->nullable(); // วันที่จะแจ้งเตือน
+            $table->string('message', 500)->nullable(); // ข้อความแจ้งเตือน
+            $table->timestamps(); // created_at, updated_at
         });
     }
 
