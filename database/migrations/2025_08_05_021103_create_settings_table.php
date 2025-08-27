@@ -14,8 +14,9 @@ return new class extends Migration
         Schema::create('settings', function (Blueprint $table) {
             $table->id(); // PK, Auto Increment
             $table->string('title', 255)->nullable(); // ชื่อการแจ้งเตือน
-            $table->integer('day_notify')->nullable(); // จำนวนวันล่วงหน้า
-            $table->date('notify_date')->nullable(); // วันที่จะแจ้งเตือน
+            // เก็บวันที่แจ้งเตือนจริง 2 รอบ
+            $table->date('notify_date1')->nullable()->comment('วันที่แจ้งเตือนรอบที่ 1');
+            $table->date('notify_date2')->nullable()->comment('วันที่แจ้งเตือนรอบที่ 2');
             $table->string('message', 500)->nullable(); // ข้อความแจ้งเตือน
             $table->timestamps(); // created_at, updated_at
         });

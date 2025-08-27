@@ -43,7 +43,7 @@ Route::prefix('settings')->name('settings.')->group(function () {
     Route::get('/', [SettingController::class, 'index'])->name('index');
     Route::post('/store', [SettingController::class, 'store'])->name('store');
     Route::put('/{id}', [SettingController::class, 'update'])->name('update');
-    Route::delete('/{id}', [SettingController::class, 'destroy'])->name('destroy');
+   
 });
 
 Route::prefix('users')->name('users.')->group(function () {

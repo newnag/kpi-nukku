@@ -7,24 +7,40 @@
             <div class="header-contatainers">
                 ตั้งค่าการแจ้งเตือน
             </div>
-            <!-- ฟอร์มsetting-->
-            <div class="Setting-form">
 
+            <!-- ฟอร์ม setting -->
+            <div class="Setting-form">
                 <div class="add-section-title">การตั้งค่าเว็บไซต์</div>
 
                 <form action="{{ route('settings.store') }}" method="POST">
                     @csrf
+
+                    <!-- Title -->
                     <div class="form-group">
                         <label class="form-label">ชื่อเว็บไซต์ <span class="required">*</span></label>
-                        <input type="text" name="title" class="form-input" required value="{{ old('title', $setting->title ?? '') }}">
-                        
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">จำนวนวันก่อนถึงกำหนดการแจ้งเตือน <span class="required">*</span></label>
-                        <input type="text" name="day_notify" class="form-input2" required value="{{ old('day_notify', $setting->day_notify ?? '') }}">
-                        <i data-lucide="alarm-clock" class="lucide-icon"></i>
+                        <input type="text" name="title" class="form-input" required
+                            value="{{ old('title', $setting->title ?? '') }}">
                     </div>
 
+                    <div class="form-group">
+                        <label class="form-label">วันที่แจ้งเตือนรอบที่ 1</label>
+                        <input type="date" name="notify_date1" class="form-input2"
+                            value="{{ old('notify_date1', $setting?->notify_date1?->format('Y-m-d')) }}">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">วันที่แจ้งเตือนรอบที่ 2</label>
+                        <input type="date" name="notify_date2" class="form-input2"
+                            value="{{ old('notify_date2', $setting?->notify_date2?->format('Y-m-d')) }}">
+                    </div>
+
+                    <!-- Message -->
+                    <div class="form-group">
+                        <label class="form-label">ข้อความแจ้งเตือน</label>
+                        <textarea name="message" class="form-input" rows="3" placeholder="เช่น กรุณากรอกข้อมูลภายในสิ้นเดือน">{{ old('message', $setting->message ?? '') }}</textarea>
+                    </div>
+
+                    <!-- Submit -->
                     <button type="submit" class="submit-btn">
                         <i data-lucide="save" class="btn-icon"></i> บันทึก
                     </button>
@@ -32,6 +48,7 @@
             </div>
         </div>
     </div>
+
 
 
     <script>
@@ -238,11 +255,11 @@
             gap: 10px;
         }
 
-        
 
-      
 
-       
+
+
+
 
         .lucide-icon {
             width: 30px;

@@ -9,27 +9,41 @@ class SettingController extends Controller
 {
     public function index()
     {
-        $setting = Setting::first();  // หรือ Setting::find(1) ถ้ามีแค่ 1 record
+        // ดึงเรคอร์ดเดียว ถ้าไม่มีจะคืน null
+        $setting = Setting::first();
         return view('setting.app', compact('setting'));
     }
 
     public function store(Request $request)
     {
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'day_notify' => 'required|integer|min:1',
-
+        $validated = $request->validate([
+            'title'        => ['nullable', 'string', 'max:255'],
+            'notify_date1' => ['nullable', 'date'],
+            'notify_date2' => ['nullable', 'date'],
+            'message'      => ['nullable', 'string', 'max:500'],
         ]);
 
-        // สมมติว่า settings มีแค่ 1 record (id=1) เก็บ config เดียว
-        $data = $request->only(['title', 'day_notify',]);
-
-        // updateOrCreate จะค้นหา id=1 ถ้ามีอัปเดต ถ้าไม่มีสร้างใหม่
+        // อัปเดตหรือสร้างแถวเดียว (id = 1)
         $setting = Setting::updateOrCreate(
             ['id' => 1],
-            $data
+            $validated
         );
 
         return redirect()->route('settings.index')->with('success', 'บันทึกข้อมูลสำเร็จ!');
+    }
+
+    public function update(Request $request, $id)
+    {
+        $validated = $request->validate([
+            'title'        => ['nullable', 'string', 'max:255'],
+            'notify_date1' => ['nullable', 'date'],
+            'notify_date2' => ['nullable', 'date'],
+            'message'      => ['nullable', 'string', 'max:500'],
+        ]);
+
+        $setting = Setting::findOrFail($id);
+        $setting->update($validated);
+
+        return redirect()->route('settings.index')->with('success', 'อัปเดตข้อมูลสำเร็จ!');
     }
 }

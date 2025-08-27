@@ -8,16 +8,16 @@ class Setting extends Model
 {
     protected $fillable = [
         'title',
-        'day_notify',
-        'notify_date',
+        'notify_date1',
+        'notify_date2',
         'message',
     ];
 
-    public $timestamps = true; // ใช้ timestamps ถ้า migration มี $table->timestamps()
+    public $timestamps = false; // ใช้ timestamps ถ้า migration มี $table->timestamps()
 
     protected $casts = [
-        'day_notify'   => 'integer',
-        'notify_date'  => 'date',
+        'notify_date1' => 'date',
+        'notify_date2' => 'date',
     ];
 
     public static function getSetting()
