@@ -3,4 +3,28 @@
 
 body { font-family: 'Prompt', sans-serif; }
 
+/* Status icon colors */
+.text-danger {
+    color: #ef4444 !important;
+}
+
+.text-warn {
+    color: #f59e0b !important;
+}
+
+.text-success {
+    color: #22c55e !important;
+}
+
+.text-gray-500 {
+    color: #6b7280 !important;
+}
+
+/* Status icon styling */
+.status-icon {
+    width: 20px;
+    height: 20px;
+    display: inline-block;
+}
+
 

@@ -15,8 +15,6 @@ use Illuminate\Support\Facades\Log;
 class DashboardController extends Controller
 {
 
-
-
     public function index(Request $request)
     {
         // ====== 1) ปีทั้งหมดสำหรับ Filter ======
@@ -25,7 +23,7 @@ class DashboardController extends Controller
             ->whereNotNull('year')
             ->selectRaw('DISTINCT CAST(year AS INT) AS y')
             ->orderBy('y')
-            ->pluck('y');   // [2024,2025,...] เป็น int
+            ->pluck('y');   // [2020,2021,...] เป็น int (Collection)
 
         // ====== 2) Summary รวมคะแนนตามปี ======
         $yearlyTotals = Indicator::query()
@@ -125,7 +123,136 @@ class DashboardController extends Controller
             ->orderBy('name')
             ->get();
 
-        // ====== 8) DEBUG LOG ======
+        // ====== 8) เตรียมช่วงปี 5 ปีย้อนหลังที่มีจริง ======
+        $allYears = Indicator::query()
+            ->whereHas('assignments')
+            ->whereNotNull('year')
+            ->selectRaw('DISTINCT CAST(year AS INT) AS y')
+            ->orderBy('y')
+            ->pluck('y')
+            ->toArray();
+
+        $last5Years = array_slice($allYears, max(0, count($allYears) - 5));
+
+        // เตรียมค่า default กันตัวแปรหาย
+        $chart                = ['labels' => [], 'datasets' => []]; // กราฟ 3 มาตรฐาน (ของเดิม)
+        $chartYearXDimension  = ['labels' => [], 'datasets' => []]; // กราฟปีละ 7 แท่ง (รวม 3 มาตรฐานต่อด้าน)
+
+        if (!empty($last5Years)) {
+
+            // ====== (A) กราฟ 3 มาตรฐาน (ถ้าคุณยังใช้ส่วนนี้ในหน้าเดิม) ======
+            $standards = DB::table('standards')->select('id', 'name')->orderBy('id')->get();
+            $threeStandardIds = $standards->pluck('id')->take(3)->values()->all();
+
+            $rowsStd = Indicator::query()
+                ->join('categories', 'categories.id', '=', 'indicators.categorie_id')
+                ->join('standards',  'standards.id',  '=', 'categories.standard_id')
+                ->whereHas('assignments')
+                ->whereNotNull('indicators.year')
+                ->whereIn(DB::raw('CAST(indicators.year AS INT)'), $last5Years)
+                ->whereIn('standards.id', $threeStandardIds)
+                ->selectRaw('
+                CAST(indicators.year AS INT) AS year,
+                standards.id AS standard_id,
+                SUM(indicators.score_acc) AS total_score
+            ')
+                ->groupByRaw('CAST(indicators.year AS INT), standards.id')
+                ->orderByRaw('CAST(indicators.year AS INT)')
+                ->get();
+
+            $series = [];
+            foreach ($threeStandardIds as $sid) {
+                foreach ($last5Years as $y) {
+                    $series[$sid][$y] = 0.0;
+                }
+            }
+            foreach ($rowsStd as $r) {
+                $series[$r->standard_id][$r->year] = (float)$r->total_score;
+            }
+
+            $paletteById = [
+                $threeStandardIds[0] ?? 0 => ['label' => 'มาตราฐานโครงสร้าง', 'color' => '#8979FF'],
+                $threeStandardIds[1] ?? 0 => ['label' => 'มาตรฐานกระบวนการ',   'color' => '#FF928A'],
+                $threeStandardIds[2] ?? 0 => ['label' => 'มาตรฐานผลลัพธ์',      'color' => '#3CC3DF'],
+            ];
+
+            $chart = [
+                'labels'   => array_map(fn($y) => "ปี {$y}", $last5Years),
+                'datasets' => [],
+            ];
+            foreach ($threeStandardIds as $sid) {
+                if (!isset($paletteById[$sid])) continue;
+                $conf = $paletteById[$sid];
+                $chart['datasets'][] = [
+                    'label'           => $conf['label'],
+                    'data'            => array_values(array_intersect_key($series[$sid], array_flip($last5Years))),
+                    'backgroundColor' => $conf['color'],
+                ];
+            }
+
+
+            // ====== (B) กราฟ "ปีละ 7 แท่ง": รวม 3 มาตรฐานต่อ "ด้าน" ในปีนั้น ======
+
+            // 0) ล็อกชื่อ 7 ด้าน (เรียงตามที่อยากแสดง)
+            $rowsDim = Indicator::query()
+                ->join('categories', 'categories.id', '=', 'indicators.categorie_id')
+                ->whereHas('assignments')
+                ->whereNotNull('indicators.year')
+                ->whereIn(DB::raw('CAST(indicators.year AS INT)'), $last5Years)
+                ->selectRaw('
+        CAST(indicators.year AS INT) AS year,
+        categories.name AS dim_name,
+        SUM(indicators.score_acc) AS total_score
+     ')
+                ->groupByRaw('CAST(indicators.year AS INT), categories.name')
+                ->orderByRaw('CAST(indicators.year AS INT)')
+                ->get();
+
+            // 2) กำหนดลำดับชื่อ “7 ด้าน” ตามที่ต้องการแสดง (แก้ให้ตรงชื่อในฐานข้อมูลของคุณ)
+            $dimOrder = [
+                'ด้านองค์กรและการบริหารองค์กร',
+                'ด้านบุคลากร',
+                'ด้านการจัดการศึกษา',
+                'ด้านการวิจัยและนวัตกรรมและผลผลิตทางวิชาการ',
+                'ด้านการบริการวิชาการ/วิชาชีพแก่สังคม',
+                'ด้านการทำนุบำรุงศิลปะและวัฒนธรรม',
+                'ด้านนิสิตและนักศึกษา',
+            ];
+
+            // 3) สร้าง matrix [ด้าน][ปี] = คะแนน
+            $matrix = [];
+            foreach ($dimOrder as $d) {
+                foreach ($last5Years as $y) {
+                    $matrix[$d][$y] = 0.0;
+                }
+            }
+            foreach ($rowsDim as $r) {
+                if (isset($matrix[$r->dim_name][$r->year])) {
+                    $matrix[$r->dim_name][$r->year] = (float)$r->total_score;
+                }
+            }
+
+            // 4) สี 7 สีสำหรับ 7 ด้าน (ปรับได้)
+            $dimColors = ['#6366F1', '#F59E0B', '#10B981', '#EF4444', '#3B82F6', '#A855F7', '#14B8A6'];
+
+            // 5) โครงสำหรับ Chart.js: labels = ปี, datasets = 7 ด้าน
+            $chartYearAsX = [
+                'labels'   => array_values($last5Years),  // เช่น [2020,2021,...]
+                'datasets' => [],
+            ];
+            foreach ($dimOrder as $i => $name) {
+                $chartYearAsX['datasets'][] = [
+                    'label'           => $name,
+                    'data'            => array_map(fn($y) => $matrix[$name][$y], $last5Years),
+                    'backgroundColor' => $dimColors[$i % count($dimColors)],
+                    'borderColor'     => $dimColors[$i % count($dimColors)],
+                    'borderWidth'     => 1,
+                    'barPercentage'   => 0.75,
+                    'categoryPercentage' => 0.8,
+                ];
+            }
+        } // end if last5Years
+        // ====== 9) DEBUG LOG ======
         Log::info('==== DASHBOARD DEBUG ====');
         Log::info('Selected Year param: ' . ($request->input('year') ?? 'NULL'));
         Log::info('Latest Year: ' . ($latestYear ?? 'NULL'));
@@ -135,6 +262,7 @@ class DashboardController extends Controller
         Log::info('Status Counts: ' . json_encode($statusCounts));
         Log::info('==========================');
 
+        // ====== 10) RETURN VIEW ======
         return view('dashboard.app', compact(
             'indicators',
             'totalScore',
@@ -154,6 +282,9 @@ class DashboardController extends Controller
             'dimensionStats',
             'yearlyTotals',
             'yearsForFilter',
+            'last5Years',          // ถ้าจะใช้บน Blade
+            'chart',               // กราฟ 3 มาตรฐาน (ของเดิม)
+            'chartYearAsX'  // ✅ ปีละ 7 แท่ง = รวม 3 มาตรฐานต่อด้าน
         ));
     }
 

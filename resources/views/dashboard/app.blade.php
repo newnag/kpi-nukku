@@ -175,7 +175,7 @@
             <div class="chart-card">
                 <div class="chart-header">
                     <h3></h3>
-                    <button class="btn-export">
+                    <button id="exportChart1" class="btn-export">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
                             <path d="M9 12l3 3 3-3" stroke="#16a34a" stroke-width="2" stroke-linecap="round"
                                 stroke-linejoin="round" />
@@ -186,11 +186,11 @@
                             <path d="M3 15v4a2 2 0 0 0 2 2" stroke="#16a34a" stroke-width="2" stroke-linecap="round"
                                 stroke-linejoin="round" />
                         </svg>
-                        EXPORT TO EXCEL
+                        EXPORT CHART (PNG)
                     </button>
                 </div>
                 <div class="chart-content">
-                    <canvas id="visitsChart" width="400" height="200"></canvas>
+                    <canvas id="visitsChart"></canvas>
                 </div>
             </div>
             <div class="stat-title">
@@ -201,7 +201,7 @@
             <div class="chart-card">
                 <div class="chart-header">
                     <h3></h3>
-                    <button class="btn-export">
+                    <button id="exportChart2" class="btn-export">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
                             <path d="M9 12l3 3 3-3" stroke="#16a34a" stroke-width="2" stroke-linecap="round"
                                 stroke-linejoin="round" />
@@ -212,12 +212,13 @@
                             <path d="M3 15v4a2 2 0 0 0 2 2" stroke="#16a34a" stroke-width="2" stroke-linecap="round"
                                 stroke-linejoin="round" />
                         </svg>
-                        EXPORT TO EXCEL
+                        EXPORT CHART (PNG)
                     </button>
                 </div>
 
+
                 <div class="chart-content">
-                    <canvas id="score7Chart"></canvas>
+                    <canvas id="yearAsXChart"></canvas>
                 </div>
             </div>
 
@@ -228,7 +229,7 @@
                 <table class="table" id="dashboardTable">
                     <thead>
                         <tr>
-                            <th>ลำดับ</th>
+                            {{-- <th>ลำดับ</th> --}}
                             <th>ปีการประเมิน</th>
                             <th>ชื่อตัวบ่งชี้</th>
                             <th>รหัส</th>
@@ -250,15 +251,21 @@
                                     0 => 'pending',
                                     default => 'pending',
                                 };
+                                // Debug: แสดงข้อมูล status
+                                if ($index < 3) {
+                                    echo "<!-- Debug: Indicator {$index} - Status: {$indicator->status} (Type: " .
+                                        gettype($indicator->status) .
+                                        ') -->';
+                                }
                             @endphp
                             <tr data-max="{{ (float) $indicator->max_score }}"
                                 data-standard="{{ $indicator->category->standard->name ?? '' }}"
                                 data-dimension="{{ $indicator->category->name ?? '' }}"
                                 data-collector="{{ $indicator->assignments->first()->collectorUser->name ?? '' }}"
                                 data-status="{{ $statusKey }}">
-                                <td class="status-cell">{{ $index + 1 }}</td>
+                                {{-- <td class="status-cell">{{ $index + 1 }}</td> --}}
                                 <td class="status-cell">{{ $indicator->year }}</td>
-                                <td class="status-cell">{{ $indicator->name }}</td>
+                                <td>{{ $indicator->name }}</td>
                                 <td class="status-cell">{{ $indicator->code }}</td>
                                 <td class="status-cell">{{ $indicator->type }}</td>
 
@@ -275,7 +282,7 @@
                                         @case(0)
                                             <span class="tip" data-tip="อยู่ระหว่างดำเนินการ"
                                                 aria-label="อยู่ระหว่างดำเนินการ" tabindex="0">
-                                                <i data-lucide=" alert-triangle " class="status-icon text-danger"></i>
+                                                <i data-lucide="alert-triangle" class="status-icon text-danger"></i>
                                             </span>
                                         @break
 
@@ -287,11 +294,18 @@
                                         @break
 
                                         @case(2)
+                                        @case(3)
                                             <span class="tip" data-tip="ผลการดำเนินงานครบถ้วนตามเกณฑ์มาตรฐาน"
                                                 aria-label="ผลการดำเนินงานครบถ้วนตามเกณฑ์มาตรฐาน" tabindex="0">
                                                 <i data-lucide="check-circle" class="status-icon text-success"></i>
                                             </span>
                                         @break
+
+                                        @default
+                                            <span class="tip" data-tip="สถานะไม่ระบุ ({{ $indicator->status }})"
+                                                aria-label="สถานะไม่ระบุ" tabindex="0">
+                                                <i data-lucide="help-circle" class="status-icon text-gray-500"></i>
+                                            </span>
                                     @endswitch
                                 </td>
                                 {{-- 
@@ -317,110 +331,285 @@
     <!-- DataTables -->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // ปลอดภัยไว้ก่อน: ถ้าไม่ได้โหลด lucide ให้ข้าม
-            if (window.lucide?.createIcons) lucide.createIcons();
+        // ============== Utility Functions ==============
+        function cloneDeep(obj) {
+            return JSON.parse(JSON.stringify(obj ?? {}));
+        }
 
-            // ===== Doughnut: Satisfaction =====
-            // const donutCanvas = document.getElementById('satisfactionChart');
-            // if (donutCanvas) {
-            //     const donutCtx = donutCanvas.getContext('2d');
+        function downloadBlob(blob, filename) {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            URL.revokeObjectURL(url);
+        }
 
-            //     // ดึง arrays จาก Blade ให้ตรงลำดับกับ legendConfig
-            //     const chartLabels = @json(array_column($legendConfig, 'label'));
-            //     const chartColors = @json(array_column($legendConfig, 'color'));
-            //     const chartKeys = @json(array_column($legendConfig, 'key'));
+        // ============== Background Plugin ==============
+        const bgPlugin = {
+            id: 'bg',
+            beforeDraw(c) {
+                const {
+                    ctx,
+                    width,
+                    height
+                } = c;
+                ctx.save();
+                ctx.globalCompositeOperation = 'destination-over';
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, width, height);
+                ctx.restore();
+            }
+        };
 
-            //     // map key -> count
-            //     const countsMap = @json($statusCounts);
-            //     const dataValues = chartKeys.map(k => Number(countsMap[k] ?? 0));
+        // ============== Export Chart.js เป็น PNG แบบ offscreen ==============
+        async function exportChartPNG(chart, filename, {
+            widthScale = 2, // ขยายความกว้างจากต้นฉบับกี่เท่า
+            heightScale = 2, // ขยายความสูงจากต้นฉบับกี่เท่า (เพิ่มค่านี้ให้รูป "สูง" ขึ้น)
+            extraBottom = 60, // เผื่อพื้นที่ legend/label ด้านล่าง (px ของขนาดเดิม)
+            bg = '#ffffff' // สีพื้นหลังภาพ
+        } = {}) {
 
-            //     new Chart(donutCtx, {
-            //         type: 'doughnut',
-            //         data: {
-            //             labels: chartLabels,
-            //             datasets: [{
-            //                 data: dataValues,
-            //                 backgroundColor: chartColors,
-            //                 borderColor: "#ffffff",
-            //                 borderWidth: 4,
-            //                 hoverOffset: 4,
-            //             }]
-            //         },
-            //         options: {
-            //             responsive: true,
-            //             maintainAspectRatio: false,
-            //             cutout: '72%',
-            //             plugins: {
-            //                 legend: {
-            //                     display: false
-            //                 },
-            //                 tooltip: {
-            //                     callbacks: {
-            //                         title: () => '',
-            //                         label: (ctx) => {
-            //                             const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
-            //                             const val = ctx.parsed;
-            //                             const pct = total > 0 ? (val / total * 100).toFixed(2) : '0.00';
-            //                             // แสดง "ฉลาก: 10 (12.34%)"
-            //                             return ` ${ctx.label}: ${val} (${pct}%)`;
-            //                         }
-            //                     }
-            //                 }
-            //             }
-            //         }
-            //     });
-            // }
+            // 1) คำนวณขนาดเอาต์พุตจากขนาด "จริง" ของ canvas เดิม (หน่วย px ภายใน)
+            const srcW = chart.canvas.width;
+            const srcH = chart.canvas.height;
 
-            // ===== Visits (ตัวอย่าง 3 ชุดข้อมูล) =====
-            const visitsCanvas = document.getElementById('visitsChart');
-            if (visitsCanvas) {
-                const visitsCtx = visitsCanvas.getContext('2d');
-                new Chart(visitsCtx, {
+            const outW = Math.round(srcW * widthScale);
+            const outH = Math.round((srcH + extraBottom) * heightScale);
+
+            // 2) เตรียม offscreen canvas
+            const off = document.createElement('canvas');
+            off.width = outW;
+            off.height = outH;
+            const offCtx = off.getContext('2d');
+
+            // 3) clone data/options แล้วปรับให้เหมาะกับ export
+            const data = cloneDeep(chart.config.data);
+            const options = cloneDeep(chart.config.options);
+            options.responsive = false; // เรากำหนดขนาดเอง
+            options.maintainAspectRatio = false;
+            options.animation = false;
+            options.layout = options.layout || {};
+            // เพิ่ม padding ล่างเพื่อกัน legend ชนขอบ
+            const pad = options.layout.padding || {};
+            options.layout.padding = {
+                top: pad.top || 0,
+                right: pad.right || 0,
+                bottom: (pad.bottom || 0) + extraBottom,
+                left: pad.left || 0
+            };
+
+            // ขยายขนาดฟอนต์ให้เหมาะกับความสูงใหม่ (optional)
+            options.plugins = options.plugins || {};
+            options.plugins.legend = options.plugins.legend || {};
+            options.plugins.legend.labels = options.plugins.legend.labels || {};
+            const baseFont = (options.plugins.legend.labels.font && options.plugins.legend.labels.font.size) || 12;
+            options.plugins.legend.labels.font = {
+                size: Math.round(baseFont * heightScale)
+            };
+
+            // 4) ปลั๊กอินพื้นหลังสำหรับ export
+            const exportBgPlugin = {
+                id: 'exportBg',
+                beforeDraw(c) {
+                    const {
+                        ctx,
+                        width,
+                        height
+                    } = c;
+                    ctx.save();
+                    ctx.globalCompositeOperation = 'destination-over';
+                    ctx.fillStyle = bg;
+                    ctx.fillRect(0, 0, width, height);
+                    ctx.restore();
+                }
+            };
+
+            // 5) เรนเดอร์กราฟใหม่บน offscreen (ชนิดเดียวกับต้นฉบับ)
+            const plugins = [exportBgPlugin];
+            if (window.ChartDataLabels) plugins.push(ChartDataLabels);
+
+            const offChart = new Chart(offCtx, {
+                type: chart.config.type,
+                data,
+                options,
+                plugins
+            });
+
+            // ให้กราฟคำนวณเลย์เอาต์ตามขนาดเป้าหมาย
+            offChart.resize(outW, outH);
+            offChart.update('none');
+
+            // 6) บันทึกไฟล์ (PNG)
+            await new Promise(r => setTimeout(r, 0)); // ปล่อยให้วาดเสร็จเฟรมนี้
+            off.toBlob((blob) => {
+                downloadBlob(blob, filename);
+                offChart.destroy();
+            }, 'image/png', 1);
+        }
+        document.addEventListener('DOMContentLoaded', () => {
+            // Lucide
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+
+            // ---------- Chart 1 ----------
+            const el1 = document.getElementById('visitsChart');
+            const data1 = @json($chart);
+            let chart1 = null;
+
+            if (el1 && Array.isArray(data1?.labels) && data1.labels.length) {
+                chart1 = new Chart(el1.getContext('2d'), {
                     type: 'bar',
-                    data: {
-                        labels: ['ปี 2020', 'ปี 2021', 'ปี 2022', 'ปี 2023', 'ปี 2024'],
-                        datasets: [{
-                                label: 'มาตราฐานโครงสร้าง',
-                                data: [120, 150, 180, 220, 190],
-                                backgroundColor: '#8979FF'
-                            },
-                            {
-                                label: 'มาตรฐานกระบวนการ',
-                                data: [80, 110, 140, 170, 160],
-                                backgroundColor: '#FF928A'
-                            },
-                            {
-                                label: 'มาตรฐานผลลัพธ์',
-                                data: [40, 60, 80, 100, 85],
-                                backgroundColor: '#3CC3DF'
-                            }
-                        ]
-                    },
+                    data: data1,
+                    plugins: [bgPlugin],
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
                         scales: {
                             y: {
-                                beginAtZero: true
+                                beginAtZero: true,
+                                ticks: {
+                                    font: {
+                                        size: 12
+                                    }
+                                }
+                            },
+                            x: {
+                                ticks: {
+                                    font: {
+                                        size: 12
+                                    }
+                                }
                             }
                         },
                         plugins: {
                             legend: {
-                                position: 'bottom'
+                                position: 'bottom',
+                                labels: {
+                                    font: {
+                                        size: 12
+                                    },
+                                    usePointStyle: true,
+                                    padding: 15
+                                }
                             }
                         }
                     }
                 });
             }
 
+            // export ปุ่ม 1
+            const btn1 = document.getElementById('exportChart1');
+            if (btn1 && chart1) {
+                btn1.addEventListener('click', async () => {
+                    chart1.options.animation = false;
+                    chart1.update('none');
 
+                    // คมชัดขึ้น: scale 2x ชั่วคราว
+                    const {
+                        width,
+                        height
+                    } = chart1;
+                    chart1.resize(width * 2, height * 2);
+                    chart1.update('none');
 
+                    el1.toBlob((blob) => {
+                        downloadBlob(blob, `chart-1-${Date.now()}.png`);
+                        // คืนขนาดเดิม
+                        chart1.resize(width, height);
+                        chart1.update('none');
+                    }, 'image/png', 1);
+                });
+            }
 
+            // ---------- Chart 2 ----------
+            const el2 = document.getElementById('yearAsXChart');
+            const data2 = @json($chartYearAsX);
+            let chart2 = null;
+
+            if (el2 && Array.isArray(data2?.labels) && data2.labels.length) {
+                const plugins = window.ChartDataLabels ? [ChartDataLabels, bgPlugin] : [bgPlugin];
+                chart2 = new Chart(el2.getContext('2d'), {
+                    type: 'bar',
+                    data: data2,
+                    plugins,
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: {
+                                stacked: false,
+                                ticks: {
+                                    autoSkip: false,
+                                    font: {
+                                        size: 12
+                                    }
+                                }
+                            },
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    font: {
+                                        size: 12
+                                    }
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    font: {
+                                        size: 12
+                                    },
+                                    usePointStyle: true,
+                                    padding: 15
+                                }
+                            },
+                            tooltip: {
+                                mode: 'index',
+                                intersect: false
+                            },
+                            datalabels: window.ChartDataLabels ? {
+                                anchor: 'end',
+                                align: 'end',
+                                clamp: true,
+                                font: {
+                                    size: 11
+                                },
+                                formatter: (v) => (v == null ? '' : Number(v).toFixed(2))
+                            } : undefined
+                        }
+                    }
+                });
+            }
+
+            // export ปุ่ม 2
+            const btn2 = document.getElementById('exportChart2');
+            if (btn2 && chart2) {
+                btn2.addEventListener('click', () => {
+                    chart2.options.animation = false;
+                    chart2.update('none');
+
+                    const {
+                        width,
+                        height
+                    } = chart2;
+                    chart2.resize(width * 2, height * 2);
+                    chart2.update('none');
+
+                    el2.toBlob((blob) => {
+                        downloadBlob(blob, `chart-2-${Date.now()}.png`);
+                        chart2.resize(width, height);
+                        chart2.update('none');
+                    }, 'image/png', 1);
+                });
+            }
         });
     </script>
+
     <script>
         (function($) {
             let table, donutChart;
@@ -433,16 +622,15 @@
             const numberFormat = (n) => (isNaN(n) ? 0 : Number(n)).toLocaleString('th-TH');
             // แผนที่คะแนนรวม/คะแนนเต็มต่อปีจากเซิร์ฟเวอร์ เพื่อใช้คำนวณสรุปแบบไม่ปนปี
             const YEARLY_TOTALS_ARRAY = @json($yearlyTotals);
-            const YEARLY_TOTALS_MAP = Array.isArray(YEARLY_TOTALS_ARRAY)
-                ? YEARLY_TOTALS_ARRAY.reduce((acc, item) => {
+            const YEARLY_TOTALS_MAP = Array.isArray(YEARLY_TOTALS_ARRAY) ?
+                YEARLY_TOTALS_ARRAY.reduce((acc, item) => {
                     const y = String(item.year ?? '');
                     acc[y] = {
                         total: Number(item.total_score ?? 0),
                         max: Number(item.max_score ?? 0),
                     };
                     return acc;
-                }, {})
-                : {};
+                }, {}) : {};
             const getLatestYear = () => {
                 const years = Array.isArray(window.ALL_YEARS) ? window.ALL_YEARS : [];
                 const nums = years
@@ -572,14 +760,20 @@
 
                     // รวมจากแถวที่ "ผ่านการกรองอื่น ๆ" และอยู่ในปี effectiveYear เท่านั้น
                     const data = table
-                        .column(idxScore, { search: 'applied', page: 'all' })
+                        .column(idxScore, {
+                            search: 'applied',
+                            page: 'all'
+                        })
                         .data()
                         .toArray();
 
                     let total = 0;
                     let maxSum = 0;
 
-                    table.rows({ search: 'applied', page: 'all' }).every(function(rowIdx) {
+                    table.rows({
+                        search: 'applied',
+                        page: 'all'
+                    }).every(function(rowIdx) {
                         // คอลัมน์คะแนนรวม
                         const rowData = this.data();
                         const rowScoreCell = idxScore !== -1 ? rowData[idxScore] : '0';
@@ -694,14 +888,19 @@
                     const fallbackYear = getLatestYear();
                     const effectiveYear = selectedYear || fallbackYear || '';
 
-                    table.rows({ search: 'applied', page: 'all' }).every(function() {
+                    table.rows({
+                        search: 'applied',
+                        page: 'all'
+                    }).every(function() {
                         const key = this.node().dataset.status;
 
                         let rowYear = '';
                         try {
                             const rowData = this.data();
                             rowYear = idxYear !== -1 ? stripHtml(rowData[idxYear]) : '';
-                        } catch (e) { /* noop */ }
+                        } catch (e) {
+                            /* noop */
+                        }
 
                         if (effectiveYear && rowYear && rowYear !== effectiveYear) return;
 
@@ -733,11 +932,16 @@
                 }
 
                 // 12) Bind events
-                $('#filter-form').on('submit', function(e) { e.preventDefault(); });
-                $('#apply-filters').on('click', function(e){ e.preventDefault(); applyFilters(); });
+                $('#filter-form').on('submit', function(e) {
+                    e.preventDefault();
+                });
+                $('#apply-filters').on('click', function(e) {
+                    e.preventDefault();
+                    applyFilters();
+                });
 
                 $(document).off('click.reset', '#reset-filters').on('click.reset', '#reset-filters', function(
-                e) {
+                    e) {
                     e.preventDefault();
                     e.stopPropagation();
 
@@ -754,7 +958,8 @@
                     table.columns().every(function() {
                         this.search('');
                     });
-                    table.page('first').draw('page'); // จะไปเรียก updateSummary()/updateDonutAndLegend() ให้อัตโนมัติ
+                    table.page('first').draw(
+                        'page'); // จะไปเรียก updateSummary()/updateDonutAndLegend() ให้อัตโนมัติ
                 })
 
 
@@ -990,7 +1195,9 @@
             border-radius: 18px;
             box-shadow: 0 10px 28px rgba(0, 0, 0, .08);
             padding: 18px 18px 20px;
-
+            min-height: 500px;
+            display: flex;
+            flex-direction: column;
         }
 
         .chart-header {
@@ -1029,7 +1236,38 @@
 
         .chart-content {
             position: relative;
-            height: 420px;
+            height: 400px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+        }
+
+        .chart-content canvas {
+            max-width: 100%;
+            max-height: 100%;
+            width: auto !important;
+            height: auto !important;
+            border-radius: 8px;
+        }
+        
+        /* ปรับปรุงการแสดงผลของ chart */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 32px;
+            margin-top: 24px;
+        }
+        
+        /* เพิ่ม animation สำหรับ chart card */
+        .chart-card {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .chart-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
         }
 
         /* Buttons */
@@ -1069,6 +1307,52 @@
             .dashboard-container {
                 padding: 16px;
             }
+            
+            .chart-card {
+                min-height: 400px;
+                padding: 16px;
+            }
+            
+            .chart-content {
+                height: 300px;
+            }
+            
+            .chart-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+            
+            .btn-export {
+                align-self: flex-end;
+                font-size: 11px;
+                padding: 6px 12px;
+            }
+            
+            .stat-title h3 {
+                font-size: 18px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .chart-card {
+                min-height: 350px;
+                padding: 12px;
+            }
+            
+            .chart-content {
+                height: 250px;
+            }
+            
+            .btn-export {
+                font-size: 10px;
+                padding: 5px 10px;
+            }
+            
+            .stat-title h3 {
+                font-size: 16px;
+            }
+        }
 
             .stats-grid {
                 grid-template-columns: 1fr;
@@ -1203,7 +1487,7 @@
         }
 
         /* ตัวเลือก: วาง tooltip ด้านล่าง (ถ้าพื้นที่ด้านบนไม่พอ)
-                                                                                                                                                   <span class="tip" data-tip="..." data-pos="bottom"> */
+                                                                                                                                                                                                                       <span class="tip" data-tip="..." data-pos="bottom"> */
         .tip[data-pos="bottom"]::after {
             top: calc(100% + 10px);
             bottom: auto;
