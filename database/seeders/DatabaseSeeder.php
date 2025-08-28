@@ -1,6 +1,7 @@
 <?php
 namespace Database\Seeders;
 
+use App\Models\Assignment;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -21,6 +22,7 @@ class DatabaseSeeder extends Seeder
             StandardSeeder::class,
             CategorieSeeder::class,
             IndicatorsSeeder::class,
+            AssignmentSeeder::class,
             CriteriasSeeder::class,
             EvidenceSeeder::class,
             FormulaSeeder::class,
