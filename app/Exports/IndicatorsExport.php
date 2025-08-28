@@ -44,29 +44,75 @@ class IndicatorsExport implements FromQuery, WithHeadings, WithMapping, ShouldAu
                 'categories.name as category_name',
                 'standards.name as standard_name',
                 'departments.name as dept_name',
-            ])
-            ->groupBy(
-                'indicators.id',
-                'indicators.name',
-                'indicators.code',
-                'indicators.type',
-                'indicators.year',
-                'indicators.score_acc',
-                'indicators.max_score',
-                'indicators.status',
-                'categories.name',
-                'standards.name',
-                'departments.name'
-            );
+            ]);
 
-        if ($y = $this->filters['year'] ?? null)         $q->where('indicators.year', $y);
-        if ($s = $this->filters['standard_id'] ?? null)  $q->where('categories.standard_id', $s);
-        if ($c = $this->filters['category_id'] ?? null)  $q->where('indicators.categorie_id', $c);
-        if (($st = $this->filters['status'] ?? '') !== '') $q->where('indicators.status', $st);
-        if ($d = $this->filters['dept_id'] ?? null)      $q->where('collector_users.department_id', $d);
-        if ($code = $this->filters['code'] ?? null)      $q->where('indicators.code', 'like', "%$code%");
+        // ===== ฟิลเตอร์ =====
+        $y   = $this->filters['year']         ?? null;
+        $std = $this->filters['standard_id']  ?? null;   // อาจเป็น id หรือชื่อ
+        $cat = $this->filters['category_id']  ?? null;   // (dimension) อาจเป็น id หรือชื่อ
+        $st  = $this->filters['status']       ?? '';
+        $dep = $this->filters['dept_id']      ?? null;   // อาจเป็น id หรือชื่อแผนก
+        $code = $this->filters['code']         ?? null;
 
-        return $q->orderBy('indicators.year')->orderBy('indicators.code');
+        if ($y) {
+            $q->where('indicators.year', $y);
+        }
+
+        if ($std !== null && $std !== '') {
+            if (is_numeric($std)) {
+                $q->where('categories.standard_id', (int)$std);
+            } else {
+                // Postgres ใช้ ILIKE ค้นหาไม่สนตัวพิมพ์
+                $q->where('standards.name', 'ILIKE', $std);
+                // ถ้าต้องการแบบ contains: $q->where('standards.name', 'ILIKE', "%{$std}%");
+            }
+        }
+
+        if ($cat !== null && $cat !== '') {
+            if (is_numeric($cat)) {
+                $q->where('indicators.categorie_id', (int)$cat);
+            } else {
+                $q->where('categories.name', 'ILIKE', $cat);
+                // หรือ contains: $q->where('categories.name', 'ILIKE', "%{$cat}%");
+            }
+        }
+
+        if ($st !== '') {
+            $q->where('indicators.status', $st);
+        }
+
+        if ($dep !== null && $dep !== '') {
+            if (is_numeric($dep)) {
+                $q->where('collector_users.department_id', (int)$dep);
+            } else {
+                $q->where('departments.name', 'ILIKE', $dep);
+                // หรือ contains: $q->where('departments.name', 'ILIKE', "%{$dep}%");
+            }
+        }
+
+        if ($code) {
+            $q->where('indicators.code', 'ILIKE', "%{$code}%");
+        }
+
+        // ===== การเรียง (ปี → prefix → เลขหลังขีด) =====
+        if (!$y) {
+            $q->orderBy('indicators.year', 'asc');
+        }
+
+        $q->orderByRaw("
+        CASE
+            WHEN indicators.code LIKE 'NCS-%' THEN 1
+            WHEN indicators.code LIKE 'NCP-%' THEN 2
+            WHEN indicators.code LIKE 'NCO-%' THEN 3
+            ELSE 99
+        END
+    ");
+        $q->orderByRaw("
+        COALESCE(NULLIF(regexp_replace(indicators.code, '.*-', ''), '')::int, 0) ASC
+    ");
+        $q->orderBy('indicators.code', 'asc');
+
+        return $q;
     }
 
     public function headings(): array

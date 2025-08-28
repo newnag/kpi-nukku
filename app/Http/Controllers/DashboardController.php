@@ -64,15 +64,38 @@ class DashboardController extends Controller
                 'evidences' => fn($q) => $q->select('evidence.id', 'evidence.criteria_id', 'evidence.name', 'evidence.created_at'),
             ])
             ->withCount(['criterias as criteria_count', 'evidences as evidence_count'])
+
+            // 1) แยกตามปี
+            ->orderBy('indicators.year', 'asc')   // ถ้าอยากปีล่าสุดก่อน → 'desc'
+
+            // 2) จัดกลุ่ม prefix: NCS -> NCP -> NCO
+            ->orderByRaw("
+        CASE
+            WHEN indicators.code LIKE 'NCS-%' THEN 1
+            WHEN indicators.code LIKE 'NCP-%' THEN 2
+            WHEN indicators.code LIKE 'NCO-%' THEN 3
+            ELSE 99
+        END
+    ")
+
+            // 3) เลขหลังขีด (เอาตัวท้ายสุด)
+            ->orderByRaw("
+        COALESCE(NULLIF(regexp_replace(indicators.code, '.*-', ''), '')::int, 0) ASC
+    ")
+
+            // กันกรณีเลขเท่ากัน → เรียง code เต็ม
+            ->orderBy('indicators.code', 'asc')
+
             ->get()
             ->map(function ($indicator) {
-                $criteriaCount = (int)($indicator->criteria_count ?? 0);
-                $evidenceCount = (int)($indicator->evidence_count ?? 0);
+                $criteriaCount  = (int)($indicator->criteria_count ?? 0);
+                $evidenceCount  = (int)($indicator->evidence_count ?? 0);
                 $indicator->status_doc = $evidenceCount === 0
                     ? 'รอดำเนินการ'
                     : ($evidenceCount < $criteriaCount ? 'ไม่ครบ' : 'ครบ');
                 return $indicator;
             });
+
 
         // ====== 5) นับสถานะตัวชี้วัด (รวมทั้งหมด ให้ client เป็นคนกรอง)
         $indicatorsForStatus = Indicator::query()

@@ -352,16 +352,52 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-  
-  <script>
+
+    {{-- <script>
         document.addEventListener('DOMContentLoaded', function() {
-            document.getElementById('exportExell').addEventListener('click', function() {
-                // ดึง query string ปัจจุบันของหน้า (ถ้ามีการกรองผ่าน ?year=...&standard=... )
-                const qs = window.location.search || '';
-                window.location.href = "{{ route('dashboard.export') }}" + qs;
-            });
+            // document.getElementById('exportExell').addEventListener('click', function() {
+            //     // ดึง query string ปัจจุบันของหน้า (ถ้ามีการกรองผ่าน ?year=...&standard=... )
+            //     const qs = window.location.search || '';
+            //     window.location.href = "{{ route('dashboard.export') }}" + qs;
+            // });
+
+                document.getElementById('exportExell').addEventListener('click', function() {
+            const qs = window.location.search || ''; // ?year=2024&standard=1 ...
+            window.location.href = "{{ route('dashboard.export') }}" + qs;
+        });
+
+        });
+
+    
+    </script> --}}
+
+    <script>
+        document.getElementById('exportExell').addEventListener('click', function() {
+            const params = new URLSearchParams();
+
+            const year = document.getElementById('filter-year')?.value || '';
+            if (year) params.set('year', year);
+
+            const standard = document.getElementById('filter-standard')?.value || '';
+            if (standard) params.set('standard', standard);
+
+            const dimension = document.getElementById('filter-dimension')?.value || '';
+            if (dimension) params.set('dimension', dimension);
+
+            const status = document.getElementById('filter-status')?.value || '';
+            if (status !== '') params.set('status', status);
+
+            const dept = document.getElementById('filter-dept')?.value || '';
+            if (dept) params.set('dept_id', dept);
+
+            const code = document.getElementById('filter-code')?.value || '';
+            if (code) params.set('code', code);
+
+            const url = "{{ route('dashboard.export') }}" + (params.toString() ? `?${params}` : '');
+            window.location.href = url;
         });
     </script>
+
     <script>
         // ============== Utility Functions ==============
         function cloneDeep(obj) {
@@ -2043,7 +2079,7 @@
         }
 
         /* ตัวเลือก: วาง tooltip ด้านล่าง (ถ้าพื้นที่ด้านบนไม่พอ)
-                                                                                                                                                                                                                                                                                                                                                       <span class="tip" data-tip="..." data-pos="bottom"> */
+                                                                                                                                                                                                                                                                                                                                                               <span class="tip" data-tip="..." data-pos="bottom"> */
         .tip[data-pos="bottom"]::after {
             top: calc(100% + 10px);
             bottom: auto;
