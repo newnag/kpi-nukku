@@ -221,101 +221,124 @@
                     <canvas id="yearAsXChart"></canvas>
                 </div>
             </div>
+            <div class="stat-title">
+                <h3>รายการตัวบงชี้</h3>
 
-        </div>
-        <!-- ตารางเอกสารและหลักฐาน -->
-        <div class="dashboard-containers">
-            <div class="dashboard-list">
-                <table class="table" id="dashboardTable">
-                    <thead>
-                        <tr>
-                            {{-- <th>ลำดับ</th> --}}
-                            <th>ปีการประเมิน</th>
-                            <th>ชื่อตัวบ่งชี้</th>
-                            <th>รหัส</th>
-                            <th>ประเภทตัวชี้วัด</th>
-                            <th>หน่วยงานที่รับผิดชอบ</th>
-                            <th>ผลลัพธ์</th>
-                            <th>คะแนนรวม</th>
-                            <th>สถานะตัวชี้วัด</th>
-                            {{-- <th>สถานะเอกสาร</th> --}}
-                        </tr>
-                    </thead>
-                    <tbody>
+            </div>
+            <div class="dashboard-containers">
 
-                        @foreach ($indicators as $index => $indicator)
-                            @php
-                                $statusKey = match ((int) $indicator->status) {
-                                    2, 3 => 'complete', // ✅ รองรับทั้ง 2 และ 3
-                                    1 => 'incomplete',
-                                    0 => 'pending',
-                                    default => 'pending',
-                                };
+                <div class="chart-header">
+                    <h3></h3>
+                    <button id="exportExell" class="btn-export-excel">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                            <path d="M9 12l3 3 3-3" stroke="#16a34a" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                            <path d="M12 3v12" stroke="#16a34a" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                            <path d="M5 21h14a2 2 0 0 0 2-2v-4" stroke="#16a34a" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                            <path d="M3 15v4a2 2 0 0 0 2 2" stroke="#16a34a" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                        </svg>
+                        EXPORT TO EXCEL
+                    </button>
+                </div>
+                <div class="dashboard-list">
+                    <table class="table" id="dashboardTable">
 
-                                // ดึงข้อมูล standard และ dimension
-                                $standardName = $indicator->category->standard->name ?? '';
-                                $dimensionName = $indicator->category->name ?? '';
-                                $collectorName = $indicator->assignments->first()->collectorUser->name ?? '';
-                                $deptName = '';
-                                foreach ($indicator->assignments as $assignment) {
-                                    $deptName = optional($assignment->collectorUser?->department)->name ?? '';
-                                    if ($deptName) {
-                                        break;
-                                    } // หยุดเมื่อเจอแล้ว
-                                }
-                            @endphp
-                            <tr data-max="{{ (float) $indicator->max_score }}" data-standard="{{ $standardName }}"
-                                data-dimension="{{ $dimensionName }}" data-collector="{{ $collectorName }}"
-                                data-dept="{{ $deptName }}" data-status="{{ $statusKey }}">
-
-                                <td class="status-cell">{{ $indicator->year }}</td>
-                                <td>{{ $indicator->name }}</td>
-                                <td class="status-cell">{{ $indicator->code }}</td>
-                                <td class="status-cell">{{ $indicator->type }}</td>
-
-                                <td class="status-cell">
-                                    {{ $deptName ?: '-' }}
-                                </td>
-
-                                <td class="status-cell">{{ $indicator->score_acc }}</td>
-                                <td class="status-cell">{{ $indicator->max_score }}</td>
-                                <td class="status-cell">
-                                    @switch($indicator->status)
-                                        @case(0)
-                                            <span class="tip" data-tip="อยู่ระหว่างดำเนินการ"
-                                                aria-label="อยู่ระหว่างดำเนินการ" tabindex="0">
-                                                <i data-lucide="alert-triangle" class="status-icon text-danger"></i>
-                                            </span>
-                                        @break
-
-                                        @case(1)
-                                            <span class="tip" data-tip="ผลการดำเนินงานยังไม่ครบถ้วนตามเกณฑ์"
-                                                aria-label="ผลการดำเนินงานยังไม่ครบถ้วนตามเกณฑ์" tabindex="0">
-                                                <i data-lucide="clock" class="status-icon text-warn"></i>
-                                            </span>
-                                        @break
-
-                                        @case(2)
-                                        @case(3)
-                                            <span class="tip" data-tip="ผลการดำเนินงานครบถ้วนตามเกณฑ์มาตรการ"
-                                                aria-label="ผลการดำเนินงานครบถ้วนตามเกณฑ์มาตรการ" tabindex="0">
-                                                <i data-lucide="check-circle" class="status-icon text-success"></i>
-                                            </span>
-                                        @break
-
-                                        @default
-                                            <span class="tip" data-tip="สถานะไม่ระบุ ({{ $indicator->status }})"
-                                                aria-label="สถานะไม่ระบุ" tabindex="0">
-                                                <i data-lucide="help-circle" class="status-icon text-gray-500"></i>
-                                            </span>
-                                    @endswitch
-                                </td>
+                        <thead>
+                            <tr>
+                                {{-- <th>ลำดับ</th> --}}
+                                <th>ปีการประเมิน</th>
+                                <th>ชื่อตัวบ่งชี้</th>
+                                <th>รหัส</th>
+                                <th>ประเภทตัวชี้วัด</th>
+                                <th>หน่วยงานที่รับผิดชอบ</th>
+                                <th>ผลลัพธ์</th>
+                                <th>คะแนนรวม</th>
+                                <th>สถานะตัวชี้วัด</th>
+                                {{-- <th>สถานะเอกสาร</th> --}}
                             </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+
+                            @foreach ($indicators as $index => $indicator)
+                                @php
+                                    $statusKey = match ((int) $indicator->status) {
+                                        2, 3 => 'complete', // ✅ รองรับทั้ง 2 และ 3
+                                        1 => 'incomplete',
+                                        0 => 'pending',
+                                        default => 'pending',
+                                    };
+
+                                    // ดึงข้อมูล standard และ dimension
+                                    $standardName = $indicator->category->standard->name ?? '';
+                                    $dimensionName = $indicator->category->name ?? '';
+                                    $collectorName = $indicator->assignments->first()->collectorUser->name ?? '';
+                                    $deptName = '';
+                                    foreach ($indicator->assignments as $assignment) {
+                                        $deptName = optional($assignment->collectorUser?->department)->name ?? '';
+                                        if ($deptName) {
+                                            break;
+                                        } // หยุดเมื่อเจอแล้ว
+                                    }
+                                @endphp
+                                <tr data-max="{{ (float) $indicator->max_score }}" data-standard="{{ $standardName }}"
+                                    data-dimension="{{ $dimensionName }}" data-collector="{{ $collectorName }}"
+                                    data-dept="{{ $deptName }}" data-status="{{ $statusKey }}">
+
+                                    <td class="status-cell">{{ $indicator->year }}</td>
+                                    <td>{{ $indicator->name }}</td>
+                                    <td class="status-cell">{{ $indicator->code }}</td>
+                                    <td class="status-cell">{{ $indicator->type }}</td>
+
+                                    <td class="status-cell">
+                                        {{ $deptName ?: '-' }}
+                                    </td>
+
+                                    <td class="status-cell">{{ $indicator->score_acc }}</td>
+                                    <td class="status-cell">{{ $indicator->max_score }}</td>
+                                    <td class="status-cell">
+                                        @switch($indicator->status)
+                                            @case(0)
+                                                <span class="tip" data-tip="อยู่ระหว่างดำเนินการ"
+                                                    aria-label="อยู่ระหว่างดำเนินการ" tabindex="0">
+                                                    <i data-lucide="alert-triangle" class="status-icon text-danger"></i>
+                                                </span>
+                                            @break
+
+                                            @case(1)
+                                                <span class="tip" data-tip="ผลการดำเนินงานยังไม่ครบถ้วนตามเกณฑ์"
+                                                    aria-label="ผลการดำเนินงานยังไม่ครบถ้วนตามเกณฑ์" tabindex="0">
+                                                    <i data-lucide="clock" class="status-icon text-warn"></i>
+                                                </span>
+                                            @break
+
+                                            @case(2)
+                                            @case(3)
+                                                <span class="tip" data-tip="ผลการดำเนินงานครบถ้วนตามเกณฑ์มาตรการ"
+                                                    aria-label="ผลการดำเนินงานครบถ้วนตามเกณฑ์มาตรการ" tabindex="0">
+                                                    <i data-lucide="check-circle" class="status-icon text-success"></i>
+                                                </span>
+                                            @break
+
+                                            @default
+                                                <span class="tip" data-tip="สถานะไม่ระบุ ({{ $indicator->status }})"
+                                                    aria-label="สถานะไม่ระบุ" tabindex="0">
+                                                    <i data-lucide="help-circle" class="status-icon text-gray-500"></i>
+                                                </span>
+                                        @endswitch
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
+
+        <!-- ตารางเอกสารและหลักฐาน -->
+
     </div>
     </div>
 
@@ -329,7 +352,16 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-
+  
+  <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('exportExell').addEventListener('click', function() {
+                // ดึง query string ปัจจุบันของหน้า (ถ้ามีการกรองผ่าน ?year=...&standard=... )
+                const qs = window.location.search || '';
+                window.location.href = "{{ route('dashboard.export') }}" + qs;
+            });
+        });
+    </script>
     <script>
         // ============== Utility Functions ==============
         function cloneDeep(obj) {
@@ -449,6 +481,7 @@
                 offChart.destroy();
             }, 'image/png', 1);
         }
+
         document.addEventListener('DOMContentLoaded', () => {
             // Lucide
             if (typeof lucide !== 'undefined') lucide.createIcons();
@@ -456,6 +489,14 @@
             // ---------- Chart 1 ----------
             const el1 = document.getElementById('visitsChart');
             const data1 = @json($chart);
+            // 👉 ใส่คำว่า "ปี " ให้ labels ของ chart1
+            if (Array.isArray(data1?.labels)) {
+                data1.labels = data1.labels.map(l => {
+                    const t = String(l ?? '');
+                    return /^ปี\s*/.test(t) ? t : `ปี ${t}`;
+                });
+            }
+
             let chart1 = null;
 
             if (el1 && Array.isArray(data1?.labels) && data1.labels.length) {
@@ -526,6 +567,13 @@
             // ---------- Chart 2 ----------
             const el2 = document.getElementById('yearAsXChart');
             const data2 = @json($chartYearAsX);
+            // 👉 ใส่คำว่า "ปี " ให้ labels ของ chart2
+            if (Array.isArray(data2?.labels)) {
+                data2.labels = data2.labels.map(l => {
+                    const t = String(l ?? '');
+                    return /^ปี\s*/.test(t) ? t : `ปี ${t}`;
+                });
+            }
             let chart2 = null;
 
             if (el2 && Array.isArray(data2?.labels) && data2.labels.length) {
@@ -1721,6 +1769,27 @@
             background: #ecffef
         }
 
+        .btn-export-excel {
+            margin-top: 20px;
+            margin-right: 20px;
+            background: #f8fff9;
+            color: #16a34a;
+            border: 2px solid #86efac;
+            padding: 8px 14px;
+            border-radius: 999px;
+            font-weight: 700;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            box-shadow: 0 1px 0 rgba(0, 0, 0, .02);
+        }
+
+        .btn-export-excel:hover {
+            background: #ecffef
+        }
+
         .chart-content {
             position: relative;
             height: 400px;
@@ -1974,7 +2043,7 @@
         }
 
         /* ตัวเลือก: วาง tooltip ด้านล่าง (ถ้าพื้นที่ด้านบนไม่พอ)
-                                                                                                                                                                                                                                                                                                                       <span class="tip" data-tip="..." data-pos="bottom"> */
+                                                                                                                                                                                                                                                                                                                                                       <span class="tip" data-tip="..." data-pos="bottom"> */
         .tip[data-pos="bottom"]::after {
             top: calc(100% + 10px);
             bottom: auto;
