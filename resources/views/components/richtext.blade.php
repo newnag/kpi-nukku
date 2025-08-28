@@ -15,7 +15,122 @@
 @once
     @push('styles')
         <style>
-            /* Preview content styles */
+            /* ---------- Shell (จากหน้า create) ---------- */
+            .trumbowyg-box {
+                border-radius: 1rem;
+                /* rounded-2xl */
+                border: 1px solid #e5e7eb;
+                /* slate-200 */
+                box-shadow: 0 1px 2px rgba(0, 0, 0, .04);
+                overflow: hidden;
+                background: #fff;
+            }
+
+            /* ---------- Toolbar (จากหน้า create + เสริม focus) ---------- */
+            .trumbowyg-box .trumbowyg-button-pane {
+                display: flex;
+                flex-wrap: wrap;
+                gap: .25rem .375rem;
+                padding: .375rem .5rem;
+                background: #fff;
+            }
+
+            .trumbowyg-box .trumbowyg-button-pane::before,
+            .trumbowyg-box .trumbowyg-button-pane::after {
+                content: none;
+                display: none;
+            }
+
+            .trumbowyg-box .trumbowyg-button-group {
+                display: flex;
+                gap: .25rem;
+            }
+
+            .trumbowyg-box .trumbowyg-button-pane button {
+                border-radius: .5rem;
+                padding: .25rem;
+                transition: background .15s ease;
+                outline: none;
+            }
+
+            .trumbowyg-box .trumbowyg-button-pane button:hover {
+                background: #f1f5f9;
+            }
+
+            /* slate-100 */
+            .trumbowyg-box .trumbowyg-button-pane button:focus-visible {
+                box-shadow: 0 0 0 3px rgba(59, 130, 246, .3);
+                background: #eff6ff;
+            }
+
+            .trumbowyg-box .trumbowyg-button-pane button:active {
+                transform: translateY(.5px);
+                background: #e2e8f0;
+            }
+
+            .trumbowyg-box .trumbowyg-button-pane button.trumbowyg-active,
+            .trumbowyg-box .trumbowyg-button-pane button.trumbowyg-active-btn {
+                background: #dbeafe;
+            }
+
+            @media (max-width:640px) {
+                .trumbowyg-box .trumbowyg-button-pane {
+                    padding: .25rem .5rem;
+                }
+
+                .trumbowyg-box .trumbowyg-button-pane button {
+                    transform: scale(.95);
+                }
+            }
+
+            /* ---------- Editor area (รวมของเดิม + หน้า create) ---------- */
+            .trumbowyg-box .trumbowyg-editor {
+                padding: .75rem;
+                font-size: .9375rem;
+                min-height: var(--rte-min-h, 260px);
+                position: relative;
+                /* anchor for placeholder */
+            }
+
+            /* Lists (เหมือนในหน้า create) */
+            .trumbowyg-box .trumbowyg-editor ul {
+                list-style: disc;
+                padding-left: 1.25rem;
+            }
+
+            .trumbowyg-box .trumbowyg-editor ol {
+                list-style: decimal;
+                padding-left: 1.5rem;
+            }
+
+            .trumbowyg-box .trumbowyg-editor li {
+                list-style: inherit;
+                margin: .25rem 0;
+            }
+
+            /* Tables (รวม fix ฟอนต์/ขนาด) */
+            .trumbowyg-box .trumbowyg-editor table {
+                width: 100%;
+                border-collapse: collapse;
+                font-size: inherit;
+            }
+
+            .trumbowyg-box .trumbowyg-editor th,
+            .trumbowyg-box .trumbowyg-editor td {
+                border: 1px solid #e5e7eb;
+                padding: .5rem .625rem;
+                font-size: inherit;
+                vertical-align: top;
+            }
+
+            /* Dropdowns */
+            .trumbowyg-box .trumbowyg-dropdown {
+                border: 1px solid #e5e7eb;
+                border-radius: .75rem;
+                box-shadow: 0 10px 20px rgba(0, 0, 0, .06);
+            }
+
+            /* ---------- Preview content (ของคอมโพเนนต์เดิม) ---------- */
             .rte-content {
                 font-size: .9375rem;
             }
@@ -55,73 +170,25 @@
                 padding: .5rem .625rem;
             }
 
-            /* Editor area typography */
-            .trumbowyg-box .trumbowyg-editor {
-                font-size: .9375rem;
-                min-height: var(--rte-min-h, 260px);
-                position: relative;
-                /* needed for placeholder overlay */
-            }
-
-            /* Toolbar button states: focus/active */
-            .trumbowyg-box .trumbowyg-button-pane button {
-                border-radius: .5rem;
-                outline: none;
-            }
-
-            .trumbowyg-box .trumbowyg-button-pane button:focus-visible {
-                box-shadow: 0 0 0 3px rgba(59, 130, 246, .3);
-                background: #eff6ff;
-            }
-
-            .trumbowyg-box .trumbowyg-button-pane button:active {
-                transform: translateY(0.5px);
-                background: #e2e8f0;
-            }
-
-            .trumbowyg-box .trumbowyg-button-pane button.trumbowyg-active,
-            .trumbowyg-box .trumbowyg-button-pane button.trumbowyg-active-btn {
-                background: #dbeafe;
-            }
-
-            /* Editor tables: full width + inherit font size immediately */
-            .trumbowyg-box .trumbowyg-editor table {
-                width: 100%;
-                border-collapse: collapse;
-                font-size: inherit;
-            }
-
-            .trumbowyg-box .trumbowyg-editor th,
-            .trumbowyg-box .trumbowyg-editor td {
-                font-size: inherit;
-                padding: .5rem .625rem;
-                border: 1px solid #e5e7eb;
-                vertical-align: top;
-            }
-
-            /* Fallback (kept): placeholder when truly empty */
+            /* ---------- Placeholder (สองรูปแบบ: fallback :empty + แบบคลาส) ---------- */
             .trumbowyg-box .trumbowyg-editor[contenteditable="true"][placeholder]:empty::before {
                 content: attr(placeholder);
                 color: #94a3b8;
                 opacity: .9;
             }
 
-            /* Primary: class-based placeholder (works even with <p><br>) */
             .trumbowyg-box .trumbowyg-editor.rte-empty::before {
                 content: attr(placeholder);
                 position: absolute;
                 left: .75rem;
-                /* align with editor padding */
                 top: .75rem;
                 color: #94a3b8;
-                /* slate-400 */
                 opacity: .9;
                 pointer-events: none;
-                /* don't block typing/clicks */
                 user-select: none;
             }
 
-            /* Prevent FOUC for Alpine */
+            /* Alpine FOUC */
             [x-cloak] {
                 display: none !important;
             }

@@ -16,10 +16,10 @@
 
 <body class="bg-[#f8fafc] w-full">
     @include('components.navbar')
-    <header class="container mx-auto p-4">
-        <h1 class="text-4xl font-bold ">@yield('header', 'Welcome!')</h1>
+    <header class="container mx-auto px-4 py-7">
+        <h1 class="text-4xl font-bold ">@yield('header', '')</h1>
     </header>
-    <main class="container mx-auto p-4">
+    <main class="container mx-auto px-4">
         @yield('content')
     </main>
     {{-- <footer class="static bottom-0 w-full bg-gray-800 text-white text-center py-4">

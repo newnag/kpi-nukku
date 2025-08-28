@@ -1,42 +1,38 @@
 @props(['index' => 1, 'namePrefix' => null, 'showControls' => true])
 
-@php
-    // Fallback names when Alpine is missing
-    $prefix = $namePrefix ?? 'criteria[' . $index . ']';
-@endphp
+@php $prefix = $namePrefix ?? 'criteria[' . $index . ']'; @endphp
 
-<div {{ $attributes->merge(['class' => 'rounded-2xl border border-slate-200 bg-white shadow-sm p-5 md:p-6']) }}>
-    <div class="flex items-center justify-between mb-4">
-        <h3 class="text-lg font-semibold text-slate-900">
+<div {{ $attributes->merge(['class' => 'rounded-2xl border border-slate-200 bg-white shadow-sm p-4 sm:p-5 md:p-6']) }}>
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3 md:mb-4">
+        <h3 class="text-base md:text-lg font-semibold text-slate-900">
             ลำดับ <span x-text="order ?? {{ $index }}">{{ $index }}</span>
         </h3>
-
         @if ($showControls)
-            <div class="flex items-center gap-3">
-                <button type="button" class="p-1 text-slate-500 hover:text-slate-700"
+            <div class="flex items-center gap-2">
+                <button type="button" class="p-1 text-slate-500 hover:text-slate-700 text-sm md:text-base"
                     @click="$dispatch('criteria-move-up',   { index: order ?? {{ $index }} })"
                     title="ย้ายขึ้น">▲</button>
-                <button type="button" class="p-1 text-slate-500 hover:text-slate-700"
+                <button type="button" class="p-1 text-slate-500 hover:text-slate-700 text-sm md:text-base"
                     @click="$dispatch('criteria-move-down', { index: order ?? {{ $index }} })"
                     title="ย้ายลง">▼</button>
-                <button type="button" class="p-1 text-red-500 hover:text-red-600"
+                <button type="button" class="p-1 text-red-500 hover:text-red-600 text-sm md:text-base"
                     @click="$dispatch('criteria-remove',    { index: order ?? {{ $index }} })"
                     title="ลบรายการนี้">✖</button>
             </div>
         @endif
     </div>
 
-    <!-- hidden order -->
     <input type="hidden" :name="(prefix || '{{ $prefix }}') + '[order]'" :value="order ?? {{ $index }}">
 
     <div class="space-y-4">
         <div>
-            <label class="block text-sm font-medium text-slate-700 mb-1">
-                ชื่อเกณฑ์ <span class="text-red-500">*</span>
-            </label>
+            <label class="block text-sm font-medium text-slate-700 mb-1">ชื่อเกณฑ์ <span
+                    class="text-red-500">*</span></label>
             <input type="text" data-criteria-title :name="(prefix || '{{ $prefix }}') + '[title]'" required
                 placeholder="กรุณากรอกชื่อเกณฑ์"
-                class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500"
+                class="p-2 mt-1 w-full rounded-xl border border-slate-300 
+        placeholder-slate-400 text-sm md:text-base 
+        hover:border-blue-400 transition"
                 @input.debounce.200ms="$dispatch('criteria-title-change', { idx: (order ?? {{ $index }}) - 1, title: $event.target.value })">
         </div>
 
@@ -44,7 +40,9 @@
             <label class="block text-sm font-medium text-slate-700 mb-1">หลักฐานอ้างอิง</label>
             <textarea rows="3" :name="(prefix || '{{ $prefix }}') + '[evidence]'"
                 placeholder="กรุณากรอกรายละเอียดหลักฐานอ้างอิง เช่น เอกสารแสดงรายชื่ออาจารย์"
-                class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500 resize-y"></textarea>
+                class="p-2 mt-1 w-full rounded-xl border border-slate-300 
+        placeholder-slate-400 text-sm md:text-base 
+        hover:border-blue-400 transition"></textarea>
         </div>
     </div>
 
