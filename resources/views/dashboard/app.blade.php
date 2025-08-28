@@ -111,7 +111,7 @@
 
                     </div>
 
-                    <button class="btn-export">
+                    <button class="btn-export"id="downloadCard">
                         <!-- icon -->
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
                             <path d="M9 12l3 3 3-3" stroke="#16a34a" stroke-width="2" stroke-linecap="round"
@@ -123,7 +123,7 @@
                             <path d="M3 15v4a2 2 0 0 0 2 2" stroke="#16a34a" stroke-width="2" stroke-linecap="round"
                                 stroke-linejoin="round" />
                         </svg>
-                        EXPORT TO EXCEL
+                        EXPORT CHART (PNG)
                     </button>
                 </div>
 
@@ -175,7 +175,7 @@
             <div class="chart-card">
                 <div class="chart-header">
                     <h3></h3>
-                    <button id="exportChart1" class="btn-export">
+                    <button id="exportChart1" class="btn-export btn-export-in-card">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
                             <path d="M9 12l3 3 3-3" stroke="#16a34a" stroke-width="2" stroke-linecap="round"
                                 stroke-linejoin="round" />
@@ -251,28 +251,30 @@
                                     0 => 'pending',
                                     default => 'pending',
                                 };
-                                // Debug: แสดงข้อมูล status
-                                if ($index < 3) {
-                                    echo "<!-- Debug: Indicator {$index} - Status: {$indicator->status} (Type: " .
-                                        gettype($indicator->status) .
-                                        ') -->';
+
+                                // ดึงข้อมูล standard และ dimension
+                                $standardName = $indicator->category->standard->name ?? '';
+                                $dimensionName = $indicator->category->name ?? '';
+                                $collectorName = $indicator->assignments->first()->collectorUser->name ?? '';
+                                $deptName = '';
+                                foreach ($indicator->assignments as $assignment) {
+                                    $deptName = optional($assignment->collectorUser?->department)->name ?? '';
+                                    if ($deptName) {
+                                        break;
+                                    } // หยุดเมื่อเจอแล้ว
                                 }
                             @endphp
-                            <tr data-max="{{ (float) $indicator->max_score }}"
-                                data-standard="{{ $indicator->category->standard->name ?? '' }}"
-                                data-dimension="{{ $indicator->category->name ?? '' }}"
-                                data-collector="{{ $indicator->assignments->first()->collectorUser->name ?? '' }}"
-                                data-status="{{ $statusKey }}">
-                                {{-- <td class="status-cell">{{ $index + 1 }}</td> --}}
+                            <tr data-max="{{ (float) $indicator->max_score }}" data-standard="{{ $standardName }}"
+                                data-dimension="{{ $dimensionName }}" data-collector="{{ $collectorName }}"
+                                data-dept="{{ $deptName }}" data-status="{{ $statusKey }}">
+
                                 <td class="status-cell">{{ $indicator->year }}</td>
                                 <td>{{ $indicator->name }}</td>
                                 <td class="status-cell">{{ $indicator->code }}</td>
                                 <td class="status-cell">{{ $indicator->type }}</td>
 
                                 <td class="status-cell">
-                                    @foreach ($indicator->assignments as $as)
-                                        {{ optional($as->collectorUser?->department)->name ?? '-' }}
-                                    @endforeach
+                                    {{ $deptName ?: '-' }}
                                 </td>
 
                                 <td class="status-cell">{{ $indicator->score_acc }}</td>
@@ -295,8 +297,8 @@
 
                                         @case(2)
                                         @case(3)
-                                            <span class="tip" data-tip="ผลการดำเนินงานครบถ้วนตามเกณฑ์มาตรฐาน"
-                                                aria-label="ผลการดำเนินงานครบถ้วนตามเกณฑ์มาตรฐาน" tabindex="0">
+                                            <span class="tip" data-tip="ผลการดำเนินงานครบถ้วนตามเกณฑ์มาตรการ"
+                                                aria-label="ผลการดำเนินงานครบถ้วนตามเกณฑ์มาตรการ" tabindex="0">
                                                 <i data-lucide="check-circle" class="status-icon text-success"></i>
                                             </span>
                                         @break
@@ -308,11 +310,6 @@
                                             </span>
                                     @endswitch
                                 </td>
-                                {{-- 
-                                <td class="status-cell">
-                                    {{ $indicator->status_doc }}
-                                </td> --}}
-
                             </tr>
                         @endforeach
                     </tbody>
@@ -331,6 +328,8 @@
     <!-- DataTables -->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
     <script>
         // ============== Utility Functions ==============
         function cloneDeep(obj) {
@@ -729,66 +728,97 @@
                     return isNaN(n) ? 0 : n;
                 }
 
-                function updateSummary() {
-                    const selectedYear = ($year.val() || '').toString();
 
-                    // ปีที่ใช้คำนวณจริง: ปีที่เลือก หรือปีล่าสุด
-                    const latestFromMap = Object.keys(YEARLY_TOTALS_MAP)
-                        .map((k) => Number(k))
-                        .filter((n) => !isNaN(n))
-                        .sort((a, b) => b - a)[0];
-                    const latestYear = latestFromMap ? String(latestFromMap) : (getLatestYear() || '');
-                    const effectiveYear = selectedYear || latestYear;
+                // ตรวจว่ามีตัวกรองอื่นนอกจาก "ปี" หรือมีค้นหาข้อความ/คอลัมน์ไหม
+                function anyExtraFilterActive() {
+                    const hasNonYearSelect =
+                        ($code.val() || $dept.val() || $std.val() || $dim.val() || $collector.val());
+                    const hasGlobalSearch = !!table.search();
+                    // ถ้าใช้ column search ด้วย (กรณีคุณมี), ให้เช็คด้วย
+                    let hasColumnSearch = false;
+                    table.columns().every(function() {
+                        if (this.search()) {
+                            hasColumnSearch = true;
+                        }
+                    });
+                    return !!(hasNonYearSelect || hasGlobalSearch || hasColumnSearch);
+                }
 
-                    if (!effectiveYear) {
-                        $('#display-year').text('ไม่มีข้อมูล');
-                        $('#display-years').text('ไม่มีข้อมูล');
-                        $('#display-total').text('0');
-                        $('#display-max').text('0');
-                        return;
-                    }
-
-                    // อัปเดตปีที่แสดง
-                    $('#display-year').text(effectiveYear);
-                    $('#display-years').text(effectiveYear);
-
-                    if (idxScore === -1) {
-                        $('#display-total').text('0');
-                        $('#display-max').text('0');
-                        return;
-                    }
-
-                    // รวมจากแถวที่ "ผ่านการกรองอื่น ๆ" และอยู่ในปี effectiveYear เท่านั้น
-                    const data = table
-                        .column(idxScore, {
-                            search: 'applied',
-                            page: 'all'
-                        })
-                        .data()
-                        .toArray();
-
-                    let total = 0;
-                    let maxSum = 0;
+                // รวมจากผลกรองปัจจุบัน (ใช้ data-total / data-max ถ้ามี; เผื่อ fallback ไปอ่านคอลัมน์)
+                function computeFilteredTotalsForYear(targetYear) {
+                    let total = 0,
+                        max = 0;
 
                     table.rows({
                         search: 'applied',
                         page: 'all'
-                    }).every(function(rowIdx) {
-                        // คอลัมน์คะแนนรวม
+                    }).every(function() {
+                        const node = this.node();
                         const rowData = this.data();
-                        const rowScoreCell = idxScore !== -1 ? rowData[idxScore] : '0';
-                        // ปีของแถวนี้
-                        const rowYear = idxYear !== -1 ? stripHtml(rowData[idxYear]) : '';
 
-                        if (rowYear === effectiveYear) {
-                            total += parseNumberCell(rowScoreCell);
-                            const val = Number(this.node().dataset.max || 0);
-                            maxSum += isNaN(val) ? 0 : val;
-                        }
+                        // ปีของแถว
+                        const rowYear = (idxYear !== -1 ? stripHtml(rowData[idxYear]) : '').toString();
+                        if (targetYear && rowYear && rowYear !== targetYear) return;
+
+                        // อ่านจาก data-attribute ก่อน (แม่นสุด ไม่ติดฟอร์แมต ,)
+                        const rowTotal = Number(node?.dataset?.total ?? NaN);
+                        const rowMax = Number(node?.dataset?.max ?? NaN);
+
+                        if (!Number.isNaN(rowTotal)) total += rowTotal;
+                        else if (idxScore !== -1) total += parseNumberCell(rowData[idxScore]);
+
+                        if (!Number.isNaN(rowMax)) max += rowMax;
+                        // ถ้ามีคอลัมน์ "คะแนนเต็ม" ให้ fallback ตรงนี้ได้ ถ้าคุณมี idxMax
+                        // else if (idxMax !== -1) max += parseNumberCell(rowData[idxMax]);
                     });
 
+                    return {
+                        total,
+                        max
+                    };
+                }
+
+                // แทนที่ updateSummary เดิมด้วยเวอร์ชันนี้
+                function updateSummary() {
+                    const selectedYear = ($year.val() || '').toString();
+
+                    // หา "ปีล่าสุด" จากฝั่งเซิร์ฟเวอร์ก่อน แล้วค่อย fallback ไปปีล่าสุดในตาราง
+                    const latestFromMap = Object.keys(YEARLY_TOTALS_MAP)
+                        .map(Number).filter(n => !isNaN(n)).sort((a, b) => b - a)[0];
+                    const latestYearFromMap = latestFromMap ? String(latestFromMap) : '';
+                    const fallbackYearFromTable = getLatestYear() || '';
+                    const effectiveYear = selectedYear || latestYearFromMap || fallbackYearFromTable;
+
+                    if (!effectiveYear) {
+                        $('#display-year, #display-years').text('ไม่มีข้อมูล');
+                        $('#display-total').text('0');
+                        $('#display-max').text('0');
+                        return;
+                    }
+
+                    $('#display-year, #display-years').text(effectiveYear);
+
+                    // ❗ กฎสำคัญ:
+                    // - ถ้า "ไม่มีตัวกรองอื่น" (นอกจากปี) => ใช้ YEARLY_TOTALS_MAP เพื่อให้ค่าตรง 735/740
+                    // - ถ้า "มีตัวกรองอื่น" หรือค้นหา => รวมจากแถวที่กรองจริง
+                    if (!anyExtraFilterActive()) {
+                        // ใช้ยอดจากเซิร์ฟเวอร์ (ถูกต้อง 735/740 ตามปี)
+                        const y = YEARLY_TOTALS_MAP[effectiveYear] || {
+                            total: 0,
+                            max: 0
+                        };
+                        $('#display-total').text(numberFormat(y.total));
+                        $('#display-max').text(numberFormat(y.max));
+                        return;
+                    }
+
+                    // มีตัวกรองอื่นแล้ว => รวมจากผลกรองจริง
+                    const {
+                        total,
+                        max
+                    } = computeFilteredTotalsForYear(effectiveYear);
                     $('#display-total').text(numberFormat(total));
-                    $('#display-max').text(numberFormat(maxSum));
+                    $('#display-max').text(numberFormat(max));
                 }
 
 
@@ -828,8 +858,45 @@
                     // กรองทั้งหมดแบบ client-side
                     table.draw();
                 }
+                // >>>>>>>>>>>>> เพิ่ม Custom Filter ของ DataTables <<<<<<<<<<<<<<
+                $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
+                    if (settings.nTable !== document.getElementById('dashboardTable')) return true;
+
+                    const vYear = $year.val();
+                    const vCode = $code.val();
+                    const vDept = $dept.val();
+                    const vStd = $std.val();
+                    const vDim = $dim.val();
+                    const vCollector = $collector.val();
+
+                    const yearVal = idxYear !== -1 ? stripHtml(data[idxYear]) : '';
+                    const codeVal = idxCode !== -1 ? stripHtml(data[idxCode]) : '';
+                    const deptVal = idxDept !== -1 ? stripHtml(data[idxDept]) : '';
+
+                    // อ่านค่า data-* จาก DOM ของแถว
+                    const node = table.row(dataIndex).node();
+                    const stdVal = node?.dataset?.standard || '';
+                    const dimVal = node?.dataset?.dimension || '';
+                    const colVal = node?.dataset?.collector || '';
+
+                    if (vYear && yearVal !== vYear) return false;
+                    if (vCode && codeVal !== vCode) return false;
+                    if (vDept && deptVal !== vDept) return false;
+                    if (vStd && stdVal !== vStd) return false;
+                    if (vDim && dimVal !== vDim) return false;
+                    if (vCollector && colVal !== vCollector) return false;
+
+                    return true;
+                });
+
+                // 7) ฟิลเตอร์แถว (ให้ DataTables เป็นคนกรองเอง)
+                function applyFilters() {
+                    // กรองทั้งหมดแบบ client-side
+                    table.draw();
+                }
 
                 // 8) Chart.js (คงเดิม)
+                let donutChart = null;
                 const donutCanvas = document.getElementById('satisfactionChart');
                 let chartKeys = [],
                     chartLabels = [],
@@ -881,6 +948,41 @@
                     });
                 }
 
+                // ====== ฟังก์ชัน Export ทั้งการ์ดเป็น PNG ======
+                function exportCardToImage() {
+                    const card = document.querySelector('.stat-card'); // เลือกเฉพาะการ์ด
+                    if (!card) return;
+
+                    html2canvas(card, {
+                        backgroundColor: '#ffffff',
+                        scale: 2,
+                        useCORS: true,
+
+                        // มองข้าม element ที่ติด flag
+                        ignoreElements: (el) => el.closest('[data-html2canvas-ignore]') !== null,
+
+                        // กันกรณีปุ่มอยู่ใน card และไม่มี flag
+                        onclone: (doc) => {
+                            // ซ่อนปุ่มใน shadow DOM ที่ถูกโคลนไปเรนเดอร์
+                            doc.querySelectorAll('.btn-export, #downloadCard').forEach(btn => {
+                                btn.style.display = 'none';
+                            });
+                        }
+                    }).then(canvas => {
+                        const a = document.createElement('a');
+                        a.href = canvas.toDataURL('image/png');
+                        a.download = 'satisfaction_card.png';
+                        a.click();
+                    });
+                }
+
+                document.getElementById('downloadCard')
+                    .addEventListener('click', exportCardToImage);
+
+
+                // ====== ผูกปุ่มดาวน์โหลด ======
+                document.getElementById('downloadCard')
+                    .addEventListener('click', exportCardToImage);
                 // 9) นับสถานะจาก "ผลกรองแล้ว"
                 function computeStatusCountsFiltered() {
                     const counts = Object.fromEntries(chartKeys.map((k) => [k, 0]));
@@ -945,23 +1047,20 @@
                     e.preventDefault();
                     e.stopPropagation();
 
-                    // เคลียร์ select ทั้งหมดก่อน
+                    // ล้างค่า select ทั้งหมดให้เป็น "ทั้งหมด"
                     $('.filter-card select').each(function() {
                         $(this).prop('selectedIndex', 0).val('').trigger('change');
                     });
 
-                    // ไม่ตั้งค่าเป็นปีล่าสุด ให้คงไว้ที่ "ทั้งหมด"
-
-                    // เคลียร์ค้นหา + redraw
+                    // ล้างกล่องค้นหา + วาดใหม่
                     $('#custom-search').val('');
                     table.search('');
                     table.columns().every(function() {
                         this.search('');
                     });
                     table.page('first').draw(
-                        'page'); // จะไปเรียก updateSummary()/updateDonutAndLegend() ให้อัตโนมัติ
-                })
-
+                        'page'); // จะเรียก updateSummary()/updateDonutAndLegend() ต่อเอง
+                });
 
                 let timer;
                 $('#custom-search')
@@ -991,6 +1090,389 @@
         })(jQuery);
     </script>
 
+    {{-- <script>
+        (function($) {
+            let table, donutChart;
+
+            const stripHtml = (s) => {
+                const d = document.createElement('div');
+                d.innerHTML = String(s ?? '');
+                return (d.textContent || d.innerText || '').trim();
+            };
+            const numberFormat = (n) => (isNaN(n) ? 0 : Number(n)).toLocaleString('th-TH');
+            // แผนที่คะแนนรวม/คะแนนเต็มต่อปีจากเซิร์ฟเวอร์ เพื่อใช้คำนวณสรุปแบบไม่ปนปี
+            const YEARLY_TOTALS_ARRAY = @json($yearlyTotals);
+            const YEARLY_TOTALS_MAP = Array.isArray(YEARLY_TOTALS_ARRAY) ?
+                YEARLY_TOTALS_ARRAY.reduce((acc, item) => {
+                    const y = String(item.year ?? '');
+                    acc[y] = {
+                        total: Number(item.total_score ?? 0),
+                        max: Number(item.max_score ?? 0),
+                    };
+                    return acc;
+                }, {}) : {};
+            const getLatestYear = () => {
+                const years = Array.isArray(window.ALL_YEARS) ? window.ALL_YEARS : [];
+                const nums = years
+                    .map((y) => Number(String(y).replace(/[^0-9-]/g, '')))
+                    .filter((n) => !isNaN(n));
+                return nums.length ? Math.max(...nums).toString() : '';
+            };
+
+            $(function() {
+                // 1) Init DataTable
+                table = $('#dashboardTable').DataTable({
+                    searching: true,
+                    lengthChange: false,
+                    dom: 'rtip',
+                    order: [],
+                    stateSave: false,
+                    language: {
+                        paginate: {
+                            previous: 'ก่อนหน้า',
+                            next: 'ถัดไป'
+                        },
+                        info: 'แสดง _START_ ถึง _END_ จากทั้งหมด _TOTAL_ รายการ',
+                        emptyTable: 'ไม่พบข้อมูล',
+                        zeroRecords: 'ไม่พบข้อมูลที่ตรงกับการค้นหา',
+                    },
+                });
+
+                // 2) หาคอลัมน์จริง
+                const heads = $('#dashboardTable thead th').map((i, th) => $(th).text().trim()).get();
+                const findCol = (cands) => {
+                    for (const kw of cands) {
+                        const idx = heads.findIndex((h) => h.includes(kw));
+                        if (idx !== -1) return idx;
+                    }
+                    return -1;
+                };
+
+                const idxYear = findCol(['ปีการประเมิน']);
+                const idxCode = findCol(['รหัส']);
+                const idxDept = findCol(['หน่วยงานที่รับผิดชอบ']);
+                const idxScore = findCol(['คะแนนรวม']); // ใช้รวมเป็น total
+
+                // 3) Select element
+                const $year = $('#filter-year'),
+                    $code = $('#filter-code'),
+                    $std = $('#filter-standard'),
+                    $dim = $('#filter-dimension'),
+                    $dept = $('#filter-dept'),
+                    $collector = $('#filter-collector');
+
+                // 4) เติม option …
+                const populateFromColumn = ($sel, colIdx) => {
+                    $sel.find('option:not([value=""])').remove();
+                    if (colIdx === -1) return;
+                    const vals = table.column(colIdx).data().toArray().map(stripHtml).filter(Boolean);
+                    const uniq = [...new Set(vals)].sort((a, b) => a.localeCompare(b, 'th'));
+                    uniq.forEach((v) => $sel.append(`<option value="${v}">${v}</option>`));
+                };
+                populateFromColumn($year, idxYear);
+                populateFromColumn($code, idxCode);
+                populateFromColumn($dept, idxDept);
+
+                window.ALL_YEARS = @json($yearsForFilter);
+                window.ALL_DEPARTMENTS = @json($departments);
+                window.ALL_COLLECTORS = @json($collectors);
+                window.ALL_STANDARDS = @json($allStandards->pluck('name'));
+                window.ALL_DIMENSIONS = @json($dimensionNames);
+
+                const populateFromData = ($sel, attr) => {
+                    $sel.find('option:not([value=""])').remove();
+                    const vals = [];
+                    $('#dashboardTable tbody tr').each(function() {
+                        const v = $(this).data(attr);
+                        if (v) vals.push(v);
+                    });
+                    const uniq = [...new Set(vals)].sort((a, b) => a.localeCompare(b, 'th'));
+                    uniq.forEach((v) => $sel.append(`<option value="${v}">${v}</option>`));
+                };
+
+                function fillSelect($sel, items) {
+                    $sel.find('option:not([value=""])').remove();
+                    (items || []).forEach((v) => $sel.append(`<option value="${v}">${v}</option>`));
+                }
+                fillSelect($('#filter-year'), window.ALL_YEARS);
+                fillSelect($('#filter-dept'), window.ALL_DEPARTMENTS);
+                fillSelect($('#filter-collector'), window.ALL_COLLECTORS);
+                fillSelect($('#filter-standard'), window.ALL_STANDARDS);
+                fillSelect($('#filter-dimension'), window.ALL_DIMENSIONS);
+
+                populateFromData($collector, 'collector');
+
+                // 6) การ์ดสรุป
+                function parseNumberCell(s) {
+                    const t = stripHtml(String(s)).replace(/[^0-9.,-]/g, '').replace(/,/g, '');
+                    const n = Number(t);
+                    return isNaN(n) ? 0 : n;
+                }
+
+                function updateSummary() {
+                    const selectedYear = ($year.val() || '').toString();
+
+                    // หา "ปีใช้งานจริง" = ปีที่เลือก หรือปีล่าสุดใน YEARLY_TOTALS_MAP
+                    const latestFromMap = Object.keys(YEARLY_TOTALS_MAP)
+                        .map(Number)
+                        .filter(n => !isNaN(n))
+                        .sort((a, b) => b - a)[0];
+
+                    const fallbackYear = getLatestYear() || '';
+                    const effectiveYear = selectedYear || (latestFromMap ? String(latestFromMap) :
+                        fallbackYear);
+
+                    if (!effectiveYear) {
+                        $('#display-year, #display-years').text('ไม่มีข้อมูล');
+                        $('#display-total').text('0');
+                        $('#display-max').text('0');
+                        return;
+                    }
+
+                    $('#display-year').text(effectiveYear);
+                    $('#display-years').text(effectiveYear);
+
+                    // ✅ ใช้ค่าจากเซิร์ฟเวอร์ (ถูกต้อง = 735/740)
+                    const y = YEARLY_TOTALS_MAP[effectiveYear] || {
+                        total: 0,
+                        max: 0
+                    };
+                    $('#display-total').text(numberFormat(y.total)); // ควรออกมา 735
+                    $('#display-max').text(numberFormat(y.max)); // ควรออกมา 740
+                }
+
+                // >>>>>>>>>>>>> เพิ่ม Custom Filter ของ DataTables <<<<<<<<<<<<<<
+                $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
+                    if (settings.nTable !== document.getElementById('dashboardTable')) return true;
+
+                    const vYear = $year.val();
+                    const vCode = $code.val();
+                    const vDept = $dept.val();
+                    const vStd = $std.val();
+                    const vDim = $dim.val();
+                    const vCollector = $collector.val();
+
+                    const yearVal = idxYear !== -1 ? stripHtml(data[idxYear]) : '';
+                    const codeVal = idxCode !== -1 ? stripHtml(data[idxCode]) : '';
+                    const deptVal = idxDept !== -1 ? stripHtml(data[idxDept]) : '';
+
+                    // อ่านค่า data-* จาก DOM ของแถว
+                    const node = table.row(dataIndex).node();
+                    const stdVal = node?.dataset?.standard || '';
+                    const dimVal = node?.dataset?.dimension || '';
+                    const colVal = node?.dataset?.collector || '';
+
+                    if (vYear && yearVal !== vYear) return false;
+                    if (vCode && codeVal !== vCode) return false;
+                    if (vDept && deptVal !== vDept) return false;
+                    if (vStd && stdVal !== vStd) return false;
+                    if (vDim && dimVal !== vDim) return false;
+                    if (vCollector && colVal !== vCollector) return false;
+
+                    return true;
+                });
+
+                // 7) ฟิลเตอร์แถว (ให้ DataTables เป็นคนกรองเอง)
+                function applyFilters() {
+                    // กรองทั้งหมดแบบ client-side
+                    table.draw();
+                }
+
+                // 8) Chart.js (คงเดิม)
+                let donutChart = null;
+                const donutCanvas = document.getElementById('satisfactionChart');
+                let chartKeys = [],
+                    chartLabels = [],
+                    chartColors = [];
+                if (donutCanvas) {
+                    const donutCtx = donutCanvas.getContext('2d');
+                    chartLabels = @json(array_column($legendConfig, 'label'));
+                    chartColors = @json(array_column($legendConfig, 'color'));
+                    chartKeys = @json(array_column($legendConfig, 'key'));
+
+                    const countsMap = @json($statusCounts);
+                    const dataValues = chartKeys.map((k) => Number(countsMap[k] ?? 0));
+
+                    donutChart = new Chart(donutCtx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: chartLabels,
+                            datasets: [{
+                                data: dataValues,
+                                backgroundColor: chartColors,
+                                borderColor: '#ffffff',
+                                borderWidth: 4,
+                                hoverOffset: 4,
+                            }],
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            cutout: '72%',
+                            plugins: {
+                                legend: {
+                                    display: false
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        title: () => '',
+                                        label: (ctx) => {
+                                            const total = ctx.dataset.data.reduce((a, b) => a + b,
+                                                0);
+                                            const val = ctx.parsed;
+                                            const pct = total > 0 ? ((val / total) * 100).toFixed(
+                                                2) : '0.00';
+                                            return ` ${ctx.label}: ${val} (${pct}%)`;
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                    });
+                }
+
+                // ====== ฟังก์ชัน Export ทั้งการ์ดเป็น PNG ======
+                function exportCardToImage() {
+                    const card = document.querySelector('.stat-card'); // เลือกเฉพาะการ์ด
+                    if (!card) return;
+
+                    html2canvas(card, {
+                        backgroundColor: '#ffffff',
+                        scale: 2,
+                        useCORS: true,
+
+                        // มองข้าม element ที่ติด flag
+                        ignoreElements: (el) => el.closest('[data-html2canvas-ignore]') !== null,
+
+                        // กันกรณีปุ่มอยู่ใน card และไม่มี flag
+                        onclone: (doc) => {
+                            // ซ่อนปุ่มใน shadow DOM ที่ถูกโคลนไปเรนเดอร์
+                            doc.querySelectorAll('.btn-export, #downloadCard').forEach(btn => {
+                                btn.style.display = 'none';
+                            });
+                        }
+                    }).then(canvas => {
+                        const a = document.createElement('a');
+                        a.href = canvas.toDataURL('image/png');
+                        a.download = 'satisfaction_card.png';
+                        a.click();
+                    });
+                }
+
+                document.getElementById('downloadCard')
+                    .addEventListener('click', exportCardToImage);
+
+
+                // ====== ผูกปุ่มดาวน์โหลด ======
+                document.getElementById('downloadCard')
+                    .addEventListener('click', exportCardToImage);
+                // 9) นับสถานะจาก "ผลกรองแล้ว"
+                function computeStatusCountsFiltered() {
+                    const counts = Object.fromEntries(chartKeys.map((k) => [k, 0]));
+                    const selectedYear = ($('#filter-year').val() || '').toString();
+                    const fallbackYear = getLatestYear();
+                    const effectiveYear = selectedYear || fallbackYear || '';
+
+                    table.rows({
+                        search: 'applied',
+                        page: 'all'
+                    }).every(function() {
+                        const key = this.node().dataset.status;
+
+                        let rowYear = '';
+                        try {
+                            const rowData = this.data();
+                            rowYear = idxYear !== -1 ? stripHtml(rowData[idxYear]) : '';
+                        } catch (e) {
+                            /* noop */
+                        }
+
+                        if (effectiveYear && rowYear && rowYear !== effectiveYear) return;
+
+                        if (key && counts.hasOwnProperty(key)) counts[key] += 1;
+                    });
+                    return counts;
+                }
+
+                // 10-11) อัปเดต legend + chart จากข้อมูลที่กรองแล้ว
+                function updateLegend(counts) {
+                    const total = Object.values(counts).reduce((a, b) => a + b, 0);
+                    chartKeys.forEach((k) => {
+                        const c = counts[k] ?? 0;
+                        const pct = total > 0 ? (c / total) * 100 : 0;
+                        const $item = $(`.legend-item[data-key="${k}"]`);
+                        $item.find('.legend-count').text(c);
+                        $item.find('.legend-pct').text(pct.toFixed(2) + '%');
+                        $item.find('.bar').css('width', pct + '%');
+                    });
+                }
+
+                function updateDonutAndLegend() {
+                    if (!donutChart) return;
+                    const counts = computeStatusCountsFiltered();
+                    const newData = chartKeys.map((k) => counts[k] ?? 0);
+                    donutChart.data.datasets[0].data = newData;
+                    donutChart.update();
+                    updateLegend(counts);
+                }
+
+                // 12) Bind events
+                $('#filter-form').on('submit', function(e) {
+                    e.preventDefault();
+                });
+                $('#apply-filters').on('click', function(e) {
+                    e.preventDefault();
+                    applyFilters();
+                });
+
+                $(document).off('click.reset', '#reset-filters').on('click.reset', '#reset-filters', function(
+                    e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    // ล้างค่า select ทั้งหมดให้เป็น "ทั้งหมด"
+                    $('.filter-card select').each(function() {
+                        $(this).prop('selectedIndex', 0).val('').trigger('change');
+                    });
+
+                    // ล้างกล่องค้นหา + วาดใหม่
+                    $('#custom-search').val('');
+                    table.search('');
+                    table.columns().every(function() {
+                        this.search('');
+                    });
+                    table.page('first').draw(
+                        'page'); // จะเรียก updateSummary()/updateDonutAndLegend() ต่อเอง
+                });
+
+                let timer;
+                $('#custom-search')
+                    .on('input', function() {
+                        clearTimeout(timer);
+                        const val = this.value;
+                        timer = setTimeout(() => {
+                            table.search(val).draw();
+                        }, 150);
+                    })
+                    .on('search', function() {
+                        if (this.value === '') {
+                            table.search('').draw();
+                        }
+                    });
+
+                // ให้สรุป/กราฟอัปเดตทุกครั้งที่ DataTables คำนวณใหม่
+                table.on('draw', function() {
+                    updateSummary();
+                    updateDonutAndLegend();
+                });
+
+                // 13) อัปเดตครั้งแรก
+                updateSummary();
+                updateDonutAndLegend();
+            });
+        })(jQuery);
+    </script> --}}
+
 
 
     <style>
@@ -1010,6 +1492,11 @@
             --gray-700: #374151;
             --gray-800: #1f2937;
             --gray-900: #111827;
+        }
+
+        .chart-wrap {
+            width: 480px;
+            height: 320px;
         }
 
         .dashboard-container {
@@ -1248,10 +1735,10 @@
             max-width: 100%;
             max-height: 100%;
             width: auto !important;
-            height: auto !important;
+
             border-radius: 8px;
         }
-        
+
         /* ปรับปรุงการแสดงผลของ chart */
         .charts-grid {
             display: grid;
@@ -1259,12 +1746,12 @@
             gap: 32px;
             margin-top: 24px;
         }
-        
+
         /* เพิ่ม animation สำหรับ chart card */
         .chart-card {
             transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
-        
+
         .chart-card:hover {
             transform: translateY(-2px);
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
@@ -1307,69 +1794,69 @@
             .dashboard-container {
                 padding: 16px;
             }
-            
+
             .chart-card {
                 min-height: 400px;
                 padding: 16px;
             }
-            
+
             .chart-content {
                 height: 300px;
             }
-            
+
             .chart-header {
                 flex-direction: column;
                 align-items: flex-start;
                 gap: 12px;
             }
-            
+
             .btn-export {
                 align-self: flex-end;
                 font-size: 11px;
                 padding: 6px 12px;
             }
-            
+
             .stat-title h3 {
                 font-size: 18px;
             }
         }
-        
+
         @media (max-width: 480px) {
             .chart-card {
                 min-height: 350px;
                 padding: 12px;
             }
-            
+
             .chart-content {
                 height: 250px;
             }
-            
+
             .btn-export {
                 font-size: 10px;
                 padding: 5px 10px;
             }
-            
+
             .stat-title h3 {
                 font-size: 16px;
             }
         }
 
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
 
-            .stat-card {
-                padding: 16px;
-            }
+        .stat-card {
+            padding: 16px;
+        }
 
-            .satisfaction-chart {
-                flex-direction: column;
-                gap: 16px;
-            }
+        .satisfaction-chart {
+            flex-direction: column;
+            gap: 16px;
+        }
 
-            .stat-footer {
-                flex-direction: column;
-            }
+        .stat-footer {
+            flex-direction: column;
+        }
         }
 
         @media (max-width: 480px) {
@@ -1487,7 +1974,7 @@
         }
 
         /* ตัวเลือก: วาง tooltip ด้านล่าง (ถ้าพื้นที่ด้านบนไม่พอ)
-                                                                                                                                                                                                                       <span class="tip" data-tip="..." data-pos="bottom"> */
+                                                                                                                                                                                                                                                                                                                       <span class="tip" data-tip="..." data-pos="bottom"> */
         .tip[data-pos="bottom"]::after {
             top: calc(100% + 10px);
             bottom: auto;
