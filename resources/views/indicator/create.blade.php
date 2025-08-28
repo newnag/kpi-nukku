@@ -31,10 +31,10 @@
                             <x-select name="standard_id" :options="$standards ?? []" label="มาตรฐานตัวชี้วัด"
                                 placeholder="กรุณาเลือกมาตรฐานตัวชี้วัด" searchable required />
 
-                            <x-select name="category_id" :options="$categories ?? []" label="ด้านตัวชี้วัด" placeholder="กรุณาเลือกด้าน"
-                                searchable required />
+                            <x-select name="category_id" :options="$categories ?? []" label="ด้านตัวชี้วัด"
+                                placeholder="กรุณาเลือกด้าน" searchable required />
 
-                            <x-select name="type_id" :options="$types ?? []" label="ประเภทตัวชี้วัด"
+                            <x-select name="type" :options="['เชิงคุณภาพ', 'เชิงปริมาณ']" label="ประเภทตัวชี้วัด"
                                 placeholder="กรุณาเลือกประเภท" required />
                             <x-input name="deadline" type="date" label="วันสิ้นสุดการประเมิน" />
                         </div>
@@ -45,7 +45,7 @@
                             <x-select name="department_id" :options="$departments ?? []" label="หน่วยงานที่รับผิดชอบ"
                                 placeholder="กรุณาเลือกหน่วยงาน" searchable required />
 
-                            <x-select name="user_id" :options="$user ?? []" label="ผู้รับผิดชอบในการรวบรวมข้อมูล"
+                            <x-select name="user_id" :options="$users ?? []" label="ผู้รับผิดชอบในการรวบรวมข้อมูล"
                                 placeholder="กรุณาเลือกผู้รับผิดชอบ" searchable required />
                         </div>
                     </x-card>
@@ -58,7 +58,7 @@
                         <x-card-box title="รายการเกณฑ์การพิจารณา" icon="📋">
                             <div x-data="{
                                 items: [{ id: Date.now() }],
-                                titles: [],
+                                name: [],
                                 add() {
                                     this.items = [...this.items, { id: Date.now() + this.items.length }];
                                     this.$nextTick(() => this.broadcast())
@@ -86,24 +86,24 @@
                                     }
                                 },
                                 broadcast() {
-                                    const inputs = Array.from($el.querySelectorAll('[data-criteria-title]'));
-                                    this.titles = inputs.map(el => el.value || '');
-                                    window.__criteriaTitles = this.titles.slice();
-                                    $dispatch('criteria-updated', { titles: this.titles });
-                                    window.dispatchEvent(new CustomEvent('criteria-updated', { detail: { titles: this.titles } }));
+                                    const inputs = Array.from($el.querySelectorAll('[data-criteria-name]'));
+                                    this.name = inputs.map(el => el.value || '');
+                                    window.__criteriaTitles = this.name.slice();
+                                    $dispatch('criteria-updated', { name: this.name });
+                                    window.dispatchEvent(new CustomEvent('criteria-updated', { detail: { name: this.name } }));
                                 }
                             }" x-init="$nextTick(() => broadcast())"
                                 @criteria-remove="remove($event.detail.index-1)"
                                 @criteria-move-up="up($event.detail.index-1)"
                                 @criteria-move-down="down($event.detail.index-1)"
                                 @criteria-title-change="
-              titles[$event.detail.idx] = $event.detail.title;
-              window.__criteriaTitles = titles.slice();
-              $dispatch('criteria-updated', { titles })
+              name[$event.detail.idx] = $event.detail.title;
+              window.__criteriaTitles = name.slice();
+              $dispatch('criteria-updated', { name })
             "
                                 class="space-y-4">
                                 <template x-for="(it, i) in items" :key="it.id">
-                                    <div x-data="{ order: i + 1, prefix: 'criteria[' + i + ']' }" x-effect="order = i+1; prefix = 'criteria['+i+']'">
+                                    <div x-data="{ sequence: i + 1, prefix: 'criteria[' + i + ']' }" x-effect="sequence = i+1; prefix = 'criteria['+i+']'">
                                         <x-card-criteria :show-controls="true" />
                                     </div>
                                 </template>
@@ -122,7 +122,8 @@
                         </x-card-box>
                     </x-card>
 
-                    <x-card number="5" title="เกณฑ์การให้คะแนน" class="space-y-5 sm:space-y-6">
+                    <x-card number="5" title="เกณฑ์การให้คะแนน" class="space-y-5 sm:space-y-6" x-data="{ scoringMethod: '' }">
+
                         <x-card-box title="เกณฑ์ให้คะแนนและคะแนนเต็ม" icon="📋">
                             <div>
                                 <x-richtext name="comment" placeholder="คำอธิบายเกณฑ์ให้คะแนน" />
@@ -135,40 +136,61 @@
                             </div>
                         </x-card-box>
 
-                        <x-card-box title="เกณฑ์ให้คะแนนแบบหลายตัวเลือก-ตามจำนวนข้อที่เลือก" icon="📋">
-                            <x-multichoice-score-count name-prefix="multiCounts[0]" :index="1" />
-                        </x-card-box>
+                        {{-- Dropdown to select scoring method --}}
+                        <div>
+                            <label class="block mb-2 text-sm font-medium text-slate-700">เลือกวิธีการให้คะแนน</label>
+                            <select x-model="scoringMethod"
+                                class="w-full rounded-xl border border-slate-300 p-2 text-sm md:text-base">
+                                <option value="">-- กรุณาเลือกวิธีการให้คะแนน --</option>
+                                <option value="count">หลายตัวเลือก - ตามจำนวนข้อที่เลือก</option>
+                                <option value="selected">หลายตัวเลือก - คะแนนตามข้อที่เลือก</option>
+                                <option value="custom">ปรับแต่งอิสระ</option>
+                            </select>
+                        </div>
 
-                        <x-card-box title="เกณฑ์ให้คะแนนแบบหลายตัวเลือก-คะแนนตามข้อที่เลือก" icon="📋">
-                            <div x-data="{
-                                items: [{ id: Date.now() }],
-                                add() { this.items = [...this.items, { id: Date.now() + this.items.length }] },
-                                remove(i) {
-                                    const a = [...this.items];
-                                    a.splice(i, 1);
-                                    this.items = a.length ? a : [{ id: Date.now() }]
-                                }
-                            }" @criteria-remove="remove($event.detail.index - 1)"
-                                class="space-y-4">
-                                <template x-for="(it, i) in items" :key="it.id">
-                                    <div x-data="{ order: i + 1, prefix: 'multiSelected[' + i + ']' }"
-                                        x-effect="order = i + 1; prefix = 'multiSelected[' + i + ']'">
-                                        <x-multichoice-score-selected :options="$criteriaOptions ?? []" />
+                        {{-- Conditionally render based on dropdown --}}
+                        <div class="space-y-5 sm:space-y-6">
+                            <template x-if="scoringMethod === 'count'">
+                                <x-card-box title="เกณฑ์ให้คะแนนแบบหลายตัวเลือก-ตามจำนวนข้อที่เลือก" icon="📋">
+                                    <x-multichoice-score-count name-prefix="multiCounts[0]" :index="1" />
+                                </x-card-box>
+                            </template>
+
+                            <template x-if="scoringMethod === 'selected'">
+                                <x-card-box title="เกณฑ์ให้คะแนนแบบหลายตัวเลือก-คะแนนตามข้อที่เลือก" icon="📋">
+                                    <div x-data="{
+                                        items: [{ id: Date.now() }],
+                                        add() { this.items = [...this.items, { id: Date.now() + this.items.length }] },
+                                        remove(i) {
+                                            const a = [...this.items];
+                                            a.splice(i, 1);
+                                            this.items = a.length ? a : [{ id: Date.now() }]
+                                        }
+                                    }" @criteria-remove="remove($event.detail.index - 1)"
+                                        class="space-y-4">
+                                        <template x-for="(it, i) in items" :key="it.id">
+                                            <div x-data="{ sequence: i + 1, prefix: 'multiSelected[' + i + ']' }"
+                                                x-effect="sequence = i + 1; prefix = 'multiSelected[' + i + ']'">
+                                                <x-multichoice-score-selected :options="$criteriaOptions ?? []" />
+                                            </div>
+                                        </template>
+
+                                        <button type="button" @click="add()"
+                                            class="inline-flex items-center gap-2 rounded-xl bg-blue-600 text-white px-3 py-2 md:px-4 md:py-2 hover:bg-blue-700 text-sm md:text-base">
+                                            เพิ่มเกณฑ์ <span class="text-xl leading-none">＋</span>
+                                        </button>
                                     </div>
-                                </template>
+                                </x-card-box>
+                            </template>
 
-                                <button type="button" @click="add()"
-                                    class="inline-flex items-center gap-2 rounded-xl bg-blue-600 text-white px-3 py-2 md:px-4 md:py-2 hover:bg-blue-700 text-sm md:text-base">
-                                    เพิ่มเกณฑ์ <span class="text-xl leading-none">＋</span>
-                                </button>
-                            </div>
-                        </x-card-box>
+                            <template x-if="scoringMethod === 'custom'">
+                                <x-card-box title="เกณฑ์ให้คะแนนแบบปรับแต่งอิสระ" icon="📋">
+                                    <x-variable-formula prefix="scoring" />
+                                </x-card-box>
+                            </template>
+                        </div>
 
-                        <x-card-box title="เกณฑ์ให้คะแนนแบบปรับแต่งอิสระ" icon="📋">
-                            <x-variable-formula prefix="scoring" />
-                        </x-card-box>
                     </x-card>
-
                     <x-card number="6" title="หมายเหตุ">
                         <x-richtext name="annotation" placeholder="...." />
                     </x-card>
