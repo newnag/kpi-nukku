@@ -29,6 +29,7 @@ class Evidence extends Model
 
     protected $casts = [
         'status' => 'boolean',
+         'path'   => 'array',
     ];
 
     public function criteria()

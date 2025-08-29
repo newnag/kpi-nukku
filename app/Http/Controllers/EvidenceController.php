@@ -84,127 +84,110 @@ class EvidenceController extends Controller
             'criterias' => $criterias,
         ]);
     }
-    /**
-     * Store a newly created evidence in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
+
+
     public function store(Request $request)
     {
-        // Validation rules
+        // 1) Validate
         $request->validate([
-            'files.*' => 'nullable|file|mimes:pdf,jpg,jpeg,png,doc,docx|max:10240', // 10MB max per file
-            'url' => 'nullable|url|max:2048',
-            'additional_url' => 'nullable|url|max:2048',
-            'detail' => 'nullable|string|max:65535',
+            'files.*'           => 'nullable|file|mimes:pdf,jpg,jpeg,png,doc,docx|max:10240', // 10MB ต่อไฟล์
+            'additional_urls'   => 'nullable|array',
+            'additional_urls.*' => 'nullable|url|max:2048',
+            'detail'            => 'nullable|string|max:65535',
+            'criteria_id'       => 'nullable|integer',
         ], [
-            'files.*.mimes' => 'ไฟล์ต้องเป็นประเภท: pdf, jpg, jpeg, png, doc, docx เท่านั้น',
-            'files.*.max' => 'ไฟล์ต้องมีขนาดไม่เกิน 10MB',
-            'url.url' => 'รูปแบบ URL ไม่ถูกต้อง',
-            'additional_url.url' => 'รูปแบบ URL เพิ่มเติมไม่ถูกต้อง',
-            'detail.max' => 'รายละเอียดต้องมีความยาวไม่เกิน 65,535 ตัวอักษร'
+            'files.*.mimes'         => 'ไฟล์ต้องเป็นประเภท: pdf, jpg, jpeg, png, doc, docx เท่านั้น',
+            'files.*.max'           => 'ไฟล์ต้องมีขนาดไม่เกิน 10MB',
+            'additional_urls.*.url' => 'รูปแบบ URL ไม่ถูกต้อง',
+            'detail.max'            => 'รายละเอียดต้องมีความยาวไม่เกิน 65,535 ตัวอักษร',
         ]);
 
         try {
-            // Check if at least one input is provided
-            if (!$request->hasFile('files') && !$request->filled('url') && !$request->filled('additional_url') && !$request->filled('detail')) {
-                return redirect()->back()
-                    ->withInput()
-                    ->withErrors(['general' => 'กรุณาระบุข้อมูลอย่างน้อย 1 รายการ (ไฟล์, URL, หรือรายละเอียด)']);
+            // 2) อย่างน้อยต้องมีอย่างใดอย่างหนึ่ง
+            $urls = collect($request->input('additional_urls', []))
+                ->filter(fn($u) => filled($u))
+                ->values();
+
+            $hasFiles = $request->hasFile('files') && count($request->file('files')) > 0;
+            $hasUrls  = $urls->isNotEmpty();
+            $hasDetail = filled($request->input('detail'));
+
+            if (!$hasFiles && !$hasUrls && !$hasDetail) {
+                return back()->withInput()->withErrors([
+                    'general' => 'กรุณาระบุข้อมูลอย่างน้อย 1 รายการ (ไฟล์, URL หรือรายละเอียด)',
+                ]);
             }
 
-            // Create new evidence record
-            $evidence = new Evidence();
+            // 3) เตรียม payload สำหรับเก็บใน column "path" (เป็น JSON)
+            $payload = [];
+            $uploadedFiles = [];
 
-            // Handle file uploads
-            if ($request->hasFile('files')) {
-                $uploadedFiles = [];
+            if ($hasFiles) {
                 foreach ($request->file('files') as $file) {
-                    // Generate unique filename
                     $originalName = $file->getClientOriginalName();
-                    $extension = $file->getClientOriginalExtension();
-                    $filename = time() . '_' . Str::random(10) . '.' . $extension;
+                    $extension    = $file->getClientOriginalExtension();
+                    $filename     = time() . '_' . Str::random(10) . '.' . $extension;
 
-                    // Store file in storage/app/public/evidences
+                    // เก็บไฟล์ที่ storage/app/public/evidences
                     $path = $file->storeAs('evidences', $filename, 'public');
 
                     $uploadedFiles[] = [
                         'original_name' => $originalName,
-                        'stored_name' => $filename,
-                        'path' => $path,
-                        'size' => $file->getSize(),
-                        'mime_type' => $file->getMimeType()
+                        'stored_name'   => $filename,
+                        'path'          => $path,
+                        'size'          => $file->getSize(),
+                        'mime_type'     => $file->getMimeType(),
                     ];
                 }
-
-                // Store file information as JSON
-                $evidence->path = json_encode($uploadedFiles);
-                $evidence->type = 'file';
-                $evidence->name = 'หลักฐานไฟล์ - ' . count($uploadedFiles) . ' ไฟล์';
+                $payload['files'] = $uploadedFiles;
             }
 
-            // Handle URL input
-            $urls = [];
-            if ($request->filled('url')) {
-                $urls[] = $request->url;
-            }
-            if ($request->filled('additional_url')) {
-                $urls[] = $request->additional_url;
+            if ($hasUrls) {
+                $payload['urls'] = $urls->all();
             }
 
-            if (!empty($urls)) {
-                if ($request->hasFile('files')) {
-                    // If files exist, store URLs separately or combine
-                    $evidence->path = json_encode(array_merge(
-                        json_decode($evidence->path, true),
-                        ['urls' => $urls]
-                    ));
-                } else {
-                    $evidence->path = json_encode(['urls' => $urls]);
-                    $evidence->type = 'url';
-                    $evidence->name = 'หลักฐาน URL - ' . count($urls) . ' ลิงก์';
-                }
-            }
+            // 4) บันทึก Evidence
+            $evidence = new Evidence();
+            $evidence->path        = $payload;   // แนะนำ cast เป็น array ใน Model (ดูด้านล่าง)
+            $evidence->detail      = $request->input('detail');
+            $evidence->status      = true;
+            $evidence->criteria_id = $request->input('criteria_id');
+            $evidence->user_id     = auth()->id();
 
-            // Handle mixed content name
-            if ($request->hasFile('files') && !empty($urls)) {
-                $fileCount = count($request->file('files'));
-                $urlCount = count($urls);
-                $evidence->name = "หลักฐานรวม - {$fileCount} ไฟล์, {$urlCount} ลิงก์";
+            // ตั้งชื่อ/ชนิดอัตโนมัติ
+            if ($hasFiles && $hasUrls) {
                 $evidence->type = 'mixed';
+                $evidence->name = "หลักฐานรวม - " . count($uploadedFiles) . " ไฟล์, " . $urls->count() . " ลิงก์";
+            } elseif ($hasFiles) {
+                $evidence->type = 'file';
+                $evidence->name = "หลักฐานไฟล์ - " . count($uploadedFiles) . " ไฟล์";
+            } elseif ($hasUrls) {
+                $evidence->type = 'url';
+                $evidence->name = "หลักฐาน URL - " . $urls->count() . " ลิงก์";
+            } else {
+                $evidence->type = 'note';
+                $evidence->name = "รายละเอียดเพิ่มเติม";
             }
 
-            // Set other fields
-            $evidence->detail = $request->detail;
-            $evidence->status = true; // Default status as active
-
-            // Set foreign keys (adjust based on your requirements)
-            $evidence->criteria_id = $request->criteria_id ?? null;
-            $evidence->user_id = auth()->id(); // Current authenticated user
-
-            // Save to database
             $evidence->save();
 
-            // Redirect with success message
-            return redirect()->route('evidences.index')
-                ->with('success', 'บันทึกหลักฐานเรียบร้อยแล้ว');
-        } catch (\Exception $e) {
-            // Handle errors
+            return redirect()->route('evidences.index')->with('success', 'บันทึกหลักฐานเรียบร้อยแล้ว');
+        } catch (\Throwable $e) {
             \Log::error('Evidence store error: ' . $e->getMessage());
 
-            // Clean up uploaded files if database save failed
-            if (isset($uploadedFiles)) {
-                foreach ($uploadedFiles as $fileInfo) {
-                    Storage::disk('public')->delete($fileInfo['path']);
+            // ลบไฟล์ที่อัปโหลดไว้แล้ว หากบันทึก DB ล้มเหลว
+            if (!empty($uploadedFiles)) {
+                foreach ($uploadedFiles as $f) {
+                    Storage::disk('public')->delete($f['path'] ?? null);
                 }
             }
 
-            return redirect()->back()
-                ->withInput()
-                ->withErrors(['general' => 'เกิดข้อผิดพลาดในการบันทึกข้อมูล กรุณาลองใหม่อีกครั้ง']);
+            return back()->withInput()->withErrors([
+                'general' => 'เกิดข้อผิดพลาดในการบันทึกข้อมูล กรุณาลองใหม่อีกครั้ง',
+            ]);
         }
     }
+
 
     /**
      * Get file type icon class for display
@@ -347,32 +330,88 @@ class EvidenceController extends Controller
     /**
      * Download evidence file.
      */
-    public function download($id): \Symfony\Component\HttpFoundation\BinaryFileResponse|JsonResponse
-    {
-        try {
-            $evidence = Evidence::findOrFail($id);
 
-            if (!$evidence->path || !Storage::disk('public')->exists($evidence->path)) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'File not found'
-                ], 404);
+
+    public function download($id)
+    {
+        $e = \App\Models\Evidence::findOrFail($id);
+        $raw = (string) $e->getOriginal('path');
+
+        // ====== เคส JSON (multi-file หรือมี URL) ======
+        $json = json_decode($raw, true);
+        if (json_last_error() === JSON_ERROR_NONE && is_array($json)) {
+            $files = $json['files'] ?? [];
+            $urls  = $json['urls'] ?? [];
+
+            // --- มีไฟล์เดียว ---
+            if (count($files) === 1) {
+                $file = $files[0];
+                $rel  = ltrim(str_replace('\\', '/', $file['path'] ?? ''), '/');
+                if ($rel && Storage::disk('public')->exists($rel)) {
+                    return response()->download(
+                        Storage::disk('public')->path($rel),
+                        $file['original_name'] ?? basename($rel)
+                    );
+                }
+                return $this->fileNotFound();
             }
 
-            $filePath = Storage::disk('public')->path($evidence->path);
-            return response()->download($filePath, $evidence->name);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to download file',
-                'error' => $e->getMessage()
-            ], 500);
+            // --- หลายไฟล์ -> zip ---
+            if (count($files) > 1) {
+                $zipBase = Str::slug($e->name ?: "evidence-{$e->id}", '-') . "-{$e->id}";
+                $tempDir = storage_path('app/temp');
+                if (!is_dir($tempDir)) @mkdir($tempDir, 0775, true);
+                $zipFull = $tempDir . DIRECTORY_SEPARATOR . $zipBase . '.zip';
+
+                $zip = new \ZipArchive();
+                if ($zip->open($zipFull, \ZipArchive::CREATE | \ZipArchive::OVERWRITE) !== true) {
+                    return response()->json(['success' => false, 'message' => 'ไม่สามารถสร้างไฟล์ ZIP ได้'], 500);
+                }
+
+                foreach ($files as $f) {
+                    $rel = ltrim(str_replace('\\', '/', $f['path'] ?? ''), '/');
+                    if ($rel && Storage::disk('public')->exists($rel)) {
+                        $zip->addFile(Storage::disk('public')->path($rel), $f['original_name'] ?? basename($rel));
+                    }
+                }
+                $zip->close();
+
+                return response()->download($zipFull, $zipBase . '.zip')->deleteFileAfterSend(true);
+            }
+
+            // --- URL อย่างเดียว ---
+            if (!empty($urls)) {
+                return redirect()->away($urls[0]);
+            }
+
+            return $this->fileNotFound();
         }
+
+        // ====== เคส string เดี่ยว ======
+        $path = ltrim(str_replace('\\', '/', $raw), '/');
+        $path = preg_replace('#^(storage(?:/app)?/public/|public/|storage/)+#i', '', $path);
+
+        if ($path && Storage::disk('public')->exists($path)) {
+            $full = Storage::disk('public')->path($path);
+            $name = $e->name ?: basename($path);
+            if (!str_contains(strtolower($name), '.') && !empty($e->type)) {
+                $name .= '.' . ltrim($e->type, '.');
+            }
+            return response()->download($full, $name);
+        }
+
+        // เผื่อ absolute path
+        if ($raw && file_exists($raw)) {
+            return response()->download($raw, $e->name ?: basename($raw));
+        }
+
+        return $this->fileNotFound();
     }
 
-    /**
-     * Get evidence by criteria.
-     */
+    private function fileNotFound()
+    {
+        return response()->json(['success' => false, 'message' => 'File not found'], 404);
+    }
     public function getByCriteria($criteriaId): JsonResponse
     {
         try {

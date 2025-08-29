@@ -104,8 +104,8 @@ class DashboardController extends Controller
             ->get();
 
         $statusCounts = [
-            'complete'   => $indicatorsForStatus->whereIn('status', [2, 3])->count(),
-            'incomplete' => $indicatorsForStatus->where('status', 1)->count(),
+            'complete'   => $indicatorsForStatus->whereIn('status',3)->count(),
+            'incomplete' => $indicatorsForStatus->where('status', 4)->count(),
             'pending'    => $indicatorsForStatus->where('status', 0)->count(),
         ];
 

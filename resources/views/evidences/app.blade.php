@@ -114,6 +114,7 @@
                                                 <i data-lucide="file-text" style="color:#eb7e25;"></i>
                                             @elseif(str_ends_with($evidence->type, 'image') ||
                                                     str_ends_with($evidence->type, 'jpg') ||
+                                                    str_ends_with($evidence->type, 'png') ||
                                                     str_ends_with($evidence->type, 'jpeg'))
                                                 <i data-lucide="image" style="color:#16a34a;"></i>
                                             @elseif(str_ends_with($evidence->type, 'excel') || str_ends_with($evidence->name, '.xls'))
@@ -130,15 +131,16 @@
                                         </div>
                                     </div>
                                 </td>
-                                 <td>{{ $evidence->file_size ?? '2.8 MB' }}</td>
+                                <td>{{ $evidence->file_size ?? '2.8 MB' }}</td>
                                 <td data-search="{{ $evidence->type }}">{{ $evidence->type }}</td>
                                 <td data-order="{{ optional($evidence->created_at)->timestamp }}">
                                     {{ $evidence->created_at ? $evidence->created_at->format('M d, Y') : 'Dec 13, 2022' }}
                                 </td>
-                    
+
                                 <td>
                                     <div class="evidence-actions">
-                                        <button class="btn-download" onclick="downloadFile({{ $evidence->id }})"
+                                        <button class="btn-download"
+                                            onclick="window.location.href='{{ route('evidences.download', $evidence->id) }}'"
                                             title="ดาวน์โหลด">
                                             <i data-lucide="download" style="margin-right:4px;"></i> ดาวน์โหลด
                                         </button>
@@ -165,9 +167,8 @@
 
         // ฟังก์ชันดาวน์โหลดไฟล์
         function downloadFile(evidenceId) {
-            window.location.href = `/evidences/${evidenceId}/download`;
+            window.location.href = "{{ route('evidences.download', ':id') }}".replace(':id', evidenceId);
         }
-
 
         $(function() {
             // --- DataTable init ---
