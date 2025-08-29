@@ -10,20 +10,20 @@
 
 @section('content')
 
-    <form action="{{ route('indicator.store') }}" method="POST" class="" x-data="{ score_acc: @js(old('score_acc', '')) }">
+    <form action="{{ route('indicator.store') }}" method="POST" class="" x-data="{ score_acc: @js(old('max_score', '')) }">
         @csrf
         <div class="w-full disabled:grid place-items-center">
-            <div class="my-5 w-fit px-5 pb-5 bg-white rounded-2xl border border-slate-200 shadow-sm ">
+            <div class="mb-5 w-fit px-5 pb-5 bg-white rounded-2xl border border-slate-200 shadow-sm ">
                 <p class="text-3xl text-center font-bold py-7">เพิ่มตัวชี้วัด</p>
                 <div class="max-w-5xl mx-auto space-y-5 sm:space-y-6 md:space-y-8">
                     <x-card number="1" title="ข้อมูลตัวชี้วัด">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
-                            <x-input name="year_id" type="numeric" maxlength="4" pattern="\d{4}" label="ปีการประเมิน"
+                            <x-input name="year" type="number" maxlength="4" pattern="\d{4}" label="ปีการประเมิน"
                                 placeholder="กรอกปีการประเมิน" required />
 
                             <x-input name="name" label="ชื่อตัวชี้วัด" placeholder="กรุณากรอกชื่อตัวชี้วัด" required />
 
-                            <x-input name="code" label="รหัสตัวชี้วัด" placeholder="เช่น NCS-1" />
+                            <x-input name="code" label="รหัสตัวชี้วัด" placeholder="เช่น NCS-1" required />
 
                             <x-input name="max_score" type="number" step="1" label="คะแนนตัวชี้วัด"
                                 placeholder="กรุณากรอกคะแนน" required x-model.number="score_acc" />
@@ -36,7 +36,7 @@
 
                             <x-select name="type" :options="['เชิงคุณภาพ', 'เชิงปริมาณ']" label="ประเภทตัวชี้วัด"
                                 placeholder="กรุณาเลือกประเภท" required />
-                            <x-input name="deadline" type="date" label="วันสิ้นสุดการประเมิน" />
+                            <x-input name="deadline" type="date" label="วันสิ้นสุดการประเมิน" required />
                         </div>
                     </x-card>
 
@@ -96,8 +96,8 @@
                                 @criteria-remove="remove($event.detail.index-1)"
                                 @criteria-move-up="up($event.detail.index-1)"
                                 @criteria-move-down="down($event.detail.index-1)"
-                                @criteria-title-change="
-              name[$event.detail.idx] = $event.detail.title;
+                                @criteria-name-change="
+              name[$event.detail.idx] = $event.detail.name;
               window.__criteriaTitles = name.slice();
               $dispatch('criteria-updated', { name })
             "
@@ -152,7 +152,7 @@
                         <div class="space-y-5 sm:space-y-6">
                             <template x-if="scoringMethod === 'count'">
                                 <x-card-box title="เกณฑ์ให้คะแนนแบบหลายตัวเลือก-ตามจำนวนข้อที่เลือก" icon="📋">
-                                    <x-multichoice-score-count name-prefix="multiCounts[0]" :index="1" />
+                                    <x-multichoice-score-count name-prefix="multiCounts" />
                                 </x-card-box>
                             </template>
 
