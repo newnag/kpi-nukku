@@ -1,7 +1,6 @@
 @props(['prefix' => 'scoring', 'initial' => []])
 
 @php
-    // Backward-compat for old payloads that used `name` and `formula`
     $initialVars = old($prefix . '.variables', $initial['variables'] ?? []);
     $initialCondition = old(
         $prefix . '.condition',
@@ -12,17 +11,17 @@
 <div x-data="{
     prefix: '{{ $prefix }}',
 
-    // Normalize initial vars to { variable_name, type, value }
+    // Normalize initial vars to the shape we POST: { variable_name, type, value }
     vars: (@js(array_values($initialVars))).map(v => ({
         id: Date.now() + Math.random(),
-        variable_name: v.variable_name ?? v.name ?? '',
-        type: v.type ?? 'defined',
-        value: (v.type ?? 'defined') === 'defined' ? (v.value ?? '') : ''
+        variable_name: v.variable_name ?? v.name ?? '', // support legacy 'name' if present
+        type: (v.type ?? 'defined'),
+        value: ((v.type ?? 'defined') === 'defined') ? (v.value ?? '') : ''
     })),
 
     condition: @js($initialCondition),
 
-    // Inputs for adding a new var
+    // inputs for adding a new var
     newName: '',
     newType: 'defined',
     newValue: '',
@@ -30,13 +29,15 @@
     add() {
         const name = (this.newName || '').trim();
         if (!name) return;
-        const v = {
-            id: Date.now() + Math.random(),
-            variable_name: name,
-            type: this.newType,
-            value: this.newType === 'defined' ? (this.newValue ?? '') : ''
-        };
-        this.vars = [...this.vars, v];
+        this.vars = [
+            ...this.vars,
+            {
+                id: Date.now() + Math.random(),
+                variable_name: name,
+                type: this.newType,
+                value: this.newType === 'defined' ? (this.newValue ?? '') : ''
+            }
+        ];
         this.newName = '';
         this.newType = 'defined';
         this.newValue = '';
@@ -56,42 +57,29 @@
         const before = el.value.slice(0, s),
             after = el.value.slice(e);
         this.condition = before + text + after;
-        this.$nextTick(() => {
-            el.focus();
-            const pos = s + text.length;
-            el.setSelectionRange(pos, pos);
-        });
+        this.$nextTick(() => { el.focus(); const pos = s + text.length;
+            el.setSelectionRange(pos, pos); });
     },
 
-    // --- Validation helpers ---
-    reserved() {
-        return new Set(['IF', 'AND', 'OR', 'NOR', 'XOR', 'XNOR', 'NAND', 'NOT', 'TRUE', 'FALSE', 'ELSE', 'THEN']);
-    },
+    // --- validation helpers (unchanged) ---
+    reserved() { return new Set(['IF', 'AND', 'OR', 'NOR', 'XOR', 'XNOR', 'NAND', 'NOT', 'TRUE', 'FALSE', 'ELSE', 'THEN']); },
     extractVars(text) {
-        // Grab identifiers like var1, result_2; ignore numbers
         const tokens = (text || '').match(/[A-Za-z_][A-Za-z0-9_]*/g) || [];
-        const set = new Set();
-        const reserved = this.reserved();
-        tokens.forEach(t => {
-            if (!reserved.has(t) && isNaN(Number(t))) set.add(t);
-        });
+        const set = new Set(),
+            r = this.reserved();
+        tokens.forEach(t => { if (!r.has(t) && isNaN(Number(t))) set.add(t); });
         return Array.from(set);
     },
-    get declaredVars() {
-        return this.vars.map(v => (v.variable_name || '').trim()).filter(Boolean);
-    },
-    get referencedVars() {
-        return this.extractVars(this.condition);
-    },
+    get declaredVars() { return this.vars.map(v => (v.variable_name || '').trim()).filter(Boolean); },
+    get referencedVars() { return this.extractVars(this.condition); },
     get unknownVars() {
-        const declared = new Set(this.declaredVars);
-        return this.referencedVars.filter(n => !declared.has(n));
+        const d = new Set(this.declaredVars);
+        return this.referencedVars.filter(n => !d.has(n));
     },
     initSubmitGuard() {
         const form = this.$el.closest('form');
         if (!form) return;
         form.addEventListener('submit', (e) => {
-            // Recompute before submit
             if (this.unknownVars.length) {
                 e.preventDefault();
                 alert('พบตัวแปรที่ยังไม่ได้ประกาศ: ' + this.unknownVars.join(', '));
@@ -99,10 +87,11 @@
         });
     }
 }" x-init="initSubmitGuard()" class="space-y-5">
+
     <div class="grid grid-cols-1 md:grid-cols-[1fr,260px,auto] gap-3 items-center">
         <label class="block text-slate-800 font-medium">สร้างตัวแปร</label>
 
-        <input x-ref="newName" x-model="newName" type="text" placeholder="กรุณาตั้งชื่อตัวแปร"
+        <input x-ref="newName" x-model="newName" type="text" placeholder="กรุณาตั้งชื่อตัวแปร (variable_name)"
             class="p-2 w-full bg-white rounded-xl border border-slate-300 placeholder-slate-400 text-sm md:text-base hover:border-blue-400 transition" />
 
         <div class="flex gap-3 items-center">
@@ -149,7 +138,7 @@
             <button type="button" @click="remove(i)"
                 class="md:ml-2 text-slate-500 hover:text-red-600 text-sm md:text-base">✕</button>
 
-            {{-- Hidden fields for POST --}}
+            {{-- Hidden fields for POST (NO label) --}}
             <input type="hidden" :name="`${prefix}[variables][${i}][variable_name]`" :value="v.variable_name">
             <input type="hidden" :name="`${prefix}[variables][${i}][type]`" :value="v.type">
             <input type="hidden" :name="`${prefix}[variables][${i}][value]`" :value="v.value ?? ''">
@@ -162,7 +151,6 @@
             class="w-full bg-white rounded-2xl border border-blue-200 focus:border-blue-500 focus:ring-blue-500 p-3 text-sm md:text-base"
             placeholder="ตัวอย่าง: result = var1 * var2"></textarea>
 
-        {{-- Validation status --}}
         <template x-if="unknownVars.length">
             <div class="rounded-xl border border-red-200 bg-red-50 text-red-700 p-3 text-sm">
                 พบตัวแปรที่ยังไม่ได้ประกาศ: <span x-text="unknownVars.join(', ')"></span>

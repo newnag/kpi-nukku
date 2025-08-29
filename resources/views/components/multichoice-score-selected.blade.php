@@ -9,9 +9,9 @@
         selected: [],
     }" x-init="labels = (window.__criteriaTitles && window.__criteriaTitles.length) ? window.__criteriaTitles.slice() : labels"
     @criteria-updated.window="
-        labels = ($event.detail?.titles ?? []);
-        selected = selected.filter(v => v <= labels.length);
-    ">
+  labels = ($event.detail?.name ?? []);
+  selected = selected.filter(v => v <= labels.length);
+">
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3 md:mb-4">
         <h3 class="text-base md:text-lg font-semibold text-slate-900">
             เกณฑ์ที่ <span x-text="sequence ?? {{ $index }}">{{ $index }}</span>
