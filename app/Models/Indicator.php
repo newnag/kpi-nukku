@@ -22,18 +22,15 @@ class Indicator extends Model
         'score_acc',
         'max_score',
         'type',
-        'categorie_id',
+        'categorie_id', // <-- matches migration
     ];
 
-    protected $hidden = [
-        'created_at',
-        'updated_at',
-    ];
+    protected $hidden = ['created_at', 'updated_at'];
 
     protected $casts = [
-        'deadline' => 'datetime:Y-m-d',
-        'score_acc' => 'decimal:2',
-        'max_score' => 'decimal:2',
+        'deadline'   => 'datetime:Y-m-d',
+        'score_acc'  => 'decimal:2',
+        'max_score'  => 'decimal:2',
     ];
 
     public function category()
@@ -70,5 +67,4 @@ class Indicator extends Model
     {
         return $this->hasManyThrough(Evidence::class, Criteria::class);
     }
-
 }

@@ -7,11 +7,14 @@ use Illuminate\Database\Eloquent\Model;
 class Variable extends Model
 {
     protected $fillable = [
-        'label',
         'variable_name',
-        'status',
+        'type',        // <-- matches migration
         'value',
         'indicator_id',
+    ];
+
+    protected $casts = [
+        'value' => 'float',
     ];
 
     public function indicator()

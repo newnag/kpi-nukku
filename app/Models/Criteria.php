@@ -3,13 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Criteria extends Model
 {
-    use HasFactory;
-    
     public $timestamps = false;
+
     protected $fillable = [
         'name',
         'description',
@@ -17,13 +15,10 @@ class Criteria extends Model
         'indicator_id',
     ];
 
+    protected $table = 'criterias'; // matches migration
+
     public function indicator()
     {
         return $this->belongsTo(Indicator::class);
     }
-
-    public function evidences()
-    {
-        return $this->hasMany(Evidence::class, 'criteria_id');
-    }
-} 
+}
