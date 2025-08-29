@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->json('required_items')->nullable();
             $table->float('score', 5, 2)->nullable();
-            $table->text('description')->nullable();
+            $table->integer('sequence')->nullable();
 
             $table->foreignId('indicator_id')
                 ->constrained('indicators')
