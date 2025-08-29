@@ -44,7 +44,6 @@ Route::prefix('settings')->name('settings.')->group(function () {
     Route::get('/', [SettingController::class, 'index'])->name('index');
     Route::post('/store', [SettingController::class, 'store'])->name('store');
     Route::put('/{id}', [SettingController::class, 'update'])->name('update');
-   
 });
 
 Route::prefix('users')->name('users.')->group(function () {
@@ -57,11 +56,12 @@ Route::prefix('users')->name('users.')->group(function () {
 });
 Route::prefix('evidences')->name('evidences.')->group(function () {
     Route::get('/', [EvidenceController::class, 'index'])->name('index');
-     Route::get('/create',  [EvidenceController::class, 'create'])->name('create');
+    Route::get('/create',  [EvidenceController::class, 'create'])->name('create');
     Route::post('/store', [EvidenceController::class, 'store'])->name('store');
     Route::put('/{id}', [EvidenceController::class, 'update'])->name('update');
     Route::delete('/{id}', [EvidenceController::class, 'destroy'])->name('destroy');
-    Route::get('/{id}/download', [EvidenceController::class, 'download']);
+    Route::get('/{id}/download', [EvidenceController::class, 'download'])
+         ->name('download')->whereNumber('id');
     Route::get('criteria/{criteriaId}/evidences', [EvidenceController::class, 'getByCriteria']);
     Route::patch('/{id}/toggle-status', [EvidenceController::class, 'toggleStatus']);
 });
@@ -70,8 +70,6 @@ Route::prefix('dashboard')->name('dashboard.')->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('index');
     Route::get('/result', [DashboardController::class, 'getData'])->name('getData');
     Route::get('/export', [DashboardExportController::class, 'export'])->name('export');
-    
-
 });
 
 

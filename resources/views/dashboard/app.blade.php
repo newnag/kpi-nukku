@@ -266,7 +266,7 @@
                                 @php
                                     $statusKey = match ((int) $indicator->status) {
                                         2, 3 => 'complete', // ✅ รองรับทั้ง 2 และ 3
-                                        1 => 'incomplete',
+                                        4 => 'incomplete',
                                         0 => 'pending',
                                         default => 'pending',
                                     };
@@ -307,7 +307,7 @@
                                                 </span>
                                             @break
 
-                                            @case(1)
+                                            @case(4)
                                                 <span class="tip" data-tip="ผลการดำเนินงานยังไม่ครบถ้วนตามเกณฑ์"
                                                     aria-label="ผลการดำเนินงานยังไม่ครบถ้วนตามเกณฑ์" tabindex="0">
                                                     <i data-lucide="clock" class="status-icon text-warn"></i>
@@ -353,23 +353,7 @@
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
-    {{-- <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // document.getElementById('exportExell').addEventListener('click', function() {
-            //     // ดึง query string ปัจจุบันของหน้า (ถ้ามีการกรองผ่าน ?year=...&standard=... )
-            //     const qs = window.location.search || '';
-            //     window.location.href = "{{ route('dashboard.export') }}" + qs;
-            // });
-
-                document.getElementById('exportExell').addEventListener('click', function() {
-            const qs = window.location.search || ''; // ?year=2024&standard=1 ...
-            window.location.href = "{{ route('dashboard.export') }}" + qs;
-        });
-
-        });
-
-    
-    </script> --}}
+   
 
     <script>
         document.getElementById('exportExell').addEventListener('click', function() {
