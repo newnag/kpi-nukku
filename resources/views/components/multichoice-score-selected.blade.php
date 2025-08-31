@@ -1,6 +1,6 @@
 @props(['index' => 1, 'namePrefix' => null, 'showControls' => true, 'options' => []])
 
-@php $prefix = $namePrefix ?? 'multiScores[' . $index . ']'; @endphp
+@php $prefix = $namePrefix ?? 'multiSelected[' . $index . ']'; @endphp
 
 <div {{ $attributes->merge(['class' => 'rounded-2xl border border-slate-200 bg-white shadow-sm p-4 sm:p-5 md:p-6']) }}
     x-data="{

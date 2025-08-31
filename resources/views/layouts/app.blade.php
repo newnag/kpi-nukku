@@ -19,6 +19,7 @@
     <header class="container mx-auto px-4 py-7">
         <h1 class="text-4xl font-bold ">@yield('header', '')</h1>
     </header>
+    <x-toasts />
     <main class="container mx-auto px-4">
         @yield('content')
     </main>

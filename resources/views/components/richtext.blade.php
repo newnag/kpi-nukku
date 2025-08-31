@@ -84,6 +84,14 @@
             }
 
             /* ---------- Editor area (รวมของเดิม + หน้า create) ---------- */
+            .trumbowyg-editor ol,
+            .trumbowyg-editor ul {
+                list-style-position: inside;
+                /* สำคัญ */
+                padding-left: 0;
+                /* ตัดระยะเว้นซ้ายของลิสต์เดิม */
+            }
+
             .trumbowyg-box .trumbowyg-editor {
                 padding: .75rem;
                 font-size: .9375rem;
