@@ -28,7 +28,7 @@
                                 <x-input name="max_score" type="number" step="1" label="คะแนนตัวชี้วัด"
                                     placeholder="กรุณากรอกคะแนน" required x-model.number="score_acc" />
                                 <x-select name="standard_id" :options="$standards ?? []" label="มาตรฐานตัวชี้วัด"
-                                    placeholder="กรุณาเลือกมาตรฐานตัวชี้วัด" searchable required />
+                                    placeholder="กรุณาเลือกมาตรฐานตัวชี้วัด" required />
                                 <x-select name="category_id" :options="$categories ?? []" label="ด้านตัวชี้วัด"
                                     placeholder="กรุณาเลือกด้าน" searchable required />
                                 <x-select name="type" :options="['เชิงคุณภาพ', 'เชิงปริมาณ']" label="ประเภทตัวชี้วัด"
@@ -91,20 +91,32 @@
                                 <div x-data="{
                                     items: [{ id: Date.now() }],
                                     name: [],
-                                    add() { this.items = [...this.items, { id: Date.now() + this.items.length }];
-                                        this.$nextTick(() => this.broadcast()) },
-                                    remove(i) { const a = [...this.items];
+                                    add() {
+                                        this.items = [...this.items, { id: Date.now() + this.items.length }];
+                                        this.$nextTick(() => this.broadcast())
+                                    },
+                                    remove(i) {
+                                        const a = [...this.items];
                                         a.splice(i, 1);
                                         this.items = a;
-                                        this.$nextTick(() => this.broadcast()) },
-                                    up(i) { if (i > 0) { const a = [...this.items];
+                                        this.$nextTick(() => this.broadcast())
+                                    },
+                                    up(i) {
+                                        if (i > 0) {
+                                            const a = [...this.items];
                                             [a[i - 1], a[i]] = [a[i], a[i - 1]];
                                             this.items = a;
-                                            this.$nextTick(() => this.broadcast()) } },
-                                    down(i) { if (i < this.items.length - 1) { const a = [...this.items];
+                                            this.$nextTick(() => this.broadcast())
+                                        }
+                                    },
+                                    down(i) {
+                                        if (i < this.items.length - 1) {
+                                            const a = [...this.items];
                                             [a[i + 1], a[i]] = [a[i], a[i + 1]];
                                             this.items = a;
-                                            this.$nextTick(() => this.broadcast()) } },
+                                            this.$nextTick(() => this.broadcast())
+                                        }
+                                    },
                                     broadcast() {
                                         const inputs = Array.from($el.querySelectorAll('[data-criteria-name]'));
                                         this.name = inputs.map(el => el.value || '');
@@ -145,7 +157,11 @@
                         </x-card>
 
                         {{-- Card 5: Scoring --}}
-                        <x-card number="5" title="เกณฑ์การให้คะแนน" class="space-y-6" x-data="{ scoringMethod: '' }">
+                        <x-card number="5" title="เกณฑ์การให้คะแนน" class="space-y-6" x-data="{
+                            scoringMethod() {
+                                return document.querySelector('input[name=scoring_method]')?.value || '';
+                            }
+                        }">
                             <x-card-box title="เกณฑ์ให้คะแนนและคะแนนเต็ม" icon="📋">
                                 <div>
                                     <x-richtext name="comment" placeholder="คำอธิบายเกณฑ์ให้คะแนน" />
@@ -160,13 +176,18 @@
 
                             <div class="w-full">
                                 <label class="block mb-3 text-sm font-medium text-slate-700">เลือกวิธีการให้คะแนน</label>
+
                                 <select x-model="scoringMethod"
-                                    class="w-full rounded-xl border border-slate-300 p-3 text-sm md:text-base focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                    class="p-2 mt-1 w-full bg-white rounded-xl border border-slate-300 
+                placeholder-slate-400 text-sm md:text-base 
+                hover:shadow-md hover:border-blue-400 transition
+                focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-500">
                                     <option value="">-- กรุณาเลือกวิธีการให้คะแนน --</option>
                                     <option value="count">หลายตัวเลือก - ตามจำนวนข้อที่เลือก</option>
                                     <option value="selected">หลายตัวเลือก - คะแนนตามข้อที่เลือก</option>
                                     <option value="custom">ปรับแต่งอิสระ</option>
                                 </select>
+
                             </div>
 
                             <div class="space-y-6">
@@ -181,9 +202,11 @@
                                         <div x-data="{
                                             items: [{ id: Date.now() }],
                                             add() { this.items = [...this.items, { id: Date.now() + this.items.length }] },
-                                            remove(i) { const a = [...this.items];
+                                            remove(i) {
+                                                const a = [...this.items];
                                                 a.splice(i, 1);
-                                                this.items = a.length ? a : [{ id: Date.now() }] }
+                                                this.items = a.length ? a : [{ id: Date.now() }]
+                                            }
                                         }" @criteria-remove="remove($event.detail.index - 1)"
                                             class="space-y-4">
                                             <template x-for="(it, i) in items" :key="it.id">
