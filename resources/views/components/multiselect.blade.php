@@ -86,15 +86,19 @@ hookFormValidation();">
     </label>
 
     <!-- Optional below-the-trigger vertical list -->
-    <template x-if="shouldShowListBelow">
-        <div class="mt-2 border border-slate-200 bg-slate-50 rounded-xl p-2 max-h-44 overflow-y-auto">
-            <div class="flex flex-col gap-1">
+    <template x-if="selectedOptions.length > 0">
+        <div class="mt-2 border border-slate-200 bg-slate-50 rounded-xl p-3 max-h-48 overflow-y-auto">
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-sm font-medium text-slate-700">รายการที่เลือก:</span>
+                <button type="button" @click="clear()" 
+                    class="text-xs text-slate-600 hover:text-red-600 underline">ล้างทั้งหมด</button>
+            </div>
+            <div class="flex flex-col gap-2">
                 <template x-for="o in selectedOptions" :key="'below-' + o.value">
-                    <div
-                        class="flex items-start justify-between gap-2 bg-white border border-slate-200 rounded-lg px-2 py-1">
-                        <span class="text-sm break-words" x-text="o.label"></span>
+                    <div class="flex items-start justify-between gap-2 bg-white border border-slate-200 rounded-lg px-3 py-2 hover:bg-slate-50 transition-colors">
+                        <span class="text-sm break-words flex-1" x-text="o.label"></span>
                         <button type="button" @click="toggleValue(o.value)"
-                            class="text-slate-500 hover:text-red-600 text-xs">ลบ</button>
+                            class="text-slate-500 hover:text-red-600 text-sm font-medium ml-2 flex-shrink-0">ลบ</button>
                     </div>
                 </template>
             </div>
@@ -103,7 +107,8 @@ hookFormValidation();">
 
     <!-- Dropdown -->
     <div x-show="open" x-transition @click.outside="open=false"
-        class="absolute z-50 left-0 right-0 mt-1 w-full rounded-xl border border-slate-300 bg-white shadow-md overflow-hidden">
+        class="absolute z-50 left-0 right-0 w-full rounded-xl border border-slate-300 bg-white shadow-lg overflow-hidden"
+        :style="{ top: ($refs.btn?.offsetHeight || 42) + 'px' }">
         <!-- Search + actions -->
         <div class="p-2 border-b border-slate-200 flex items-center gap-2" x-show="searchable || selectAllEnabled">
             <input x-show="searchable" x-ref="search" x-model="q" @keydown.arrow-down.prevent="move(1)"
@@ -134,7 +139,7 @@ hookFormValidation();">
             </template>
         </ul>
 
-        <div class="flex justify-end px-3 py-2 border-t">
+        <div class="flex justify-end px-3 py-2 border-t border-slate-200">
             <button type="button" class="text-sm text-white bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded"
                 @click="open=false">เสร็จสิ้น</button>
         </div>
@@ -221,6 +226,9 @@ hookFormValidation();">
                 this.base = this.normalize(newOptions);
                 const avail = new Set(this.base.map(o => String(o.value)));
                 this.selected = [...before].filter(v => avail.has(String(v)));
+                // Reset search query to refresh filtered results
+                this.q = '';
+                this.hi = -1;
                 this.emitChange();
             },
 
