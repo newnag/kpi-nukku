@@ -318,7 +318,6 @@ class IndicatorController extends Controller
             'standards'   => Standard::query()->pluck('name', 'id')->toArray(),
             'categories'  => Category::query()->pluck('name', 'id')->toArray(),
             'departments' => Department::query()->pluck('name', 'id')->toArray(),
-            // 'users' => User::query()->pluck('name', 'id')->toArray(), // ไม่จำเป็น เพราะใช้ usersForAssign ใน create()
         ];
     }
 
