@@ -108,12 +108,15 @@ hookFormValidation();">
     <!-- Dropdown -->
     <div x-show="open" x-transition @click.outside="open=false"
         class="absolute z-50 left-0 right-0 w-full rounded-xl border border-slate-300 bg-white shadow-lg overflow-hidden"
-        :style="{ top: ($refs.btn?.offsetHeight || 42) + 'px' }">
+        :style="{ top: '75px' }">
         <!-- Search + actions -->
         <div class="p-2 border-b border-slate-200 flex items-center gap-2" x-show="searchable || selectAllEnabled">
             <input x-show="searchable" x-ref="search" x-model="q" @keydown.arrow-down.prevent="move(1)"
                 @keydown.arrow-up.prevent="move(-1)" @keydown.enter.prevent="submitKey($event)" type="text"
-                class="flex-1 p-2 rounded-lg border border-slate-200" placeholder="พิมพ์เพื่อค้นหา...">
+                class="p-2 mt-1 w-full bg-white rounded-xl border border-slate-300 
+                placeholder-slate-400 text-sm md:text-base 
+                hover:shadow-md hover:border-blue-400 transition
+                focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-500" placeholder="พิมพ์เพื่อค้นหา...">
             <div class="flex items-center gap-2">
                 <button x-show="selectAllEnabled" type="button" class="text-xs text-slate-600 hover:text-slate-900"
                     @click="selectAll()">เลือกทั้งหมด</button>
