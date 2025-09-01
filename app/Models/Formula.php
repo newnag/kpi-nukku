@@ -18,6 +18,6 @@ class Formula extends Model
 
     public function variables()
     {
-        return $this->belongsToMany(Variable::class, 'variable_formulas');
+        return $this->belongsToMany(Variable::class, 'variable_formulas', 'formula_id', 'variable_id');
     }
 }
