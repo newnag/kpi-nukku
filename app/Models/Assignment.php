@@ -22,4 +22,9 @@ class Assignment extends Model
     {
         return $this->belongsTo(User::class, 'collector');
     }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'collector');
+    }
 }
