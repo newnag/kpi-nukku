@@ -107,8 +107,14 @@
                                 <br>
                                 <label class="inline-flex items-center">
                                     <input type="checkbox" class="filter-option rounded text-blue-600" data-column="8"
-                                        data-value="ไม่ครบ">
-                                    <span class="ml-2 text-sm text-gray-700">ไม่ครบ</span>
+                                        data-value="ไม่ครบถ้วน">
+                                    <span class="ml-2 text-sm text-gray-700">ไม่ครบถ้วน</span>
+                                </label>
+                                <br>
+                                <label class="inline-flex items-center">
+                                    <input type="checkbox" class="filter-option rounded text-blue-600" data-column="8"
+                                        data-value="ครบถ้วน">
+                                    <span class="ml-2 text-sm text-gray-700">ครบถ้วน</span>
                                 </label>
                             </div>
 
@@ -331,20 +337,35 @@
                             @endswitch
                         </td>
 
-                        <td class="px-4 py-3 text-sm"
-                            data-search="{{ $indicator['evidences']->isNotEmpty() ? 'รอดำเนินการ' : 'ไม่ครบ' }}"
-                            data-order="{{ $indicator['evidences']->isNotEmpty() ? 1 : 0 }}">
-                            @if ($indicator['evidences']->isNotEmpty())
-                                <span
-                                    class="flex justify-center text-center px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-800">
-                                    รอดำเนินการ
-                                </span>
-                            @else
-                                <span
-                                    class="flex justify-center text-center px-2 py-1 text-xs font-medium rounded-full bg-red-100 text-red-800">
-                                    ไม่ครบ
-                                </span>
-                            @endif
+                        @php
+                            // Derive document status from criteria statuses (0/1/2)
+                            $criteria = collect($indicator['criteria'] ?? []);
+
+                            // Normalize to string to handle 0 vs "0"
+                            $has0 = $criteria->contains(fn($c) => (string) ($c['status'] ?? '') === '0');
+                            $has2 = $criteria->contains(fn($c) => (string) ($c['status'] ?? '') === '2');
+
+                            if ($criteria->isEmpty() || $has0) {
+                                $docText = 'รอดำเนินการ';
+                                $docOrder = 0;
+                                $badgeCls = 'bg-gray-100 text-gray-800';
+                            } elseif ($has2) {
+                                $docText = 'ครบถ้วน';
+                                $docOrder = 1;
+                                $badgeCls = 'bg-green-100 text-green-800';
+                            } else {
+                                $docText = 'ไม่ครบถ้วน';
+                                $docOrder = 2;
+                                $badgeCls = 'bg-red-100 text-red-800';
+                            }
+                        @endphp
+
+                        <td class="px-4 py-3 text-sm" data-search="{{ $docText }}"
+                            data-order="{{ $docOrder }}">
+                            <span
+                                class="flex justify-center text-center px-2 py-1 text-xs font-medium rounded-full {{ $badgeCls }}">
+                                {{ $docText }}
+                            </span>
                         </td>
                         <td class="px-4 py-3 text-sm">
                             <button {{-- onclick="window.location.href='{{ route('indicator.show', $indicator['id']) }}'" --}}
