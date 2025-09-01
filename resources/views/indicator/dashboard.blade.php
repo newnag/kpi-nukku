@@ -368,7 +368,7 @@
                             </span>
                         </td>
                         <td class="px-4 py-3 text-sm">
-                            <a href="{{ route('indicator.show', $indicator['id']) }}"
+                            <a href="{{ route('indicator.detail', $indicator['id']) }}"
                                 class="inline-flex items-center justify-center px-3 py-1 bg-white border border-blue-500 text-blue-500 rounded-full text-xs font-medium hover:bg-blue-500 hover:text-white">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 mr-1" fill="none"
                                     viewBox="0 0 24 24" stroke="currentColor">

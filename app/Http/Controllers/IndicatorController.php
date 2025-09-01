@@ -65,23 +65,22 @@ class IndicatorController extends Controller
 
     public function show($id)
     {
-        try {
-            $indicator = IndicatorModel::with([
-                'category.standard',
-                'criterias',
-                'variables',
-                'formulas',
-                'checklistItems',
-                'assignments',
-                'evidences',
-            ])->findOrFail($id);
+        $indicator = \App\Models\Indicator::with([
+            'category.standard',
+            'criterias',
+            'variables',
+            'formulas',
+            'checklistItems',
+            'assignments.user.department',
+            'evidences',
+        ])->findOrFail($id);
 
-            return new IndicatorResource($indicator);
-        } catch (ModelNotFoundException $e) {
-            abort(404, 'Indicator not found');
-        } catch (\Throwable $e) {
-            return response()->json(['error' => 'Failed to retrieve indicator'], 500);
-        }
+        // Reuse the API shape for the view
+        $data = (new IndicatorResource($indicator))->toArray(request());
+
+        return view('indicator.detail', compact('data'));
+
+        // return response()->json($data);
     }
 
 
