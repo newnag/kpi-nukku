@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Carbon;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 use App\Models\Indicator as IndicatorModel;
 use App\Models\User;
@@ -15,6 +16,7 @@ use App\Models\Criteria;
 use App\Models\Variable;
 use App\Models\Formula;
 use App\Models\Checklist_item;
+use App\Http\Resources\IndicatorResource;
 
 class IndicatorController extends Controller
 {
@@ -66,18 +68,23 @@ class IndicatorController extends Controller
         try {
             $indicator = IndicatorModel::with([
                 'category.standard',
-                'assignments',
                 'criterias',
                 'variables',
                 'formulas',
                 'checklistItems',
+                'assignments',
+                'evidences',
             ])->findOrFail($id);
 
-            return response()->json(['indicator' => $indicator]);
+            return new IndicatorResource($indicator);
+        } catch (ModelNotFoundException $e) {
+            abort(404, 'Indicator not found');
         } catch (\Throwable $e) {
             return response()->json(['error' => 'Failed to retrieve indicator'], 500);
         }
     }
+
+
 
     public function store(Request $request)
     {
