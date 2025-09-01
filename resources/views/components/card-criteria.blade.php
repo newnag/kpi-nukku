@@ -22,7 +22,8 @@
         @endif
     </div>
 
-    <input type="hidden" :name="(prefix || '{{ $prefix }}') + '[sequence]'" :value="sequence ?? {{ $index }}">
+    <input type="hidden" :name="(prefix || '{{ $prefix }}') + '[sequence]'"
+        :value="sequence ?? {{ $index }}">
 
     <div class="space-y-4">
         <div>
@@ -32,7 +33,8 @@
                 placeholder="กรุณากรอกชื่อเกณฑ์"
                 class="p-2 mt-1 w-full rounded-xl border border-slate-300 
         placeholder-slate-400 text-sm md:text-base 
-        hover:border-blue-400 transition"
+        hover:shadow-md hover:border-blue-400 transition
+                focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-500"
                 @input.debounce.200ms="$dispatch('criteria-name-change', { idx: (sequence ?? {{ $index }}) - 1, name: $event.target.value })">
         </div>
 
@@ -42,7 +44,8 @@
                 placeholder="กรุณากรอกรายละเอียดหลักฐานอ้างอิง เช่น เอกสารแสดงรายชื่ออาจารย์"
                 class="p-2 mt-1 w-full rounded-xl border border-slate-300 
         placeholder-slate-400 text-sm md:text-base 
-        hover:border-blue-400 transition"></textarea>
+        hover:shadow-md hover:border-blue-400 transition
+                focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-500"></textarea>
         </div>
     </div>
 
