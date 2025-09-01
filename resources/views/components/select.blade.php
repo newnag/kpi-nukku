@@ -42,13 +42,17 @@
     },
 
     // actions
-    choose(o) { this.value = o.value;
+    choose(o) {
+        this.value = o.value;
         this.open = false;
         this.q = '';
-        this.hi = -1; },
-    clear() { this.value = '';
+        this.hi = -1;
+    },
+    clear() {
+        this.value = '';
         this.q = '';
-        this.hi = -1; },
+        this.hi = -1;
+    },
     move(d) {
         const len = this.filtered.length;
         if (!len) return;
@@ -114,7 +118,11 @@
             <div class="p-2 border-b border-slate-200">
                 <input x-ref="search" x-model="q" @keydown.arrow-down.prevent="move(1)"
                     @keydown.arrow-up.prevent="move(-1)" @keydown.enter.prevent="submitKey($event)" type="text"
-                    class="w-full p-2 rounded-lg border border-slate-200" placeholder="พิมพ์เพื่อค้นหา...">
+                    class="p-2 mt-1 w-full bg-white rounded-xl border border-slate-300 
+                placeholder-slate-400 text-sm md:text-base 
+                hover:shadow-md hover:border-blue-400 transition
+                focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-500"
+                    placeholder="พิมพ์เพื่อค้นหา...">
             </div>
         @endif
 
