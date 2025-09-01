@@ -22,4 +22,9 @@ class Criteria extends Model
     {
         return $this->belongsTo(Indicator::class);
     }
+
+    public function evidences()
+    {
+        return $this->hasMany(Evidence::class, 'criteria_id');
+    }
 }
