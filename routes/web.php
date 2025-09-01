@@ -9,15 +9,16 @@ Route::get('/', function () {
 });
 
 Route::prefix('indicator')->name('indicator.')->group(function () {
-    Route::get('/dashboard', [IndicatorController::class, 'index'])->name('dashboard');
-    Route::get('/create', [IndicatorController::class, 'create'])->name('create');
+    Route::get('/dashboard-page', [IndicatorController::class, 'index'])->name('dashboard');
 
-    // route actions for indicators
-    Route::post('/', [IndicatorController::class, 'store'])->name('store');
-    Route::get('/{id}', [IndicatorController::class, 'show'])->name('show');
-    Route::get('/{id}/edit', [IndicatorController::class, 'edit'])->name('edit');
+    // create indicator
+    Route::get('/create-page', [IndicatorController::class, 'create'])->name('create');
+    Route::post('/store', [IndicatorController::class, 'store'])->name('store');
+    // get indicator by id
+    Route::get('/{id}/detail', [IndicatorController::class, 'show'])->name('detail');
+    // route actions for indicators - update and delete
     Route::put('/{id}', [IndicatorController::class, 'update'])->name('update');
-    Route::delete('/{id}', [IndicatorController::class, 'destroy'])->name('destroy');
+    Route::delete('/{id}', [IndicatorController::class, 'delete'])->name('delete');
 });
 
 Route::prefix('test')->group(function () {
