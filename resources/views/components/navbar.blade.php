@@ -6,7 +6,7 @@
             </div>
             <div class="hidden md:flex space-x-8">
                 <a href="/" class="text-gray-700 hover:text-blue-600 font-medium">หน้าหลัก</a>
-                <a href="/indicator/dashboard" class="text-gray-700 hover:text-blue-600 font-medium">ตัวบ่งชี้</a>
+                <a href="/indicator/dashboard-page" class="text-gray-700 hover:text-blue-600 font-medium">ตัวบ่งชี้</a>
             </div>
             <div class="flex items-center space-x-4">
                 <button class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 transition">เข้าสู่ระบบ</button>
