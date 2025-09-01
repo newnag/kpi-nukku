@@ -20,6 +20,8 @@ return new class extends Migration
             $table->foreignId('indicator_id')
                 ->constrained('indicators')
                 ->cascadeOnDelete();
+
+            $table->integer('status')->default(0);
         });
     }
 

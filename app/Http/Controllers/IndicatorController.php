@@ -24,16 +24,18 @@ class IndicatorController extends Controller
 
     public function index()
     {
-        // เพิ่ม eager load assignments.user ถ้ามีความสัมพันธ์ใน Model (collector -> user)
         $indicators = IndicatorModel::with([
             'category.standard',
-            'assignments.user', // ถ้าไม่มีความสัมพันธ์นี้ในโมเดล ให้ลบออก
-            'evidences',
+            'assignments.user',
+            'criterias',
+            // 'evidences',
         ])
             ->get()
             ->map(fn($i) => $this->serializeIndicatorForList($i));
 
         return view('indicator.dashboard', compact('indicators'));
+
+        // return response()->json(['indicators' => $indicators]);
     }
 
     public function create()
@@ -368,16 +370,26 @@ class IndicatorController extends Controller
                 ];
             }),
 
-            'evidences' => $i->evidences->map(function ($e) {
+            'criteria' => $i->criterias->map(function ($c) {
                 return [
-                    'id'         => $e->id,
-                    'name'       => $e->name,
-                    'path'       => $e->path,
-                    'created_at' => $e->created_at instanceof Carbon
-                        ? $e->created_at->format('Y-m-d H:i:s')
-                        : (string) $e->created_at,
+                    'id'          => $c->id,
+                    'name'        => $c->name,
+                    // 'description' => $c->description,
+                    // 'sequence'    => $c->sequence,
+                    'status'      => $c->status,
                 ];
             }),
+
+            // 'evidences' => $i->evidences->map(function ($e) {
+            //     return [
+            //         'id'         => $e->id,
+            //         'name'       => $e->name,
+            //         'path'       => $e->path,
+            //         'created_at' => $e->created_at instanceof Carbon
+            //             ? $e->created_at->format('Y-m-d H:i:s')
+            //             : (string) $e->created_at,
+            //     ];
+            // }),
         ];
     }
 
