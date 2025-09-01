@@ -6,6 +6,11 @@
 @push('styles')
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/trumbowyg@2.31.0/dist/ui/trumbowyg.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/trumbowyg@2.31.0/dist/plugins/table/ui/trumbowyg.table.min.css">
+    <style>
+        .banner {
+            background: linear-gradient(90deg, #f7fafc 0%, #fff7ed 100%);
+        }
+    </style>
 @endpush
 
 @section('content')
@@ -14,7 +19,9 @@
         <div class="w-full px-4 sm:px-6 lg:px-8">
             <div class="max-w-4xl mx-auto">
                 <div class="mb-5 w-full px-4 sm:px-6 lg:px-8 py-6 bg-white rounded-2xl border border-slate-200 shadow-sm">
-                    <h1 class="text-2xl sm:text-3xl text-center font-bold mb-6 sm:mb-8">เพิ่มตัวชี้วัด</h1>
+                    <div class="banner rounded-2xl border border-slate-200 p-5 md:p-6 mb-6 sm:mb-8">
+                        <h1 class="text-2xl sm:text-3xl text-center font-bold">เพิ่มตัวชี้วัด</h1>
+                    </div>
 
                     <div class="space-y-6 sm:space-y-8">
                         {{-- Card 1: Basic --}}
