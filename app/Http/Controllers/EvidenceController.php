@@ -16,39 +16,42 @@ use Illuminate\Support\Facades\Log;
 
 class EvidenceController extends Controller
 {
-    /**
-     * Display a listing of the evidence.
-     */
     public function index(Request $request)
     {
-        // เริ่มต้น query
-        $query = Evidence::with(['criteria', 'user']);
+        // เริ่มต้น query + preload ความสัมพันธ์
+        $query = Evidence::with(['criteria.indicator', 'user']);
 
-        // กรองแบบใช้ filled() เพื่อกันค่าว่าง ''
+        // กรอง criteria_id
         if ($request->filled('criteria_id')) {
             $query->where('criteria_id', (int) $request->input('criteria_id'));
         }
 
+        // กรอง user_id
         if ($request->filled('user_id')) {
             $query->where('user_id', (int) $request->input('user_id'));
         }
 
-        // กรอง status ให้ชัดเจน: รับเฉพาะ '0' หรือ '1'
+        // กรอง status
         if ($request->has('status') && $request->input('status') !== '') {
-            // รองรับฟอร์มที่ส่ง '0' / '1' หรือ true/false
             $status = $request->input('status');
             if (in_array($status, ['0', '1', 0, 1, true, false], true)) {
                 $query->where('status', (int) $status);
             }
-            // ถ้าส่งค่าอื่นมา เช่น 'all' จะไม่ใส่ where
         }
 
-        // กรองตามประเภทไฟล์ (หากมี)
+        // กรอง type
         if ($request->filled('type')) {
             $query->where('type', $request->input('type'));
         }
 
-        // สร้างรายการประเภทไฟล์จาก query ที่ "กรองแล้ว" (ก่อน paginate) เพื่อให้ dropdown/ตัวเลือกไม่หลุด
+        // ✅ กรอง indicator
+        if ($request->filled('indicator_id')) {
+            $query->whereHas('criteria.indicator', function ($q) use ($request) {
+                $q->where('id', (int) $request->input('indicator_id'));
+            });
+        }
+
+        // 🔹 รายการประเภทไฟล์
         $fileTypes = (clone $query)
             ->select('type')
             ->whereNotNull('type')
@@ -56,26 +59,44 @@ class EvidenceController extends Controller
             ->orderBy('type')
             ->pluck('type');
 
-        // หน้าเพจ + คง query string เวลาคลิกเปลี่ยนหน้า
-        $perPage   = (int) $request->input('per_page', 15);
+        // 🔹 รายการผู้ใช้
+        $fileUsers = (clone $query)
+            ->join('users', 'evidence.user_id', '=', 'users.id')
+            ->select('users.name')
+            ->whereNotNull('users.name')
+            ->distinct()
+            ->orderBy('users.name')
+            ->pluck('users.name');
+
+        // 🔹 รายการตัวชี้วัด
+        $indicators = \App\Models\Indicator::select('code', 'name')
+            ->groupBy('code', 'name')
+            ->orderByRaw("split_part(code, '-', 1)")        // prefix เช่น NCS, NCP
+            ->orderByRaw("(split_part(code, '-', 2))::int") // เลขหลัง dash แปลงเป็น int
+            ->get();
+
+
+        // Pagination
+        $perPage   = (int) $request->input('per_page', 5000);
         $evidences = $query->paginate($perPage)->withQueryString();
+
+        // คำนวณ total_size
         $evidences->getCollection()->transform(function ($evidence) {
             $totalSize = 0;
-
             if (!empty($evidence->path['files'])) {
                 foreach ($evidence->path['files'] as $f) {
                     $totalSize += $f['size'] ?? 0;
                 }
             }
-
             $evidence->total_size = $totalSize;
             $evidence->total_size_human = $this->formatFileSize($totalSize);
-
             return $evidence;
         });
 
-        return view('evidences.app', compact('evidences', 'fileTypes'));
+        return view('evidences.app', compact('evidences', 'fileTypes', 'fileUsers', 'indicators'));
     }
+
+
 
     /**
      * Store a newly created evidence in storage.
@@ -104,7 +125,6 @@ class EvidenceController extends Controller
             'criterias' => $criterias,
         ]);
     }
-
     public function store(Request $request)
     {
         Log::info('=== EvidenceController@store ===', [
@@ -116,16 +136,28 @@ class EvidenceController extends Controller
             'files.*'           => 'nullable|file|mimes:pdf,jpg,jpeg,png,doc,docx|max:10240',
             'additional_urls'   => 'nullable|array',
             'additional_urls.*' => 'nullable|url|max:2048',
+            'url_names'         => 'nullable|array',
+            'url_names.*'       => 'nullable|string|max:255',
             'detail'            => 'nullable|string|max:65535',
         ]);
 
         try {
-            $urls = collect($request->input('additional_urls', []))
+            $urls     = collect($request->input('additional_urls', []));
+            $urlNames = collect($request->input('url_names', []));
+
+            // จับคู่ url + name
+            $urlEntries = $urls
                 ->filter(fn($u) => filled($u))
-                ->values();
+                ->values()
+                ->map(function ($url, $i) use ($urlNames) {
+                    return [
+                        'url'  => $url,
+                        'name' => $urlNames->get($i) ?: 'หลักฐาน URL',
+                    ];
+                });
 
             $hasFiles  = $request->hasFile('files');
-            $hasUrls   = $urls->isNotEmpty();
+            $hasUrls   = $urlEntries->isNotEmpty();
             $hasDetail = filled($request->input('detail'));
 
             Log::info('Evidence input check', [
@@ -140,99 +172,116 @@ class EvidenceController extends Controller
                 ]);
             }
 
-            // ✅ ใช้ criteria_id จาก form ดึง indicator โดยตรง
-            $criteria = Criteria::with('indicator')->findOrFail($request->criteria_id);
+            // ✅ chain: criteria -> indicator -> category -> standard
+            $criteria  = Criteria::with('indicator.category.standard')->findOrFail($request->criteria_id);
             $indicator = $criteria->indicator;
+            $category  = $indicator->category;
+            $standard  = $category->standard;
 
-            if (!$indicator) {
-                Log::error('Indicator not found for criteria', [
-                    'criteria_id' => $criteria->id,
-                ]);
-                return back()->withInput()->withErrors([
-                    'general' => 'ไม่พบตัวชี้วัดที่สอดคล้อง กรุณาตรวจสอบเกณฑ์',
+            if (!$indicator || !$category || !$standard) {
+                return back()->withErrors([
+                    'general' => 'กรุณาตรวจสอบว่าตัวชี้วัดนี้มีการผูกกับหมวดหมู่และมาตรฐานแล้ว',
                 ]);
             }
 
-            $year = $indicator->year;
-            $code = $indicator->code;
+            // ใช้ slug กันชื่อไทย/ช่องว่าง
+            $standardSegment = $this->safeFolderSegment($standard->name ?? '', 'standard-' . $standard->name);
+            $categorySegment = $this->safeFolderSegment($category->name ?? '', 'category-' . $category->name);
 
-            Log::info('Indicator resolved', [
-                'indicator_id' => $indicator->id,
-                'year'         => $year,
-                'code'         => $code,
+            $folder = implode('/', [
+                'evidences',
+                'year',
+                $indicator->year,
+                $standardSegment,
+                $categorySegment,
+                $indicator->code,
             ]);
 
-            $payload = [];
-            $uploadedFiles = [];
-            $evidenceName = null;
-            $evidenceType = null;
+            Log::info('Resolved folder path', [
+                'folder' => $folder,
+            ]);
 
+            $uploadedFiles = [];
+
+            // ========== 1) ถ้ามีไฟล์ → loop แล้วบันทึกเป็นหลาย record ==========
             if ($hasFiles) {
-                foreach ($request->file('files') as $index => $file) {
+                foreach ($request->file('files') as $file) {
                     $originalName = $file->getClientOriginalName();
                     $extension    = strtolower($file->getClientOriginalExtension());
                     $filename     = uniqid() . '_' . Str::random(10) . '.' . $extension;
 
-                    $folder = "evidences/year/{$year}/{$code}";
-                    $path   = $file->storeAs($folder, $filename, 'public');
+                    $path = $file->storeAs($folder, $filename, 'public');
 
-                    $uploadedFiles[] = [
-                        'original_name' => $originalName,
-                        'stored_name'   => $filename,
-                        'path'          => $path,
-                        'size'          => $file->getSize(),
-                        'mime_type'     => $file->getMimeType(),
-                        'icon'          => $this->getFileTypeIcon($file->getMimeType()),
-                        'size_human'    => $this->formatFileSize($file->getSize()),
+                    $payload = [
+                        'files' => [[
+                            'original_name' => $originalName,
+                            'stored_name'   => $filename,
+                            'path'          => $path,
+                            'size'          => $file->getSize(),
+                            'mime_type'     => $file->getMimeType(),
+                            'icon'          => $this->getFileTypeIcon($file->getMimeType()),
+                            'size_human'    => $this->formatFileSize($file->getSize()),
+                        ]]
                     ];
 
-                    // ✅ ใช้ไฟล์แรกตั้ง name/type ของ evidence
-                    if ($index === 0) {
-                        $evidenceName = $originalName;
-                        $evidenceType = $extension;
-                    }
+                    $evidence = new Evidence();
+                    $evidence->path        = $payload;
+                    $evidence->detail      = null; // detail แยกไป record URL
+                    $evidence->status      = true;
+                    $evidence->criteria_id = $criteria->id;
+                    $evidence->user_id     = auth()->id();
+                    $evidence->name        = $originalName;
+                    $evidence->type        = $extension;
+                    $evidence->save();
+
+                    Log::info('Evidence saved (file)', [
+                        'evidence_id' => $evidence->id,
+                        'name'        => $evidence->name,
+                        'type'        => $evidence->type,
+                    ]);
                 }
-                $payload['files'] = $uploadedFiles;
-
-                Log::info('Files uploaded', [
-                    'count' => count($uploadedFiles),
-                ]);
             }
 
+            // ========== 2) ถ้ามี URL → บันทึกเป็น record แยกตามแต่ละ URL ==========
             if ($hasUrls) {
-                $payload['urls'] = $urls->all();
-                Log::info('URLs added', [
-                    'urls' => $urls->all(),
+                foreach ($urlEntries as $entry) {
+                    $payload = ['urls' => [$entry['url']]];
+
+                    $evidence = new Evidence();
+                    $evidence->path        = $payload;
+                    $evidence->detail      = $request->input('detail'); // แชร์ detail ได้
+                    $evidence->status      = true;
+                    $evidence->criteria_id = $criteria->id;
+                    $evidence->user_id     = auth()->id();
+                    $evidence->name        = $entry['name'];
+                    $evidence->type        = "url";
+                    $evidence->save();
+
+                    Log::info('Evidence saved (url)', [
+                        'evidence_id' => $evidence->id,
+                        'name'        => $evidence->name,
+                        'url'         => $entry['url'],
+                    ]);
+                }
+            }
+
+            // ========== 3) ถ้ามีแค่ Detail (ไม่มี URL) → บันทึกเป็น note ==========
+            if (!$hasUrls && $hasDetail) {
+                $evidence = new Evidence();
+                $evidence->path        = [];
+                $evidence->detail      = $request->input('detail');
+                $evidence->status      = true;
+                $evidence->criteria_id = $criteria->id;
+                $evidence->user_id     = auth()->id();
+                $evidence->name        = "รายละเอียดเพิ่มเติม";
+                $evidence->type        = "note";
+                $evidence->save();
+
+                Log::info('Evidence saved (note)', [
+                    'evidence_id' => $evidence->id,
+                    'name'        => $evidence->name,
                 ]);
             }
-
-            $evidence = new Evidence();
-            $evidence->path        = $payload;
-            $evidence->detail      = $request->input('detail');
-            $evidence->status      = true;
-            $evidence->criteria_id = $criteria->id;
-            $evidence->user_id     = auth()->id();
-
-            // ✅ กำหนดชื่อ/ประเภทจากข้อมูลจริง
-            if ($hasFiles) {
-                $evidence->name = $evidenceName ?? 'ไม่ทราบชื่อไฟล์';
-                $evidence->type = $evidenceType ?? 'unknown';
-            } elseif ($hasUrls) {
-                $evidence->name = "หลักฐาน URL";
-                $evidence->type = "url";
-            } else {
-                $evidence->name = "รายละเอียดเพิ่มเติม";
-                $evidence->type = "note";
-            }
-
-            $evidence->save();
-
-            Log::info('Evidence saved', [
-                'evidence_id' => $evidence->id,
-                'criteria_id' => $evidence->criteria_id,
-                'name'        => $evidence->name,
-                'type'        => $evidence->type,
-            ]);
 
             return redirect()->route('evidences.index')
                 ->with('success', 'บันทึกหลักฐานเรียบร้อยแล้ว');
@@ -240,6 +289,7 @@ class EvidenceController extends Controller
             Log::error('Evidence store error', [
                 'exception' => $e->getMessage(),
             ]);
+            // rollback ลบไฟล์ที่อัปโหลดแล้วถ้าเกิด error
             if (!empty($uploadedFiles)) {
                 foreach ($uploadedFiles as $f) {
                     Storage::disk('public')->delete($f['path'] ?? null);
@@ -250,6 +300,183 @@ class EvidenceController extends Controller
             ]);
         }
     }
+
+
+
+    // public function store(Request $request)
+    // {
+    //     Log::info('=== EvidenceController@store ===', [
+    //         'criteria_id' => $request->input('criteria_id'),
+    //     ]);
+
+    //     $request->validate([
+    //         'criteria_id'       => 'required|integer|exists:criterias,id',
+    //         'files.*'           => 'nullable|file|mimes:pdf,jpg,jpeg,png,doc,docx|max:10240',
+    //         'additional_urls'   => 'nullable|array',
+    //         'additional_urls.*' => 'nullable|url|max:2048',
+    //         'detail'            => 'nullable|string|max:65535',
+    //     ]);
+
+    //     try {
+    //         $urls = collect($request->input('additional_urls', []))
+    //             ->filter(fn($u) => filled($u))
+    //             ->values();
+
+    //         $hasFiles  = $request->hasFile('files');
+    //         $hasUrls   = $urls->isNotEmpty();
+    //         $hasDetail = filled($request->input('detail'));
+
+    //         Log::info('Evidence input check', [
+    //             'hasFiles'  => $hasFiles,
+    //             'hasUrls'   => $hasUrls,
+    //             'hasDetail' => $hasDetail,
+    //         ]);
+
+    //         if (!$hasFiles && !$hasUrls && !$hasDetail) {
+    //             return back()->withInput()->withErrors([
+    //                 'general' => 'กรุณาระบุข้อมูลอย่างน้อย 1 รายการ (ไฟล์, URL หรือรายละเอียด)',
+    //             ]);
+    //         }
+
+    //         // ✅ ดึงข้อมูล chain: criteria -> indicator -> category -> standard
+    //         $criteria  = Criteria::with('indicator.category.standard')->findOrFail($request->criteria_id);
+    //         $indicator = $criteria->indicator;
+    //         $category  = $indicator->category;
+    //         $standard  = $category->standard;
+
+    //         if (!$indicator || !$category || !$standard) {
+    //             Log::error('Missing relation', [
+    //                 'criteria_id' => $criteria->id,
+    //                 'indicator'   => $indicator?->id,
+    //                 'category'    => $category?->id,
+    //                 'standard'    => $standard?->id,
+    //             ]);
+    //             return back()->withInput()->withErrors([
+    //                 'general' => 'ไม่พบความสัมพันธ์ตัวชี้วัด/หมวด/มาตรฐาน กรุณาตรวจสอบข้อมูล',
+    //             ]);
+    //         }
+    //         if (!$category || !$standard) {
+    //             Log::error('Missing category or standard for indicator', [
+    //                 'indicator_id' => $indicator->id,
+    //                 'category'     => $category,
+    //                 'standard'     => $standard,
+    //             ]);
+
+    //             return back()->withInput()->withErrors([
+    //                 'general' => 'ตัวชี้วัดนี้ยังไม่ได้ผูกกับหมวดหมู่หรือมาตรฐาน กรุณาตรวจสอบข้อมูลก่อนเพิ่มหลักฐาน',
+    //             ]);
+    //         }
+
+    //         $criteria  = Criteria::with('indicator.category.standard')->findOrFail($request->criteria_id);
+    //         $indicator = $criteria->indicator;
+    //         $category  = $indicator->category;
+    //         $standard  = $category->standard;
+
+    //         // กัน null
+    //         if (!$indicator || !$category || !$standard) {
+    //             return back()->withErrors([
+    //                 'general' => 'กรุณาตรวจสอบว่าตัวชี้วัดนี้มีการผูกกับหมวดหมู่และมาตรฐานแล้ว',
+    //             ]);
+    //         }
+
+    //         // ใช้ slug กันชื่อไทย/ช่องว่าง
+    //         $standardSegment = $this->safeFolderSegment($standard->name ?? '', 'standard-' . $standard->name);
+    //         $categorySegment = $this->safeFolderSegment($category->name ?? '', 'category-' . $category->name);
+
+    //         $folder = implode('/', [
+    //             'evidences',
+    //             'year',
+    //             $indicator->year,
+    //             $standardSegment,
+    //             $categorySegment,
+    //             $indicator->code,
+    //         ]);
+
+    //         Log::info('Resolved folder path', [
+    //             'folder' => $folder,
+    //         ]);
+
+    //         $payload = [];
+    //         $uploadedFiles = [];
+    //         $evidenceName = null;
+    //         $evidenceType = null;
+
+    //         if ($hasFiles) {
+    //             foreach ($request->file('files') as $index => $file) {
+    //                 $originalName = $file->getClientOriginalName();
+    //                 $extension    = strtolower($file->getClientOriginalExtension());
+    //                 $filename     = uniqid() . '_' . Str::random(10) . '.' . $extension;
+
+    //                 $path = $file->storeAs($folder, $filename, 'public');
+
+    //                 $uploadedFiles[] = [
+    //                     'original_name' => $originalName,
+    //                     'stored_name'   => $filename,
+    //                     'path'          => $path,
+    //                     'size'          => $file->getSize(),
+    //                     'mime_type'     => $file->getMimeType(),
+    //                     'icon'          => $this->getFileTypeIcon($file->getMimeType()),
+    //                     'size_human'    => $this->formatFileSize($file->getSize()),
+    //                 ];
+
+    //                 // ✅ ใช้ไฟล์แรกตั้งชื่อและประเภท
+    //                 if ($index === 0) {
+    //                     $evidenceName = $originalName;
+    //                     $evidenceType = $extension;
+    //                 }
+    //             }
+    //             $payload['files'] = $uploadedFiles;
+    //         }
+
+    //         if ($hasUrls) {
+    //             $payload['urls'] = $urls->all();
+    //         }
+
+    //         $evidence = new Evidence();
+    //         $evidence->path        = $payload;
+    //         $evidence->detail      = $request->input('detail');
+    //         $evidence->status      = true;
+    //         $evidence->criteria_id = $criteria->id;
+    //         $evidence->user_id     = auth()->id();
+
+    //         // ✅ ตั้งชื่อและประเภท
+    //         if ($hasFiles) {
+    //             $evidence->name = $evidenceName ?? 'ไม่ทราบชื่อไฟล์';
+    //             $evidence->type = $evidenceType ?? 'unknown';
+    //         } elseif ($hasUrls) {
+    //             $evidence->name = "หลักฐาน URL";
+    //             $evidence->type = "url";
+    //         } else {
+    //             $evidence->name = "รายละเอียดเพิ่มเติม";
+    //             $evidence->type = "note";
+    //         }
+
+    //         $evidence->save();
+
+    //         Log::info('Evidence saved', [
+    //             'evidence_id' => $evidence->id,
+    //             'criteria_id' => $evidence->criteria_id,
+    //             'name'        => $evidence->name,
+    //             'type'        => $evidence->type,
+    //             'folder'      => $folder,
+    //         ]);
+
+    //         return redirect()->route('evidences.index')
+    //             ->with('success', 'บันทึกหลักฐานเรียบร้อยแล้ว');
+    //     } catch (\Throwable $e) {
+    //         Log::error('Evidence store error', [
+    //             'exception' => $e->getMessage(),
+    //         ]);
+    //         if (!empty($uploadedFiles)) {
+    //             foreach ($uploadedFiles as $f) {
+    //                 Storage::disk('public')->delete($f['path'] ?? null);
+    //             }
+    //         }
+    //         return back()->withInput()->withErrors([
+    //             'general' => 'เกิดข้อผิดพลาดในการบันทึกข้อมูล กรุณาลองใหม่อีกครั้ง',
+    //         ]);
+    //     }
+    // }
 
     /**
      * คืน icon type ตาม MIME type
@@ -269,6 +496,20 @@ class EvidenceController extends Controller
             default:
                 return 'file';
         }
+    }
+
+    /**
+     * Build a filesystem-safe slug for folder names with a reliable fallback.
+     */
+    private function safeFolderSegment(?string $text, string $fallback): string
+    {
+        $base = (string) ($text ?? '');
+        $slug = trim(Str::slug($base, '-'));
+        if ($slug === '' || $slug === '-') {
+            return $fallback;
+        }
+        // Collapse duplicate separators just in case
+        return preg_replace('/-+/', '-', $slug);
     }
 
     /**

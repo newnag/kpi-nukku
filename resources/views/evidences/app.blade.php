@@ -63,26 +63,79 @@
 
                 <div id="filter-dropdown" class="dropdown-menu hidden">
                     <div style="padding:12px 12px;">
+
+                        {{-- Section: ประเภทไฟล์ --}}
                         <h3 class="dropdown-title">ประเภทไฟล์</h3>
-                        <div id="type-options" style="display:grid; gap:8px;">
-                            @foreach ($fileTypes as $type)
-                                <label style="display:inline-flex; align-items:center;">
-                                    <input type="checkbox" class="filter-option" data-column="3"
-                                        data-value="{{ $type }}">
-                                    <span style="margin-left:8px; font-size:14px; color:#374151;">{{ $type }}</span>
-                                </label>
-                            @endforeach
+                        <div class="dropdown-multiselect" id="typeDropdown">
+                            <div class="dropdown-btn" onclick="toggleDropdown('typeDropdown')">
+                                <span id="type-label">เลือกประเภทไฟล์</span>
+                                <i style="font-size:12px;">▼</i>
+                            </div>
+                            <div class="dropdown-content">
+                                @foreach ($fileTypes as $type)
+                                    <label style="display:flex; align-items:center; margin-bottom:4px;">
+                                        <input type="checkbox" class="filter-option type-option" data-column="3"
+                                            data-value="{{ $type }}">
+                                        <span
+                                            style="margin-left:6px; font-size:14px; color:#374151;">{{ $type }}</span>
+                                    </label>
+                                @endforeach
+                            </div>
                         </div>
 
                         <div class="dropdown-divider"></div>
 
+                        {{-- Section: ผู้ใช้งาน --}}
+                        <h3 class="dropdown-title">ผู้ใช้งาน</h3>
+                        <div class="dropdown-multiselect" id="userDropdown">
+                            <div class="dropdown-btn" onclick="toggleDropdown('userDropdown')">
+                                <span id="user-label">เลือกผู้ใช้งาน</span>
+                                <i style="font-size:12px;">▼</i>
+                            </div>
+                            <div class="dropdown-content">
+                                @foreach ($fileUsers as $user)
+                                    <label style="display:flex; align-items:center; margin-bottom:4px;">
+                                        <input type="checkbox" class="filter-option user-option" data-column="5"
+                                            data-value="{{ $user }}">
+                                        <span
+                                            style="margin-left:6px; font-size:14px; color:#374151;">{{ $user }}</span>
+                                    </label>
+                                @endforeach
+                            </div>
+                        </div>
+
+                        <div class="dropdown-divider"></div>
+
+                        <h3 class="dropdown-title">ตัวชี้วัด</h3>
+                        <div class="dropdown-multiselect" id="indicatorDropdown">
+                            <div class="dropdown-btn" onclick="toggleDropdown('indicatorDropdown')">
+                                <span id="indicator-label">เลือกตัวชี้วัด</span>
+                                <i style="font-size:12px;">▼</i>
+                            </div>
+                            <div class="dropdown-content">
+                                @foreach ($indicators as $ind)
+                                    <label style="display:flex; align-items:center; margin-bottom:4px;">
+                                        <input type="checkbox" class="filter-option indicator-option" data-column="6"
+                                            data-value="{{ $ind->code }}">
+                                        <span style="margin-left:6px; font-size:14px; color:#374151;">
+                                            {{ $ind->code }}
+                                            {{-- {{ $ind->code }} - {{ $ind->name }} --}}
+                                        </span>
+                                    </label>
+                                @endforeach
+                            </div>
+                        </div>
+                        <div class="dropdown-divider"></div>
+                        {{-- Buttons --}}
                         <div style="display:flex; justify-content:space-between; gap:12px;">
                             <button id="clear-filters" class="btn" style="padding:6px 10px;">ล้างตัวกรอง</button>
-                            <button id="apply-filters" class="btn btn-primary" style="padding:6px 10px;">ใช้ตัวกรอง</button>
+                            <button id="apply-filters" class="btn btn-primary"
+                                style="padding:6px 10px;">ใช้ตัวกรอง</button>
                         </div>
                     </div>
                 </div>
             </div>
+
         </div>
 
         <!-- ตารางเอกสารและหลักฐาน -->
@@ -96,6 +149,9 @@
                             <th>ขนาดไฟล์</th>
                             <th>ประเภทไฟล์</th>
                             <th>วันที่อัปโหลด</th>
+                            <th>ชื่อผู้อัปโหลด</th>
+                            <th>ตัวชี้วัด</th>
+
                             <th>จัดการ</th>
                         </tr>
                     </thead>
@@ -108,42 +164,63 @@
                                         <div class="file-icon">
                                             @if (str_ends_with($evidence->type, 'pdf'))
                                                 <i data-lucide="file-text" style="color:#dc2626;"></i>
-                                            @elseif(str_ends_with($evidence->type, 'docx') || str_ends_with($evidence->type, '.docx'))
+                                            @elseif (str_ends_with($evidence->type, 'docx') || str_ends_with($evidence->type, '.docx'))
                                                 <i data-lucide="file-text" style="color:#2563eb;"></i>
-                                            @elseif(str_ends_with($evidence->type, 'pptx') || str_ends_with($evidence->type, '.pptx'))
+                                            @elseif (str_ends_with($evidence->type, 'pptx') || str_ends_with($evidence->type, '.pptx'))
                                                 <i data-lucide="file-text" style="color:#eb7e25;"></i>
-                                            @elseif(str_ends_with($evidence->type, 'image') ||
+                                            @elseif (str_ends_with($evidence->type, 'image') ||
                                                     str_ends_with($evidence->type, 'jpg') ||
                                                     str_ends_with($evidence->type, 'png') ||
                                                     str_ends_with($evidence->type, 'jpeg'))
                                                 <i data-lucide="image" style="color:#16a34a;"></i>
-                                            @elseif(str_ends_with($evidence->type, 'excel') || str_ends_with($evidence->name, '.xls'))
+                                            @elseif (str_ends_with($evidence->type, 'excel') || str_ends_with($evidence->name, '.xls'))
                                                 <i data-lucide="file-spreadsheet" style="color:#059669;"></i>
+                                            @elseif ($evidence->type === 'url')
+                                                <i data-lucide="link" style="color:#9333ea;"></i>
                                             @else
                                                 <i data-lucide="file" style="color:#6b7280;"></i>
                                             @endif
                                         </div>
+
                                         <div class="file-details">
                                             <div class="file-name">{{ $evidence->name }}</div>
                                             @if ($evidence->detail)
-                                                <div class="file-description">{{ Str::limit($evidence->detail, 50) }}</div>
+                                                <div class="file-description">
+                                                    {{ Str::limit(strip_tags($evidence->detail), 50) }}</div>
                                             @endif
                                         </div>
+
                                     </div>
                                 </td>
-                                 <td>{{ $evidence->total_size_human ?? '-' }}</td>
+                                <td>{{ $evidence->total_size_human ?? '-' }}</td>
                                 <td data-search="{{ $evidence->type }}">{{ $evidence->type }}</td>
                                 <td data-order="{{ optional($evidence->created_at)->timestamp }}">
                                     {{ $evidence->created_at ? $evidence->created_at->format('M d, Y') : 'Dec 13, 2022' }}
                                 </td>
+                                <td data-search="{{ optional($evidence->user)->name ?? '' }}">
+                                    {{ $evidence->user->name ?? '-' }}
+                                </td>
+                                <td data-search="{{ optional($evidence->criteria->indicator)->code ?? '' }}">
+                                    {{ optional($evidence->criteria->indicator)->name ?? '-' }}
+                                </td>
 
                                 <td>
                                     <div class="evidence-actions">
-                                        <button class="btn-download"
-                                            onclick="window.location.href='{{ route('evidences.download', $evidence->id) }}'"
-                                            title="ดาวน์โหลด">
-                                            <i data-lucide="download" style="margin-right:4px;"></i> ดาวน์โหลด
-                                        </button>
+                                        @if ($evidence->type === 'url' && !empty($evidence->path['urls'][0]))
+                                            <button type="button" class="btn-link" style="width: 110px;"
+                                                onclick="window.open('{{ $evidence->path['urls'][0] }}', '_blank')"
+                                                title="เปิดลิงก์">
+                                                <i data-lucide="external-link" style="margin-right:4px;"></i> เปิดลิงก์
+                                            </button>
+                                        @else
+                                            <button type="button" class="btn-download"
+                                                onclick="window.location.href='{{ route('evidences.download', $evidence->id) }}'"
+                                                title="ดาวน์โหลด">
+                                                <i data-lucide="download" style="margin-right:4px;"></i> ดาวน์โหลด
+                                            </button>
+                                        @endif
+
+
                                     </div>
                                 </td>
                             </tr>
@@ -295,14 +372,76 @@
             // ล้างตัวกรอง
             $('#clear-filters').on('click', function(e) {
                 e.preventDefault();
+
                 $('.filter-option').prop('checked', false);
                 activeFilters = {};
                 $('#filter-button span').text('กรองข้อมูล');
+
+                // reset label ทั้ง 2 dropdown
+                $('#type-label').text('เลือกประเภทไฟล์');
+                $('#user-label').text('เลือกผู้ใช้งาน');
+                $('#indicator-label').text('เลือกตัวชี้วัด');
+
                 table.columns().search('').draw();
             });
+
+
         });
     </script>
+    <script>
+        function toggleDropdown(id) {
+            document.querySelectorAll('.dropdown-multiselect').forEach(el => {
+                if (el.id !== id) el.classList.remove("open");
+            });
+            document.getElementById(id).classList.toggle("open");
+        }
 
+        // อัปเดต label เมื่อเลือก
+        function setupDropdownLabel(dropdownId, labelId) {
+            const checkboxes = document.querySelectorAll(`#${dropdownId} .filter-option`);
+            const label = document.getElementById(labelId);
+
+            checkboxes.forEach(cb => {
+                cb.addEventListener('change', () => {
+                    const selected = Array.from(checkboxes)
+                        .filter(x => x.checked)
+                        .map(x => x.getAttribute('data-value'));
+
+                    label.textContent = selected.length ?
+                        selected.join(', ') :
+                        (dropdownId === 'typeDropdown' ?
+                            'เลือกประเภทไฟล์' :
+                            (dropdownId === 'userDropdown' ?
+                                'เลือกผู้ใช้งาน' :
+                                'เลือกตัวชี้วัด'));
+                });
+            });
+        }
+
+        setupDropdownLabel('typeDropdown', 'type-label');
+        setupDropdownLabel('userDropdown', 'user-label');
+        setupDropdownLabel('indicatorDropdown', 'indicator-label');
+
+        // checkboxes.forEach(cb => {
+        //     cb.addEventListener('change', () => {
+        //         const selected = Array.from(checkboxes)
+        //             .filter(x => x.checked)
+        //             .map(x => x.getAttribute('data-value'));
+
+        //         label.textContent = selected.length ?
+        //             selected.join(', ') :
+        //             'เลือกประเภทไฟล์';
+        //     });
+        // });
+
+        // ปิด dropdown ถ้าคลิกข้างนอก
+        document.addEventListener('click', function(e) {
+            const dropdown = document.getElementById("typeDropdown");
+            if (!dropdown.contains(e.target)) {
+                dropdown.classList.remove("open");
+            }
+        });
+    </script>
     <script>
         lucide.createIcons();
     </script>
@@ -564,6 +703,7 @@
         }
 
         .btn-download,
+        .btn-link,
         .btn-edit,
         .btn-delete {
             text-decoration: none;
@@ -577,6 +717,15 @@
             cursor: pointer;
             font-size: 12px;
             white-space: nowrap;
+        }
+
+        .btn-link {
+            color: #398ECA;
+            border-color: #398ECA;
+        }
+
+        .btn-link:hover {
+            background: #ecfdf5;
         }
 
         .btn-download {
@@ -651,6 +800,45 @@
         i[data-lucide] {
             display: inline-block;
             vertical-align: middle;
+        }
+
+        .dropdown-multiselect {
+            position: relative;
+            display: inline-block;
+            width: 220px;
+        }
+
+        .dropdown-multiselect .dropdown-btn {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            padding: 6px 10px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            background: #fff;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .dropdown-multiselect .dropdown-content {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: 100%;
+            max-height: 220px;
+            overflow-y: auto;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            background: #fff;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+            z-index: 20;
+            padding: 8px;
+        }
+
+        .dropdown-multiselect.open .dropdown-content {
+            display: block;
         }
     </style>
 

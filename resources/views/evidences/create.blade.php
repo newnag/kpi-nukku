@@ -59,6 +59,8 @@
 
                         {{-- แถวสุดท้าย: ว่าง + ปุ่มเพิ่ม (แก้ได้เพียงช่องเดียวในหน้า) --}}
                         <div class="form-group url-row">
+                            <input type="text" name="url_names[]" class="form-input url-name"
+                                placeholder="ชื่อหลักฐาน URL">
                             <input type="url" name="additional_urls[]" class="form-input url-input"
                                 placeholder="วาง URL เพิ่มเติม">
                             <button type="button" class="add-url-btn" aria-label="เพิ่ม URL">
@@ -73,8 +75,8 @@
 
                         {{-- ใช้ Trumbowyg บน textarea นี้ --}}
                         <textarea id="detailEditor" name="detail" rows="6">
-              {!! old('detail') !!}
-                  </textarea>
+                         {!! old('detail') !!}
+                         </textarea>
                     </div>
                     <!-- ================= Action Buttons ================= -->
                     <div class="action-buttons">
