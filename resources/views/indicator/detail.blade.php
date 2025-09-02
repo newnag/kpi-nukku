@@ -14,7 +14,7 @@
 @section('content')
     @php
         // --- Normalize input (works with: ['data'=>...] JSON, or $indicator model/array) ---
-        $ind = ($data['data'] ?? $data ?? ($indicator ?? null));
+        $ind = $data['data'] ?? ($data ?? ($indicator ?? null));
 
         // helper (works for array|object)
         $dg = fn($key, $default = null) => data_get($ind, $key, $default);
@@ -56,17 +56,59 @@
         // Distinct departments (from API's departments array)
 $departments = collect($dg('departments', []))->pluck('name')->unique()->values()->all();
 
-// Checklist rules (required_items -> names, + score)
+// ---------- Checklist ----------
 $checklist = collect($dg('checklistItems', []))
-    ->map(function ($item) use ($seqToName) {
-        $req = collect(data_get($item, 'required_items', []))->values();
-        $label = $req->map(fn($i) => $seqToName[$i] ?? "ข้อ {$i}")->implode(', ');
+    ->map(function ($it) use ($seqToName) {
+        $label = collect(data_get($it, 'required_items', []))
+            ->map(fn($i) => $seqToName[$i] ?? "ข้อ {$i}")
+            ->implode(', ');
         return [
-            'label' => $label ?: '-',
-            'score' => data_get($item, 'score', 0),
-                ];
-            })
-            ->values();
+            'label' => $label,
+            'score' => (float) data_get($it, 'score', 0),
+        ];
+    })
+    ->reject(fn($r) => ($r['label'] === '' || $r['label'] === '-') && $r['score'] <= 0)
+    ->values();
+
+// ---------- Variable & Formula ----------
+$vf = (array) $dg('variable_formula', []);
+
+// variables อนุญาตทั้งสตริง หรืออ็อบเจ็กต์ {variable_name, type, value}
+$variablesVF = collect(data_get($vf, 'variables', []))
+    ->map(function ($v) {
+        
+        $var = data_get($v, 'variable_name');
+        $type = data_get($v, 'type');
+        $value = data_get($v, 'value', null);
+
+        return [
+            'var' => trim((string) $var),
+            'type' => trim((string) $type),
+            'value' => $value,
+        ];
+    })
+    // ->reject(fn($r) => $r['var'] === '' && $r['type'] === '' && is_null($r['value']))
+    ->values();
+
+// formulas อนุญาตทั้งสตริง หรืออ็อบเจ็กต์ {condition} / {expression}
+$formulasVF = collect(data_get($vf, 'formulas', []))
+    ->map(function ($f) {
+        $raw = is_string($f) ? $f : data_get($f, 'condition') ?? data_get($f, 'expression', '');
+        return trim((string) $raw);
+    })
+    ->filter()
+    ->values();
+
+// flags
+$hasVFVars = $variablesVF->isNotEmpty();
+$hasVFFx = $formulasVF->isNotEmpty();
+$hasChecklist = $checklist->isNotEmpty();
+
+// โชว์ตามโหมด (และซ่อนส่วนว่างอัตโนมัติ)
+$showVFSection = $type === 'variable_formula' || ($type !== 'checklist' && ($hasVFVars || $hasVFFx));
+$showChecklistSection = $type === 'checklist' || ($type !== 'variable_formula' && $hasChecklist);
+    @endphp
+
     @endphp
 
     <div class="w-full px-4 sm:px-6 lg:px-8">
@@ -86,17 +128,16 @@ $checklist = collect($dg('checklistItems', []))
                                 <div class="text-xs text-slate-500">ปีการประเมิน</div>
                                 <div class="font-medium">{{ $year ?: '-' }}</div>
                             </div>
-                            <div>
-                                <div class="text-xs text-slate-500">คะแนนตัวชี้วัด</div>
-                                <div class="font-medium">{{ $maxScore !== null ? number_format((float) $maxScore, 2) : '-' }}
-                                </div>
-                            </div>
-
                             <div class="lg:col-span-2">
                                 <div class="text-xs text-slate-500">ชื่อตัวชี้วัด</div>
                                 <div class="font-medium">{{ $name ?: '-' }}</div>
                             </div>
-
+                            <div>
+                                <div class="text-xs text-slate-500">คะแนนตัวชี้วัด</div>
+                                <div class="font-medium">
+                                    {{ $maxScore !== null ? number_format((float) $maxScore, 2) : '-' }}
+                                </div>
+                            </div>
                             <div>
                                 <div class="text-xs text-slate-500">รหัสตัวชี้วัด</div>
                                 <div class="font-medium">{{ $code ?: '-' }}</div>
@@ -105,17 +146,15 @@ $checklist = collect($dg('checklistItems', []))
                                 <div class="text-xs text-slate-500">มาตรฐานตัวชี้วัด</div>
                                 <div class="font-medium">{{ $standardName }}</div>
                             </div>
-
+                            <div>
+                                <div class="text-xs text-slate-500">ด้านตัวชี้วัด</div>
+                                <div class="font-medium">{{ $categoryName }}</div>
+                            </div>
                             <div>
                                 <div class="text-xs text-slate-500">ประเภทตัวชี้วัด</div>
                                 <div class="font-medium">{{ $type ?: '-' }}</div>
                             </div>
                             <div>
-                                <div class="text-xs text-slate-500">ด้านตัวชี้วัด</div>
-                                <div class="font-medium">{{ $categoryName }}</div>
-                            </div>
-
-                            <div class="lg:col-span-2">
                                 <div class="text-xs text-slate-500">วันสิ้นสุดการประเมิน</div>
                                 <div class="font-medium">{{ $deadlineDisplay }}</div>
                             </div>
@@ -128,13 +167,29 @@ $checklist = collect($dg('checklistItems', []))
                             <div>
                                 <div class="text-xs text-slate-500">หน่วยงานที่รับผิดชอบ</div>
                                 <div class="font-medium">
-                                    {{ count($departments) ? implode(', ', $departments) : '-' }}
+                                    @if (count($departments))
+                                        <ol class="list-decimal list-inside space-y-1">
+                                            @foreach ($departments as $department)
+                                                <li>{{ $department }}</li>
+                                            @endforeach
+                                        </ol>
+                                    @else
+                                        -
+                                    @endif
                                 </div>
                             </div>
                             <div>
                                 <div class="text-xs text-slate-500">ผู้รับผิดชอบในการรวบรวมข้อมูล</div>
                                 <div class="font-medium">
-                                    {{ count($collectors) ? implode(', ', $collectors) : '-' }}
+                                    @if (count($collectors))
+                                        <ol class="list-decimal list-inside space-y-1">
+                                            @foreach ($collectors as $collector)
+                                                <li>{{ $collector }}</li>
+                                            @endforeach
+                                        </ol>
+                                    @else
+                                        -
+                                    @endif
                                 </div>
                             </div>
                         </div>
@@ -160,28 +215,80 @@ $checklist = collect($dg('checklistItems', []))
                         @endif
                     </x-card>
 
-                    {{-- Card 5: Scoring (comment richtext + checklist rules) --}}
+                    {{-- Card 5: Scoring (comment richtext + variable/formula + checklist rules) --}}
                     <x-card number="5" title="เกณฑ์การให้คะแนน" class="space-y-4">
-                        {{-- คำอธิบายเกณฑ์ให้คะแนน (richtext from "comment") --}}
+
+                        {{-- คำอธิบายเกณฑ์ให้คะแนน --}}
                         <div class="prose max-w-none text-slate-800">
                             {!! $comment ?: '<span class="text-slate-400">ไม่มีคำอธิบายเกณฑ์</span>' !!}
                         </div>
 
-                        {{-- กติกาคะแนนแบบเช็กลิสต์ (required_items -> score) --}}
-                        <div class="space-y-2">
-                            <div class="text-sm font-medium text-slate-700">เกณฑ์ให้คะแนนแบบเช็กลิสต์</div>
-                            @if ($checklist->count())
-                                <ul class="list-disc pl-5 text-slate-800">
+                        {{-- ตัวแปร/สูตร --}}
+                        @if ($showVFSection && ($hasVFVars || $hasVFFx))
+                            <div class="space-y-3">
+                                <div class="text-sm font-medium text-slate-700">ตัวแปรและสูตรคำนวณ</div>
+
+                                {{-- Variables --}}
+                                @if ($hasVFVars)
+                                    <div class="overflow-x-auto">
+                                        <table
+                                            class="min-w-full text-sm text-slate-800 border border-slate-200 rounded-xl overflow-hidden">
+                                            <thead class="bg-slate-50">
+                                                <tr>
+                                                    <th class="px-3 py-2 text-left font-semibold border-b border-slate-200">
+                                                        ตัวแปร</th>
+                                                    <th class="px-3 py-2 text-left font-semibold border-b border-slate-200">
+                                                        ประเภท</th>
+                                                    <th class="px-3 py-2 text-left font-semibold border-b border-slate-200">
+                                                        ค่าเริ่มต้น</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach ($variablesVF as $v)
+                                                    <tr class="odd:bg-white even:bg-slate-50">
+                                                        <td class="px-3 py-2 font-medium">{{ $v['var'] ?: '-' }}</td>
+                                                        <td class="px-3 py-2">{{ $v['type'] ?: '-' }}</td>
+                                                        <td class="px-3 py-2">
+                                                            {{ is_null($v['value']) ? '-' : (is_bool($v['value']) ? ($v['value'] ? 'true' : 'false') : $v['value']) }}
+                                                        </td>
+                                                    </tr>
+                                                @endforeach
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                @endif
+
+                                {{-- Formulas --}}
+                                @if ($hasVFFx)
+                                    <div>
+                                        <div class="text-xs text-slate-500 mb-1">สูตร/เงื่อนไข</div>
+                                        @foreach ($formulasVF as $fx)
+                                            <pre class="whitespace-pre-wrap bg-slate-50 rounded px-2 py-1 border border-slate-200">{{ $fx }}</pre>
+                                        @endforeach
+                                        </ol>
+                                    </div>
+                                @endif
+                            </div>
+                        @endif
+
+                        {{-- เช็กลิสต์ --}}
+                        @if ($showChecklistSection && $hasChecklist)
+                            <div class="space-y-2">
+                                <div class="text-sm font-medium text-slate-700">เกณฑ์ให้คะแนนแบบเช็กลิสต์</div>
+                                <ul class="list-disc pl-5 space-y-1 text-slate-800">
                                     @foreach ($checklist as $r)
-                                        <li>ต้องมี: {{ $r['label'] }} = {{ number_format((float) $r['score'], 2) }} คะแนน
-                                        </li>
+                                        <li>{{ $r['label'] }} = {{ number_format($r['score'], 2) }} คะแนน</li>
                                     @endforeach
                                 </ul>
-                            @else
-                                <div class="text-slate-400">-</div>
-                            @endif
-                        </div>
+                            </div>
+                        @endif
+
+                        {{-- ไม่มีข้อมูลทั้งสองฝั่ง --}}
+                        @if (!($showVFSection && ($hasVFVars || $hasVFFx)) && !($showChecklistSection && $hasChecklist))
+                            <div class="text-slate-400">-</div>
+                        @endif
                     </x-card>
+
 
                     {{-- Card 6: Calculation/Condition (richtext) --}}
                     <x-card number="6" title="วิธีการคำนวณ">
