@@ -19,10 +19,10 @@
         @csrf
         <div class="w-full px-4 sm:px-6 lg:px-8">
             <div class="max-w-4xl mx-auto">
-                <div class="mb-5 w-full px-4 sm:px-6 lg:px-8 py-6 bg-white rounded-2xl border border-slate-200 shadow-sm">
-                    <div class="banner rounded-2xl border border-slate-200 p-5 md:p-6 mb-6 sm:mb-8">
-                        <h1 class="text-2xl sm:text-3xl text-center font-bold">เพิ่มตัวชี้วัด</h1>
-                    </div>
+                <div class="banner rounded-t-2xl border border-slate-200 p-5 ">
+                    <h1 class="text-2xl sm:text-3xl text-center font-bold">เพิ่มตัวชี้วัด</h1>
+                </div>
+                <div class="mb-5 w-full px-4 sm:px-6 lg:px-8 py-6 bg-white rounded-b-2xl border border-slate-200 shadow-sm">
 
                     <div class="space-y-6 sm:space-y-8">
                         {{-- Card 1: Basic --}}
