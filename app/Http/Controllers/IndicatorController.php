@@ -149,7 +149,7 @@ class IndicatorController extends Controller
                 'categorie_id' => $validated['category_id'], // คอลัมน์สะกดตามนี้
                 'type'         => $validated['type'] ?? null,
                 'deadline'     => $validated['deadline'],
-                'status'       => 2,
+                'status'       => 0,
                 'description'  => $validated['description'] ?? null,
                 'condition'    => $validated['condition'] ?? null,
                 'comment'      => $validated['comment'] ?? null,
