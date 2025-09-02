@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
-use App\Models\Indicator as IndicatorModel;
+use App\Models\Indicator;
 use App\Models\User;
 use App\Models\Standard;
 use App\Models\Department;
@@ -18,15 +18,14 @@ use App\Models\Formula;
 use App\Models\Checklist_item;
 use App\Http\Resources\IndicatorResource;
 
+
+
 class IndicatorController extends Controller
 {
-    /* ===========================
-     * Views
-     * =========================== */
 
     public function index()
     {
-        $indicators = IndicatorModel::with([
+        $indicators = Indicator::with([
             'category.standard',
             'assignments.user',
             'criterias',
@@ -58,14 +57,9 @@ class IndicatorController extends Controller
         return view('indicator.create', $data);
     }
 
-
-    /* ===========================
-     * APIs
-     * =========================== */
-
     public function show($id)
     {
-        $indicator = \App\Models\Indicator::with([
+        $indicator = Indicator::with([
             'category.standard',
             'criterias',
             'variables',
@@ -140,7 +134,7 @@ class IndicatorController extends Controller
         try {
             DB::beginTransaction();
 
-            $indicator = IndicatorModel::create([
+            $indicator = Indicator::create([
                 'year'         => $validated['year'],
                 'name'         => $validated['name'],
                 'code'         => $validated['code'],
@@ -177,6 +171,42 @@ class IndicatorController extends Controller
                 ->withErrors(['error' => 'เกิดข้อผิดพลาดในการบันทึก: ' . $e->getMessage()])
                 ->withInput();
         }
+    }
+
+    public function edit($id)
+    {
+        $data = $this->formSelections();
+        // $data['criteriaOptions'] = [];
+
+        // ใช้สำหรับ multi-select + filter
+        $data['usersForAssign'] = User::select('id', 'name', 'department_id')
+            ->orderBy('name')
+            ->get()
+            ->map(fn($u) => [
+                'id' => $u->id,
+                'name' => $u->name,
+                'department_id' => $u->department_id,
+            ]);
+
+
+        $indicator = Indicator::with([
+            'category.standard',
+            'criterias',
+            'variables',
+            'formulas',
+            'checklistItems',
+            'assignments.user.department',
+            'evidences',
+        ])->findOrFail($id);
+
+        // Reuse the API shape for the view
+        $data_indicator = (new IndicatorResource($indicator))->toArray(request());
+
+        return view('indicator.edit', [
+            'data_indicator' => $data_indicator,
+            'information' => $data
+        ]);
+        // return response()->json(['information' => [$data], 'indicator' => $data_indicator]);
     }
 
     public function update(Request $request, $id)
@@ -222,7 +252,7 @@ class IndicatorController extends Controller
             'multiSelected.*.required_items.*'  => 'integer',
             'multiSelected.*.score'             => 'required|numeric',
 
-            // Scoring
+            // Scoring (variable/formula)
             'scoring.variables'                       => 'nullable|array',
             'scoring.variables.*.variable_name'      => 'required|string|max:100',
             'scoring.variables.*.type'               => 'required|in:defined,input,output',
@@ -231,62 +261,70 @@ class IndicatorController extends Controller
         ]);
 
         try {
-            DB::beginTransaction();
+            DB::transaction(function () use ($validated, $id) {
+                $indicator = Indicator::findOrFail($id);
 
-            $indicator = IndicatorModel::findOrFail($id);
+                // --- Update base fields (FIX: save standard_id + category_id; fix categorie_id typo) ---
+                $indicator->update([
+                    'year'         => $validated['year'],
+                    'name'         => $validated['name'],
+                    'code'         => $validated['code'],
+                    'max_score'    => $validated['max_score'],
+                    'standard_id'  => $validated['standard_id'],     // <-- added
+                    'category_id'  => $validated['category_id'],     // <-- fixed key
+                    'type'         => $validated['type'] ?? null,
+                    'deadline'     => $validated['deadline'],
+                    'description'  => $validated['description'] ?? null,
+                    'condition'    => $validated['condition'] ?? null,
+                    'comment'      => $validated['comment'] ?? null,
+                    'annotation'   => $validated['annotation'] ?? null,
+                ]);
 
-            $indicator->update([
-                'year'         => $validated['year'],
-                'name'         => $validated['name'],
-                'code'         => $validated['code'],
-                'max_score'    => $validated['max_score'],
-                'categorie_id' => $validated['category_id'],
-                'type'         => $validated['type'] ?? null,
-                'deadline'     => $validated['deadline'],
-                'description'  => $validated['description'] ?? null,
-                'condition'    => $validated['condition'] ?? null,
-                'comment'      => $validated['comment'] ?? null,
-                'annotation'   => $validated['annotation'] ?? null,
-            ]);
+                // --- Departments (you validated them, so sync them) ---
+                if (method_exists($indicator, 'departments')) {
+                    $indicator->departments()->sync($validated['department_ids'] ?? []);
+                }
 
-            // อัปเดต assignment (ลบของเดิมแล้วสร้างใหม่)
-            $indicator->assignments()->delete();
-            $indicator->assignments()->createMany(
-                collect($validated['user_ids'])->unique()->values()->map(fn($uid) => ['collector' => $uid])->all()
-            );
+                // --- Assignments (delete & recreate) ---
+                $indicator->assignments()->delete();
 
-            // แทนที่ criterias ทั้งชุด
-            $indicator->criterias()->delete();
-            $criteriaCount = $this->syncCriterias($indicator, $validated['criteria'] ?? []);
+                $userIds = collect($validated['user_ids'])->unique()->values();
+                $indicator->assignments()->createMany(
+                    $userIds->map(function ($uid) {
+                        return ['user_id' => $uid];
+                    })->all()
+                );
 
-            // แทนที่ variables + formula
-            $this->syncVariablesAndFormula($indicator, $validated['scoring'] ?? []);
+                // --- Criteria (replace all) ---
+                $indicator->criterias()->delete();
+                $criteriaCount = $this->syncCriterias($indicator, $validated['criteria'] ?? []);
 
-            // แทนที่ checklist items
-            $indicator->checklistItems()->delete();
-            $this->syncChecklistFromSelected($indicator, $validated['multiSelected'] ?? []);
-            $this->syncChecklistFromCounts($indicator, $validated['multiCounts'] ?? [], $criteriaCount);
+                // --- Variable & Formula (replace) ---
+                $this->syncVariablesAndFormula($indicator, $validated['scoring'] ?? []);
 
-            DB::commit();
+                // --- Checklist (replace from two sources) ---
+                $indicator->checklistItems()->delete();
+                $this->syncChecklistFromSelected($indicator, $validated['multiSelected'] ?? []);
+                $this->syncChecklistFromCounts($indicator, $validated['multiCounts'] ?? [], $criteriaCount);
+            });
 
             return redirect()
-                ->route('indicator.dashboard')
+                ->route('indicator.detail', $id)
                 ->with('success', 'ตัวชี้วัดถูกอัปเดตเรียบร้อยแล้ว');
         } catch (\Throwable $e) {
-            DB::rollBack();
             return back()
                 ->withErrors(['error' => 'เกิดข้อผิดพลาดในการอัปเดต: ' . $e->getMessage()])
                 ->withInput();
         }
     }
 
+
     public function delete($id)
     {
         try {
             DB::beginTransaction();
 
-            $indicator = IndicatorModel::findOrFail($id);
-            // อาศัย FK cascade ในตารางลูก (ถ้าตั้งค่าไว้แล้ว)
+            $indicator = Indicator::findOrFail($id);
             $indicator->delete();
 
             DB::commit();
@@ -303,13 +341,13 @@ class IndicatorController extends Controller
     public function getIndicatorsByCategory($categoryId)
     {
         // หมายเหตุ: คอลัมน์คือ categorie_id
-        $indicators = IndicatorModel::where('categorie_id', $categoryId)->get();
+        $indicators = Indicator::where('categorie_id', $categoryId)->get();
         return response()->json(['indicators' => $indicators]);
     }
 
     public function getIndicatorsByStandard($standardId)
     {
-        $indicators = IndicatorModel::whereHas('category.standard', function ($q) use ($standardId) {
+        $indicators = Indicator::whereHas('category.standard', function ($q) use ($standardId) {
             $q->where('id', $standardId);
         })->get();
 
@@ -329,7 +367,7 @@ class IndicatorController extends Controller
         ];
     }
 
-    private function serializeIndicatorForList(IndicatorModel $i): array
+    private function serializeIndicatorForList(Indicator $i): array
     {
         // รองรับทั้ง cast ที่เป็น Carbon และสตริงธรรมดา
         $deadline = null;
@@ -402,7 +440,7 @@ class IndicatorController extends Controller
     /**
      * Insert criteria rows; return count for combination generation.
      */
-    private function syncCriterias(IndicatorModel $indicator, array $criteria): int
+    private function syncCriterias(Indicator $indicator, array $criteria): int
     {
         $rows = [];
         foreach ($criteria as $c) {
@@ -423,7 +461,7 @@ class IndicatorController extends Controller
     /**
      * Variables + a single Formula (text in formulas.condition); link via pivot.
      */
-    private function syncVariablesAndFormula(IndicatorModel $indicator, array $scoring): void
+    private function syncVariablesAndFormula(Indicator $indicator, array $scoring): void
     {
         $indicator->variables()->delete();
         $indicator->formulas()->delete();
@@ -462,7 +500,7 @@ class IndicatorController extends Controller
     /**
      * Persist explicit checklist combos.
      */
-    private function syncChecklistFromSelected(IndicatorModel $indicator, array $multiSelected): void
+    private function syncChecklistFromSelected(Indicator $indicator, array $multiSelected): void
     {
         foreach ($multiSelected as $row) {
             $req      = array_values(array_filter((array) ($row['required_items'] ?? []), 'is_numeric'));
@@ -485,7 +523,7 @@ class IndicatorController extends Controller
      * From count rules like [{count:1,score:5},{count:2,score:15}],
      * generate all k-combinations of [1..criteriaCount], skipping duplicates.
      */
-    private function syncChecklistFromCounts(IndicatorModel $indicator, array $multiCounts, int $criteriaCount): void
+    private function syncChecklistFromCounts(Indicator $indicator, array $multiCounts, int $criteriaCount): void
     {
         if ($criteriaCount <= 0 || empty($multiCounts)) {
             return;
