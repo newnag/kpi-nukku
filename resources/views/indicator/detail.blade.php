@@ -253,9 +253,7 @@ $statusDotClass = $opt['dot'] ?? 'bg-slate-500';
 
                     {{-- Card 3: Description (richtext) --}}
                     <x-card number="3" title="คำอธิบายตัวชี้วัด">
-                        <div class="prose max-w-none text-slate-800">
-                            {!! $descHtml ?: '<span class="text-slate-400">-</span>' !!}
-                        </div>
+                        <x-richtext-content :html="$descHtml" empty="-" />
                     </x-card>
 
                     {{-- Card 4: Criteria --}}
@@ -274,9 +272,7 @@ $statusDotClass = $opt['dot'] ?? 'bg-slate-500';
                     {{-- Card 5: Scoring (comment richtext + variable/formula + checklist rules) --}}
                     <x-card number="5" title="เกณฑ์การให้คะแนน" class="space-y-5">
                         {{-- คำอธิบาย --}}
-                        <div class="prose max-w-none text-slate-800">
-                            {!! $comment ?: '<span class="text-slate-400">ไม่มีคำอธิบายเกณฑ์</span>' !!}
-                        </div>
+                            <x-richtext-content :html="$comment" empty="ไม่มีคำอธิบายเกณฑ์" />
 
                         {{-- ตัวแปร/สูตร --}}
                         @if ($showVFSection && ($hasVFVars || $hasVFFx))
@@ -347,16 +343,12 @@ $statusDotClass = $opt['dot'] ?? 'bg-slate-500';
 
                     {{-- Card 6: Calculation/Condition (richtext) --}}
                     <x-card number="6" title="วิธีการคำนวณ">
-                        <div class="prose max-w-none text-slate-800">
-                            {!! $condHtml ?: '<span class="text-slate-400">-</span>' !!}
-                        </div>
+                        <x-richtext-content :html="$condHtml" empty="-" />
                     </x-card>
 
                     {{-- Card 7: Annotation/Note (richtext) --}}
                     <x-card number="7" title="หมายเหตุ">
-                        <div class="prose max-w-none text-slate-800">
-                            {!! $annoHtml ?: '<span class="text-slate-400">-</span>' !!}
-                        </div>
+                        <x-richtext-content :html="$annoHtml" empty="-" />
                     </x-card>
 
                     {{-- Actions --}}
