@@ -30,6 +30,7 @@
         $dg = fn($key, $default = null) => data_get($ind, $key, $default);
 
         // Basic fields
+        $indicatorId = $dg('id') ?? null;
         $year = $dg('year') ?? '-';
         $name = $dg('name') ?? '-';
         $code = $dg('code') ?? '-';
@@ -158,13 +159,11 @@ $statusDotClass = $opt['dot'] ?? 'bg-slate-500';
 
     <div class="w-full px-4 sm:px-6 lg:px-8">
         <div class="max-w-4xl mx-auto">
-            <div class="mb-5 w-full px-4 sm:px-6 lg:px-8 py-6 bg-white rounded-2xl border border-slate-200 shadow-sm">
-
-                {{-- Header --}}
-                <div class="banner rounded-2xl border border-slate-200 p-5 md:p-6 mb-6 sm:mb-8">
-                    <h1 class="text-2xl sm:text-3xl text-center font-bold">รายละเอียดตัวชี้วัด</h1>
-                </div>
-
+            {{-- Header --}}
+            <div class="banner rounded-t-2xl border border-slate-200 p-5 ">
+                <h1 class="text-2xl sm:text-3xl text-center font-bold">รายละเอียดตัวชี้วัด</h1>
+            </div>
+            <div class="mb-5 w-full px-4 sm:px-6 lg:px-8 py-6 bg-white rounded-b-2xl-2xl border border-slate-200 shadow-sm">
                 <div class="space-y-6 sm:space-y-5">
                     {{-- Card 1: Basic --}}
                     <x-card number="1" title="ข้อมูลตัวชี้วัด">
@@ -272,7 +271,7 @@ $statusDotClass = $opt['dot'] ?? 'bg-slate-500';
                     {{-- Card 5: Scoring (comment richtext + variable/formula + checklist rules) --}}
                     <x-card number="5" title="เกณฑ์การให้คะแนน" class="space-y-5">
                         {{-- คำอธิบาย --}}
-                            <x-richtext-content :html="$comment" empty="ไม่มีคำอธิบายเกณฑ์" />
+                        <x-richtext-content :html="$comment" empty="ไม่มีคำอธิบายเกณฑ์" />
 
                         {{-- ตัวแปร/สูตร --}}
                         @if ($showVFSection && ($hasVFVars || $hasVFFx))
@@ -374,7 +373,7 @@ $statusDotClass = $opt['dot'] ?? 'bg-slate-500';
                             </form>
 
                             {{-- Enable when edit route is ready --}}
-                            <a
+                            <a href="{{ route('indicator.edit', $indicatorId) }}"
                                 class="inline-flex items-center justify-center gap-2 rounded-xl bg-amber-500 text-white px-6 py-3 hover:bg-amber-600 text-sm md:text-base transition-colors">
                                 แก้ไข
                             </a>
