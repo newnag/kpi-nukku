@@ -18,7 +18,6 @@
         .action-btn:hover {
             transform: translateY(-2px);
         }
-
     </style>
 @endpush
 
@@ -31,17 +30,17 @@
         $dg = fn($key, $default = null) => data_get($ind, $key, $default);
 
         // Basic fields
-        $year = $dg('year');
-        $name = $dg('name');
-        $code = $dg('code');
-        $type = $dg('type');
-        $maxScore = $dg('max_score');
-        $deadline = $dg('deadline');
-        $status = $dg('status');
-        $comment = $dg('comment');
-        $descHtml = $dg('description');
-        $condHtml = $dg('condition');
-        $annoHtml = $dg('annotation');
+        $year = $dg('year') ?? '-';
+        $name = $dg('name') ?? '-';
+        $code = $dg('code') ?? '-';
+        $type = $dg('type') ?? '-';
+        $maxScore = $dg('max_score') ?? '-';
+        $deadline = $dg('deadline') ?? '-';
+        $status = $dg('status') ?? '-';
+        $comment = $dg('comment') ?? '-';
+        $descHtml = $dg('description') ?? '-';
+        $condHtml = $dg('condition') ?? '-';
+        $annoHtml = $dg('annotation') ?? '-';
 
         // Dates
         $deadlineDisplay = $deadline ? \Carbon\Carbon::parse($deadline)->format('d/m/Y') : '-';
@@ -65,58 +64,96 @@
         $collectors = $assignments->map(fn($a) => data_get($a, 'user.name'))->filter()->unique()->values()->all();
 
         // Distinct departments (from API's departments array)
-        $departments = collect($dg('departments', []))->pluck('name')->unique()->values()->all();
+$departments = collect($dg('departments', []))->pluck('name')->unique()->values()->all();
 
-        // ---------- Checklist ----------
-        $checklist = collect($dg('checklistItems', []))
-            ->map(function ($it) use ($seqToName) {
-                $label = collect(data_get($it, 'required_items', []))
-                    ->map(fn($i) => $seqToName[$i] ?? "ข้อ {$i}")
-                    ->implode(', ');
-                return [
-                    'label' => $label,
-                    'score' => (float) data_get($it, 'score', 0),
-                ];
-            })
-            ->reject(fn($r) => ($r['label'] === '' || $r['label'] === '-') && $r['score'] <= 0)
-            ->values();
+// ---------- Checklist ----------
+$checklist = collect($dg('checklistItems', []))
+    ->map(function ($it) use ($seqToName) {
+        $label = collect(data_get($it, 'required_items', []))
+            ->map(fn($i) => $seqToName[$i] ?? "ข้อ {$i}")
+            ->implode(', ');
+        return [
+            'label' => $label,
+            'score' => (float) data_get($it, 'score', 0),
+        ];
+    })
+    ->reject(fn($r) => ($r['label'] === '' || $r['label'] === '-') && $r['score'] <= 0)
+    ->values();
 
-        // ---------- Variable & Formula ----------
-        $vf = (array) $dg('variable_formula', []);
+// ---------- Variable & Formula ----------
+$vf = (array) $dg('variable_formula', []);
 
-        // variables อนุญาตทั้งสตริง หรืออ็อบเจ็กต์ {variable_name, type, value}
-        $variablesVF = collect(data_get($vf, 'variables', []))
-            ->map(function ($v) {
-                $var = data_get($v, 'variable_name');
-                $vtype = data_get($v, 'type');
-                $value = data_get($v, 'value', null);
+// variables อนุญาตทั้งสตริง หรืออ็อบเจ็กต์ {variable_name, type, value}
+$variablesVF = collect(data_get($vf, 'variables', []))
+    ->map(function ($v) {
+        $var = data_get($v, 'variable_name');
+        $vtype = data_get($v, 'type');
+        $value = data_get($v, 'value', null);
 
-                return [
-                    'var' => trim((string) $var),
-                    'vtype' => trim((string) $vtype),
-                    'value' => $value,
-                ];
-            })
-            // ->reject(fn($r) => $r['var'] === '' && $r['type'] === '' && is_null($r['value']))
-            ->values();
+        return [
+            'var' => trim((string) $var),
+            'vtype' => trim((string) $vtype),
+            'value' => $value,
+        ];
+    })
+    // ->reject(fn($r) => $r['var'] === '' && $r['type'] === '' && is_null($r['value']))
+    ->values();
 
-        // formulas อนุญาตทั้งสตริง หรืออ็อบเจ็กต์ {condition} / {expression}
-        $formulasVF = collect(data_get($vf, 'formulas', []))
-            ->map(function ($f) {
-                $raw = is_string($f) ? $f : data_get($f, 'condition') ?? data_get($f, 'expression', '');
-                return trim((string) $raw);
-            })
-            ->filter()
-            ->values();
+// formulas อนุญาตทั้งสตริง หรืออ็อบเจ็กต์ {condition} / {expression}
+$formulasVF = collect(data_get($vf, 'formulas', []))
+    ->map(function ($f) {
+        $raw = is_string($f) ? $f : data_get($f, 'condition') ?? data_get($f, 'expression', '');
+        return trim((string) $raw);
+    })
+    ->filter()
+    ->values();
 
-        // flags
-        $hasVFVars = $variablesVF->isNotEmpty();
-        $hasVFFx = $formulasVF->isNotEmpty();
-        $hasChecklist = $checklist->isNotEmpty();
+// flags
+$hasVFVars = $variablesVF->isNotEmpty();
+$hasVFFx = $formulasVF->isNotEmpty();
+$hasChecklist = $checklist->isNotEmpty();
 
-        // โชว์ตามโหมด (และซ่อนส่วนว่างอัตโนมัติ)
-        $showVFSection = $type === 'variable_formula' || ($type !== 'checklist' && ($hasVFVars || $hasVFFx));
-        $showChecklistSection = $type === 'checklist' || ($type !== 'variable_formula' && $hasChecklist);
+// โชว์ตามโหมด (และซ่อนส่วนว่างอัตโนมัติ)
+$showVFSection = $type === 'variable_formula' || ($type !== 'checklist' && ($hasVFVars || $hasVFFx));
+$showChecklistSection = $type === 'checklist' || ($type !== 'variable_formula' && $hasChecklist);
+
+// ---- Status mapping -> label + badge classes (shadcn-like) ----
+$statusOptions = [
+    0 => [
+        'label' => 'รอดำเนินการ',
+        'class' => 'bg-slate-100 text-slate-800 ring-slate-300',
+        'dot' => 'bg-slate-500',
+    ],
+    1 => [
+        'label' => 'บันทึกร่าง',
+        'class' => 'bg-amber-100 text-amber-800 ring-amber-300',
+        'dot' => 'bg-amber-600',
+    ],
+    2 => [
+        'label' => 'บันทึกจริง',
+        'class' => 'bg-blue-100 text-blue-800 ring-blue-300',
+        'dot' => 'bg-blue-600',
+    ],
+    3 => [
+        'label' => 'ผลการดำเนินงานครบถ้วนตามเกณฑ์มาตรฐาน',
+        'class' => 'bg-emerald-100 text-emerald-800 ring-emerald-300',
+        'dot' => 'bg-emerald-600',
+    ],
+    4 => [
+        'label' => 'ผลการดำเนินงานไม่ครบถ้วนตามเกณฑ์มาตรฐาน',
+        'class' => 'bg-rose-100 text-rose-800 ring-rose-300',
+        'dot' => 'bg-rose-600',
+    ],
+];
+
+$statusKey = is_numeric($status) ? (int) $status : null;
+$opt = $statusKey !== null && array_key_exists($statusKey, $statusOptions) ? $statusOptions[$statusKey] : null;
+
+$statusLabel = $opt['label'] ?? ($status !== null && $status !== '' ? (string) $status : '-');
+$statusBadgeClass =
+    'inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium ring-1 ring-inset ' .
+    ($opt['class'] ?? 'bg-slate-100 text-slate-700 ring-slate-300');
+$statusDotClass = $opt['dot'] ?? 'bg-slate-500';
     @endphp
 
     <div class="w-full px-4 sm:px-6 lg:px-8">
@@ -128,80 +165,91 @@
                     <h1 class="text-2xl sm:text-3xl text-center font-bold">รายละเอียดตัวชี้วัด</h1>
                 </div>
 
-                <div class="space-y-6 sm:space-y-8">
+                <div class="space-y-6 sm:space-y-5">
                     {{-- Card 1: Basic --}}
                     <x-card number="1" title="ข้อมูลตัวชี้วัด">
-                        <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4">
                             <div>
-                                <dt class="text-xs text-slate-500">ปีการประเมิน</dt>
-                                <dd class="font-medium text-slate-900">{{ $year ?: '-' }}</dd>
+                                <div class="text-sm text-slate-500">ปีการประเมิน</div>
+                                <div class="font-medium text-slate-900">{{ $year ?: '-' }}</div>
                             </div>
+
                             <div>
-                                <dt class="text-xs text-slate-500">คะแนนตัวชี้วัด</dt>
-                                <dd class="font-medium text-slate-900">
-                                    {{ $maxScore !== null ? number_format((float) $maxScore, 2) : '-' }}</dd>
+                                <div class="text-sm text-slate-500">คะแนนตัวชี้วัด</div>
+                                <div class="font-medium text-slate-900">
+                                    {{ $maxScore !== null ? number_format((float) $maxScore, 2) : '-' }}
+                                </div>
                             </div>
+
                             <div class="sm:col-span-2">
-                                <dt class="text-xs text-slate-500">ชื่อตัวชี้วัด</dt>
-                                <dd class="font-medium text-slate-900">{{ $name ?: '-' }}</dd>
+                                <div class="text-sm text-slate-500">ชื่อตัวชี้วัด</div>
+                                <div class="font-medium text-slate-900">{{ $name ?: '-' }}</div>
                             </div>
-                            <div>
-                                <dt class="text-xs text-slate-500">รหัสตัวชี้วัด</dt>
-                                <dd class="font-medium text-slate-900">{{ $code ?: '-' }}</dd>
-                            </div>
-                            <div>
-                                <dt class="text-xs text-slate-500">มาตรฐานตัวชี้วัด</dt>
-                                <dd class="font-medium text-slate-900">{{ $standardName }}</dd>
-                            </div>
-                            <div>
-                                <dt class="text-xs text-slate-500">ด้านตัวชี้วัด</dt>
-                                <dd class="font-medium text-slate-900">{{ $categoryName }}</dd>
-                            </div>
-                            <div>
-                                <dt class="text-xs text-slate-500">ประเภทตัวชี้วัด</dt>
-                                <dd class="font-medium text-slate-900">{{ $type ?: '-' }}</dd>
-                            </div>
-                            <div>
-                                <dt class="text-xs text-slate-500">วันสิ้นสุดการประเมิน</dt>
-                                <dd class="font-medium text-slate-900">{{ $deadlineDisplay }}</dd>
-                            </div>
-                        </dl>
-                    </x-card>
 
-
-                    {{-- Card 2: Responsible --}}
-                    <x-card number="2" title="ผู้รับผิดชอบ">
-                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
                             <div>
-                                <div class="text-xs text-slate-500">หน่วยงานที่รับผิดชอบ</div>
-                                <div class="font-medium">
-                                    @if (count($departments))
-                                        <ol class="list-decimal list-inside space-y-1">
-                                            @foreach ($departments as $department)
-                                                <li>{{ $department }}</li>
-                                            @endforeach
-                                        </ol>
-                                    @else
-                                        -
-                                    @endif
+                                <div class="text-sm text-slate-500">รหัสตัวชี้วัด</div>
+                                <div class="font-medium text-slate-900">{{ $code ?: '-' }}</div>
+                            </div>
+
+                            <div>
+                                <div class="text-sm text-slate-500">มาตรฐานตัวชี้วัด</div>
+                                <div class="font-medium text-slate-900">{{ $standardName }}</div>
+                            </div>
+
+                            <div>
+                                <div class="text-sm text-slate-500">ด้านตัวชี้วัด</div>
+                                <div class="font-medium text-slate-900">{{ $categoryName }}</div>
+                            </div>
+
+                            <div>
+                                <div class="text-sm text-slate-500 ">ประเภทตัวชี้วัด</div>
+                                <div class="font-medium text-slate-900">{{ $type ?: '-' }}</div>
+                            </div>
+
+                            <div>
+                                <div class="text-sm text-slate-500">สถานะตัวชี้วัด</div>
+                                <div class="mt-1">
+                                    <x-status-badge :status="$status" size="sm" />
                                 </div>
                             </div>
+
                             <div>
-                                <div class="text-xs text-slate-500">ผู้รับผิดชอบในการรวบรวมข้อมูล</div>
-                                <div class="font-medium">
-                                    @if (count($collectors))
-                                        <ol class="list-decimal list-inside space-y-1">
-                                            @foreach ($collectors as $collector)
-                                                <li>{{ $collector }}</li>
-                                            @endforeach
-                                        </ol>
-                                    @else
-                                        -
-                                    @endif
-                                </div>
+                                <div class="text-sm text-slate-500">วันสิ้นสุดการประเมิน</div>
+                                <div class="font-medium text-slate-900">{{ $deadlineDisplay }}</div>
                             </div>
                         </div>
                     </x-card>
+
+                    {{-- Card 2: Responsible --}}
+                    <x-card number="2" title="ผู้รับผิดชอบ">
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <div>
+                                <div class="text-sm text-slate-500 mb-1">หน่วยงานที่รับผิดชอบ</div>
+                                @if (count($departments))
+                                    <ol class="list-decimal list-inside space-y-1 text-slate-900">
+                                        @foreach ($departments as $department)
+                                            <li>{{ $department }}</li>
+                                        @endforeach
+                                    </ol>
+                                @else
+                                    <div class="text-slate-400">-</div>
+                                @endif
+                            </div>
+                            <div>
+                                <div class="text-sm text-slate-500 mb-1">ผู้รับผิดชอบในการรวบรวมข้อมูล</div>
+                                @if (count($collectors))
+                                    <ol class="list-decimal list-inside space-y-1 text-slate-900">
+                                        @foreach ($collectors as $collector)
+                                            <li>{{ $collector }}</li>
+                                        @endforeach
+                                    </ol>
+                                @else
+                                    <div class="text-slate-400">-</div>
+                                @endif
+                            </div>
+                        </div>
+                    </x-card>
+
 
                     {{-- Card 3: Description (richtext) --}}
                     <x-card number="3" title="คำอธิบายตัวชี้วัด">
@@ -224,9 +272,8 @@
                     </x-card>
 
                     {{-- Card 5: Scoring (comment richtext + variable/formula + checklist rules) --}}
-                    <x-card number="5" title="เกณฑ์การให้คะแนน" class="space-y-4">
-
-                        {{-- คำอธิบายเกณฑ์ให้คะแนน --}}
+                    <x-card number="5" title="เกณฑ์การให้คะแนน" class="space-y-5">
+                        {{-- คำอธิบาย --}}
                         <div class="prose max-w-none text-slate-800">
                             {!! $comment ?: '<span class="text-slate-400">ไม่มีคำอธิบายเกณฑ์</span>' !!}
                         </div>
@@ -236,7 +283,6 @@
                             <div class="space-y-3">
                                 <div class="text-sm font-medium text-slate-700">ตัวแปรและสูตรคำนวณ</div>
 
-                                {{-- Variables --}}
                                 @if ($hasVFVars)
                                     <div class="overflow-x-auto">
                                         <table
@@ -266,14 +312,14 @@
                                     </div>
                                 @endif
 
-                                {{-- Formulas --}}
                                 @if ($hasVFFx)
                                     <div>
-                                        <div class="text-xs text-slate-500 mb-1">สูตร/เงื่อนไข</div>
-                                        @foreach ($formulasVF as $fx)
-                                            <pre class="whitespace-pre-wrap bg-slate-50 rounded px-2 py-1 border border-slate-200">{{ $fx }}</pre>
-                                        @endforeach
-                                        </ol>
+                                        <div class="text-sm text-slate-500 mb-1">สูตร/เงื่อนไข</div>
+                                        <div class="space-y-2">
+                                            @foreach ($formulasVF as $fx)
+                                                <pre class="whitespace-pre-wrap bg-slate-50 rounded px-2 py-1 border border-slate-200">{{ $fx }}</pre>
+                                            @endforeach
+                                        </div>
                                     </div>
                                 @endif
                             </div>
@@ -291,11 +337,12 @@
                             </div>
                         @endif
 
-                        {{-- ไม่มีข้อมูลทั้งสองฝั่ง --}}
+                        {{-- ว่างทั้งสองฝั่ง --}}
                         @if (!($showVFSection && ($hasVFVars || $hasVFFx)) && !($showChecklistSection && $hasChecklist))
                             <div class="text-slate-400">-</div>
                         @endif
                     </x-card>
+
 
 
                     {{-- Card 6: Calculation/Condition (richtext) --}}
