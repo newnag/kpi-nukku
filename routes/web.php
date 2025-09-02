@@ -11,12 +11,15 @@ Route::get('/', function () {
 Route::prefix('indicator')->name('indicator.')->group(function () {
     Route::get('/dashboard-page', [IndicatorController::class, 'index'])->name('dashboard');
 
-    // create indicator
+    // create
     Route::get('/create-page', [IndicatorController::class, 'create'])->name('create');
     Route::post('/store', [IndicatorController::class, 'store'])->name('store');
-    // get indicator by id
+
+    // read
     Route::get('/{id}/detail', [IndicatorController::class, 'show'])->name('detail');
-    // route actions for indicators - update and delete
+
+    // edit + update + delete
+    Route::get('/{id}/edit', [IndicatorController::class, 'edit'])->name('edit');
     Route::put('/{id}', [IndicatorController::class, 'update'])->name('update');
     Route::delete('/{id}', [IndicatorController::class, 'delete'])->name('delete');
 });
