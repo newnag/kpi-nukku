@@ -8,8 +8,20 @@
 
             <!-- ฟอร์มเพิ่มหลักฐาน -->
             <div class="evidence-form">
+
+
                 <form action="{{ route('evidences.store') }}" method="POST" enctype="multipart/form-data">
                     @csrf
+                    <!-- เลือกเกณฑ์ -->
+                    <div class="form-group">
+                        <label for="criteria_id">เลือกเกณฑ์</label>
+                        <select name="criteria_id" id="criteria_id" class="form-control" required>
+                            <option value="">-- เลือกเกณฑ์ --</option>
+                            @foreach ($criterias as $c)
+                                <option value="{{ $c->id }}">{{ $c->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
 
                     <!-- ================= Upload Section ================= -->
                     <div class="upload-section">
@@ -61,8 +73,8 @@
 
                         {{-- ใช้ Trumbowyg บน textarea นี้ --}}
                         <textarea id="detailEditor" name="detail" rows="6">
-    {!! old('detail') !!}
-  </textarea>
+              {!! old('detail') !!}
+                  </textarea>
                     </div>
                     <!-- ================= Action Buttons ================= -->
                     <div class="action-buttons">

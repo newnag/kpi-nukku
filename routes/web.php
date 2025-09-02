@@ -58,7 +58,13 @@ Route::prefix('evidences')->name('evidences.')->group(function () {
     Route::get('/', [EvidenceController::class, 'index'])->name('index');
     Route::get('/create',  [EvidenceController::class, 'create'])->name('create');
     Route::post('/store', [EvidenceController::class, 'store'])->name('store');
+    // Route::get('/create/{criteria}', [EvidenceController::class, 'create'])->name('create');
+
+
+
     Route::put('/{id}', [EvidenceController::class, 'update'])->name('update');
+
+
     Route::delete('/{id}', [EvidenceController::class, 'destroy'])->name('destroy');
     Route::get('/{id}/download', [EvidenceController::class, 'download'])
          ->name('download')->whereNumber('id');

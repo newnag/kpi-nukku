@@ -131,7 +131,7 @@
                                         </div>
                                     </div>
                                 </td>
-                                <td>{{ $evidence->file_size ?? '2.8 MB' }}</td>
+                                 <td>{{ $evidence->total_size_human ?? '-' }}</td>
                                 <td data-search="{{ $evidence->type }}">{{ $evidence->type }}</td>
                                 <td data-order="{{ optional($evidence->created_at)->timestamp }}">
                                     {{ $evidence->created_at ? $evidence->created_at->format('M d, Y') : 'Dec 13, 2022' }}
