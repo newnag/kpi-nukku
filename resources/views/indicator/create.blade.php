@@ -8,7 +8,8 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/trumbowyg@2.31.0/dist/plugins/table/ui/trumbowyg.table.min.css">
     <style>
         .banner {
-            background: linear-gradient(90deg, #f7fafc 0%, #fff7ed 100%);
+            background: linear-gradient(90deg, #e0f2fe 0%, #fef3e0 100%);
+            transition: all 0.3s ease-in-out;
         }
     </style>
 @endpush
