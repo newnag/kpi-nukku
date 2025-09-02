@@ -4,10 +4,21 @@
 
 @push('styles')
     <style>
-        /* match create page vibe */
+        /* Custom banner gradient with a modern, soft look */
         .banner {
-            background: linear-gradient(90deg, #f7fafc 0%, #fff7ed 100%);
+            background: linear-gradient(90deg, #e0f2fe 0%, #fef3e0 100%);
+            transition: all 0.3s ease-in-out;
         }
+
+        /* Smooth hover effects for buttons */
+        .action-btn {
+            transition: background-color 0.2s ease, transform 0.1s ease;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+        }
+
     </style>
 @endpush
 
@@ -54,61 +65,58 @@
         $collectors = $assignments->map(fn($a) => data_get($a, 'user.name'))->filter()->unique()->values()->all();
 
         // Distinct departments (from API's departments array)
-$departments = collect($dg('departments', []))->pluck('name')->unique()->values()->all();
+        $departments = collect($dg('departments', []))->pluck('name')->unique()->values()->all();
 
-// ---------- Checklist ----------
-$checklist = collect($dg('checklistItems', []))
-    ->map(function ($it) use ($seqToName) {
-        $label = collect(data_get($it, 'required_items', []))
-            ->map(fn($i) => $seqToName[$i] ?? "ข้อ {$i}")
-            ->implode(', ');
-        return [
-            'label' => $label,
-            'score' => (float) data_get($it, 'score', 0),
-        ];
-    })
-    ->reject(fn($r) => ($r['label'] === '' || $r['label'] === '-') && $r['score'] <= 0)
-    ->values();
+        // ---------- Checklist ----------
+        $checklist = collect($dg('checklistItems', []))
+            ->map(function ($it) use ($seqToName) {
+                $label = collect(data_get($it, 'required_items', []))
+                    ->map(fn($i) => $seqToName[$i] ?? "ข้อ {$i}")
+                    ->implode(', ');
+                return [
+                    'label' => $label,
+                    'score' => (float) data_get($it, 'score', 0),
+                ];
+            })
+            ->reject(fn($r) => ($r['label'] === '' || $r['label'] === '-') && $r['score'] <= 0)
+            ->values();
 
-// ---------- Variable & Formula ----------
-$vf = (array) $dg('variable_formula', []);
+        // ---------- Variable & Formula ----------
+        $vf = (array) $dg('variable_formula', []);
 
-// variables อนุญาตทั้งสตริง หรืออ็อบเจ็กต์ {variable_name, type, value}
-$variablesVF = collect(data_get($vf, 'variables', []))
-    ->map(function ($v) {
-        
-        $var = data_get($v, 'variable_name');
-        $type = data_get($v, 'type');
-        $value = data_get($v, 'value', null);
+        // variables อนุญาตทั้งสตริง หรืออ็อบเจ็กต์ {variable_name, type, value}
+        $variablesVF = collect(data_get($vf, 'variables', []))
+            ->map(function ($v) {
+                $var = data_get($v, 'variable_name');
+                $vtype = data_get($v, 'type');
+                $value = data_get($v, 'value', null);
 
-        return [
-            'var' => trim((string) $var),
-            'type' => trim((string) $type),
-            'value' => $value,
-        ];
-    })
-    // ->reject(fn($r) => $r['var'] === '' && $r['type'] === '' && is_null($r['value']))
-    ->values();
+                return [
+                    'var' => trim((string) $var),
+                    'vtype' => trim((string) $vtype),
+                    'value' => $value,
+                ];
+            })
+            // ->reject(fn($r) => $r['var'] === '' && $r['type'] === '' && is_null($r['value']))
+            ->values();
 
-// formulas อนุญาตทั้งสตริง หรืออ็อบเจ็กต์ {condition} / {expression}
-$formulasVF = collect(data_get($vf, 'formulas', []))
-    ->map(function ($f) {
-        $raw = is_string($f) ? $f : data_get($f, 'condition') ?? data_get($f, 'expression', '');
-        return trim((string) $raw);
-    })
-    ->filter()
-    ->values();
+        // formulas อนุญาตทั้งสตริง หรืออ็อบเจ็กต์ {condition} / {expression}
+        $formulasVF = collect(data_get($vf, 'formulas', []))
+            ->map(function ($f) {
+                $raw = is_string($f) ? $f : data_get($f, 'condition') ?? data_get($f, 'expression', '');
+                return trim((string) $raw);
+            })
+            ->filter()
+            ->values();
 
-// flags
-$hasVFVars = $variablesVF->isNotEmpty();
-$hasVFFx = $formulasVF->isNotEmpty();
-$hasChecklist = $checklist->isNotEmpty();
+        // flags
+        $hasVFVars = $variablesVF->isNotEmpty();
+        $hasVFFx = $formulasVF->isNotEmpty();
+        $hasChecklist = $checklist->isNotEmpty();
 
-// โชว์ตามโหมด (และซ่อนส่วนว่างอัตโนมัติ)
-$showVFSection = $type === 'variable_formula' || ($type !== 'checklist' && ($hasVFVars || $hasVFFx));
-$showChecklistSection = $type === 'checklist' || ($type !== 'variable_formula' && $hasChecklist);
-    @endphp
-
+        // โชว์ตามโหมด (และซ่อนส่วนว่างอัตโนมัติ)
+        $showVFSection = $type === 'variable_formula' || ($type !== 'checklist' && ($hasVFVars || $hasVFFx));
+        $showChecklistSection = $type === 'checklist' || ($type !== 'variable_formula' && $hasChecklist);
     @endphp
 
     <div class="w-full px-4 sm:px-6 lg:px-8">
@@ -123,43 +131,43 @@ $showChecklistSection = $type === 'checklist' || ($type !== 'variable_formula' &
                 <div class="space-y-6 sm:space-y-8">
                     {{-- Card 1: Basic --}}
                     <x-card number="1" title="ข้อมูลตัวชี้วัด">
-                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+                        <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4">
                             <div>
-                                <div class="text-xs text-slate-500">ปีการประเมิน</div>
-                                <div class="font-medium">{{ $year ?: '-' }}</div>
-                            </div>
-                            <div class="lg:col-span-2">
-                                <div class="text-xs text-slate-500">ชื่อตัวชี้วัด</div>
-                                <div class="font-medium">{{ $name ?: '-' }}</div>
+                                <dt class="text-xs text-slate-500">ปีการประเมิน</dt>
+                                <dd class="font-medium text-slate-900">{{ $year ?: '-' }}</dd>
                             </div>
                             <div>
-                                <div class="text-xs text-slate-500">คะแนนตัวชี้วัด</div>
-                                <div class="font-medium">
-                                    {{ $maxScore !== null ? number_format((float) $maxScore, 2) : '-' }}
-                                </div>
+                                <dt class="text-xs text-slate-500">คะแนนตัวชี้วัด</dt>
+                                <dd class="font-medium text-slate-900">
+                                    {{ $maxScore !== null ? number_format((float) $maxScore, 2) : '-' }}</dd>
+                            </div>
+                            <div class="sm:col-span-2">
+                                <dt class="text-xs text-slate-500">ชื่อตัวชี้วัด</dt>
+                                <dd class="font-medium text-slate-900">{{ $name ?: '-' }}</dd>
                             </div>
                             <div>
-                                <div class="text-xs text-slate-500">รหัสตัวชี้วัด</div>
-                                <div class="font-medium">{{ $code ?: '-' }}</div>
+                                <dt class="text-xs text-slate-500">รหัสตัวชี้วัด</dt>
+                                <dd class="font-medium text-slate-900">{{ $code ?: '-' }}</dd>
                             </div>
                             <div>
-                                <div class="text-xs text-slate-500">มาตรฐานตัวชี้วัด</div>
-                                <div class="font-medium">{{ $standardName }}</div>
+                                <dt class="text-xs text-slate-500">มาตรฐานตัวชี้วัด</dt>
+                                <dd class="font-medium text-slate-900">{{ $standardName }}</dd>
                             </div>
                             <div>
-                                <div class="text-xs text-slate-500">ด้านตัวชี้วัด</div>
-                                <div class="font-medium">{{ $categoryName }}</div>
+                                <dt class="text-xs text-slate-500">ด้านตัวชี้วัด</dt>
+                                <dd class="font-medium text-slate-900">{{ $categoryName }}</dd>
                             </div>
                             <div>
-                                <div class="text-xs text-slate-500">ประเภทตัวชี้วัด</div>
-                                <div class="font-medium">{{ $type ?: '-' }}</div>
+                                <dt class="text-xs text-slate-500">ประเภทตัวชี้วัด</dt>
+                                <dd class="font-medium text-slate-900">{{ $type ?: '-' }}</dd>
                             </div>
                             <div>
-                                <div class="text-xs text-slate-500">วันสิ้นสุดการประเมิน</div>
-                                <div class="font-medium">{{ $deadlineDisplay }}</div>
+                                <dt class="text-xs text-slate-500">วันสิ้นสุดการประเมิน</dt>
+                                <dd class="font-medium text-slate-900">{{ $deadlineDisplay }}</dd>
                             </div>
-                        </div>
+                        </dl>
                     </x-card>
+
 
                     {{-- Card 2: Responsible --}}
                     <x-card number="2" title="ผู้รับผิดชอบ">
@@ -247,7 +255,7 @@ $showChecklistSection = $type === 'checklist' || ($type !== 'variable_formula' &
                                                 @foreach ($variablesVF as $v)
                                                     <tr class="odd:bg-white even:bg-slate-50">
                                                         <td class="px-3 py-2 font-medium">{{ $v['var'] ?: '-' }}</td>
-                                                        <td class="px-3 py-2">{{ $v['type'] ?: '-' }}</td>
+                                                        <td class="px-3 py-2">{{ $v['vtype'] ?: '-' }}</td>
                                                         <td class="px-3 py-2">
                                                             {{ is_null($v['value']) ? '-' : (is_bool($v['value']) ? ($v['value'] ? 'true' : 'false') : $v['value']) }}
                                                         </td>
@@ -326,11 +334,11 @@ $showChecklistSection = $type === 'checklist' || ($type !== 'variable_formula' &
                                 </button>
                             </form>
 
-                            {{-- Enable when edit route is ready
-                        <a href="{{ route('indicator.edit', $dg('id')) }}"
-                           class="inline-flex items-center justify-center gap-2 rounded-xl bg-amber-500 text-white px-6 py-3 hover:bg-amber-600 text-sm md:text-base transition-colors">
-                            แก้ไข
-                        </a> --}}
+                            {{-- Enable when edit route is ready --}}
+                            <a
+                                class="inline-flex items-center justify-center gap-2 rounded-xl bg-amber-500 text-white px-6 py-3 hover:bg-amber-600 text-sm md:text-base transition-colors">
+                                แก้ไข
+                            </a>
 
                             <button type="button"
                                 class="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 text-white px-6 py-3 hover:bg-blue-700 text-sm md:text-base transition-colors">
