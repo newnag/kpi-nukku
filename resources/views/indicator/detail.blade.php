@@ -34,7 +34,7 @@
         $year = $dg('year') ?? '-';
         $name = $dg('name') ?? '-';
         $code = $dg('code') ?? '-';
-        $type = $dg('type') ?? '-';
+        $type = $dg('type') ?? '-'; 
         $maxScore = $dg('max_score') ?? '-';
         $deadline = $dg('deadline') ?? '-';
         $status = $dg('status') ?? '-';
@@ -266,6 +266,10 @@ $statusDotClass = $opt['dot'] ?? 'bg-slate-500';
                         @else
                             <div class="text-slate-400">-</div>
                         @endif
+
+                        <x-card-box title="วิธีการคำนวณ" icon="📋">
+                            <x-richtext-content :html="$condHtml" empty="-" />
+                        </x-card-box>
                     </x-card>
 
                     {{-- Card 5: Scoring (comment richtext + variable/formula + checklist rules) --}}
@@ -338,15 +342,8 @@ $statusDotClass = $opt['dot'] ?? 'bg-slate-500';
                         @endif
                     </x-card>
 
-
-
-                    {{-- Card 6: Calculation/Condition (richtext) --}}
-                    <x-card number="6" title="วิธีการคำนวณ">
-                        <x-richtext-content :html="$condHtml" empty="-" />
-                    </x-card>
-
                     {{-- Card 7: Annotation/Note (richtext) --}}
-                    <x-card number="7" title="หมายเหตุ">
+                    <x-card number="6" title="หมายเหตุ">
                         <x-richtext-content :html="$annoHtml" empty="-" />
                     </x-card>
 
