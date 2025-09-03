@@ -1,7 +1,7 @@
 @props([
-    'name', // ex: department_ids (submits as name[]=..)
+    'name',
     'label' => '',
-    'options' => [], // { id, name } or map [id => name] or richer objects
+    'options' => [],
     'placeholder' => 'กรุณาเลือก',
     'required' => false,
     'optionValue' => 'id',
@@ -9,22 +9,25 @@
     'searchable' => true,
     'selectAll' => true,
     'showChips' => true,
-    'max' => null, // limit number of selected items (optional)
-    'maxChips' => 6, // chips shown inside button; rest collapsed as “+N”
-    'listBelow' => false, // force show selected list below
-    'listBelowThreshold' => 6, // auto show list below when selected > threshold
-    'buttonHeight' => null, // e.g., "44px"
-    'chipsWrap' => true, // allow wrapping by default
+    'max' => null,
+    'maxChips' => 6,
+    'listBelow' => false,
+    'listBelowThreshold' => 6,
+    'buttonHeight' => null,
+    'chipsWrap' => true,
+    'value' => [], // NEW: allow default selected (array)
 ])
 
 @php
-    $oldValues = (array) old($name, []);
+    // Use controller-provided $value as fallback for old()
+    $oldValues = (array) old($name, $value);
+
     $raw = collect($options)
         ->map(function ($v, $k) use ($optionValue, $optionLabel) {
             if (is_array($v)) {
                 return $v;
             }
-            return [$optionValue => $k, $optionLabel => $v]; // map id=>name
+            return [$optionValue => $k, $optionLabel => $v];
         })
         ->values();
 @endphp
@@ -68,7 +71,7 @@ hookFormValidation();">
                 <span class="block text-slate-400 truncate" x-text="placeholder"></span>
             </template>
 
-            <template x-if="selectedOptions.length"> 
+            <template x-if="selectedOptions.length">
                 <div class="text-slate-700 text-sm">
                     <span x-text="selectedOptions.length + ' รายการที่เลือก'"></span>
                 </div>
@@ -90,12 +93,13 @@ hookFormValidation();">
         <div class="mt-2 border border-slate-200 bg-slate-50 rounded-xl p-3 max-h-48 overflow-y-auto">
             <div class="flex items-center justify-between mb-2">
                 <span class="text-sm font-medium text-slate-700">รายการที่เลือก:</span>
-                <button type="button" @click="clear()" 
+                <button type="button" @click="clear()"
                     class="text-xs text-slate-600 hover:text-red-600 underline">ล้างทั้งหมด</button>
             </div>
             <div class="flex flex-col gap-2">
                 <template x-for="o in selectedOptions" :key="'below-' + o.value">
-                    <div class="flex items-start justify-between gap-2 bg-white border border-slate-200 rounded-lg px-3 py-2 hover:bg-slate-50 transition-colors">
+                    <div
+                        class="flex items-start justify-between gap-2 bg-white border border-slate-200 rounded-lg px-3 py-2 hover:bg-slate-50 transition-colors">
                         <span class="text-sm break-words flex-1" x-text="o.label"></span>
                         <button type="button" @click="toggleValue(o.value)"
                             class="text-slate-500 hover:text-red-600 text-sm font-medium ml-2 flex-shrink-0">ลบ</button>
@@ -116,7 +120,8 @@ hookFormValidation();">
                 class="p-2 mt-1 w-full bg-white rounded-xl border border-slate-300 
                 placeholder-slate-400 text-sm md:text-base 
                 hover:shadow-md hover:border-blue-400 transition
-                focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-500" placeholder="พิมพ์เพื่อค้นหา...">
+                focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-500"
+                placeholder="พิมพ์เพื่อค้นหา...">
             <div class="flex items-center gap-2">
                 <button x-show="selectAllEnabled" type="button" class="text-xs text-slate-600 hover:text-slate-900"
                     @click="selectAll()">เลือกทั้งหมด</button>
