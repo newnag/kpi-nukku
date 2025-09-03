@@ -78,10 +78,10 @@ class DashboardController extends Controller
         END
     ")
 
-            // 3) เลขหลังขีด (เอาตัวท้ายสุด)
-            ->orderByRaw("
-        COALESCE(NULLIF(regexp_replace(indicators.code, '.*-', ''), '')::int, 0) ASC
-    ")
+                    // 3) เลขหลังขีด (เอาตัวท้ายสุด)
+                 ->orderByRaw("
+                        COALESCE(NULLIF(regexp_replace(indicators.code, '.*-', ''), '')::int, 0) ASC
+            ")
 
             // กันกรณีเลขเท่ากัน → เรียง code เต็ม
             ->orderBy('indicators.code', 'asc')
