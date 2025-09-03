@@ -1,24 +1,52 @@
 @props(['prefix' => 'scoring', 'initial' => []])
 
 @php
-    $initialVars = old($prefix . '.variables', $initial['variables'] ?? []);
+    // Existing props:
+    // $prefix (e.g., 'scoring'), $initial (may contain resources/collections)
+
+    // 1) Variables
+    $initialVarsRaw = old($prefix . '.variables', $initial['variables'] ?? []);
+
+    if ($initialVarsRaw instanceof \Illuminate\Http\Resources\Json\ResourceCollection) {
+        // resource collection → safe array without needing request()
+        $initialVarsRaw = $initialVarsRaw->jsonSerialize();
+    } elseif ($initialVarsRaw instanceof \Illuminate\Support\Collection) {
+        // laravel collection
+        $initialVarsRaw = $initialVarsRaw->values()->toArray();
+    } elseif (is_object($initialVarsRaw) && method_exists($initialVarsRaw, 'toArray')) {
+        // plain resource or arrayable object
+        // prefer toArray(request()) if available, fall back to ->toArray()
+        try {
+            $initialVarsRaw = $initialVarsRaw->toArray(request());
+        } catch (\Throwable $e) {
+            $initialVarsRaw = $initialVarsRaw->toArray();
+        }
+    }
+
+    // ensure plain, indexed array
+    $initialVars = array_values((array) $initialVarsRaw);
+
+    // 2) Condition / formula
     $initialCondition = old(
         $prefix . '.condition',
         old($prefix . '.formula', $initial['condition'] ?? ($initial['formula'] ?? '')),
     );
+    
+    // Check if we have existing formula data with ID (for updates)
+    $hasExistingFormula = !empty($initial['condition']) && !empty($initial['formula_id'] ?? null);
+    $formulaId = $initial['formula_id'] ?? null;
 @endphp
+
 
 <div x-data="{
     prefix: '{{ $prefix }}',
-
-    // Normalize initial vars to the shape we POST: { variable_name, type, value }
-    vars: (@js(array_values($initialVars))).map(v => ({
+    vars: (@js($initialVars)).map(v => ({
         id: Date.now() + Math.random(),
-        variable_name: v.variable_name ?? v.name ?? '', // support legacy 'name' if present
+        dbId: v.id ?? null, // Store database ID
+        variable_name: v.variable_name ?? v.name ?? '',
         type: (v.type ?? 'defined'),
         value: ((v.type ?? 'defined') === 'defined') ? (v.value ?? '') : ''
     })),
-
     condition: @js($initialCondition),
 
     // inputs for adding a new var
@@ -33,6 +61,7 @@
             ...this.vars,
             {
                 id: Date.now() + Math.random(),
+                dbId: null, // New variables don't have database ID
                 variable_name: name,
                 type: this.newType,
                 value: this.newType === 'defined' ? (this.newValue ?? '') : ''
@@ -57,8 +86,11 @@
         const before = el.value.slice(0, s),
             after = el.value.slice(e);
         this.condition = before + text + after;
-        this.$nextTick(() => { el.focus(); const pos = s + text.length;
-            el.setSelectionRange(pos, pos); });
+        this.$nextTick(() => {
+            el.focus();
+            const pos = s + text.length;
+            el.setSelectionRange(pos, pos);
+        });
     },
 
     // --- validation helpers (unchanged) ---
@@ -142,6 +174,10 @@
             <input type="hidden" :name="`${prefix}[variables][${i}][variable_name]`" :value="v.variable_name">
             <input type="hidden" :name="`${prefix}[variables][${i}][type]`" :value="v.type">
             <input type="hidden" :name="`${prefix}[variables][${i}][value]`" :value="v.value ?? ''">
+            {{-- Hidden field for existing variable ID --}}
+            <template x-if="v.dbId">
+                <input type="hidden" :name="`${prefix}[variables][${i}][id]`" :value="v.dbId">
+            </template>
         </div>
     </template>
 
@@ -196,5 +232,10 @@
 
         {{-- Hidden field for POST --}}
         <input type="hidden" :name="`${prefix}[condition]`" :value="condition">
+        
+        @if($formulaId)
+        {{-- Hidden field for existing formula ID --}}
+        <input type="hidden" name="{{ $prefix }}[formula_id]" value="{{ $formulaId }}">
+        @endif
     </div>
 </div>
