@@ -7,10 +7,11 @@
     'optionValue' => 'id',
     'optionLabel' => 'name',
     'searchable' => false, // แค่บอกให้โชว์ช่องค้นหาหรือไม่
+    'value' => null, // รับค่าเริ่มต้นจากหน้าแก้ไข
 ])
 
 @php
-    $oldValue = old($name);
+    $oldValue = old($name, $value); // ใช้ old value หรือค่าที่ส่งมา
     // ทำให้เป็น format เดียว [{value, label}]
     $norm = collect($options)
         ->map(function ($v, $k) use ($optionValue, $optionLabel) {
