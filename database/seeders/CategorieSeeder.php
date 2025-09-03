@@ -14,31 +14,37 @@ class CategorieSeeder extends Seeder
     {
         DB::table('categories')->insert([
             [
+                // id-1
                 'standard_id' => 1,
                 'name' =>'ด้านองค์กรและการบริหารองค์กร',
                 'max_score' => 10.00,
             ],
            [
+                // id-2
                 'standard_id' => 1,
                 'name' => 'ด้านบุคลากร',
                 'max_score' => 20.00,
             ],
            [
+                // id-3
                 'standard_id' => 1,
                 'name' => 'ด้านการจัดการศึกษา',
                 'max_score' => 150.00,
             ],
            [
+
                 'standard_id' => 1,
                 'name' => 'ด้านการวิจัยและนวัตกรรมและผลผลิตทางวิชาการ',
                 'max_score' => 5.00,
             ],
            [
+                // id-5
                 'standard_id' => 1,
                 'name' => 'ด้านการบริการวิชาการ/วิชาชีพแก่สังคม',
                 'max_score' => 5.00,
             ],
            [
+                
                 'standard_id' => 1,
                 'name' => 'ด้านการทำนุบำรุงศิลปะและวัฒนธรรม',
                 'max_score' => 5.00,

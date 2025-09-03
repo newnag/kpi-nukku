@@ -10,7 +10,7 @@ class Standard extends Model
     use HasFactory;
 
     public $timestamps = false;
-    
+
     protected $fillable = [
         'name',
     ];
@@ -22,6 +22,13 @@ class Standard extends Model
 
     public function indicators()
     {
-        return $this->hasManyThrough(Indicator::class, Category::class, 'standard_id', 'type');
+        return $this->hasManyThrough(
+            Indicator::class,
+            Category::class,
+            'standard_id',  // foreign key ใน categories ชี้ไป standards
+            'categorie_id', // foreign key ใน indicators ชี้ไป categories (ชื่อคอลัมน์จริงใน DB)
+            'id',           // primary key ใน standards (local key)
+            'id'            // primary key ใน categories (local key)
+        );
     }
 }

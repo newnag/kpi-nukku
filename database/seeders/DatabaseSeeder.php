@@ -1,4 +1,5 @@
 <?php
+
 namespace Database\Seeders;
 
 use App\Models\Assignment;
@@ -12,10 +13,10 @@ class DatabaseSeeder extends Seeder
     /**
      * Seed the application's database.
      */
-  public function run(): void
+    public function run(): void
     {
         $this->call([
-          
+            RolesAndPermissionsSeeder::class,      // ← เพิ่มบรรทัดนี้ไว้ก่อน เพื่อให้สิทธิ์กับ UserSeeder ได้
             DepartmentSeeder::class,
             UserSeeder::class,
             PasswordResetTokenSeeder::class,
@@ -29,6 +30,7 @@ class DatabaseSeeder extends Seeder
             VariableSeeder::class,
             Variable_formulasSeeder::class,
             Checklist_itemSeeder::class,
+            AssignmentSeeder::class, 
         ]);
     }
 }

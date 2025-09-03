@@ -6,15 +6,15 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
     use HasFactory, Notifiable;
-
+    use HasRoles;
     protected $fillable = [
-        'prefix',
+   
         'name',
-        'employee_id',
         'password',
         'phone',
         'status',
@@ -36,10 +36,11 @@ class User extends Authenticatable
         ];
     }
 
-    public function department()
+     public function department()
     {
-        return $this->belongsTo(Department::class);
+        return $this->belongsTo(Department::class, 'department_id', 'id');
     }
+
 
     public function assignments()
     {
