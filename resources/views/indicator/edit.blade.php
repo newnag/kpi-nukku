@@ -1,7 +1,6 @@
 @extends('layouts.app')
 
 @section('title', 'แก้ไขตัวชี้วัด')
-{{-- @section('header', 'เพิ่มตัวชี้วัด') --}}
 
 @push('styles')
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/trumbowyg@2.31.0/dist/ui/trumbowyg.min.css">
@@ -14,139 +13,272 @@
     </style>
 @endpush
 
-@section('content')
-    <div x-data="{
-        score_acc: {{ $data_indicator['max_score'] ?? 0 }},
-        scoringMethod: ''
-    }">
-        <form action="{{ route('indicator.update', ['id' => $data_indicator['id']]) }}" method="POST" >
-            @csrf
-            @method('PUT')
-            <div class="w-full px-4 sm:px-6 lg:px-8">
-                <div class="max-w-4xl mx-auto">
-                    <div class="banner rounded-t-2xl border border-slate-200 p-5 ">
-                        <h1 class="text-2xl sm:text-3xl text-center font-bold">แก้ไขตัวชี้วัด</h1>
-                    </div>
-                    <div class="mb-5 w-full px-4 sm:px-6 lg:px-8 py-6 bg-white rounded-b-2xl border border-slate-200 shadow-sm">
+@php
+    // ---- guard inputs from controller ----
+    $ind = $data_indicator ?? [];
+    $info = $information ?? [];
 
-                        <div class="space-y-6 sm:space-y-8">
-                            {{-- Card 1: Basic --}}
-                            <x-card number="1" title="ข้อมูลตัวชี้วัด">
-                                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-                                    <x-input name="year" type="number" maxlength="4" pattern="\d{4}" label="ปีการประเมิน"
-                                        placeholder="กรอกปีการประเมิน" required value="{{ $data_indicator['year'] ?? '' }}" />
-                                    <x-input name="name" label="ชื่อตัวชี้วัด" placeholder="กรุณากรอกชื่อตัวชี้วัด"
-                                        required value="{{ $data_indicator['name'] ?? '' }}" />
-                                    <x-input name="code" label="รหัสตัวชี้วัด" placeholder="เช่น NCS-1" required 
-                                        value="{{ $data_indicator['code'] ?? '' }}" />
-                                    <x-input name="max_score" type="number" step="1" label="คะแนนตัวชี้วัด"
-                                        placeholder="กรุณากรอกคะแนน" required x-model.number="score_acc" 
-                                        value="{{ $data_indicator['max_score'] ?? '' }}" />
-                                    
-                                    @php
-                                        $standardId = $data_indicator['standard']['id'] ?? '';
-                                        $categoryId = $data_indicator['category']['id'] ?? '';
-                                        $indicatorType = $data_indicator['type'] ?? '';
-                                    @endphp
-                                    
-                                    <div x-data="{ value: '{{ $standardId }}' }">
-                                        <x-select name="standard_id" :options="$information['standards'] ?? []" label="มาตรฐานตัวชี้วัด"
-                                            placeholder="กรุณาเลือกมาตรฐานตัวชี้วัด" required />
-                                    </div>
-                                    
-                                    <div x-data="{ value: '{{ $categoryId }}' }">
-                                        <x-select name="category_id" :options="$information['categories'] ?? []" label="ด้านตัวชี้วัด"
-                                            placeholder="กรุณาเลือกด้าน" searchable required />
-                                    </div>
-                                    
-                                    <div x-data="{ value: '{{ $indicatorType }}' }">
-                                        <x-select name="type" :options="['เชิงคุณภาพ', 'เชิงปริมาณ']" label="ประเภทตัวชี้วัด"
-                                            placeholder="กรุณาเลือกประเภท" required />
-                                    </div>
-                                    
-                                    <x-input name="deadline" type="date" label="วันสิ้นสุดการประเมิน" required 
-                                        value="{{ $data_indicator['deadline'] ?? '' }}" />
-                                </div>
-                            </x-card>
+    // ---- basic fields ----
+    $id = $ind['id'] ?? null;
+    $year = $ind['year'] ?? '';
+    $name = $ind['name'] ?? '';
+    $code = $ind['code'] ?? '';
+    $maxScore = $ind['max_score'] ?? '';
+    $deadline = $ind['deadline'] ?? '';
+
+    // normalize type for select ['เชิงคุณภาพ','เชิงปริมาณ']
+    $rawType = $ind['type'] ?? '';
+
+    // select ids
+    $std = $ind['standard']['id'] ?? null;
+    $category = $ind['category']['id'] ?? null;
+
+    // dd(['std' => $std, 'category' => $category, 'ind' => $ind]);
+
+    // richtexts
+    $desc = $ind['description'] ?? '';
+    $cond = $ind['condition'] ?? '';
+    $comment = $ind['comment'] ?? '';
+    $note = $ind['annotation'] ?? '';
+
+    // options (from formSelections)
+    // options (from formSelections)
+    $standards = $info['standards'] ?? [];
+    $categories = $info['categories'] ?? [];
+
+    $departments = $info['departments'] ?? [];
+    $usersForAssign = $info['usersForAssign'] ?? [];
+
+    // preselected departments & users
+    $depSelected = collect($ind['departments'] ?? [])
+        ->pluck('id')
+        ->map(fn($v) => (string) $v)
+        ->values()
+        ->all();
+    $userSelected = collect($ind['assignments'] ?? [])
+        ->pluck('user.id')
+        ->map(fn($v) => (string) $v)
+        ->values()
+        ->all();
+
+    // criteria labels/options
+    $criterias = collect($ind['criterias'])
+        ->sortBy('sequence')
+        ->values()
+        ->all();
+
+    // $criteriaLabels = collect($criterias)->pluck('name')->values()->all();
+    // dd($criteriaLabels);
+
+
+    $vf = $ind['variable_formula'] ;
+    $vfInitial = [
+        'variables' => collect($vf['variables']) ?? [],
+        'condition' => collect($vf['formulas']) ?? [],
+    ];
+
+    $checklist = collect($ind['checklistItems'])?? [];
+    
+    function determineScoring($vfInitial, $checklist) {
+
+        if($checklist->count() > 0) {
+            return 'selected';
+
+        } else {
+            return 'custom';
+        }
+    }
+
+    $select_scoringMethod = determineScoring($vfInitial, $checklist);
+
+    
+    
+    // Debug info (uncomment to see detection logic)
+    // dd([
+    //     'variable_formula' => $vfInitial,
+    //     'checklistItems' => $checklist,
+    //     'select_scoringMethod' => $select_scoringMethod,
+    //     // 'hasCustom' => $hasCustom,
+    //     // 'countRules' => $countRules,
+    //     // 'finalScoringMethod' => $initialScoringMethod
+    // ]);
+
+    // Derive "count" rules: group by number of items and take max score per count
+    // $countRules = $checklist
+    //     ->filter(fn($r) => is_array($r['required_items'] ?? null))
+    //     ->groupBy(fn($r) => count($r['required_items']))
+    //     ->map(
+    //         fn($grp, $k) => [
+    //             'count' => (int) $k,
+    //             'score' => (float) $grp->max('score'),
+    //         ],
+    //     )
+    //     ->sortBy('count')
+    //     ->values()
+    //     ->all();
+
+    // $hasSelected = $checklist->count() > 0 && empty($countRules) === false; // combos exist (we’ll still default to count if it maps cleanly)
+
+    // pick initial scoringMethod priority: custom > selected > count > ''
+    // $initialScoringMethod = $autoScoringMethod ?: (!empty($countRules) ? 'count' : '');
+
+    // initial for multiCounts component
+    // $multiCountsInitial = $countRules;
+
+    // expose criteria for filling inputs on mount (name/description)
+    // $initialCriteriasForJs = collect($criterias)
+    //     ->map(
+    //         fn($c) => [
+    //             'name' => $c['name'] ?? '',
+    //             'description' => $c['description'] ?? '',
+    //         ],
+    //     )
+    //     ->values()
+    //     ->all();
+
+
+
+@endphp
+
+@section('content')
+    <form action="{{ route('indicator.update', $id) }}" method="POST" x-data="{ score_acc: @js(old('max_score', $maxScore)), scoringMethod: @js(old('scoring_method', $select_scoringMethod)) }">
+        @csrf
+        @method('PUT')
+
+        <div class="w-full px-4 sm:px-6 lg:px-8">
+            <div class="max-w-4xl mx-auto">
+
+                <div class="banner rounded-t-2xl border border-slate-200 p-5">
+                    <h1 class="text-2xl sm:text-3xl text-center font-bold">แก้ไขตัวชี้วัด</h1>
+                </div>
+
+                <div class="mb-5 w-full px-4 sm:px-6 lg:px-8 py-6 bg-white rounded-b-2xl border border-slate-200 shadow-sm">
+                    <div class="space-y-6 sm:space-y-8">
+
+                        {{-- Card 1: Basic --}}
+                        <x-card number="1" title="ข้อมูลตัวชี้วัด">
+                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+                                <x-input name="year" type="number" maxlength="4" pattern="\d{4}" :value="$year"
+                                    label="ปีการประเมิน" placeholder="กรอกปีการประเมิน" required />
+                                <x-input name="name" :value="$name" label="ชื่อตัวชี้วัด"
+                                    placeholder="กรุณากรอกชื่อตัวชี้วัด" required />
+                                <x-input name="code" :value="$code" label="รหัสตัวชี้วัด" placeholder="เช่น NCS-1"
+                                    required />
+                                <x-input name="max_score" type="number" step="1" :value="$maxScore"
+                                    label="คะแนนตัวชี้วัด" placeholder="กรุณากรอกคะแนน" required
+                                    x-model.number="score_acc" />
+
+                                <x-select name="standard_id" :options="$standards" :value="$std" label="มาตรฐานตัวชี้วัด"
+                                    placeholder="กรุณาเลือกมาตรฐานตัวชี้วัด" required />
+
+                                <x-select name="category_id" :options="$categories" :value="$category" label="ด้านตัวชี้วัด"
+                                    placeholder="กรุณาเลือกด้าน" searchable required />
+
+                                <x-select name="type" :options="['เชิงคุณภาพ', 'เชิงปริมาณ']" :value="$rawType" label="ประเภทตัวชี้วัด"
+                                    placeholder="กรุณาเลือกประเภท" required />
+
+                                <x-input name="deadline" type="date" :value="$deadline" label="วันสิ้นสุดการประเมิน"
+                                    required />
+                            </div>
+                        </x-card>
 
                         {{-- Card 2: Responsible --}}
                         <x-card number="2" title="ผู้รับผิดชอบ">
                             <div x-data="{
-                                usersAll: @js($information['usersForAssign'] ?? []), // [{id,name,department_id}]
-                                depSelected: (@js(old('department_ids', [])) || []).map(v => String(v)),
-                                preSelectedUsers: @js(collect($data_indicator['assignments'] ?? [])->pluck('user.id')->filter()->values()->all()),
-                            
+                                usersAll: @js($usersForAssign),
+                                depSelected: (@js(old('department_ids', $depSelected)) || []).map(v => String(v)),
                                 usersEl() { return this.$refs.usersMulti },
-                                deptEl() { return this.$refs.deptMulti },
-                            
                                 filteredUsers() {
                                     if (!this.depSelected?.length) return this.usersAll;
                                     const set = new Set(this.depSelected.map(String));
                                     return this.usersAll.filter(u => set.has(String(u.department_id)));
                                 },
-                            
                                 refreshUsers() {
                                     const filtered = this.filteredUsers();
                                     this.usersEl()?.setOptions?.(filtered);
-                            
                                     const allowed = new Set(filtered.map(u => String(u.id)));
                                     const current = (this.usersEl()?.selected || []).map(String);
                                     const keep = current.filter(v => allowed.has(v));
                                     this.usersEl()?.setSelected?.(keep);
                                 }
-                            }" x-init="$nextTick(() => { 
-                                setTimeout(() => {
-                                    refreshUsers();
-                                    // Pre-select users from database
-                                    if (preSelectedUsers.length > 0) {
-                                        usersEl()?.setSelected?.(preSelectedUsers.map(String));
-                                    }
-                                }, 100);
-                            })"
+                            }" x-init="$nextTick(() => { refreshUsers(); })"
                                 @multiselect-change.window="
-                            if ($event.detail?.name === 'department_ids') {
-                              depSelected = ($event.detail.values || []).map(String);
-                              refreshUsers();
-                            }
-                          "
+                                    if ($event.detail?.name === 'department_ids') {
+                                        depSelected = ($event.detail.values || []).map(String);
+                                        refreshUsers();
+                                    }
+                                "
                                 class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-                                {{-- Departments (multi) --}}
+                                {{-- Departments --}}
                                 <x-multiselect x-ref="deptMulti" name="department_ids" label="หน่วยงานที่รับผิดชอบ"
-                                    :options="$information['departments'] ?? []" placeholder="กรุณาเลือกหน่วยงาน" searchable select-all />
+                                    :options="$departments" :value="$depSelected" placeholder="กรุณาเลือกหน่วยงาน" searchable
+                                    select-all />
 
-                                {{-- Users (multi, filtered by departments) --}}
+                                {{-- Users (filtered by departments) --}}
                                 <x-multiselect x-ref="usersMulti" name="user_ids" label="ผู้รับผิดชอบในการรวบรวมข้อมูล"
-                                    :options="$information['usersForAssign'] ?? []" optionValue="id" optionLabel="name"
+                                    :options="$usersForAssign" optionValue="id" optionLabel="name" :value="$userSelected"
                                     placeholder="กรุณาเลือกผู้รับผิดชอบ" searchable select-all required />
                             </div>
                         </x-card>
 
                         {{-- Card 3: Description --}}
                         <x-card number="3" title="คำอธิบายตัวชี้วัด">
-                            <x-richtext name="description" placeholder="กรอกคำอธิบายตัวชี้วัด" 
-                                value="{{ $data_indicator['description'] ?? '' }}" />
+                            <x-richtext name="description" :value="$desc" placeholder="กรอกคำอธิบายตัวชี้วัด" />
                         </x-card>
 
                         {{-- Card 4: Criteria & Condition --}}
                         <x-card number="4" title="เกณฑ์การพิจารณา" class="space-y-6">
                             <x-card-box title="รายการเกณฑ์การพิจารณา" icon="📋">
                                 <div x-data="{
-                                    items: @js(count($data_indicator['criteria'] ?? []) > 0 ? $data_indicator['criteria'] : [['id' => 'new_1']]),
-                                    name: @js(collect($data_indicator['criteria'] ?? [])->pluck('name')->toArray()),
+                                    items: @js(count($criterias) > 0 ? array_map(function($criteria, $index) {
+                                        return [
+                                            'id' => 'criteria_' . ($criteria['id'] ?? 'new_' . ($index + 1)),
+                                            'dbId' => $criteria['id'] ?? null,
+                                            'name' => $criteria['name'] ?? '',
+                                            'description' => $criteria['description'] ?? '',
+                                            'sequence' => $criteria['sequence'] ?? ($index + 1),
+                                            'data' => $criteria
+                                        ];
+                                    }, $criterias, array_keys($criterias)) : [['id' => 'new_1', 'dbId' => null, 'name' => '', 'description' => '', 'sequence' => 1, 'data' => null]]),
+                                    name: [],
                                     add() {
-                                        this.items = [...this.items, { id: 'new_' + Date.now() }];
+                                        const newIndex = this.items.length + 1;
+                                        this.items = [...this.items, { 
+                                            id: 'new_' + Date.now(), 
+                                            dbId: null, 
+                                            name: '', 
+                                            description: '', 
+                                            sequence: newIndex,
+                                            data: null 
+                                        }];
                                         this.$nextTick(() => this.broadcast())
                                     },
                                     remove(i) {
                                         const a = [...this.items];
                                         a.splice(i, 1);
-                                        this.items = a;
+                                        // Ensure at least one item exists
+                                        this.items = a.length ? a : [{ 
+                                            id: 'new_' + Date.now(), 
+                                            dbId: null, 
+                                            name: '', 
+                                            description: '', 
+                                            sequence: 1,
+                                            data: null 
+                                        }];
+                                        // Update sequences after removal
+                                        this.items.forEach((item, index) => {
+                                            item.sequence = index + 1;
+                                        });
                                         this.$nextTick(() => this.broadcast())
                                     },
                                     up(i) {
                                         if (i > 0) {
                                             const a = [...this.items];
                                             [a[i - 1], a[i]] = [a[i], a[i - 1]];
+                                            // Update sequences after swap
+                                            a.forEach((item, index) => {
+                                                item.sequence = index + 1;
+                                            });
                                             this.items = a;
                                             this.$nextTick(() => this.broadcast())
                                         }
@@ -155,6 +287,10 @@
                                         if (i < this.items.length - 1) {
                                             const a = [...this.items];
                                             [a[i + 1], a[i]] = [a[i], a[i + 1]];
+                                            // Update sequences after swap
+                                            a.forEach((item, index) => {
+                                                item.sequence = index + 1;
+                                            });
                                             this.items = a;
                                             this.$nextTick(() => this.broadcast())
                                         }
@@ -165,20 +301,45 @@
                                         window.__criteriaTitles = this.name.slice();
                                         $dispatch('criteria-updated', { name: this.name });
                                         window.dispatchEvent(new CustomEvent('criteria-updated', { detail: { name: this.name } }));
+                                    },
+                                    updateCriteria(index, field, value) {
+                                        if (this.items[index]) {
+                                            this.items[index][field] = value;
+                                            // Update the data object as well for consistency
+                                            if (this.items[index].data) {
+                                                this.items[index].data[field] = value;
+                                            }
+                                        }
                                     }
                                 }" x-init="$nextTick(() => broadcast())"
                                     @criteria-remove="remove($event.detail.index-1)"
                                     @criteria-move-up="up($event.detail.index-1)"
                                     @criteria-move-down="down($event.detail.index-1)"
                                     @criteria-name-change="
-                                  name[$event.detail.idx] = $event.detail.name;
+                                  const idx = $event.detail.idx;
+                                  const newName = $event.detail.name;
+                                  name[idx] = newName;
+                                  updateCriteria(idx, 'name', newName);
                                   window.__criteriaTitles = name.slice();
                                   $dispatch('criteria-updated', { name })
                                 "
+                                    @criteria-description-change="
+                                  const idx = $event.detail.idx;
+                                  const newDescription = $event.detail.description;
+                                  updateCriteria(idx, 'description', newDescription);
+                                "
                                     class="space-y-4">
                                     <template x-for="(it, i) in items" :key="it.id">
-                                        <div x-data="{ sequence: i + 1, prefix: 'criteria[' + i + ']' }"
-                                            x-effect="sequence = i + 1; prefix = 'criteria[' + i + ']'">
+                                        <div x-data="{ 
+                                            sequence: i + 1, 
+                                            prefix: 'criteria[' + i + ']',
+                                            criteriaData: {
+                                                id: it.dbId,
+                                                name: it.name,
+                                                description: it.description,
+                                                sequence: it.sequence
+                                            }
+                                        }" x-effect="sequence = i + 1; prefix = 'criteria[' + i + ']'; it.sequence = sequence;">
                                             <x-card-criteria :show-controls="true" />
                                         </div>
                                     </template>
@@ -194,24 +355,18 @@
                             </x-card-box>
 
                             <x-card-box title="วิธีการคำนวณ" icon="📋">
-                                <x-richtext name="condition" placeholder="กรอกวิธีการคำนวณ/เงื่อนไข" 
-                                    value="{{ $data_indicator['condition'] ?? '' }}" />
+                                <x-richtext name="condition" :value="$cond" placeholder="กรอกวิธีการคำนวณ/เงื่อนไข" />
                             </x-card-box>
                         </x-card>
 
                         {{-- Card 5: Scoring --}}
-                        <x-card number="5" title="เกณฑ์การให้คะแนน" class="space-y-6" x-data="{
-                            scoringMethod() {
-                                return document.querySelector('input[name=scoring_method]')?.value || '';
-                            }
-                        }">
+                        <x-card number="5" title="เกณฑ์การให้คะแนน" class="space-y-6">
                             <x-card-box title="เกณฑ์ให้คะแนนและคะแนนเต็ม" icon="📋">
                                 <div>
-                                    <x-richtext name="comment" placeholder="คำอธิบายเกณฑ์ให้คะแนน" 
-                                        value="{{ $data_indicator['comment'] ?? '' }}" />
+                                    <x-richtext name="comment" :value="$comment" placeholder="คำอธิบายเกณฑ์ให้คะแนน" />
                                     <label class="block">
                                         <span class="text-sm font-medium text-slate-700">คะแนนเต็มทั้งหมดของตัวชี้วัด</span>
-                                        <input type="text" value="{{ $data_indicator['max_score'] ?? '' }}" readonly
+                                        <input type="text" :value="score_acc" readonly
                                             class="p-2 mt-1 w-full bg-gray-100 rounded-xl border border-slate-300 text-sm md:text-base cursor-not-allowed"
                                             placeholder="คะแนนจะปรากฏที่นี่">
                                     </label>
@@ -220,27 +375,27 @@
 
                             <div class="w-full">
                                 <label class="block mb-3 text-sm font-medium text-slate-700">เลือกวิธีการให้คะแนน</label>
-
-                                <select x-model="scoringMethod"
-                                    class="p-2 mt-1 w-full bg-white rounded-xl border border-slate-300 
-                placeholder-slate-400 text-sm md:text-base 
-                hover:shadow-md hover:border-blue-400 transition
-                focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-500">
+                                <select name="scoring_method" x-model="scoringMethod"
+                                    class="p-2 mt-1 w-full bg-white rounded-xl border border-slate-300
+                                           placeholder-slate-400 text-sm md:text-base
+                                           hover:shadow-md hover:border-blue-400 transition
+                                           focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-500">
                                     <option value="">-- กรุณาเลือกวิธีการให้คะแนน --</option>
                                     <option value="count">หลายตัวเลือก - ตามจำนวนข้อที่เลือก</option>
                                     <option value="selected">หลายตัวเลือก - คะแนนตามข้อที่เลือก</option>
                                     <option value="custom">ปรับแต่งอิสระ</option>
                                 </select>
-
                             </div>
 
                             <div class="space-y-6">
+                                {{-- COUNT rules (prefilled from checklist when possible) --}}
                                 <template x-if="scoringMethod === 'count'">
                                     <x-card-box title="เกณฑ์ให้คะแนนแบบหลายตัวเลือก-ตามจำนวนข้อที่เลือก" icon="📋">
                                         <x-multichoice-score-count name-prefix="multiCounts" />
                                     </x-card-box>
                                 </template>
 
+                                {{-- SELECTED rules (UI starts empty; user can recompose as needed) --}}
                                 <template x-if="scoringMethod === 'selected'">
                                     <x-card-box title="เกณฑ์ให้คะแนนแบบหลายตัวเลือก-คะแนนตามข้อที่เลือก" icon="📋">
                                         <div x-data="{
@@ -249,14 +404,14 @@
                                             remove(i) {
                                                 const a = [...this.items];
                                                 a.splice(i, 1);
-                                                this.items = a.length ? a : [{ id: Date.now() }]
+                                                this.items = a.length ? a : [{ id: Date.now() }];
                                             }
                                         }" @criteria-remove="remove($event.detail.index - 1)"
                                             class="space-y-4">
                                             <template x-for="(it, i) in items" :key="it.id">
                                                 <div x-data="{ sequence: i + 1, prefix: 'multiSelected[' + i + ']' }"
                                                     x-effect="sequence = i + 1; prefix = 'multiSelected[' + i + ']'">
-                                                    <x-multichoice-score-selected :options="$criteriaOptions ?? []" />
+                                                    <x-multichoice-score-selected />
                                                 </div>
                                             </template>
 
@@ -269,9 +424,10 @@
                                     </x-card-box>
                                 </template>
 
+                                {{-- CUSTOM (variables + formula) --}}
                                 <template x-if="scoringMethod === 'custom'">
                                     <x-card-box title="เกณฑ์ให้คะแนนแบบปรับแต่งอิสระ" icon="📋">
-                                        <x-variable-formula prefix="scoring" />
+                                        <x-variable-formula prefix="scoring"  />
                                     </x-card-box>
                                 </template>
                             </div>
@@ -279,13 +435,12 @@
 
                         {{-- Card 6: Note --}}
                         <x-card number="6" title="หมายเหตุ">
-                            <x-richtext name="annotation" placeholder="...." 
-                                value="{{ $data_indicator['annotation'] ?? '' }}" />
+                            <x-richtext name="annotation" :value="$note" placeholder="...." />
                         </x-card>
 
                         {{-- Actions --}}
                         <div class="flex flex-col sm:flex-row justify-center gap-4 pt-6">
-                            <button type="button" onclick="history.back()"
+                            <a href="{{ route('indicator.detail', $id) }}"
                                 class="inline-flex items-center justify-center gap-2 rounded-xl bg-gray-200 text-gray-700 px-6 py-3 hover:bg-gray-300 text-sm md:text-base transition-colors order-2 sm:order-1">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
                                     viewBox="0 0 24 24" stroke="currentColor">
@@ -293,7 +448,8 @@
                                         d="M15 19l-7-7 7-7" />
                                 </svg>
                                 <span>กลับ</span>
-                            </button>
+                            </a>
+
                             <button type="submit"
                                 class="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 text-white px-6 py-3 hover:bg-blue-700 text-sm md:text-base transition-colors order-1 sm:order-2">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
@@ -301,11 +457,12 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M5 13l4 4L19 7" />
                                 </svg>
-                                <span>อัปเดตตัวชี้วัด</span>
+                                <span>บันทึกการแก้ไข</span>
                             </button>
                         </div>
                     </div>
                 </div>
+
             </div>
         </div>
     </form>
