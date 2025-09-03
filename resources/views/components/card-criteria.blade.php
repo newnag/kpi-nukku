@@ -24,12 +24,18 @@
 
     <input type="hidden" :name="(prefix || '{{ $prefix }}') + '[sequence]'"
         :value="sequence ?? {{ $index }}">
+    
+    <!-- Hidden input for existing criteria ID -->
+    <template x-if="criteriaData?.id">
+        <input type="hidden" :name="(prefix || '{{ $prefix }}') + '[id]'" :value="criteriaData.id">
+    </template>
 
     <div class="space-y-4">
         <div>
             <label class="block text-sm font-medium text-slate-700 mb-1">ชื่อเกณฑ์ <span
                     class="text-red-500">*</span></label>
-            <input type="text" data-criteria-name :name="(prefix || '{{ $prefix }}') + '[name]'" required
+            <input type="text" data-criteria-name :name="(prefix || '{{ $prefix }}') + '[name]'" 
+                :value="criteriaData?.name || ''" required
                 placeholder="กรุณากรอกชื่อเกณฑ์"
                 class="p-2 mt-1 w-full rounded-xl border border-slate-300 
         placeholder-slate-400 text-sm md:text-base 
@@ -45,7 +51,9 @@
                 class="p-2 mt-1 w-full rounded-xl border border-slate-300 
         placeholder-slate-400 text-sm md:text-base 
         hover:shadow-md hover:border-blue-400 transition
-                focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-500"></textarea>
+                focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-500"
+                @input.debounce.200ms="$dispatch('criteria-description-change', { idx: (sequence ?? {{ $index }}) - 1, description: $event.target.value })"
+                x-text="criteriaData?.description || ''"></textarea>
         </div>
     </div>
 
