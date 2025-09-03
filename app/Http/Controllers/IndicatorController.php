@@ -107,6 +107,7 @@ class IndicatorController extends Controller
 
             // Criteria
             'criteria'                   => 'nullable|array',
+            'criteria.*.id'              => 'nullable|integer|exists:criterias,id',
             'criteria.*.sequence'        => 'required|integer',
             'criteria.*.name'            => 'required|string|max:255',
             'criteria.*.description'     => 'nullable|string',
@@ -206,7 +207,7 @@ class IndicatorController extends Controller
             'data_indicator' => $data_indicator,
             'information' => $data
         ]);
-        // return response()->json(['information' => [$data], 'indicator' => $data_indicator]);
+        // return response()->json(['information' => [$data], 'data_indicator' => $data_indicator]);
     }
 
     public function update(Request $request, $id)
@@ -237,6 +238,7 @@ class IndicatorController extends Controller
 
             // Criteria
             'criteria'                   => 'nullable|array',
+            'criteria.*.id'              => 'nullable|integer|exists:criterias,id',
             'criteria.*.sequence'        => 'required|integer',
             'criteria.*.name'            => 'required|string|max:255',
             'criteria.*.description'     => 'nullable|string',
@@ -254,24 +256,25 @@ class IndicatorController extends Controller
 
             // Scoring (variable/formula)
             'scoring.variables'                       => 'nullable|array',
-            'scoring.variables.*.variable_name'      => 'required|string|max:100',
-            'scoring.variables.*.type'               => 'required|in:defined,input,output',
-            'scoring.variables.*.value'              => 'nullable|numeric',
-            'scoring.condition'                      => 'nullable|string',
+            'scoring.variables.*.id'                  => 'nullable|integer|exists:variables,id',
+            'scoring.variables.*.variable_name'       => 'required|string|max:100',
+            'scoring.variables.*.type'                => 'required|in:defined,input,output',
+            'scoring.variables.*.value'               => 'nullable|numeric',
+            'scoring.condition'                       => 'nullable|string',
+            'scoring.formula_id'                      => 'nullable|integer|exists:formulas,id',
         ]);
 
         try {
             DB::transaction(function () use ($validated, $id) {
                 $indicator = Indicator::findOrFail($id);
 
-                // --- Update base fields (FIX: save standard_id + category_id; fix categorie_id typo) ---
+                // --- Update base fields ---
                 $indicator->update([
                     'year'         => $validated['year'],
                     'name'         => $validated['name'],
                     'code'         => $validated['code'],
                     'max_score'    => $validated['max_score'],
-                    'standard_id'  => $validated['standard_id'],     // <-- added
-                    'category_id'  => $validated['category_id'],     // <-- fixed key
+                    'categorie_id' => $validated['category_id'],     // Database column is categorie_id
                     'type'         => $validated['type'] ?? null,
                     'deadline'     => $validated['deadline'],
                     'description'  => $validated['description'] ?? null,
@@ -291,18 +294,18 @@ class IndicatorController extends Controller
                 $userIds = collect($validated['user_ids'])->unique()->values();
                 $indicator->assignments()->createMany(
                     $userIds->map(function ($uid) {
-                        return ['user_id' => $uid];
+                        return ['collector' => $uid];
                     })->all()
                 );
 
-                // --- Criteria (replace all) ---
-                $indicator->criterias()->delete();
-                $criteriaCount = $this->syncCriterias($indicator, $validated['criteria'] ?? []);
+                // --- Criteria (update existing by ID or create new) ---
+                $criteriaCount = $this->syncCriteriasWithUpdate($indicator, $validated['criteria'] ?? []);
 
-                // --- Variable & Formula (replace) ---
+                // --- Variable & Formula (delete all existing and create new) ---
+                $this->deleteScoringData($indicator);
                 $this->syncVariablesAndFormula($indicator, $validated['scoring'] ?? []);
 
-                // --- Checklist (replace from two sources) ---
+                // --- Checklist (delete all existing and create new) ---
                 $indicator->checklistItems()->delete();
                 $this->syncChecklistFromSelected($indicator, $validated['multiSelected'] ?? []);
                 $this->syncChecklistFromCounts($indicator, $validated['multiCounts'] ?? [], $criteriaCount);
@@ -585,5 +588,63 @@ class IndicatorController extends Controller
             $this->kCombDfs($arr, $k, $i + 1, $curr, $out);
             array_pop($curr);
         }
+    }
+
+    /**
+     * Update existing criteria by ID or create new ones.
+     * Returns count of criteria for combination generation.
+     */
+    private function syncCriteriasWithUpdate(Indicator $indicator, array $criteria): int
+    {
+        $existingIds = [];
+        $totalCount = 0;
+
+        foreach ($criteria as $c) {
+            $criteriaData = [
+                'name'         => (string) ($c['name'] ?? ''),
+                'description'  => $c['description'] ?? null,
+                'sequence'     => (int) ($c['sequence'] ?? 0),
+                'indicator_id' => $indicator->id,
+            ];
+
+            if (!empty($c['id'])) {
+                // Update existing criteria
+                $existingCriteria = Criteria::where('id', $c['id'])
+                    ->where('indicator_id', $indicator->id)
+                    ->first();
+                
+                if ($existingCriteria) {
+                    $existingCriteria->update($criteriaData);
+                    $existingIds[] = $c['id'];
+                    $totalCount++;
+                }
+            } else {
+                // Create new criteria
+                $newCriteria = Criteria::create($criteriaData);
+                $existingIds[] = $newCriteria->id;
+                $totalCount++;
+            }
+        }
+
+        // Delete criteria that are not in the submitted form (orphaned criteria)
+        $indicator->criterias()->whereNotIn('id', $existingIds)->delete();
+
+        return $totalCount;
+    }
+
+    /**
+     * Delete all scoring-related data for an indicator.
+     * This includes variables, formulas, and their pivot relationships.
+     */
+    private function deleteScoringData(Indicator $indicator): void
+    {
+        // Delete variable-formula pivot relationships first
+        $indicator->variables()->each(function ($variable) {
+            $variable->formulas()->detach();
+        });
+
+        // Delete variables and formulas
+        $indicator->variables()->delete();
+        $indicator->formulas()->delete();
     }
 }
