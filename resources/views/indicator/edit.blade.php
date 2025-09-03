@@ -61,10 +61,11 @@
 
 
 
-    $vf = $ind['variable_formula'] ;
+    $vf = $ind['variable_formula'] ?? [];
     $vfInitial = [
-        'variables' => collect($vf['variables']) ?? [],
-        'condition' => collect($vf['formulas']) ?? [],
+        'variables' => $vf['variables'] ?? [],
+        'condition' => !empty($vf['formulas']) ? $vf['formulas'][0]['condition'] ?? '' : '',
+        'formula_id' => !empty($vf['formulas']) ? $vf['formulas'][0]['id'] ?? null : null,
     ];
 
     $checklist = collect($ind['checklistItems'])?? [];
@@ -408,7 +409,7 @@
                                 {{-- CUSTOM (variables + formula) --}}
                                 <template x-if="scoringMethod === 'custom'">
                                     <x-card-box title="เกณฑ์ให้คะแนนแบบปรับแต่งอิสระ" icon="📋">
-                                        <x-variable-formula prefix="scoring"  />
+                                        <x-variable-formula prefix="scoring" :initial="$vfInitial" />
                                     </x-card-box>
                                 </template>
                             </div>
