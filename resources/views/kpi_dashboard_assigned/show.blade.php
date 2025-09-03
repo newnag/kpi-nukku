@@ -204,15 +204,8 @@
                         .then(res => res.json())
                         .then(data => {
                             if (data.success) {
-                                const element = document.getElementById(`evidence-${id}`);
-                                if (element) element.remove();
-
-                                // ถ้าไม่เหลือ evidence แล้ว → โชว์ข้อความว่าง
-                                if (document.querySelectorAll('.evidence-item').length === 0) {
-                                    const container = document.querySelector('.evidence-list');
-                                    container.innerHTML =
-                                        '<div class="evidence-empty">ยังไม่มีหลักฐานแนบ</div>';
-                                }
+                                alert("ลบหลักฐานเรียบร้อยแล้ว");
+                                    location.reload();
                             } else {
                                 alert("เกิดข้อผิดพลาด: " + (data.message || "ไม่สามารถลบได้"));
                             }
