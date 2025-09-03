@@ -14,11 +14,9 @@
 @endpush
 
 @php
-    // ---- guard inputs from controller ----
     $ind = $data_indicator ?? [];
     $info = $information ?? [];
 
-    // ---- basic fields ----
     $id = $ind['id'] ?? null;
     $year = $ind['year'] ?? '';
     $name = $ind['name'] ?? '';
@@ -26,14 +24,10 @@
     $maxScore = $ind['max_score'] ?? '';
     $deadline = $ind['deadline'] ?? '';
 
-    // normalize type for select ['เชิงคุณภาพ','เชิงปริมาณ']
     $rawType = $ind['type'] ?? '';
 
-    // select ids
     $std = $ind['standard']['id'] ?? null;
     $category = $ind['category']['id'] ?? null;
-
-    // dd(['std' => $std, 'category' => $category, 'ind' => $ind]);
 
     // richtexts
     $desc = $ind['description'] ?? '';
@@ -41,15 +35,13 @@
     $comment = $ind['comment'] ?? '';
     $note = $ind['annotation'] ?? '';
 
-    // options (from formSelections)
-    // options (from formSelections)
     $standards = $info['standards'] ?? [];
     $categories = $info['categories'] ?? [];
 
     $departments = $info['departments'] ?? [];
     $usersForAssign = $info['usersForAssign'] ?? [];
 
-    // preselected departments & users
+
     $depSelected = collect($ind['departments'] ?? [])
         ->pluck('id')
         ->map(fn($v) => (string) $v)
@@ -61,14 +53,12 @@
         ->values()
         ->all();
 
-    // criteria labels/options
+
     $criterias = collect($ind['criterias'])
         ->sortBy('sequence')
         ->values()
         ->all();
 
-    // $criteriaLabels = collect($criterias)->pluck('name')->values()->all();
-    // dd($criteriaLabels);
 
 
     $vf = $ind['variable_formula'] ;
@@ -90,52 +80,6 @@
     }
 
     $select_scoringMethod = determineScoring($vfInitial, $checklist);
-
-    
-    
-    // Debug info (uncomment to see detection logic)
-    // dd([
-    //     'variable_formula' => $vfInitial,
-    //     'checklistItems' => $checklist,
-    //     'select_scoringMethod' => $select_scoringMethod,
-    //     // 'hasCustom' => $hasCustom,
-    //     // 'countRules' => $countRules,
-    //     // 'finalScoringMethod' => $initialScoringMethod
-    // ]);
-
-    // Derive "count" rules: group by number of items and take max score per count
-    // $countRules = $checklist
-    //     ->filter(fn($r) => is_array($r['required_items'] ?? null))
-    //     ->groupBy(fn($r) => count($r['required_items']))
-    //     ->map(
-    //         fn($grp, $k) => [
-    //             'count' => (int) $k,
-    //             'score' => (float) $grp->max('score'),
-    //         ],
-    //     )
-    //     ->sortBy('count')
-    //     ->values()
-    //     ->all();
-
-    // $hasSelected = $checklist->count() > 0 && empty($countRules) === false; // combos exist (we’ll still default to count if it maps cleanly)
-
-    // pick initial scoringMethod priority: custom > selected > count > ''
-    // $initialScoringMethod = $autoScoringMethod ?: (!empty($countRules) ? 'count' : '');
-
-    // initial for multiCounts component
-    // $multiCountsInitial = $countRules;
-
-    // expose criteria for filling inputs on mount (name/description)
-    // $initialCriteriasForJs = collect($criterias)
-    //     ->map(
-    //         fn($c) => [
-    //             'name' => $c['name'] ?? '',
-    //             'description' => $c['description'] ?? '',
-    //         ],
-    //     )
-    //     ->values()
-    //     ->all();
-
 
 
 @endphp
@@ -399,18 +343,55 @@
                                 <template x-if="scoringMethod === 'selected'">
                                     <x-card-box title="เกณฑ์ให้คะแนนแบบหลายตัวเลือก-คะแนนตามข้อที่เลือก" icon="📋">
                                         <div x-data="{
-                                            items: [{ id: Date.now() }],
-                                            add() { this.items = [...this.items, { id: Date.now() + this.items.length }] },
+                                            items: @js(count($checklist) > 0 ? array_map(function($item, $index) {
+                                                return [
+                                                    'id' => 'checklist_' . ($item['id'] ?? 'new_' . ($index + 1)),
+                                                    'dbId' => $item['id'] ?? null,
+                                                    'required_items' => $item['required_items'] ?? [],
+                                                    'score' => $item['score'] ?? 0,
+                                                    'sequence' => $item['sequence'] ?? null,
+                                                    'data' => $item
+                                                ];
+                                            }, $checklist->sortBy(function($item) {
+                                                return $item['sequence'] ?? -1; // null sequence comes first
+                                            })->values()->all(), array_keys($checklist->sortBy(function($item) {
+                                                return $item['sequence'] ?? -1;
+                                            })->values()->all())) : [['id' => 'new_1', 'dbId' => null, 'required_items' => [], 'score' => 0, 'sequence' => null, 'data' => null]]),
+                                            add() { 
+                                                this.items = [...this.items, { 
+                                                    id: 'new_' + Date.now(), 
+                                                    dbId: null, 
+                                                    required_items: [], 
+                                                    score: 0, 
+                                                    sequence: this.items.length + 1,
+                                                    data: null 
+                                                }] 
+                                            },
                                             remove(i) {
                                                 const a = [...this.items];
                                                 a.splice(i, 1);
-                                                this.items = a.length ? a : [{ id: Date.now() }];
+                                                this.items = a.length ? a : [{ 
+                                                    id: 'new_' + Date.now(), 
+                                                    dbId: null, 
+                                                    required_items: [], 
+                                                    score: 0, 
+                                                    sequence: 1,
+                                                    data: null 
+                                                }];
                                             }
                                         }" @criteria-remove="remove($event.detail.index - 1)"
                                             class="space-y-4">
                                             <template x-for="(it, i) in items" :key="it.id">
-                                                <div x-data="{ sequence: i + 1, prefix: 'multiSelected[' + i + ']' }"
-                                                    x-effect="sequence = i + 1; prefix = 'multiSelected[' + i + ']'">
+                                                <div x-data="{ 
+                                                    sequence: i + 1, 
+                                                    prefix: 'multiSelected[' + i + ']',
+                                                    checklistData: {
+                                                        id: it.dbId,
+                                                        required_items: it.required_items,
+                                                        score: it.score,
+                                                        sequence: it.sequence
+                                                    }
+                                                }" x-effect="sequence = i + 1; prefix = 'multiSelected[' + i + ']';">
                                                     <x-multichoice-score-selected />
                                                 </div>
                                             </template>
