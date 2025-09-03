@@ -6,7 +6,8 @@
     x-data="{
         labels: @js(array_values($options)),
         get allList() { return Array.from({ length: this.labels.length }, (_, i) => i + 1) },
-        selected: [],
+        selected: checklistData?.required_items || [],
+        score: checklistData?.score || '',
     }" x-init="labels = (window.__criteriaTitles && window.__criteriaTitles.length) ? window.__criteriaTitles.slice() : labels"
     @criteria-updated.window="
   labels = ($event.detail?.name ?? []);
@@ -29,6 +30,11 @@
     <input type="hidden" :name="(prefix || '{{ $prefix }}') + '[sequence]'"
         :value="sequence ?? {{ $index }}">
 
+    {{-- Hidden input for existing checklist ID --}}
+    <template x-if="checklistData?.id">
+        <input type="hidden" :name="(prefix || '{{ $prefix }}') + '[id]'" :value="checklistData.id">
+    </template>
+
     <div class="space-y-4">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <div class="text-slate-900 font-semibold border-l-4 border-blue-500 pl-3">รายการเกณฑ์</div>
@@ -46,7 +52,7 @@
                     <input type="checkbox" :name="(prefix || '{{ $prefix }}') + '[required_items][]'"
                         :value="i + 1" x-model="selected"
                         class="mt-1 h-4 w-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500">
-                    <span class="text-slate-800 text-sm md:text-base" x-text="label"></span>
+                    <span class="text-slate-800 text-sm md:text-base " x-text="label"></span>
                 </label>
             </template>
 
@@ -60,6 +66,7 @@
         <div class="space-y-2">
             <label class="block text-sm font-medium text-slate-700">คะแนน <span class="text-red-500">*</span></label>
             <input type="number" step="1" required :name="(prefix || '{{ $prefix }}') + '[score]'"
+                x-model="score"
                 placeholder="กรุณากรอกคะแนนเป็นตัวเลข เช่น 0"
                 class="w-full rounded-xl border bg-white py-1 px-3 border-slate-300 focus:border-blue-500 focus:ring-blue-500 sm:text-sm md:text-base">
         </div>
