@@ -8,21 +8,11 @@
 
             <!-- ฟอร์มเพิ่มหลักฐาน -->
             <div class="evidence-form">
-
+               
 
                 <form action="{{ route('evidences.store') }}" method="POST" enctype="multipart/form-data">
                     @csrf
-                    <!-- เลือกเกณฑ์ -->
-                    <div class="form-group">
-                        <label for="criteria_id">เลือกเกณฑ์</label>
-                        <select name="criteria_id" id="criteria_id" class="form-control" required>
-                            <option value="">-- เลือกเกณฑ์ --</option>
-                            @foreach ($criterias as $c)
-                                <option value="{{ $c->id }}">{{ $c->name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-
+                    <input type="hidden" name="criteria_id" value="{{ $criteria_id }}">
                     <!-- ================= Upload Section ================= -->
                     <div class="upload-section">
                         <div class="upload-area" id="uploadArea">

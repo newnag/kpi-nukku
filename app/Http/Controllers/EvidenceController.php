@@ -122,9 +122,12 @@ class EvidenceController extends Controller
         ]);
 
         return view('evidences.create', [
-            'criterias' => $criterias,
+            'criterias'   => $criterias,
+            'criteria_id' => $criteria->id, // ✅ ส่งไปด้วย
+            'criteria'    => $criteria      // ถ้าอยากใช้ทั้ง object
         ]);
     }
+
     public function store(Request $request)
     {
         Log::info('=== EvidenceController@store ===', [
@@ -226,13 +229,15 @@ class EvidenceController extends Controller
 
                     $evidence = new Evidence();
                     $evidence->path        = $payload;
-                    $evidence->detail      = null; // detail แยกไป record URL
+                    $evidence->detail      = null;
                     $evidence->status      = true;
                     $evidence->criteria_id = $criteria->id;
                     $evidence->user_id     = auth()->id();
                     $evidence->name        = $originalName;
                     $evidence->type        = $extension;
                     $evidence->save();
+
+                    $uploadedFiles[] = ['path' => $path];
 
                     Log::info('Evidence saved (file)', [
                         'evidence_id' => $evidence->id,
@@ -242,14 +247,14 @@ class EvidenceController extends Controller
                 }
             }
 
-            // ========== 2) ถ้ามี URL → บันทึกเป็น record แยกตามแต่ละ URL ==========
+            // ========== 2) ถ้ามี URL → บันทึกเป็น record แยก ==========
             if ($hasUrls) {
                 foreach ($urlEntries as $entry) {
                     $payload = ['urls' => [$entry['url']]];
 
                     $evidence = new Evidence();
                     $evidence->path        = $payload;
-                    $evidence->detail      = $request->input('detail'); // แชร์ detail ได้
+                    $evidence->detail      = $request->input('detail');
                     $evidence->status      = true;
                     $evidence->criteria_id = $criteria->id;
                     $evidence->user_id     = auth()->id();
@@ -265,7 +270,7 @@ class EvidenceController extends Controller
                 }
             }
 
-            // ========== 3) ถ้ามีแค่ Detail (ไม่มี URL) → บันทึกเป็น note ==========
+            // ========== 3) ถ้ามีแค่ Detail ==========
             if (!$hasUrls && $hasDetail) {
                 $evidence = new Evidence();
                 $evidence->path        = [];
@@ -283,18 +288,19 @@ class EvidenceController extends Controller
                 ]);
             }
 
-            return redirect()->route('evidences.index')
-                ->with('success', 'บันทึกหลักฐานเรียบร้อยแล้ว');
+            return redirect()->route('dashboardKpiUser.show', $indicator->id);
         } catch (\Throwable $e) {
             Log::error('Evidence store error', [
                 'exception' => $e->getMessage(),
             ]);
+
             // rollback ลบไฟล์ที่อัปโหลดแล้วถ้าเกิด error
             if (!empty($uploadedFiles)) {
                 foreach ($uploadedFiles as $f) {
                     Storage::disk('public')->delete($f['path'] ?? null);
                 }
             }
+
             return back()->withInput()->withErrors([
                 'general' => 'เกิดข้อผิดพลาดในการบันทึกข้อมูล กรุณาลองใหม่อีกครั้ง',
             ]);
@@ -303,180 +309,6 @@ class EvidenceController extends Controller
 
 
 
-    // public function store(Request $request)
-    // {
-    //     Log::info('=== EvidenceController@store ===', [
-    //         'criteria_id' => $request->input('criteria_id'),
-    //     ]);
-
-    //     $request->validate([
-    //         'criteria_id'       => 'required|integer|exists:criterias,id',
-    //         'files.*'           => 'nullable|file|mimes:pdf,jpg,jpeg,png,doc,docx|max:10240',
-    //         'additional_urls'   => 'nullable|array',
-    //         'additional_urls.*' => 'nullable|url|max:2048',
-    //         'detail'            => 'nullable|string|max:65535',
-    //     ]);
-
-    //     try {
-    //         $urls = collect($request->input('additional_urls', []))
-    //             ->filter(fn($u) => filled($u))
-    //             ->values();
-
-    //         $hasFiles  = $request->hasFile('files');
-    //         $hasUrls   = $urls->isNotEmpty();
-    //         $hasDetail = filled($request->input('detail'));
-
-    //         Log::info('Evidence input check', [
-    //             'hasFiles'  => $hasFiles,
-    //             'hasUrls'   => $hasUrls,
-    //             'hasDetail' => $hasDetail,
-    //         ]);
-
-    //         if (!$hasFiles && !$hasUrls && !$hasDetail) {
-    //             return back()->withInput()->withErrors([
-    //                 'general' => 'กรุณาระบุข้อมูลอย่างน้อย 1 รายการ (ไฟล์, URL หรือรายละเอียด)',
-    //             ]);
-    //         }
-
-    //         // ✅ ดึงข้อมูล chain: criteria -> indicator -> category -> standard
-    //         $criteria  = Criteria::with('indicator.category.standard')->findOrFail($request->criteria_id);
-    //         $indicator = $criteria->indicator;
-    //         $category  = $indicator->category;
-    //         $standard  = $category->standard;
-
-    //         if (!$indicator || !$category || !$standard) {
-    //             Log::error('Missing relation', [
-    //                 'criteria_id' => $criteria->id,
-    //                 'indicator'   => $indicator?->id,
-    //                 'category'    => $category?->id,
-    //                 'standard'    => $standard?->id,
-    //             ]);
-    //             return back()->withInput()->withErrors([
-    //                 'general' => 'ไม่พบความสัมพันธ์ตัวชี้วัด/หมวด/มาตรฐาน กรุณาตรวจสอบข้อมูล',
-    //             ]);
-    //         }
-    //         if (!$category || !$standard) {
-    //             Log::error('Missing category or standard for indicator', [
-    //                 'indicator_id' => $indicator->id,
-    //                 'category'     => $category,
-    //                 'standard'     => $standard,
-    //             ]);
-
-    //             return back()->withInput()->withErrors([
-    //                 'general' => 'ตัวชี้วัดนี้ยังไม่ได้ผูกกับหมวดหมู่หรือมาตรฐาน กรุณาตรวจสอบข้อมูลก่อนเพิ่มหลักฐาน',
-    //             ]);
-    //         }
-
-    //         $criteria  = Criteria::with('indicator.category.standard')->findOrFail($request->criteria_id);
-    //         $indicator = $criteria->indicator;
-    //         $category  = $indicator->category;
-    //         $standard  = $category->standard;
-
-    //         // กัน null
-    //         if (!$indicator || !$category || !$standard) {
-    //             return back()->withErrors([
-    //                 'general' => 'กรุณาตรวจสอบว่าตัวชี้วัดนี้มีการผูกกับหมวดหมู่และมาตรฐานแล้ว',
-    //             ]);
-    //         }
-
-    //         // ใช้ slug กันชื่อไทย/ช่องว่าง
-    //         $standardSegment = $this->safeFolderSegment($standard->name ?? '', 'standard-' . $standard->name);
-    //         $categorySegment = $this->safeFolderSegment($category->name ?? '', 'category-' . $category->name);
-
-    //         $folder = implode('/', [
-    //             'evidences',
-    //             'year',
-    //             $indicator->year,
-    //             $standardSegment,
-    //             $categorySegment,
-    //             $indicator->code,
-    //         ]);
-
-    //         Log::info('Resolved folder path', [
-    //             'folder' => $folder,
-    //         ]);
-
-    //         $payload = [];
-    //         $uploadedFiles = [];
-    //         $evidenceName = null;
-    //         $evidenceType = null;
-
-    //         if ($hasFiles) {
-    //             foreach ($request->file('files') as $index => $file) {
-    //                 $originalName = $file->getClientOriginalName();
-    //                 $extension    = strtolower($file->getClientOriginalExtension());
-    //                 $filename     = uniqid() . '_' . Str::random(10) . '.' . $extension;
-
-    //                 $path = $file->storeAs($folder, $filename, 'public');
-
-    //                 $uploadedFiles[] = [
-    //                     'original_name' => $originalName,
-    //                     'stored_name'   => $filename,
-    //                     'path'          => $path,
-    //                     'size'          => $file->getSize(),
-    //                     'mime_type'     => $file->getMimeType(),
-    //                     'icon'          => $this->getFileTypeIcon($file->getMimeType()),
-    //                     'size_human'    => $this->formatFileSize($file->getSize()),
-    //                 ];
-
-    //                 // ✅ ใช้ไฟล์แรกตั้งชื่อและประเภท
-    //                 if ($index === 0) {
-    //                     $evidenceName = $originalName;
-    //                     $evidenceType = $extension;
-    //                 }
-    //             }
-    //             $payload['files'] = $uploadedFiles;
-    //         }
-
-    //         if ($hasUrls) {
-    //             $payload['urls'] = $urls->all();
-    //         }
-
-    //         $evidence = new Evidence();
-    //         $evidence->path        = $payload;
-    //         $evidence->detail      = $request->input('detail');
-    //         $evidence->status      = true;
-    //         $evidence->criteria_id = $criteria->id;
-    //         $evidence->user_id     = auth()->id();
-
-    //         // ✅ ตั้งชื่อและประเภท
-    //         if ($hasFiles) {
-    //             $evidence->name = $evidenceName ?? 'ไม่ทราบชื่อไฟล์';
-    //             $evidence->type = $evidenceType ?? 'unknown';
-    //         } elseif ($hasUrls) {
-    //             $evidence->name = "หลักฐาน URL";
-    //             $evidence->type = "url";
-    //         } else {
-    //             $evidence->name = "รายละเอียดเพิ่มเติม";
-    //             $evidence->type = "note";
-    //         }
-
-    //         $evidence->save();
-
-    //         Log::info('Evidence saved', [
-    //             'evidence_id' => $evidence->id,
-    //             'criteria_id' => $evidence->criteria_id,
-    //             'name'        => $evidence->name,
-    //             'type'        => $evidence->type,
-    //             'folder'      => $folder,
-    //         ]);
-
-    //         return redirect()->route('evidences.index')
-    //             ->with('success', 'บันทึกหลักฐานเรียบร้อยแล้ว');
-    //     } catch (\Throwable $e) {
-    //         Log::error('Evidence store error', [
-    //             'exception' => $e->getMessage(),
-    //         ]);
-    //         if (!empty($uploadedFiles)) {
-    //             foreach ($uploadedFiles as $f) {
-    //                 Storage::disk('public')->delete($f['path'] ?? null);
-    //             }
-    //         }
-    //         return back()->withInput()->withErrors([
-    //             'general' => 'เกิดข้อผิดพลาดในการบันทึกข้อมูล กรุณาลองใหม่อีกครั้ง',
-    //         ]);
-    //     }
-    // }
 
     /**
      * คืน icon type ตาม MIME type
@@ -612,30 +444,27 @@ class EvidenceController extends Controller
     /**
      * Remove the specified evidence from storage.
      */
-    public function destroy($id): JsonResponse
+    public function destroy($id)
     {
-        try {
-            $evidence = Evidence::findOrFail($id);
+        $evidence = Evidence::findOrFail($id);
 
-            // Delete file from storage
-            if ($evidence->path && Storage::disk('public')->exists($evidence->path)) {
-                Storage::disk('public')->delete($evidence->path);
+        // ถ้ามีไฟล์จริงใน storage → ลบด้วย
+        if (is_array($evidence->path) && isset($evidence->path['files'])) {
+            foreach ($evidence->path['files'] as $file) {
+                if (!empty($file['path'])) {
+                    \Storage::disk('public')->delete($file['path']);
+                }
             }
-
-            $evidence->delete();
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Evidence deleted successfully'
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to delete evidence',
-                'error' => $e->getMessage()
-            ], 500);
         }
+
+        $evidence->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'ลบหลักฐานเรียบร้อยแล้ว'
+        ]);
     }
+
 
     /**
      * Download evidence file.

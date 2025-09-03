@@ -443,7 +443,7 @@
         });
     </script>
     <script>
-        lucide.createIcons();
+       ห
     </script>
 
     <!-- ========== CSS ========== -->
