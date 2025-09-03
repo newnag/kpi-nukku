@@ -4,6 +4,7 @@ use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\CategorieController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DashboardExportController;
+use App\Http\Controllers\DashboardKpiUserController;
 use App\Http\Controllers\EvidenceController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\StandardController;
@@ -56,7 +57,7 @@ Route::prefix('users')->name('users.')->group(function () {
 });
 Route::prefix('evidences')->name('evidences.')->group(function () {
     Route::get('/', [EvidenceController::class, 'index'])->name('index');
-    Route::get('/create',  [EvidenceController::class, 'create'])->name('create');
+    Route::get('/create/{criteria}',  [EvidenceController::class, 'create'])->name('create');
     Route::post('/store', [EvidenceController::class, 'store'])->name('store');
     // Route::get('/create/{criteria}', [EvidenceController::class, 'create'])->name('create');
 
@@ -67,7 +68,7 @@ Route::prefix('evidences')->name('evidences.')->group(function () {
 
     Route::delete('/{id}', [EvidenceController::class, 'destroy'])->name('destroy');
     Route::get('/{id}/download', [EvidenceController::class, 'download'])
-         ->name('download')->whereNumber('id');
+        ->name('download')->whereNumber('id');
     Route::get('criteria/{criteriaId}/evidences', [EvidenceController::class, 'getByCriteria']);
     Route::patch('/{id}/toggle-status', [EvidenceController::class, 'toggleStatus']);
 });
@@ -76,6 +77,10 @@ Route::prefix('dashboard')->name('dashboard.')->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('index');
     Route::get('/result', [DashboardController::class, 'getData'])->name('getData');
     Route::get('/export', [DashboardExportController::class, 'export'])->name('export');
+});
+Route::prefix('dashboardKpiUser')->name('dashboardKpiUser.')->group(function () {
+    Route::get('/', [DashboardKpiUserController::class, 'index'])->name('index');
+    Route::get('/dashboardKpiUser/{id}', [DashboardKpiUserController::class, 'show'])->name('show');
 });
 
 

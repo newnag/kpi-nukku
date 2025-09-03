@@ -204,7 +204,7 @@
                                 </td>
                                 <td>
                                     <div class="evidence-actions">
-                                        <a href="{{ route('assessment.show', $indicator->id) }}" class="btn-edit"
+                                        <a href="{{ route('dashboardKpiUser.show', $indicator->id) }}" class="btn-edit"
                                             title="ทำการประเมิน">
                                             <i data-lucide="edit" style="margin-right:4px;"></i> ทำการประเมิน
                                         </a>
