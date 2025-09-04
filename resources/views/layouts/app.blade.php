@@ -258,7 +258,8 @@
             background: #f3f4f6;
         }
     </style>
-    @yield('styles')
+    @stack('styles')
+       {{-- @stark('styles') --}}
 </head>
 
 <body>
@@ -412,7 +413,9 @@
         });
     </script>
 
-    @yield('scripts')
+    {{-- @yield('scripts') --}}
+    @stack('scripts')
+
 </body>
 
 </html>

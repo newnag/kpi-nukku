@@ -593,10 +593,7 @@
                 });
 
                 $('#add_indicator_button').on('click', function() {
-                    console.log('Redirecting to add indicator page...');
                     window.location.href = "{{ route('indicator.create') }}";
-                    
-                    
                 });
 
                 // Sorting dropdown functionality
