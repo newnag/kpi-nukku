@@ -26,6 +26,11 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
     <!-- Custom CSS -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Prompt:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+        rel="stylesheet">
+
+    {{-- @stack('styles') --}}
 
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
@@ -90,7 +95,7 @@
         }
 
         .dropdown-menu {
-            width: fit-content!important;
+            width: fit-content !important;
             border: none;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
@@ -130,6 +135,7 @@
         }
     </style>
 
+    {{-- @stack('styles') --}}
     @yield('styles')
 </head>
 
@@ -155,7 +161,7 @@
             </button>
 
             <!-- Navigation Menu -->
-            <div class="collapse navbar-collapse" id="navbarNav">
+            <div class=" navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav mx-auto">
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}" href="">
@@ -163,24 +169,14 @@
                             Dashboard
                         </a>
                     </li>
+
                     <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('standards*') ? 'active' : '' }}" href="">
-                            {{-- <i class="fas fa-clipboard-list me-1"></i> --}}
-                            Standards
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('indicators*') ? 'active' : '' }}" href="">
-                            {{-- <i class="fas fa-chart-line me-1"></i> --}}
+                        <a class="nav-link " href="/indicator">
+                            <i class="fas fa-chart-line me-1"></i>
                             Indicators
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('reports*') ? 'active' : '' }}" href="">
-                            {{-- <i class="fas fa-file-alt me-1"></i> --}}
-                            Reports
-                        </a>
-                    </li>
+
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button"
                             data-bs-toggle="dropdown">
@@ -189,18 +185,22 @@
                             {{-- <i class="fas fa-cog ms-1"></i> --}}
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="">
-                                    <i class="fas fa-user me-2"></i>ตั้งค่าหน่วยงาน/กำหนดวันแจ้งเตือน
+                            <li>
+                                <a class="dropdown-item" href="">
+                                    <i class="fas fa-building me-2"></i>ตั้งค่าหน่วยงาน/กำหนดวันแจ้งเตือน
                                 </a>
                             </li>
-                            <li><a class="dropdown-item" href="">
-                                    <i class="fas fa-cog me-2"></i>ตั้งค่าประเภทตัวชี้วัด
+                            <li>
+                                <a class="dropdown-item" href="">
+                                    <i class="fas fa-stream me-2"></i>ตั้งค่าประเภทตัวชี้วัด
                                 </a>
                             </li>
-                            <li><a class="dropdown-item" href="">
-                                    <i class="fas fa-cog me-2"></i>จัดการข้อมูลมาตรฐาน/ด้านต่างๆ
+                            <li>
+                                <a class="dropdown-item" href="">
+                                    <i class="fas fa-layer-group me-2"></i>จัดการข้อมูลมาตรฐาน/ด้านต่างๆ
                                 </a>
                             </li>
+
 
 
                         </ul>
@@ -332,6 +332,7 @@
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
+    {{-- @stack('scripts') --}}
     @yield('scripts')
 
     <script>
