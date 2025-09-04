@@ -111,4 +111,8 @@ class UserController extends Controller
 
         return redirect()->route('users.index')->with('success', 'ลบผู้ใช้งานสำเร็จ');
     }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> origin/Jui

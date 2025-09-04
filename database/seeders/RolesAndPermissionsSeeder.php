@@ -48,4 +48,8 @@ class RolesAndPermissionsSeeder extends Seeder
         $user = Role::firstOrCreate(['name' => 'User']);
         $user->syncPermissions(['view own indicators', 'manage indicators']);
     }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> origin/Jui

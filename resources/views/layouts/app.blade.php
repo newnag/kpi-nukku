@@ -259,7 +259,7 @@
         }
     </style>
     @stack('styles')
-    {{-- @stark('styles') --}}
+       {{-- @stark('styles') --}}
 </head>
 
 <body>

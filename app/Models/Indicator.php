@@ -9,6 +9,8 @@ class Indicator extends Model
 {
     use HasFactory;
 
+    protected $table = 'indicators';
+
     protected $fillable = [
         'name',
         'year',
@@ -63,8 +65,16 @@ class Indicator extends Model
         return $this->hasMany(Assignment::class);
     }
 
+    // สำคัญ: กัน ambiguous column โดยเลือก evidence.* ชัดเจน
     public function evidences()
     {
-        return $this->hasManyThrough(Evidence::class, Criteria::class);
+        return $this->hasManyThrough(
+            Evidence::class,
+            Criteria::class,
+            'indicator_id', // foreign key ใน criterias
+            'criteria_id',  // foreign key ใน evidence
+            'id',           // local key ใน indicators
+            'id'            // local key ใน criterias
+        );
     }
 }

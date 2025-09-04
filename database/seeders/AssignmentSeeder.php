@@ -29,7 +29,7 @@ class AssignmentSeeder extends Seeder
             ]);
         }
 
-        // $this->command->info('✅ AssignmentSeeder: สร้าง assignments สำเร็จ');
+        $this->command->info('✅ AssignmentSeeder: สร้าง assignments สำเร็จ');
     
     }
 }

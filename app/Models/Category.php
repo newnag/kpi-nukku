@@ -30,4 +30,5 @@ class Category extends Model
     {
         return $this->hasMany(Indicator::class, 'categorie_id');
     }
+    
 }

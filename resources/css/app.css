@@ -1,124 +1,32 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700&display=swap');
+
+
 @import "tailwindcss";
+body { font-family: 'Prompt', sans-serif; }
 
-@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
-@source '../../storage/framework/views/*.php';
-@source '../**/*.blade.php';
-@source '../**/*.js';
-
-@theme {
-    --font-sans: "Instrument Sans", ui-sans-serif, system-ui, sans-serif,
-        "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
-        "Noto Color Emoji";
+/* Status icon colors */
+.text-danger {
+    color: #ef4444 !important;
 }
 
-body {
-    font-family: 'Prompt', sans-serif;
+.text-warn {
+    color: #f59e0b !important;
 }
 
-.prompt-thin {
-    font-family: "Prompt", sans-serif;
-    font-weight: 100;
-    font-style: normal;
+.text-success {
+    color: #22c55e !important;
 }
 
-.prompt-extralight {
-    font-family: "Prompt", sans-serif;
-    font-weight: 200;
-    font-style: normal;
+.text-gray-500 {
+    color: #6b7280 !important;
 }
 
-.prompt-light {
-    font-family: "Prompt", sans-serif;
-    font-weight: 300;
-    font-style: normal;
+/* Status icon styling */
+.status-icon {
+    width: 20px;
+    height: 20px;
+    display: inline-block;
 }
 
-.prompt-regular {
-    font-family: "Prompt", sans-serif;
-    font-weight: 400;
-    font-style: normal;
-}
 
-.prompt-medium {
-    font-family: "Prompt", sans-serif;
-    font-weight: 500;
-    font-style: normal;
-}
-
-.prompt-semibold {
-    font-family: "Prompt", sans-serif;
-    font-weight: 600;
-    font-style: normal;
-}
-
-.prompt-bold {
-    font-family: "Prompt", sans-serif;
-    font-weight: 700;
-    font-style: normal;
-}
-
-.prompt-extrabold {
-    font-family: "Prompt", sans-serif;
-    font-weight: 800;
-    font-style: normal;
-}
-
-.prompt-black {
-    font-family: "Prompt", sans-serif;
-    font-weight: 900;
-    font-style: normal;
-}
-
-.prompt-thin-italic {
-    font-family: "Prompt", sans-serif;
-    font-weight: 100;
-    font-style: italic;
-}
-
-.prompt-extralight-italic {
-    font-family: "Prompt", sans-serif;
-    font-weight: 200;
-    font-style: italic;
-}
-
-.prompt-light-italic {
-    font-family: "Prompt", sans-serif;
-    font-weight: 300;
-    font-style: italic;
-}
-
-.prompt-regular-italic {
-    font-family: "Prompt", sans-serif;
-    font-weight: 400;
-    font-style: italic;
-}
-
-.prompt-medium-italic {
-    font-family: "Prompt", sans-serif;
-    font-weight: 500;
-    font-style: italic;
-}
-
-.prompt-semibold-italic {
-    font-family: "Prompt", sans-serif;
-    font-weight: 600;
-    font-style: italic;
-}
-
-.prompt-bold-italic {
-    font-family: "Prompt", sans-serif;
-    font-weight: 700;
-    font-style: italic;
-}
-
-.prompt-extrabold-italic {
-    font-family: "Prompt", sans-serif;
-    font-weight: 800;
-    font-style: italic;
-}
-
-.prompt-black-italic {
-    font-family: "Prompt", sans-serif;
-    font-weight: 900;
-    font-style: italic;
-}
