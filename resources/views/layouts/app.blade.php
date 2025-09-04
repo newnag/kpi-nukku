@@ -5,358 +5,414 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>@yield('title', 'ระบบบริหารจัดการข้อมูลการรับรองสถาบันจากสภาการพยาบาล')</title>
 
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- แอปของเรา (ครั้งเดียว) -->
+    <!-- Vite Assets -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
-    <!-- Font -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Prompt&display=swap" rel="stylesheet">
-
-    <!-- DataTables CSS (ครั้งเดียว) -->
+    <!-- DataTables -->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
-
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
-    <!-- Custom CSS -->
-    <link
-        href="https://fonts.googleapis.com/css2?family=Prompt:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
-        rel="stylesheet">
-
-    {{-- @stack('styles') --}}
-
-    <script src="https://unpkg.com/lucide@latest"></script>
+    {{-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"> --}}
+    {{-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"> --}}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+        integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
-        /* ให้เมนู dropdown ซ่อนตามปกติ จนกว่าจะมี .show จาก Bootstrap */
-        .navbar .dropdown-menu {
-            display: none;
-        }
-
-        .navbar .dropdown-menu.show {
-            display: block;
-        }
-
         body {
             font-family: 'Prompt', sans-serif;
-            background-color: #f8f9fa;
+            background: #f8f9fa;
+            margin: 0;
         }
 
-        .navbar-custom {
-            background: linear-gradient(135deg, #fefeff 0%, #ffffff 100%);
+        /* Navbar */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #fff;
+            padding: 0.5rem 1rem;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
         }
 
         .navbar-brand {
-            font-weight: 600;
-            color: rgb(0, 0, 0) !important;
-        }
-
-        .navbar-collapse {
-            flex-grow: 0;
-        }
-
-        .nav-link {
-            color: rgba(0, 0, 0, 0.9) !important;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            border-radius: 8px;
-            margin: 0 5px;
-            padding: 8px 16px !important;
-        }
-
-        .nav-link:hover,
-        .nav-link.active {
-            color: rgb(0, 0, 0) !important;
-            background-color: rgba(255, 255, 255, 0.2);
-            transform: translateY(-2px);
-        }
-
-        .logo-icon {
-            width: 40px;
-            height: 40px;
-            background: white;
-            border-radius: 50%;
-            display: inline-flex;
+            display: flex;
             align-items: center;
-            justify-content: center;
+            font-weight: 600;
+            color: #000;
+            text-decoration: none;
+        }
+
+        .navbar-brand img {
+            height: 40px;
+            width: 40px;
+            border-radius: 50%;
             margin-right: 10px;
         }
 
-        .main-content {
-            min-height: calc(100vh - 80px);
-            padding: 20px 0;
+        .navbar-menu {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
         }
 
-        .dropdown-menu {
-            width: fit-content !important;
-            border: none;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        .navbar-menu a {
+            color: #333;
+            text-decoration: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            transition: background 0.2s;
+        }
+
+        .navbar-menu a:hover,
+        .navbar-menu a.active {
+            background: #eee;
+        }
+
+        /* Dropdown */
+        .dropdown {
+            position: relative;
+        }
+
+        .dropdown-toggle {
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+
+        /* Navbar Dropdown */
+        .navbar .dropdown-menu {
+            display: none;
+            position: absolute;
+            right: 0;
+            /* ✅ ชิดขอบขวา */
+            left: auto;
+            /* ✅ ไม่บังคับชิดซ้าย */
+            top: 100%;
+            margin-top: 8px;
+            background: #fff;
+            border-radius: 6px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, .1);
+            min-width: 180px;
+            z-index: 1000;
+        }
+
+        .navbar .dropdown.open .dropdown-menu {
+            display: block;
+        }
+
+
+        .dropdown-menu a {
+            padding: 8px 12px;
+            color: #333;
+            text-decoration: none;
+        }
+
+        .dropdown-menu a:hover {
+            background: #f3f4f6;
         }
 
         .user-avatar {
-            width: 35px;
             height: 35px;
+            width: 35px;
             border-radius: 50%;
-            border: 2px solid rgba(255, 255, 255, 0.3);
+            border: 2px solid #ddd;
         }
 
-        .logo {
-
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            border: 2px solid rgba(255, 255, 255, 0.3);
+        /* Main Content */
+        .main-content {
+            padding: 20px;
+            min-height: calc(100vh - 120px);
         }
 
-        .breadcrumb-custom {
-            background: white;
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        /* Breadcrumb */
+        .breadcrumb {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 1rem 0;
+            display: flex;
+            gap: 6px;
+            font-size: 14px;
         }
 
-        @media (max-width: 768px) {
-            .navbar-brand {
-                font-size: 14px;
-            }
+        .breadcrumb a {
+            text-decoration: none;
+            color: #007bff;
+        }
 
-            .nav-link {
-                font-size: 14px;
-                padding: 6px 12px !important;
-            }
+        .breadcrumb li::after {
+            content: "/";
+            margin: 0 4px;
+            color: #999;
+        }
+
+        .breadcrumb li:last-child::after {
+            content: "";
+        }
+
+        /* Footer */
+        footer {
+            background: #fff;
+            padding: 1rem;
+            border-top: 1px solid #ddd;
+            text-align: center;
+            font-size: 14px;
+            color: #666;
+        }
+
+        /* Alerts */
+        .alert {
+            padding: 10px 15px;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+        }
+
+        .alert-success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .alert-danger {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .alert-warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .alert button {
+            background: transparent;
+            border: none;
+            float: right;
+            font-size: 16px;
+            cursor: pointer;
+            color: inherit;
+        }
+
+        /* Navbar Menu */
+        .navbar-menu a {
+            color: #333;
+            text-decoration: none;
+            padding: 8px 14px;
+            border-radius: 6px;
+            transition: background 0.2s, color 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .navbar-menu a:hover,
+        .navbar-menu a.active {
+            background: #f3f4f6;
+            color: #111;
+        }
+
+        /* Dropdown Menu */
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            min-width: 220px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            display: none;
+            flex-direction: column;
+            z-index: 1000;
+            padding: 6px 0;
+        }
+
+        .dropdown-menu a {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 14px;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .dropdown-menu a:hover {
+            background: #f9fafb;
+        }
+
+        /* ปุ่ม Settings + User ให้ cursor pointer */
+        .dropdown-toggle {
+            cursor: pointer;
+            padding: 8px 14px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: background 0.2s;
+        }
+
+        .dropdown-toggle:hover {
+            background: #f3f4f6;
         }
     </style>
-
-    {{-- @stack('styles') --}}
     @yield('styles')
 </head>
 
 <body>
 
-    <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-custom">
-        <div class="container-fluid">
-            <!-- Logo and Brand -->
-            <a class="navbar-brand d-flex align-items-center " href=""style="margin-left: 50px;">
-                <div class="logo-icon">
-                    <img src="/uploads/logonuthaiS-2.png" alt="User" class="logo me-2 rounded-circle">
-                </div>
-                <span class="d-none d-md-inline">
-                    {{ $global_setting->title ?? 'ระบบบริหารจัดการข้อมูลการรับรองสถาบันจากสภาการพยาบาล' }}
-                </span>
-                <span class="d-md-none">ระบบจัดการข้อมูล</span>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <a href="{{ route('dashboard.index') }}" class="navbar-brand">
+            <img src="/uploads/logonuthaiS-2.png" alt="Logo">
+            <span>{{ $global_setting->title ?? 'ระบบบริหารจัดการข้อมูลการรับรองสถาบันจากสภาการพยาบาล' }}</span>
+        </a>
+
+        <div class="navbar-menu">
+            <!-- Dashboard -->
+            <a href="{{ route('dashboard.index') }}"
+                class="{{ request()->routeIs('dashboard.index') ? 'active' : '' }}">
+                <i class="fa-solid fa-gauge-high"></i> Dashboard
             </a>
 
-            <!-- Mobile Toggle -->
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
 
-            <!-- Navigation Menu -->
-            <div class=" navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav mx-auto">
-                    <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}" href="">
-                            {{-- <i class="fas fa-tachometer-alt me-1"></i> --}}
-                            Dashboard
-                        </a>
-                    </li>
+            <!-- Graph Result -->
+            <a href="{{ route('dashboard.getData') }}"
+                class="{{ request()->routeIs('dashboard.getData') ? 'active' : '' }}">
+                <i class="fa-solid fa-chart-column"></i> กราฟแสดงผลลัพธ์ตัวชี้วัด
+            </a>
 
-                    <li class="nav-item">
-                        <a class="nav-link " href="/indicator">
-                            <i class="fas fa-chart-line me-1"></i>
-                            Indicators
-                        </a>
-                    </li>
+            <!-- Indicators -->
+            <a href="{{ route('indicator.dashboard') }}" class="{{ request()->is('indicator*') ? 'active' : '' }}">
+                <i class="fa-solid fa-bullseye"></i> จัดการตัวชี้วัด
+            </a>
 
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button"
-                            data-bs-toggle="dropdown">
-                            {{-- <img src="https://via.placeholder.com/35x35/6c757d/ffffff?text=U" alt="User" class="user-avatar me-2"> --}}
-                            <span class="d-none d-md-inline">Settings</span>
-                            {{-- <i class="fas fa-cog ms-1"></i> --}}
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <li>
-                                <a class="dropdown-item" href="">
-                                    <i class="fas fa-building me-2"></i>ตั้งค่าหน่วยงาน/กำหนดวันแจ้งเตือน
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" href="">
-                                    <i class="fas fa-stream me-2"></i>ตั้งค่าประเภทตัวชี้วัด
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" href="">
-                                    <i class="fas fa-layer-group me-2"></i>จัดการข้อมูลมาตรฐาน/ด้านต่างๆ
-                                </a>
-                            </li>
+            <!-- Settings -->
+            <div class="dropdown" id="settingsDropdown">
+                <div class="dropdown-toggle">
+                    <i class="fa-solid fa-gear"></i> Settings <i class="fa-solid fa-caret-down ml-1"></i>
+                </div>
+                <div class="dropdown-menu">
+                    <a href="{{ route('settings.index') }}">
+                        <i class="fa-solid fa-building"></i> ตั้งค่าหน่วยงาน/กำหนดวันแจ้งเตือน
+                    </a>
+                    <a href="{{ route('departments.index') }}">
+                        <i class="fa-solid fa-sitemap"></i> จัดการหน่วยงาน
+                    </a>
+                    <a href="{{ route('standards.index') }}">
+                        <i class="fa-solid fa-layer-group"></i> จัดการข้อมูลมาตรฐาน/ด้านต่างๆ
+                    </a>
+                </div>
+            </div>
 
-
-
-                        </ul>
-                    </li>
-                </ul>
-
-                <!-- User Menu -->
-                <ul class="navbar-nav">
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button"
-                            data-bs-toggle="dropdown">
-                            <img src="/uploads/avatar-type1.png" alt="User" class="user-avatar me-2 rounded-circle">
-
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="">
-                                    <i class="fas fa-user me-2"></i>โปรไฟล์
-                                </a></li>
-                            <li><a class="dropdown-item" href="">
-                                    <i class="fas fa-cog me-2"></i>ตั้งค่าระบบ
-                                </a></li>
-                            <li>
-                                <hr class="dropdown-divider">
-                            </li>
-                            <li><a class="dropdown-item" href=""
-                                    onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                                    <i class="fas fa-sign-out-alt me-2"></i>ออกจากระบบ
-                                </a></li>
-                        </ul>
-                    </li>
-                </ul>
+            <!-- User -->
+            <div class="dropdown" id="userDropdown">
+                <div class="dropdown-toggle">
+                    <img src="/uploads/avatar-type1.png" alt="User" class="user-avatar">
+                </div>
+                <div class="dropdown-menu">
+                    <a href="#"><i class="fa-solid fa-id-badge"></i> โปรไฟล์</a>
+                    <a href="#"><i class="fa-solid fa-sliders"></i> ตั้งค่าระบบ</a>
+                    <hr>
+                    <a href="#"
+                        onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                        <i class="fa-solid fa-right-from-bracket"></i> ออกจากระบบ
+                    </a>
+                </div>
             </div>
         </div>
     </nav>
 
-    <!-- Main Content -->
-    <div class="container-fluid main-content">
-        <!-- Breadcrumb -->
+
+    <!-- Main -->
+    <div class="main-content">
         @if (!empty($breadcrumbs))
-            <div class="breadcrumb-custom">
-                <nav aria-label="breadcrumb">
-                    <ol class="breadcrumb mb-0">
-                        <li class="breadcrumb-item">
-                            <a href="{{ route('dashboard') }}">
-                                <i class="fas fa-home"></i>
-                            </a>
-                        </li>
-                        @foreach ($breadcrumbs as $breadcrumb)
-                            @if ($loop->last)
-                                <li class="breadcrumb-item active">{{ $breadcrumb['title'] }}</li>
-                            @else
-                                <li class="breadcrumb-item">
-                                    <a href="{{ $breadcrumb['url'] }}">{{ $breadcrumb['title'] }}</a>
-                                </li>
-                            @endif
-                        @endforeach
-                    </ol>
-                </nav>
-            </div>
+            <ul class="breadcrumb">
+                <li><a href="{{ route('dashboard') }}"><i class="fas fa-home"></i></a></li>
+                @foreach ($breadcrumbs as $breadcrumb)
+                    @if ($loop->last)
+                        <li>{{ $breadcrumb['title'] }}</li>
+                    @else
+                        <li><a href="{{ $breadcrumb['url'] }}">{{ $breadcrumb['title'] }}</a></li>
+                    @endif
+                @endforeach
+            </ul>
         @endif
 
-        <!-- Page Header -->
-        @hasSection('page-header')
-            <div class="row mb-4">
-                <div class="col-12">
-                    <div class="card">
-                        <div class="card-body">
-                            @yield('page-header')
-                        </div>
-                    </div>
-                </div>
-            </div>
-        @endif
-
-        <!-- Alert Messages -->
+        <!-- Flash Messages -->
         @if (session('success'))
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                <i class="fas fa-check-circle me-2"></i>
+            <div class="alert alert-success">
+                <button onclick="this.parentElement.remove()">×</button>
                 {{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
         @endif
-
         @if (session('error'))
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                <i class="fas fa-exclamation-circle me-2"></i>
+            <div class="alert alert-danger">
+                <button onclick="this.parentElement.remove()">×</button>
                 {{ session('error') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
         @endif
-
         @if (session('warning'))
-            <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                <i class="fas fa-exclamation-triangle me-2"></i>
+            <div class="alert alert-warning">
+                <button onclick="this.parentElement.remove()">×</button>
                 {{ session('warning') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
         @endif
 
-        <!-- Main Content Area -->
         @yield('content')
     </div>
 
     <!-- Footer -->
-    <footer class="bg-white border-top mt-5 py-4">
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-md-6">
-                    <p class="text-muted mb-0">
-                        &copy; {{ date('Y') }} ระบบบริหารจัดการข้อมูลการรับรองสถาบันจากสภาการพยาบาล
-                    </p>
-                </div>
-                <div class="col-md-6 text-md-end">
-                    <p class="text-muted mb-0">
-                        Version 1.0.0
-                    </p>
-                </div>
-            </div>
-        </div>
+    <footer>
+        &copy; {{ date('Y') }} ระบบบริหารจัดการข้อมูลการรับรองสถาบันจากสภาการพยาบาล — Version 1.0.0
     </footer>
 
     <!-- Logout Form -->
-    <form id="logout-form" action="" method="POST" class="d-none">
-        @csrf
-    </form>
+    {{-- <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display:none;">@csrf</form> --}}
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- jQuery -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-    {{-- @stack('scripts') --}}
-    @yield('scripts')
-
-    <script>
-        // Auto hide alerts after 5 seconds
-        setTimeout(function() {
-            $('.alert').fadeOut('slow');
-        }, 5000);
-
-        // Active menu highlighting
-        $(document).ready(function() {
-            var currentPath = window.location.pathname;
-            $('.nav-link').each(function() {
-                if ($(this).attr('href') === currentPath) {
-                    $(this).addClass('active');
-                }
-            });
-        });
-    </script>
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
-    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <!-- Scripts -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 
+    <script>
+        // รีเซ็ต dropdown เมื่อโหลดหน้าใหม่
+        document.addEventListener("DOMContentLoaded", () => {
+            // toggle dropdown
+            document.querySelectorAll(".navbar .dropdown-toggle").forEach(btn => {
+                btn.addEventListener("click", e => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const parent = btn.closest(".dropdown");
+                    parent.classList.toggle("open");
+                });
+            });
 
+            // close เมื่อกดที่อื่น
+            window.addEventListener("click", () => {
+                document.querySelectorAll(".navbar .dropdown.open").forEach(d => d.classList.remove(
+                    "open"));
+            });
+
+            // close เมื่อคลิกลิงก์ใน dropdown
+            document.querySelectorAll(".navbar .dropdown-menu a").forEach(link => {
+                link.addEventListener("click", () => {
+                    link.closest(".dropdown").classList.remove("open");
+                });
+            });
+        });
+    </script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            if (window.lucide) {
+                lucide.createIcons();
+            }
+        });
+    </script>
+
+    @yield('scripts')
 </body>
 
 </html>
