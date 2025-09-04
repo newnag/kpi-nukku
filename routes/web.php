@@ -30,7 +30,7 @@ Route::prefix('departments')->name('departments.')->group(function () {
 });
 
 Route::prefix('indicator')->name('indicator.')->group(function () {
-    Route::get('/dashboard-page', [IndicatorController::class, 'index'])->name('dashboard');
+    Route::get('/', [IndicatorController::class, 'index'])->name('dashboard');
 
     // create
     Route::get('/create-page', [IndicatorController::class, 'create'])->name('create');
@@ -118,4 +118,4 @@ Route::prefix('dashboardKpiUser')->name('dashboardKpiUser.')->group(function () 
 });
 
 
-Route::get('/indicator/dashboard', [\App\Http\Controllers\IndicatorController::class, 'index'])->name('indicator.dashboard');
+// Route::get('/indicator/dashboard', [\App\Http\Controllers\IndicatorController::class, 'index'])->name('indicator.dashboard');
