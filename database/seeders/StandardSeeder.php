@@ -15,15 +15,12 @@ class StandardSeeder extends Seeder
         DB::table('standards')->insert([
             [
                 'name' => 'มาตรฐานโครงสร้าง',
-
             ],
             [
                 'name' => 'มาตรฐานกระบวนการ',
-
             ],
             [
                 'name' => 'มาตรฐานผลลัพธ์',
-
             ],
         ]);
     }
