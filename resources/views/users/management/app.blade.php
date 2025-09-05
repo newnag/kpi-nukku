@@ -989,8 +989,4 @@
         }
     </style>
 
-<<<<<<< HEAD
 @endsection
-=======
-@endsection
->>>>>>> origin/Jui
