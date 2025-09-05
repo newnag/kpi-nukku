@@ -34,7 +34,7 @@ class IndicatorController extends Controller
             ->get()
             ->map(fn($i) => $this->serializeIndicatorForList($i));
 
-        return view('indicator.dashboard', compact('indicators'));
+        return view('indicator.app', compact('indicators'));
 
         // return response()->json(['indicators' => $indicators]);
     }
@@ -164,7 +164,7 @@ class IndicatorController extends Controller
             DB::commit();
 
             return redirect()
-                ->route('indicator.dashboard')
+                ->route('indicator.show', $indicator->id)
                 ->with('success', 'ตัวชี้วัดถูกสร้างเรียบร้อยแล้ว');
         } catch (\Throwable $e) {
             DB::rollBack();
@@ -312,7 +312,7 @@ class IndicatorController extends Controller
             });
 
             return redirect()
-                ->route('indicator.detail', $id)
+                ->route('indicator.show', $id)
                 ->with('success', 'ตัวชี้วัดถูกอัปเดตเรียบร้อยแล้ว');
         } catch (\Throwable $e) {
             return back()
@@ -332,7 +332,7 @@ class IndicatorController extends Controller
 
             DB::commit();
             return redirect()
-                ->route('indicator.dashboard')
+                ->route('indicator.index')
                 ->with('success', 'ตัวชี้วัดถูกลบเรียบร้อยแล้ว');
         } catch (\Throwable $e) {
             DB::rollBack();

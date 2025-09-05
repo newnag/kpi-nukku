@@ -70,17 +70,17 @@ Route::middleware(['auth:sanctum'])->group(function () {
     // ===== INDICATOR ROUTES =====
     Route::prefix('indicator')->name('indicator.')->group(function () {
         // Dashboard
-        Route::get('/dashboard-page', [IndicatorController::class, 'index'])
-            ->name('dashboard')
+        Route::get('/', [IndicatorController::class, 'index'])
+            ->name('index')
             ->middleware('permission:view-indicator-dashboard');
         
         // View
-        Route::get('/{id}/detail', [IndicatorController::class, 'show'])
-            ->name('detail')
+        Route::get('/{id}/show', [IndicatorController::class, 'show'])
+            ->name('show')
             ->middleware('permission:view-indicator');
         
         // Create
-        Route::get('/create-page', [IndicatorController::class, 'create'])
+        Route::get('/create', [IndicatorController::class, 'create'])
             ->name('create')
             ->middleware('permission:create-indicator');
         Route::post('/store', [IndicatorController::class, 'store'])

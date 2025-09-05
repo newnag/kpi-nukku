@@ -184,7 +184,7 @@
 
             <!-- Indicators - Available to users with indicator permissions -->
             @can('view-indicator-dashboard')
-                <a href="{{ route('indicator.dashboard') }}" class="{{ request()->is('indicator*') ? 'active' : '' }}">
+                <a href="{{ route('indicator.index') }}" class="{{ request()->is('indicator*') ? 'active' : '' }}">
                     <i class="fa-solid fa-bullseye"></i> จัดการตัวชี้วัด
                 </a>
             @endcan
