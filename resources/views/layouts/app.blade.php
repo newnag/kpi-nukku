@@ -8,39 +8,39 @@
     <title>@yield('title', 'ระบบบริหารจัดการข้อมูลการรับรองสถาบันจากสภาการพยาบาล')</title>
 
     <!-- Vite Assets -->
-    @vite(['resources/css/app.css', 'resources/css/layout.css', 'resources/js/app.js'])
-    
+    @vite(['resources/css/app.css', 'resources/css/layout.css', 'resources/css/components.css', 'resources/js/app.js'])
+
     <link href="https://fonts.googleapis.com/css2?family=Prompt&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
-    integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
-    crossorigin="anonymous" referrerpolicy="no-referrer" />
-    
+        integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+
     @stack('styles')
 </head>
 
 <body>
 
     <!-- Navbar -->
-    <x-navbar/>
+    <x-navbar />
 
     <!-- Main -->
     <main>
-            @if (!empty($breadcrumbs))
-                <ul class="breadcrumb">
-                    <li><a href="{{ route('dashboard.index') }}"><i class="fas fa-home"></i></a></li>
-                    @foreach ($breadcrumbs as $breadcrumb)
-                        @if ($loop->last)
-                            <li>{{ $breadcrumb['title'] }}</li>
-                        @else
-                            <li><a href="{{ $breadcrumb['url'] }}">{{ $breadcrumb['title'] }}</a></li>
-                        @endif
-                    @endforeach
-                </ul>
-            @endif
+        @if (!empty($breadcrumbs))
+            <ul class="breadcrumb">
+                <li><a href="{{ route('dashboard.index') }}"><i class="fas fa-home"></i></a></li>
+                @foreach ($breadcrumbs as $breadcrumb)
+                    @if ($loop->last)
+                        <li>{{ $breadcrumb['title'] }}</li>
+                    @else
+                        <li><a href="{{ $breadcrumb['url'] }}">{{ $breadcrumb['title'] }}</a></li>
+                    @endif
+                @endforeach
+            </ul>
+        @endif
 
-            <!-- Flash Messages -->
-            {{-- @if (session('success'))
+        <!-- Flash Messages -->
+        {{-- @if (session('success'))
                 <div class="alert alert-success">
                     <span>{{ session('success') }}</span>
                     <button onclick="this.parentElement.remove()">×</button>
@@ -58,10 +58,26 @@
                     <button onclick="this.parentElement.remove()">×</button>
                 </div>
             @endif --}}
-
-            @yield('content')
-
-            <x-toasts />
+        <div class="content-wrapper">
+            @if(View::hasSection('header') || View::hasSection('subheader'))
+                <div class="page-header">
+                    <div class="page-header-content">
+                        <h1 class="page-title">
+                            @yield('header')
+                        </h1>
+                        @if(View::hasSection('subheader'))
+                            <p class="page-subtitle">
+                                @yield('subheader')
+                            </p>
+                        @endif
+                    </div>
+                </div>
+            @endif
+            <div class="page-content">
+                @yield('content')
+            </div>
+        </div>
+        <x-toasts />
     </main>
 
     <!-- Footer -->
