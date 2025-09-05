@@ -1,5 +1,3 @@
-@props(['globalSetting' => null])
-
 <style>
     /* Navbar */
     .navbar {
@@ -165,11 +163,12 @@
 
 <!-- Navbar Component -->
 <nav class="navbar">
-    <a href="{{ route('dashboard.index') }}" class="navbar-brand">
+    <a href="{{ auth()->check() ? route('dashboard.index') : '#' }}" class="navbar-brand">
         <img src="/uploads/logonuthaiS-2.png" alt="Logo">
-        <span>{{ $globalSetting->title ?? 'ระบบบริหารจัดการข้อมูลการรับรองสถาบันจากสภาการพยาบาล' }}</span>
+        <span>{{'ระบบบริหารจัดการข้อมูลการรับรองสถาบันจากสภาการพยาบาล'}}</span>
     </a>
 
+    @auth
     <div class="navbar-menu">
         <!-- Dashboard -->
         <a href="{{ route('dashboard.index') }}" class="{{ request()->routeIs('dashboard.index') ? 'active' : '' }}">
@@ -219,9 +218,12 @@
             </div>
         </div>
     </div>
+    @endauth
 </nav>
 
 <!-- Logout Form -->
+@auth
 <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display:none;">
     @csrf
 </form>
+@endauth
