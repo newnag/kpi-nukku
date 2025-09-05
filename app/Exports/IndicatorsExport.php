@@ -108,7 +108,7 @@ class IndicatorsExport implements FromQuery, WithHeadings, WithMapping, ShouldAu
         END
     ");
         $q->orderByRaw("
-        COALESCE(NULLIF(regexp_replace(indicators.code, '.*-', ''), '')::int, 0) ASC
+        COALESCE(NULLIF(SUBSTRING_INDEX(indicators.code, '-', -1), ''), 0) + 0 ASC
     ");
         $q->orderBy('indicators.code', 'asc');
 
