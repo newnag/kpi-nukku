@@ -22,7 +22,7 @@
 <body>
 
     <!-- Navbar -->
-    <x-navbar :global-setting="$global_setting ?? null" />
+    <x-navbar/>
 
     <!-- Main -->
     <main>
@@ -40,7 +40,7 @@
             @endif
 
             <!-- Flash Messages -->
-            @if (session('success'))
+            {{-- @if (session('success'))
                 <div class="alert alert-success">
                     <span>{{ session('success') }}</span>
                     <button onclick="this.parentElement.remove()">×</button>
@@ -57,9 +57,11 @@
                     <span>{{ session('warning') }}</span>
                     <button onclick="this.parentElement.remove()">×</button>
                 </div>
-            @endif
+            @endif --}}
 
             @yield('content')
+
+            <x-toasts />
     </main>
 
     <!-- Footer -->
