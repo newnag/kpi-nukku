@@ -99,47 +99,6 @@ footer {
     /* Remove flex property to allow natural content flow */
 }
 
-/* ===== CONTENT SECTIONS ===== */
-/* .content-section {
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
-    border-radius: 12px;
-    padding: 1.5rem;
-    margin-bottom: 1.5rem;
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-    transition: all 0.2s ease-in-out;
-}
-
-.content-section:hover {
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
-        0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    border-color: #cbd5e1;
-}
-
-.content-section-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 1.5rem;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid #f1f5f9;
-}
-
-.content-section-title {
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: #1e293b;
-    margin: 0;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.content-section-actions {
-    display: flex;
-    gap: 0.75rem;
-    align-items: center;
-} */
 
 /* ===== FORM CONTAINERS ===== */
 .form-container {
@@ -552,10 +511,7 @@ footer {
         font-size: 0.875rem;
     }
 
-    /* .content-section {
-        padding: 1rem;
-        margin-bottom: 1rem;
-    } */
+
 
     .form-container {
         padding: 1.5rem;
@@ -701,9 +657,7 @@ footer {
     animation: scaleIn 0.3s ease-out forwards;
 }
 
-/* .content-section {
-    animation: fadeIn 0.5s ease-out forwards;
-} */
+
 
 .stat-card {
     animation: scaleIn 0.3s ease-out forwards;
@@ -767,11 +721,6 @@ footer {
     margin-bottom: 1.5rem;
 }
 
-/* ===== FOCUS STYLES ===== */
-/* .content-section:focus-within {
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-} */
 
 /* ===== PRINT STYLES ===== */
 @media print {
@@ -787,7 +736,6 @@ footer {
         padding: 1rem 0;
     }
 
-    /* .content-section, */
     .form-container,
     .table-container {
         border: 1px solid #ccc;
@@ -816,7 +764,6 @@ footer {
         color: #94a3b8;
     }
 
-    /* .content-section, */
     .form-container,
     .table-container,
     .filter-container,
@@ -825,7 +772,6 @@ footer {
         border-color: #475569;
     }
 
-    /* .content-section-title, */
     .form-title,
     .table-title,
     .filter-title {
