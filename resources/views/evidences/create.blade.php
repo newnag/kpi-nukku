@@ -2,7 +2,7 @@
 @section('title', 'เพิ่มใหม่หลักฐาน')
 @section('content')
 
-    <div class="evidence-container">
+    {{-- <div class="evidence-container">
         <div class="evidence-containers">
             <div class="header-containers">เพิ่มใหม่หลักฐาน</div>
 
@@ -80,17 +80,17 @@
                 </form>
             </div>
         </div>
-    </div>
+    {{-- </div> --}} --}}
     <!-- jQuery -->
-    <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+    {{-- <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script> --}}
 
     <!-- Trumbowyg core -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/trumbowyg@2.27.3/dist/ui/trumbowyg.min.css">
+    {{-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/trumbowyg@2.27.3/dist/ui/trumbowyg.min.css">
     <script src="https://cdn.jsdelivr.net/npm/trumbowyg@2.27.3/dist/trumbowyg.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/trumbowyg@2.27.3/dist/langs/th.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/trumbowyg@2.27.3/dist/langs/th.min.js"></script> --}}
 
     <!-- Plugins ที่ใช้: colors, fontsize, fontfamily -->
-    <link rel="stylesheet"
+    {{-- <link rel="stylesheet"
         href="https://cdn.jsdelivr.net/npm/trumbowyg@2.27.3/dist/plugins/colors/ui/trumbowyg.colors.min.css">
     <script src="https://cdn.jsdelivr.net/npm/trumbowyg@2.27.3/dist/plugins/colors/trumbowyg.colors.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/trumbowyg@2.27.3/dist/plugins/fontsize/trumbowyg.fontsize.min.js"></script>
@@ -100,11 +100,11 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
         href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700&family=Kanit:wght@400;600&family=Sarabun:wght@400;600&display=swap"
-        rel="stylesheet">
+        rel="stylesheet"> --}}
 
 
     <!-- ================= Script ================= -->
-    <script>
+    {{-- <script>
         // กัน error ถ้าไม่ได้โหลด lucide
         if (window.lucide && typeof lucide.createIcons === 'function') {
             lucide.createIcons();
@@ -327,10 +327,10 @@
                 });
             });
         })(window.jQuery);
-    </script>
+    </script> --}}
 
     <!-- ================= Styles ================= -->
-    <style>
+    {{-- <style>
         .trumbowyg-editor ol,
         .trumbowyg-editor ul {
             list-style-position: inside;
@@ -699,6 +699,6 @@
                 align-self: flex-start;
             }
         }
-    </style>
+    </style> --}}
 
 @endsection
