@@ -5,51 +5,267 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
+use App\Models\User;
 
 class RolesAndPermissionsSeeder extends Seeder
 {
     public function run()
     {
-        // ล้าง cache
+        // Clear cached roles and permissions
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
 
-        // ====== สร้างสิทธิ์ (Permissions) ======
+        // Create permissions
         $permissions = [
-            'manage system',                    // ตั้งค่าระบบ
-            'manage database',                  // จัดการฐานข้อมูล
-            'manage indicators',                // จัดการตัวบ่งชี้
-            'view all indicators',              // ดูสถานะตัวบ่งชี้ทั้งหมด
-            'view own indicators',              // ดูเฉพาะตัวบ่งชี้ที่รับผิดชอบ
+            // ===== Indicator =====
+            'view-indicator-dashboard',
+            'create-indicator',
+            'view-indicator',
+            'edit-indicator',
+            'delete-indicator',
+
+            // ===== Users =====
+            'view-users',
+            'create-users',
+            'edit-users',
+            'delete-users',
+
+            // ===== Departments=====
+            'view-departments',
+            'create-departments',
+            'edit-departments',
+            'delete-departments',
+
+            // ===== Categories =====
+            'view-categories',
+            'create-categories',
+            'edit-categories',
+            'delete-categories',
+
+            // ===== Standards =====
+            'view-standards',
+            'create-standards',
+            'edit-standards',
+            'delete-standards',
+
+            // ===== Settings =====
+            'view-settings',
+            'create-settings',
+            'edit-settings',
+
+            // ===== Evidences =====
+            'view-evidence',
+            'create-evidence',
+            'edit-evidence',
+            'delete-evidence',
+            'download-evidence',
+
+            // ===== Dashboard =====
+            'view-dashboard',
+            'export-dashboard',
+
+            // ===== Dashboard KPI per User =====
+            'view-dashboard-kpi-user',
+            'show-dashboard-kpi-user',
+
+            // ===== Auth/โปรไฟล์พื้นฐาน (เผื่อใช้) =====
+            'edit-profile'
         ];
+
 
         foreach ($permissions as $permission) {
             Permission::firstOrCreate(['name' => $permission]);
         }
 
-        // ====== สร้างบทบาท (Roles) พร้อมมอบสิทธิ์ ======
+        // Create roles and assign permissions
 
-        // 1. Super Admin - ได้ทุกอย่าง
-        $superAdmin = Role::firstOrCreate(['name' => 'Super Admin']);
+        // Admin role - full access
+        $superAdmin = Role::firstOrCreate(['name' => 'super_admin']);
         $superAdmin->syncPermissions(Permission::all());
 
-        // 2. System Admin - ตั้งค่าระบบ + ฐานข้อมูล
-        $systemAdmin = Role::firstOrCreate(['name' => 'System Admin']);
-        $systemAdmin->syncPermissions(['manage system', 'manage database']);
+        $systemAdmin = Role::firstOrCreate(['name' => 'system_admin']);
+        $systemAdmin->syncPermissions([
+            // ===== Indicator =====
+            'view-indicator-dashboard',
+            'create-indicator',
+            'view-indicator',
+            'edit-indicator',
+            'delete-indicator',
 
-        // 3. QA Admin - จัดการตัวบ่งชี้ + ดูภาพรวม
-        $qaAdmin = Role::firstOrCreate(['name' => 'QA Admin']);
-        $qaAdmin->syncPermissions(['manage indicators', 'view all indicators']);
+            // ===== Users =====
+            'view-users',
+            'create-users',
+            'edit-users',
+            'delete-users',
 
-        // 4. Administration Admin - จัดการตัวบ่งชี้ + ดูภาพรวม
-        $adminAdmin = Role::firstOrCreate(['name' => 'Administration Admin']);
-        $adminAdmin->syncPermissions(['manage indicators', 'view all indicators']);
+            // ===== Departments=====
+            'view-departments',
+            'create-departments',
+            'edit-departments',
+            'delete-departments',
 
-        // 5. User - จัดการเฉพาะตัวบ่งชี้ของตน
-        $user = Role::firstOrCreate(['name' => 'User']);
-        $user->syncPermissions(['view own indicators', 'manage indicators']);
+            // ===== Categories =====
+            'view-categories',
+            'create-categories',
+            'edit-categories',
+            'delete-categories',
+
+            // ===== Standards =====
+            'view-standards',
+            'create-standards',
+            'edit-standards',
+            'delete-standards',
+
+            // ===== Settings =====
+            'view-settings',
+            'create-settings',
+            'edit-settings',
+
+            // ===== Evidences =====
+            'view-evidence',
+            'create-evidence',
+            'edit-evidence',
+            'delete-evidence',
+            'download-evidence',
+
+            // ===== Dashboard =====
+            'view-dashboard',
+            'export-dashboard',
+
+            // ===== Auth/โปรไฟล์พื้นฐาน (เผื่อใช้) =====
+            'edit-profile'
+
+        ]);
+
+        $qaAdmin = Role::firstOrCreate(['name' => 'qa_admin']);
+        $qaAdmin->syncPermissions([
+            // ===== Indicator =====
+            'view-indicator-dashboard',
+            'create-indicator',
+            'view-indicator',
+            'edit-indicator',
+            'delete-indicator',
+
+            // ===== Users =====
+            'view-users',
+
+            // ===== Departments =====
+            'view-departments',
+
+            // ===== Categories =====
+            'view-categories',
+
+            // ===== Standards =====
+            'view-standards',
+
+            // ===== Settings =====
+            'view-settings',
+
+            // ===== Evidences =====
+            'view-evidence',
+            'create-evidence',
+            'edit-evidence',
+            'delete-evidence',
+            'download-evidence',
+
+            // ===== Dashboard =====
+            'view-dashboard',
+            'export-dashboard',
+
+            // ===== Dashboard KPI per User =====
+            'view-dashboard-kpi-user',
+            'show-dashboard-kpi-user',
+
+            // ===== Auth/โปรไฟล์พื้นฐาน (เผื่อใช้) =====
+            'edit-profile'
+
+        ]);
+
+        $administrationAdmin = Role::firstOrCreate(['name' => 'administration_admin']);
+        $administrationAdmin->syncPermissions([
+            // ===== Indicator =====
+            'view-indicator-dashboard',
+
+            // ===== Users =====
+            'view-users',
+
+            // ===== Departments =====
+            'view-departments',
+
+            // ===== Categories =====
+            'view-categories',
+
+            // ===== Standards =====
+            'view-standards',
+
+            // ===== Settings =====
+            'view-settings',
+
+            // ===== Evidences =====
+            'view-evidence',
+            'download-evidence',
+
+            // ===== Dashboard =====
+            'view-dashboard',
+            'export-dashboard',
+
+            // ===== Dashboard KPI per User =====
+            'view-dashboard-kpi-user',
+            'show-dashboard-kpi-user',
+
+            // ===== Auth/โปรไฟล์พื้นฐาน (เผื่อใช้) =====
+            'edit-profile'
+        ]);
+
+        $user = Role::firstOrCreate(['name' => 'user']);
+        $user->syncPermissions([
+            // ===== Indicator =====
+            'view-indicator-dashboard',
+
+            // ===== Users =====
+            'view-users',
+
+            // ===== Departments=====
+            'view-departments',
+            'create-departments',
+            'edit-departments',
+            'delete-departments',
+
+            // ===== Categories =====
+            'view-categories',
+            'create-categories',
+            'edit-categories',
+            'delete-categories',
+
+            // ===== Standards =====
+            'view-standards',
+            'create-standards',
+            'edit-standards',
+            'delete-standards',
+
+            // ===== Settings =====
+            'view-settings',
+            'create-settings',
+            'edit-settings',
+
+            // ===== Evidences =====
+            'view-evidence',
+            'create-evidence',
+            'edit-evidence',
+            'delete-evidence',
+            'download-evidence',
+
+            // ===== Dashboard =====
+            'view-dashboard',
+            'export-dashboard',
+
+            // ===== Dashboard KPI per User =====
+            'view-dashboard-kpi-user',
+            'show-dashboard-kpi-user',
+
+            // ===== Auth/โปรไฟล์พื้นฐาน (เผื่อใช้) =====
+            'edit-profile'
+        ]);
+
+        $this->command->info('✅ Roles and permissions created successfully!');
     }
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> origin/Jui
