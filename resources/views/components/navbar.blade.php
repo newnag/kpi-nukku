@@ -165,65 +165,118 @@
 <nav class="navbar">
     <a href="{{ auth()->check() ? route('dashboard.index') : '#' }}" class="navbar-brand">
         <img src="/uploads/logonuthaiS-2.png" alt="Logo">
-        <span>{{'ระบบบริหารจัดการข้อมูลการรับรองสถาบันจากสภาการพยาบาล'}}</span>
+        <span>{{ 'ระบบบริหารจัดการข้อมูลการรับรองสถาบันจากสภาการพยาบาล' }}</span>
     </a>
 
     @auth
-    <div class="navbar-menu">
-        <!-- Dashboard -->
-        <a href="{{ route('dashboard.index') }}" class="{{ request()->routeIs('dashboard.index') ? 'active' : '' }}">
-            <i class="fa-solid fa-gauge-high"></i> Dashboard
-        </a>
-
-        <!-- Graph Result -->
-        <a href="{{ route('dashboard.getData') }}" class="{{ request()->routeIs('dashboard.getData') ? 'active' : '' }}">
-            <i class="fa-solid fa-chart-column"></i> กราฟแสดงผลลัพธ์ตัวชี้วัด
-        </a>
-
-        <!-- Indicators -->
-        <a href="{{ route('indicator.dashboard') }}" class="{{ request()->is('indicator*') ? 'active' : '' }}">
-            <i class="fa-solid fa-bullseye"></i> จัดการตัวชี้วัด
-        </a>
-
-        <!-- Settings -->
-        <div class="dropdown" id="settingsDropdown">
-            <div class="dropdown-toggle">
-                <i class="fa-solid fa-gear"></i> Settings <i class="fa-solid fa-caret-down ml-1"></i>
-            </div>
-            <div class="dropdown-menu">
-                <a href="{{ route('settings.index') }}">
-                    <i class="fa-solid fa-building"></i> ตั้งค่าหน่วยงาน/กำหนดวันแจ้งเตือน
+        <div class="navbar-menu">
+            <!-- Dashboard - Available to all authenticated users -->
+            @can('view-dashboard')
+                <a href="{{ route('dashboard.index') }}" class="{{ request()->routeIs('dashboard.index') ? 'active' : '' }}">
+                    <i class="fa-solid fa-gauge-high"></i> Dashboard
                 </a>
-                <a href="{{ route('departments.index') }}">
-                    <i class="fa-solid fa-sitemap"></i> จัดการหน่วยงาน
+                <!-- Graph Result - Available to users with export permission -->
+                <a href="{{ route('dashboard.getData') }}" class="{{ request()->routeIs('dashboard.getData') ? 'active' : '' }}">
+                    <i class="fa-solid fa-chart-column"></i> กราฟแสดงผลลัพธ์ตัวชี้วัด
                 </a>
-                <a href="{{ route('standards.index') }}">
-                    <i class="fa-solid fa-layer-group"></i> จัดการข้อมูลมาตรฐาน/ด้านต่างๆ
+            @endcan
+
+
+            <!-- Indicators - Available to users with indicator permissions -->
+            @can('view-indicator-dashboard')
+                <a href="{{ route('indicator.dashboard') }}" class="{{ request()->is('indicator*') ? 'active' : '' }}">
+                    <i class="fa-solid fa-bullseye"></i> จัดการตัวชี้วัด
                 </a>
+            @endcan
+
+            <!-- Settings - Only for super_admin and system_admin roles -->
+            @hasanyrole('super_admin|system_admin')
+                <div class="dropdown" id="settingsDropdown">
+                    <div class="dropdown-toggle">
+                        <i class="fa-solid fa-gear"></i> ตั้งค่าระบบ <i class="fa-solid fa-caret-down ml-1"></i>
+                    </div>
+                    <div class="dropdown-menu">
+                        @can('view-settings')
+                            <a href="{{ route('settings.index') }}">
+                                <i class="fa-solid fa-bell"></i> กำหนดวันแจ้งเตือน
+                            </a>
+                        @endcan
+                        @can('view-departments')    
+                            <a href="{{ route('departments.index') }}">
+                                <i class="fa-solid fa-sitemap"></i> จัดการหน่วยงาน
+                            </a>
+                        @endcan
+                        @can('view-standards')
+                            <a href="{{ route('standards.index') }}">
+                                <i class="fa-solid fa-layer-group"></i> จัดการข้อมูลมาตรฐาน/ด้านต่างๆ
+                            </a>
+                        @endcan
+                        @can('view-users')
+                            <a href="{{ route('users.index') }}">
+                                <i class="fa-solid fa-users"></i> จัดการผู้ใช้งาน
+                            </a>
+                        @endcan
+                    </div>
+                </div>
+            @endhasanyrole
+
+            <!-- Management Menu - For qa_admin and administration_admin -->
+            @hasanyrole('qa_admin|administration_admin')
+                <div class="dropdown" id="managementDropdown">
+                    <div class="dropdown-toggle">
+                        <i class="fa-solid fa-tasks"></i> จัดการ <i class="fa-solid fa-caret-down ml-1"></i>
+                    </div>
+                    <div class="dropdown-menu">
+                        @can('view-departments')
+                            <a href="{{ route('departments.index') }}">
+                                <i class="fa-solid fa-sitemap"></i> จัดการหน่วยงาน
+                            </a>
+                        @endcan
+                        @can('view-standards')
+                            <a href="{{ route('standards.index') }}">
+                                <i class="fa-solid fa-layer-group"></i> จัดการมาตรฐาน
+                            </a>
+                        @endcan
+                        @can('view-evidence')
+                            <a href="{{ route('evidences.index') }}">
+                                <i class="fa-solid fa-file-alt"></i> จัดการหลักฐาน
+                            </a>
+                        @endcan
+                    </div>
+                </div>
+            @endhasanyrole
+
+            <!-- User Menu - Available to all authenticated users -->
+            <div class="dropdown" id="userDropdown">
+                <div class="dropdown-toggle">
+                    <img src="/uploads/avatar-type1.png" alt="User" class="user-avatar">
+                    <span class=" sm:inline">{{ auth()->user()->name ?? 'ผู้ใช้' }}</span>
+                </div>
+                <div class="dropdown-menu">
+                    <div class="px-3 py-2 text-xs text-gray-500 border-b">
+                        <div class="font-medium">{{ auth()->user()->name ?? 'ผู้ใช้' }}</div>
+                        <div class="text-xs">
+                            @if (auth()->user()->roles->isNotEmpty())
+                                บทบาท: {{ auth()->user()->roles->pluck('name')->join(', ') }}
+                            @endif
+                        </div>
+                    </div>
+                    {{-- @can('edit-profile')
+                        <a href="#"><i class="fa-solid fa-id-badge"></i> โปรไฟล์</a>
+                    @endcan --}}
+                    <hr>
+                    <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                        <i class="fa-solid fa-right-from-bracket"></i> ออกจากระบบ
+                    </a>
+                </div>
             </div>
         </div>
-
-        <!-- User -->
-        <div class="dropdown" id="userDropdown">
-            <div class="dropdown-toggle">
-                <img src="/uploads/avatar-type1.png" alt="User" class="user-avatar">
-            </div>
-            <div class="dropdown-menu">
-                <a href="#"><i class="fa-solid fa-id-badge"></i> โปรไฟล์</a>
-                <a href="#"><i class="fa-solid fa-sliders"></i> ตั้งค่าระบบ</a>
-                <hr>
-                <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                    <i class="fa-solid fa-right-from-bracket"></i> ออกจากระบบ
-                </a>
-            </div>
-        </div>
-    </div>
     @endauth
 </nav>
 
 <!-- Logout Form -->
 @auth
-<form id="logout-form" action="{{ route('logout') }}" method="POST" style="display:none;">
-    @csrf
-</form>
+    <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display:none;">
+        @csrf
+    </form>
 @endauth
