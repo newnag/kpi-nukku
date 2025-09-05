@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('variables', function (Blueprint $table) {
             $table->id();
             $table->string('variable_name');
+            $table->string('label_name');
             $table->string('type', 50);
             $table->float('value', 5, 2)->nullable();
             

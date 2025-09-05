@@ -48,21 +48,52 @@ class DashboardKpiUserController extends Controller
         return view('kpi_dashboard_assigned.app', compact('indicators'));
     }
 
-
-
     public function show($id)
     {
         $indicator = Indicator::with([
             'category.standard',
-            'assignments.collectorUser.department', // 👈 เพิ่มบรรทัดนี้
-
-            'criterias.evidences.user.department'
+            'assignments.collectorUser.department',
+            'criterias.evidences.user.department',
+            'variables',
+            'formulas.variables',
+            'checklistItems',
         ])->findOrFail($id);
 
-        // return response()->json([
-        //     'success'   => true,
-        //     'indicator' => $indicator
-        // ]);
-        return view('kpi_dashboard_assigned.show', compact('indicator'));
+        $criteria_id = optional($indicator->criterias->first())->id;
+
+        return view('kpi_dashboard_assigned.show', compact('indicator', 'criteria_id'));
     }
+
+    // public function show($id)
+    // {
+    //     $indicator = Indicator::with([
+    //         'category.standard',
+    //         'assignments.collectorUser.department',
+    //         'criterias.evidences.user.department',
+
+    //         // ✅ เพิ่มการโหลดข้อมูลให้คะแนน
+    //         'variables',
+    //         'formulas.variables',
+    //         'checklistItems',
+    //     ])->findOrFail($id);
+
+    //     return view('kpi_dashboard_assigned.show', compact('indicator'));
+    // }
+
+
+    // public function show($id)
+    // {
+    //     $indicator = Indicator::with([
+    //         'category.standard',
+    //         'assignments.collectorUser.department', // 👈 เพิ่มบรรทัดนี้
+
+    //         'criterias.evidences.user.department'
+    //     ])->findOrFail($id);
+
+    //     // return response()->json([
+    //     //     'success'   => true,
+    //     //     'indicator' => $indicator
+    //     // ]);
+    //     return view('kpi_dashboard_assigned.show', compact('indicator'));
+    // }
 }
