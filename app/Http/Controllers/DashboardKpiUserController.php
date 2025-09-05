@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Assignment;
 
 use App\Models\Indicator;
+use App\Models\Variable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -63,37 +64,33 @@ class DashboardKpiUserController extends Controller
 
         return view('kpi_dashboard_assigned.show', compact('indicator', 'criteria_id'));
     }
+    public function saveVariables(Request $request, $id)
+    {
+        $indicator = Indicator::findOrFail($id);
 
-    // public function show($id)
-    // {
-    //     $indicator = Indicator::with([
-    //         'category.standard',
-    //         'assignments.collectorUser.department',
-    //         'criterias.evidences.user.department',
+        if ($request->has('variables')) {
+            foreach ($request->variables as $varId => $value) {
+                Variable::updateOrCreate(
+                    ['id' => $varId, 'indicator_id' => $indicator->id],
+                    ['value' => $value]
+                );
+            }
+        }
 
-    //         // ✅ เพิ่มการโหลดข้อมูลให้คะแนน
-    //         'variables',
-    //         'formulas.variables',
-    //         'checklistItems',
-    //     ])->findOrFail($id);
+        $indicator->status = $request->status; // 1 = ร่าง, 2 = จริง
+        $indicator->save();
 
-    //     return view('kpi_dashboard_assigned.show', compact('indicator'));
-    // }
+        // return response()->json([
+        //     'success' => true,
+        //     'message' => $request->status == 1
+        //         ? 'บันทึกฉบับร่างเรียบร้อย ✅'
+        //         : 'บันทึกจริงสำเร็จ 🚀',
+        // ]);
 
-
-    // public function show($id)
-    // {
-    //     $indicator = Indicator::with([
-    //         'category.standard',
-    //         'assignments.collectorUser.department', // 👈 เพิ่มบรรทัดนี้
-
-    //         'criterias.evidences.user.department'
-    //     ])->findOrFail($id);
-
-    //     // return response()->json([
-    //     //     'success'   => true,
-    //     //     'indicator' => $indicator
-    //     // ]);
-    //     return view('kpi_dashboard_assigned.show', compact('indicator'));
-    // }
+        return redirect()
+            ->route('dashboardKpiUser.index')
+            ->with('success', $request->status == 1
+                ? 'บันทึกฉบับร่างเรียบร้อย ✅'
+                : 'บันทึกจริงสำเร็จ 🚀');
+    }
 }

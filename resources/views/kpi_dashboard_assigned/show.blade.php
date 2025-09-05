@@ -278,63 +278,61 @@
             </div>
 
             @if ($indicator->variables->where('type', 'input')->isNotEmpty())
-                <div class="card">
-                    <h2 class="card-title">กรอกค่าตัวแปร</h2>
+                <form id="variables-form" action="{{ route('dashboardKpiUser.saveVariables', $indicator->id) }}"
+                    method="POST">
+                    @csrf
+                    @method('PUT')
 
-                    @php
-                        // กรองเฉพาะ type = input (ตัดช่องว่าง/คอมม่าออก)
-                        $inputVariables = $indicator->variables->filter(function ($v) {
-                            return trim($v->type) === 'input';
-                        });
-                    @endphp
+                    <div class="card">
+                        <h2 class="card-title">กรอกค่าตัวแปร</h2>
 
-                    @forelse($inputVariables as $variable)
-                        <div class="variable-row">
-                            <label class="variable-label">
-                                {{ $variable->label_name ?? $variable->variable_name }}
-                            </label>
-                            <input type="number" name="variables[{{ $variable->id }}]"
-                                value="{{ old('variables.' . $variable->id, $variable->value) }}"
-                                placeholder="กรุณากรอกร้อยละเป็นตัวเลข" class="variable-input">
-                        </div>
-                    @empty
-                        <p class="text-gray-500">ยังไม่มีตัวแปรที่ต้องกรอกเอง</p>
-                    @endforelse
-                </div>
+                        @php
+                            // กรองเฉพาะ type = input
+                            $inputVariables = $indicator->variables->filter(fn($v) => trim($v->type) === 'input');
+                        @endphp
+
+                        @forelse($inputVariables as $variable)
+                            <div class="variable-row">
+                                <label class="variable-label">
+                                    {{ $variable->label_name ?? $variable->variable_name }}
+                                </label>
+                                <input type="number" name="variables[{{ $variable->id }}]"
+                                    value="{{ old('variables.' . $variable->id, $variable->value) }}"
+                                    placeholder="กรุณากรอกร้อยละเป็นตัวเลข" class="variable-input"
+                                    {{ $indicator->status == 2 ? 'readonly' : '' }}>
+                            </div>
+                        @empty
+                            <p class="text-gray-500">ยังไม่มีตัวแปรที่ต้องกรอกเอง</p>
+                        @endforelse
+                    </div>
+
+                    <!-- hidden สำหรับเก็บ status -->
+                    <input type="hidden" name="status" id="status-input">
+
+                    <div class="action-bts">
+                        <!-- ปุ่มกลับ -->
+                        <button type="button" class="btns-secondary" onclick="history.back()">
+                            <i class="fa fa-undo"></i> กลับ
+                        </button>
+
+                        <!-- ปุ่มบันทึกฉบับร่าง -->
+                        <button type="button" class="btn-outline save-btn" data-status="1"
+                            {{ $indicator->status == 2 ? 'disabled' : '' }}>
+                            <i class="fa fa-save"></i> บันทึกฉบับร่าง
+                        </button>
+
+                        <!-- ปุ่มบันทึกจริง -->
+                        <button type="button" class="btns-primary save-btn" data-status="2"
+                            {{ $indicator->status == 2 ? 'disabled' : '' }}>
+                            <i class="fa fa-save"></i> บันทึก
+                        </button>
+                    </div>
+                </form>
             @endif
 
-            @if ($indicator->status == 3 && (isset($indicator->score_acc) || isset($indicator->max_score)))
-                <div class="card_total total-score-card">
-                    <h2 class="card-title">คะแนนรวม</h2>
 
-                    <div class="total-score-row">
-                        <span class="label">คะแนนที่ได้:</span>
-                        <span class="score-value">
-                            {{ number_format($indicator->score_acc ?? 0, 2) }}
-                        </span>
-                    </div>
-
-                    <div class="total-score-row">
-                        <span class="label">คะแนนเต็ม:</span>
-                        <span class="score-max">
-                            {{ number_format($indicator->max_score ?? 0, 2) }}
-                        </span>
-                    </div>
-                </div>
-            @endif
-
-            @if (!empty($indicator->annotation))
-                <div class="card annotation-card">
-                    <div class="annotation-header">
-                        <i class="fa fa-exclamation-triangle"></i>
-                        หมายเหตุ
-                    </div>
-                    <div class="annotation-body">
-                        {!! nl2br(e($indicator->annotation)) !!}
-                    </div>
-                </div>
-            @endif
         </div>
+
     </div>
 @endsection
 @push('scripts')
@@ -357,12 +355,92 @@
 @endpush
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const form = document.getElementById("variables-form");
+        const statusInput = document.getElementById("status-input");
 
+        // ดักทุกปุ่มที่มี class .save-btn
+        document.querySelectorAll(".save-btn").forEach(btn => {
+            btn.addEventListener("click", function() {
+                const status = this.getAttribute("data-status");
+
+                // ใส่ค่า status ลง hidden input
+                statusInput.value = status;
+
+                // ส่ง form
+                form.submit();
+            });
+        });
+    });
+</script>
 <script>
     // กัน error ถ้าไม่ได้โหลด lucide
     if (window.lucide && typeof lucide.createIcons === 'function') {
         lucide.createIcons();
     }
+    // ================= ปุ่มบันทึกตัวแปร =================
+    document.querySelectorAll('.save-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const status = this.dataset.status;
+            const form = document.getElementById('variables-form');
+            const formData = new FormData(form);
+            formData.set('status', status); // อัปเดทค่า status
+
+            fetch(form.action, {
+                    method: "POST",
+                    body: formData,
+                    headers: {
+                        "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content,
+                        "Accept": "application/json"
+                    }
+                })
+                .then(async res => {
+                    const text = await res.text();
+                    try {
+                        return JSON.parse(text);
+                    } catch (err) {
+                        console.error("Response is not JSON:", text);
+                        throw err;
+                    }
+                })
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire({
+                            toast: true,
+                            position: 'top-end',
+                            icon: 'success',
+                            title: data.message || 'บันทึกสำเร็จ',
+                            showConfirmButton: false,
+                            timer: 2000
+                        });
+                    } else {
+                        Swal.fire({
+                            toast: true,
+                            position: 'top-end',
+                            icon: 'error',
+                            title: data.message || 'เกิดข้อผิดพลาด',
+                            showConfirmButton: false,
+                            timer: 2000
+                        });
+                    }
+                })
+                .catch(err => {
+                    console.error("Fetch error:", err);
+                    Swal.fire({
+                        toast: true,
+                        position: 'top-end',
+                        icon: 'error',
+                        title: 'ไม่สามารถบันทึกได้',
+                        showConfirmButton: false,
+                        timer: 2000
+                    });
+                });
+        });
+    });
+
+
+
     // ✅ Template render หลักฐานใหม่ ให้เหมือน Blade
     function renderEvidenceItem(ev) {
         let icon = '<i data-lucide="file" style="color:#6b7280;"></i>'; // default
@@ -440,11 +518,11 @@
 
                         const list = document.querySelector(
                             `.evidence-list-${form.querySelector('[name="criteria_id"]').value}`
-                            );
+                        );
                         if (list && data.evidences && Array.isArray(data.evidences)) {
                             data.evidences.forEach(ev => {
                                 list.insertAdjacentHTML("beforeend", renderEvidenceItem(
-                                ev));
+                                    ev));
 
                                 // bind ปุ่มลบทันที
                                 const deleteBtn = list.querySelector(
@@ -846,6 +924,74 @@
         --radius-sm: 10px;
     }
 
+    .action-bts {
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+        margin-top: 20px;
+    }
+
+    .btns-primary,
+    .btns-secondary,
+    .btn-outline,
+    .btn-info {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        /* ลดระยะ icon กับข้อความ */
+        padding: 6px 12px;
+        /* ปรับ padding ให้น้อยลง */
+        font-size: 13px;
+        /* ตัวหนังสือเล็กลง */
+        font-weight: 500;
+        border-radius: 6px;
+        /* มุมมนเล็กลง */
+        cursor: pointer;
+        transition: 0.2s;
+        border: none;
+        height: 32px;
+        /* ความสูงปุ่มลดลง */
+        line-height: 1.2;
+    }
+
+    .btns-primary {
+        background: #398ECA;
+        color: #fff;
+    }
+
+    .btns-primary:hover {
+        background: #2f7db2;
+    }
+
+    .btns-secondary {
+        background: #fff;
+        border: 1.5px solid #398ECA;
+        color: #398ECA;
+    }
+
+    .btns-secondary:hover {
+        background: #EBF7FF;
+    }
+
+    .btn-outline {
+        background: #ffffff;
+        border: 1.5px solid #398ECA;
+        color: #398ECA;
+    }
+
+    .btn-outline:hover {
+        background: #dbeafe;
+    }
+
+    .btn-info {
+        background: #06b6d4;
+        color: #fff;
+    }
+
+    .btn-info:hover {
+        background: #0891b2;
+    }
+
     .card {
         background: var(--bg);
         border-radius: var(--radius);
@@ -1029,69 +1175,8 @@
         margin-right: 6px;
     }
 
-    .dropdown {
-        position: relative;
-        display: inline-block;
 
-    }
 
-    .dropdown-toggle {
-        background: #ffffff;
-        border: 1.5px solid #398ECA;
-        border-radius: 20px;
-        padding: 6px 28px 6px 12px;
-        font-size: 13px;
-        color: #398ECA;
-        cursor: pointer;
-        outline: none;
-        text-align: left;
-        position: relative;
-    }
-
-    .dropdown-toggle .arrow {
-        position: absolute;
-        right: 12px;
-        top: 50%;
-        transform: translateY(-50%);
-        border-left: 5px solid transparent;
-        border-right: 5px solid transparent;
-        border-top: 6px solid #398ECA;
-        /* ลูกศรลง */
-        pointer-events: none;
-    }
-
-    .dropdown-menu {
-        display: none;
-        position: absolute;
-        left: 0;
-        right: 0;
-        background: #fff;
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        list-style: none;
-        padding: 6px 0;
-        margin-top: 4px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-        z-index: 9999;
-        /* ป้องกันถูกบัง */
-    }
-
-    .dropdown-menu li {
-        padding: 8px 12px;
-        cursor: pointer;
-        font-size: 13px;
-        color: #374151;
-        transition: background 0.2s;
-    }
-
-    .dropdown-menu li:hover {
-        background: #EBF7FF;
-        color: #398ECA;
-    }
-
-    .dropdown-menu.show {
-        display: block;
-    }
 
     .file-icon {
         flex-shrink: 0;

@@ -115,6 +115,7 @@ Route::prefix('dashboard')->name('dashboard.')->group(function () {
 Route::prefix('dashboardKpiUser')->name('dashboardKpiUser.')->group(function () {
     Route::get('/', [DashboardKpiUserController::class, 'index'])->name('index');
     Route::get('/dashboardKpiUser/{id}', [DashboardKpiUserController::class, 'show'])->name('show');
+    Route::put('/{id}/update-variables', [DashboardKpiUserController::class, 'saveVariables'])->name('saveVariables');
 });
 
 
