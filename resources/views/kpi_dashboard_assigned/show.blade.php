@@ -51,9 +51,9 @@
                     @if ($indicator->status == 0)
                         <span class="status-chip orange">รอดำเนินการ</span>
                     @elseif ($indicator->status == 1)
-                        <span class="status-chip gray">บันทึกร่าง</span>
+                        <span class="status-chip orange">รอดำเนินการ / บันทึกร่าง</span>
                     @elseif ($indicator->status == 2)
-                        <span class="status-chip blue">บันทึกจริง</span>
+                        <span class="status-chip orange">รอดำเนินการ / บันทึกจริง</span>
                     @elseif ($indicator->status == 3)
                         <span class="status-chip green">ผลการดำเนินงานครบถ้วนตามเกณฑ์มาตรการ</span>
                     @elseif ($indicator->status == 4)
@@ -62,6 +62,7 @@
                         <span class="status-chip">ไม่ทราบสถานะ</span>
                     @endif
                 </div>
+
             </div>
             <hr class="section-divider">
 
@@ -89,8 +90,8 @@
                                 </button>
 
                                 <!-- Popup -->
-                                <div x-show="open{{ $criteria->id }}"
-                                    class="fixed inset-0  bg-opacity-50 flex items-center justify-center z-50" x-cloak>
+                                <div x-show="open{{ $criteria->id }} && {{ $indicator->status }} != 2"
+                                    class="fixed inset-0 bg-opacity-50 flex items-center justify-center z-50" x-cloak>
 
                                     <!-- ปุ่มปิด -->
                                     <button @click="open{{ $criteria->id }} = false"
@@ -277,17 +278,16 @@
                 </div>
             </div>
 
-            @if ($indicator->variables->where('type', 'input')->isNotEmpty())
-                <form id="variables-form" action="{{ route('dashboardKpiUser.saveVariables', $indicator->id) }}"
-                    method="POST">
-                    @csrf
-                    @method('PUT')
+            <form id="variables-form" action="{{ route('dashboardKpiUser.saveVariables', $indicator->id) }}"
+                method="POST">
+                @csrf
+                @method('PUT')
 
+                @if ($indicator->variables->where('type', 'input')->isNotEmpty())
                     <div class="card">
                         <h2 class="card-title">กรอกค่าตัวแปร</h2>
 
                         @php
-                            // กรองเฉพาะ type = input
                             $inputVariables = $indicator->variables->filter(fn($v) => trim($v->type) === 'input');
                         @endphp
 
@@ -305,30 +305,32 @@
                             <p class="text-gray-500">ยังไม่มีตัวแปรที่ต้องกรอกเอง</p>
                         @endforelse
                     </div>
+                @endif
 
-                    <!-- hidden สำหรับเก็บ status -->
-                    <input type="hidden" name="status" id="status-input">
+                <!-- ✅ hidden status -->
+                <input type="hidden" name="status" id="status-input">
 
-                    <div class="action-bts">
-                        <!-- ปุ่มกลับ -->
-                        <button type="button" class="btns-secondary" onclick="history.back()">
-                            <i class="fa fa-undo"></i> กลับ
-                        </button>
+                <div class="action-bts">
+                    <button type="button" class="btns-secondary" onclick="history.back()">
+                        <i class="fa fa-undo"></i> กลับ
+                    </button>
 
+                    @if (!in_array($indicator->status, [2, 3, 4]))
                         <!-- ปุ่มบันทึกฉบับร่าง -->
-                        <button type="button" class="btn-outline save-btn" data-status="1"
-                            {{ $indicator->status == 2 ? 'disabled' : '' }}>
+                        <button type="submit" class="btn-outline save-btn" data-status="1">
                             <i class="fa fa-save"></i> บันทึกฉบับร่าง
                         </button>
 
                         <!-- ปุ่มบันทึกจริง -->
-                        <button type="button" class="btns-primary save-btn" data-status="2"
-                            {{ $indicator->status == 2 ? 'disabled' : '' }}>
+                        <button type="submit" class="btns-primary save-btn" data-status="2">
                             <i class="fa fa-save"></i> บันทึก
                         </button>
-                    </div>
-                </form>
-            @endif
+                    @endif
+                </div>
+            </form>
+
+
+
 
 
         </div>

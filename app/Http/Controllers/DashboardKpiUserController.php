@@ -25,7 +25,18 @@ class DashboardKpiUserController extends Controller
                     ->with(['collectorUser:id,name,department_id', 'collectorUser.department:id,name']),
                 'criterias:id,indicator_id,status'
             ])
+            ->orderByRaw("
+        CASE LEFT(code, 3)
+            WHEN 'NCS' THEN 1
+            WHEN 'NCO' THEN 2
+            WHEN 'NCP' THEN 3
+            ELSE 4
+        END
+    ")
+            ->orderByRaw("CAST(split_part(code, '-', 2) AS INTEGER)")
             ->get()
+
+
             ->map(function ($indicator) {
                 $totalCriteria = $indicator->criterias->count();
                 $completed = $indicator->criterias->where('status', 1)->count(); // สมมติว่า 1 = ผ่าน/ครบ
@@ -77,9 +88,12 @@ class DashboardKpiUserController extends Controller
             }
         }
 
-        $indicator->status = $request->status; // 1 = ร่าง, 2 = จริง
-        $indicator->save();
+        // ✅ update status
+        if ($request->has('status')) {
+            $indicator->status = $request->status;
+        }
 
+        $indicator->save();
         // return response()->json([
         //     'success' => true,
         //     'message' => $request->status == 1
@@ -90,7 +104,7 @@ class DashboardKpiUserController extends Controller
         return redirect()
             ->route('dashboardKpiUser.index')
             ->with('success', $request->status == 1
-                ? 'บันทึกฉบับร่างเรียบร้อย ✅'
-                : 'บันทึกจริงสำเร็จ 🚀');
+                ? 'บันทึกฉบับร่างเรียบร้อย '
+                : 'บันทึกจริงสำเร็จ ');
     }
 }

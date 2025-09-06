@@ -50,7 +50,8 @@
                 </div>
             </div>
 
-            <!-- Filter -->
+
+            {{-- Filter --}}
             <div class="dropdown" id="filter-dropdown-container">
                 <button id="filter-button" class="btn">
                     <span>กรองข้อมูล</span>
@@ -63,6 +64,7 @@
 
                 <div id="filter-dropdown" class="dropdown-menu hidden">
                     <div style="padding:12px 12px;">
+
                         {{-- Section: ปี --}}
                         <h3 class="dropdown-title">ปี</h3>
                         <div class="dropdown-multiselect" id="yearDropdown">
@@ -71,43 +73,67 @@
                                 <i style="font-size:12px;">▼</i>
                             </div>
                             <div class="dropdown-content">
-                                <label style="display:flex; align-items:center; margin-bottom:4px;">
-                                    <input type="checkbox" class="filter-option year-option" data-column="0"
-                                        data-value="2568">
-                                    <span style="margin-left:6px; font-size:14px; color:#374151;">2568</span>
-                                </label>
-                                <label style="display:flex; align-items:center; margin-bottom:4px;">
-                                    <input type="checkbox" class="filter-option year-option" data-column="0"
-                                        data-value="2567">
-                                    <span style="margin-left:6px; font-size:14px; color:#374151;">2567</span>
-                                </label>
+                                @foreach ($indicators->pluck('year')->unique()->sortDesc() as $year)
+                                    <label style="display:flex; align-items:center; margin-bottom:4px;">
+                                        <input type="checkbox" class="filter-option year-option" data-column="0"
+                                            data-value="{{ $year }}">
+                                        <span style="margin-left:6px; font-size:14px; color:#374151;">
+                                            {{ $year }}
+                                        </span>
+                                    </label>
+                                @endforeach
+                            </div>
+                        </div>
+
+                        <div class="dropdown-divider"></div>
+
+                        {{-- Section: ประเภทองค์กร --}}
+                        <h3 class="dropdown-title">ประเภทองค์กร</h3>
+                        <div class="dropdown-multiselect" id="typeDropdown">
+                            <div class="dropdown-btn" onclick="toggleDropdown('typeDropdown')">
+                                <span id="type-label">เลือกประเภท</span>
+                                <i style="font-size:12px;">▼</i>
+                            </div>
+                            <div class="dropdown-content">
+                                @foreach ($indicators->pluck('type')->unique() as $type)
+                                    <label style="display:flex; align-items:center; margin-bottom:4px;">
+                                        <input type="checkbox" class="filter-option type-option" data-column="3"
+                                            data-value="{{ $type }}">
+                                        <span style="margin-left:6px; font-size:14px; color:#374151;">
+                                            {{ $type }}
+                                        </span>
+                                    </label>
+                                @endforeach
                             </div>
                         </div>
 
                         <div class="dropdown-divider"></div>
 
                         {{-- Section: สถานะ --}}
-                        <h3 class="dropdown-title">สถานะตัวบ่งชี้</h3>
+                        <h3 class="dropdown-title">สถานะตัวชี้วัด</h3>
                         <div class="dropdown-multiselect" id="statusDropdown">
                             <div class="dropdown-btn" onclick="toggleDropdown('statusDropdown')">
                                 <span id="status-label">เลือกสถานะ</span>
                                 <i style="font-size:12px;">▼</i>
                             </div>
                             <div class="dropdown-content">
-                                <label style="display:flex; align-items:center; margin-bottom:4px;">
-                                    <input type="checkbox" class="filter-option status-option" data-column="6"
-                                        data-value="รอดำเนินการ">
-                                    <span style="margin-left:6px; font-size:14px; color:#374151;">รอดำเนินการ</span>
+                                <label><input type="checkbox" class="filter-option status-option" data-column="7"
+                                        data-value="ดำเนินการ">
+                                    <span style="margin-left:6px;">อยู่ระหว่างดำเนินการ</span>
                                 </label>
-                                <label style="display:flex; align-items:center; margin-bottom:4px;">
-                                    <input type="checkbox" class="filter-option status-option" data-column="6"
+                                <label><input type="checkbox" class="filter-option status-option" data-column="7"
+                                        data-value="ครบ">
+                                    <span style="margin-left:6px;">ครบถ้วน</span>
+                                </label>
+                                <label><input type="checkbox" class="filter-option status-option" data-column="7"
                                         data-value="ไม่ครบ">
-                                    <span style="margin-left:6px; font-size:14px; color:#374151;">ไม่ครบ</span>
+                                    <span style="margin-left:6px;">ไม่ครบ</span>
                                 </label>
                             </div>
                         </div>
 
                         <div class="dropdown-divider"></div>
+
                         {{-- Buttons --}}
                         <div style="display:flex; justify-content:space-between; gap:12px;">
                             <button id="clear-filters" class="btn" style="padding:6px 10px;">ล้างตัวกรอง</button>
@@ -117,6 +143,7 @@
                     </div>
                 </div>
             </div>
+
 
         </div>
 
@@ -166,40 +193,61 @@
                                 <td class="status-cell">
                                     @switch($indicator->status)
                                         @case(0)
-                                            <i data-lucide="alert-triangle" class="status-icon text-danger"
-                                                title="อยู่ระหว่างดำเนินการ"></i>
+                                            <span class="tooltip" data-tooltip="รอดำเนินการ">
+                                                <i data-lucide="clock" class="status-icon text-warn"></i>
+                                            </span>
                                         @break
 
-                                        @case(4)
-                                            <i data-lucide="clock" class="status-icon text-warn"
-                                                title="ผลการดำเนินงานยังไม่ครบถ้วนตามเกณฑ์"></i>
+                                        @case(1)
+                                            <span class="tooltip" data-tooltip="รอดำเนินการ / บันทึกร่าง">
+                                                <i data-lucide="clock" class="status-icon text-warn"></i>
+                                            </span>
                                         @break
 
                                         @case(2)
+                                            <span class="tooltip" data-tooltip="รอดำเนินการ / บันทึกจริง">
+                                                <i data-lucide="clock" class="status-icon text-warn"></i>
+                                            </span>
+                                        @break
+
                                         @case(3)
-                                            <i data-lucide="check-circle" class="status-icon text-success"
-                                                title="ผลการดำเนินงานครบถ้วนตามเกณฑ์มาตรการ"></i>
+                                            <span class="tooltip" data-tooltip="ผลการดำเนินงานครบถ้วนตามเกณฑ์มาตรการ">
+                                                <i data-lucide="check-circle" class="status-icon text-success"></i>
+                                            </span>
+                                        @break
+
+                                        @case(4)
+                                            <span class="tooltip" data-tooltip="ผลการดำเนินงานยังไม่ครบถ้วนตามเกณฑ์">
+                                                <i data-lucide="alert-triangle" class="status-icon text-danger"></i>
+                                            </span>
                                         @break
 
                                         @default
-                                            <i data-lucide="help-circle" class="status-icon text-gray-500"
-                                                title="สถานะไม่ระบุ"></i>
+                                            <span class="tooltip" data-tooltip="สถานะไม่ระบุ">
+                                                <i data-lucide="help-circle" class="status-icon text-gray-500"></i>
+                                            </span>
                                     @endswitch
+
+
                                 </td>
                                 <td class="status-cell">
                                     @switch($indicator->doc_status)
                                         @case('ไม่ครบ')
-                                            <i data-lucide="x-circle" class="status-icon text-danger"
-                                                title="ผลการดำเนินงานยังไม่ครบถ้วนตามเกณฑ์"></i>
+                                            <span class="tooltip" data-tooltip="ผลการดำเนินงานยังไม่ครบถ้วนตามเกณฑ์">
+                                                <i data-lucide="x-circle" class="status-icon text-danger"></i>
+                                            </span>
                                         @break
 
                                         @case('ครบ')
-                                            <i data-lucide="check-circle" class="status-icon text-success"
-                                                title="ผลการดำเนินงานครบถ้วนตามเกณฑ์"></i>
+                                            <span class="tooltip" data-tooltip="ผลการดำเนินงานครบถ้วนตามเกณฑ์">
+                                                <i data-lucide="check-circle" class="status-icon text-success"></i>
+                                            </span>
                                         @break
 
                                         @default
-                                            <i data-lucide="help-circle" class="status-icon text-gray-400" title="ไม่ทราบ"></i>
+                                            <span class="tooltip" data-tooltip="ไม่ทราบ">
+                                                <i data-lucide="help-circle" class="status-icon text-gray-400"></i>
+                                            </span>
                                     @endswitch
                                 </td>
                                 <td>
@@ -379,7 +427,8 @@
         }
 
         // อัปเดต label เมื่อเลือก
-        function setupDropdownLabel(dropdownId, labelId) {
+        // อัปเดต label ของ multiselect
+        function setupDropdownLabel(dropdownId, labelId, defaultText) {
             const checkboxes = document.querySelectorAll(`#${dropdownId} .filter-option`);
             const label = document.getElementById(labelId);
 
@@ -389,17 +438,15 @@
                         .filter(x => x.checked)
                         .map(x => x.getAttribute('data-value'));
 
-                    label.textContent = selected.length ?
-                        selected.join(', ') :
-                        (dropdownId === 'yearDropdown' ?
-                            'เลือกปี' :
-                            'เลือกสถานะ');
+                    label.textContent = selected.length ? selected.join(', ') : defaultText;
                 });
             });
         }
 
-        setupDropdownLabel('yearDropdown', 'year-label');
-        setupDropdownLabel('statusDropdown', 'status-label');
+        setupDropdownLabel('yearDropdown', 'year-label', 'เลือกปี');
+        setupDropdownLabel('typeDropdown', 'type-label', 'เลือกประเภท');
+        setupDropdownLabel('statusDropdown', 'status-label', 'เลือกสถานะ');
+
 
         // ปิด dropdown ถ้าคลิกข้างนอก
         document.addEventListener('click', function(e) {
@@ -445,6 +492,35 @@
             --pad-2: 8px;
             --pad-3: 12px;
             --pad-4: 16px;
+        }
+
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+        }
+
+        .tooltip::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 125%;
+            /* tooltip อยู่ด้านบน */
+            left: 50%;
+            transform: translateX(-50%);
+            background: #333;
+            color: #fff;
+            font-size: 12px;
+            padding: 5px 8px;
+            border-radius: 6px;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease-in-out;
+            z-index: 999;
+        }
+
+        .tooltip:hover::after {
+            opacity: 1;
         }
 
         .hidden {
@@ -729,7 +805,7 @@
         .dropdown-multiselect {
             position: relative;
             display: inline-block;
-            width: 220px;
+            width: 200px;
         }
 
         .dropdown-multiselect .dropdown-btn {
