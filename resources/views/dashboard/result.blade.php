@@ -1,124 +1,123 @@
 @extends('layouts.app')
 @section('title', 'กราฟผลลัพธ์')
+
+@section('header')
+    กราฟผลลัพธ์การประเมิน
+@endsection
+
+@section('subheader')
+    ระบบบริหารจัดการข้อมูลการรับรองสถาบันจากสภาการพยาบาล
+@endsection
+
 @section('content')
 
-    <div class="resul-container">
-        <!-- Header -->
-        <div class="resul-header">
-            <h1>
-                กราฟผลลัพธ์การประเมิน
-                <span class="subtitle">/ ระบบบริหารจัดการข้อมูลการรับรองสถาบันจากสภาการพยาบาล</span>
-            </h1>
-        </div>
+    {{-- ฟิลเตอร์ --}}
+    <div class="filter-card card">
+        <h2 class="card-title">กรองข้อมูลการประเมิน</h2>
 
-        {{-- ฟิลเตอร์ --}}
-        <div class="filter-card card">
-            <h2 class="card-title">กรองข้อมูลการประเมิน</h2>
-
-            <div class="form-grid">
-                <div class="field">
-                    <label>ปีการประเมิน</label>
-                    <select id="filter-year">
-                        <option value="">ทั้งหมด</option>
-                    </select>
-                </div>
-
-                <div class="field">
-                    <label>รหัสตัวชี้วัด</label>
-                    <select id="filter-code">
-                        <option value="">ทั้งหมด</option>
-                    </select>
-                </div>
-
-                <div class="field">
-                    <label>มาตรฐานตัวชี้วัด</label>
-                    <select id="filter-standard">
-                        <option value="">ทั้งหมด</option>
-                    </select>
-                </div>
-
-                <div class="field">
-                    <label>ด้านตัวชี้วัด</label>
-                    <select id="filter-dimension">
-                        <option value="">ทั้งหมด</option>
-                    </select>
-                </div>
-
-                <div class="field">
-                    <label>ประเภทตัวชี้วัด</label>
-                    <select id="filter-type">
-                        <option value="">ทั้งหมด</option>
-                    </select>
-                </div>
+        <div class="form-grid">
+            <div class="field">
+                <label>ปีการประเมิน</label>
+                <select id="filter-year">
+                    <option value="">ทั้งหมด</option>
+                </select>
             </div>
 
-            <div class="card-actions">
-                <button type="button" id="reset-filters" class="btn btn-outline">ล้างค่า</button>
-                <button type="button" id="apply-filters" class="btn btn-primary">กรองข้อมูล</button>
+            <div class="field">
+                <label>รหัสตัวชี้วัด</label>
+                <select id="filter-code">
+                    <option value="">ทั้งหมด</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label>มาตรฐานตัวชี้วัด</label>
+                <select id="filter-standard">
+                    <option value="">ทั้งหมด</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label>ด้านตัวชี้วัด</label>
+                <select id="filter-dimension">
+                    <option value="">ทั้งหมด</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label>ประเภทตัวชี้วัด</label>
+                <select id="filter-type">
+                    <option value="">ทั้งหมด</option>
+                </select>
             </div>
         </div>
 
-        {{-- กราฟ --}}
-        <div class="charts-grid">
-            @foreach ($standards as $standard)
-                <div class="stat-title" style="margin:12px 0 8px;">
-                    <h3>กราฟผลลัพธ์ {{ $standard->name }}</h3>
-                </div>
+        <div class="card-actions">
+            <button type="button" id="reset-filters" class="btn btn-outline">ล้างค่า</button>
+            <button type="button" id="apply-filters" class="btn btn-primary">กรองข้อมูล</button>
+        </div>
+    </div>
 
-                @php $bucket = $chartsByStandard[$standard->id] ?? null; @endphp
+    {{-- กราฟ --}}
+    <div class="charts-grid">
+        @foreach ($standards as $standard)
+            <div class="stat-title" style="margin:12px 0 8px;">
+                <h3>กราฟผลลัพธ์ {{ $standard->name }}</h3>
+            </div>
 
-                @if ($bucket && !empty($bucket['indicators']))
-                    <div class="charts-of-standard" data-standard-id="{{ $standard->id }}"
-                        style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,2fr));gap:20px;">
+            @php $bucket = $chartsByStandard[$standard->id] ?? null; @endphp
 
-                        @foreach ($bucket['indicators'] as $i => $c)
-                            <div class="chart-card" id="card-{{ $c['indicator_id'] }}" data-standard="{{ $standard->id }}"
-                                data-dimension="{{ $c['category_name'] }}" data-type="{{ $c['indicator_type'] }}"
-                                data-code="{{ $c['indicator_code'] }}" data-years='@json($c['years'])'
-                                data-index="{{ $i }}"
-                                style="{{ $i >= 5 ? 'display:none;' : '' }};background:#fff;border-radius:16px;
+            @if ($bucket && !empty($bucket['indicators']))
+                <div class="charts-of-standard" data-standard-id="{{ $standard->id }}"
+                    style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,2fr));gap:20px;">
+
+                    @foreach ($bucket['indicators'] as $i => $c)
+                        <div class="chart-card" id="card-{{ $c['indicator_id'] }}" data-standard="{{ $standard->id }}"
+                            data-dimension="{{ $c['category_name'] }}" data-type="{{ $c['indicator_type'] }}"
+                            data-code="{{ $c['indicator_code'] }}" data-years='@json($c['years'])'
+                            data-index="{{ $i }}"
+                            style="{{ $i >= 5 ? 'display:none;' : '' }};background:#fff;border-radius:16px;
                                 padding:16px;box-shadow:0 2px 10px rgba(0,0,0,.06);position:relative;">
 
-                                {{-- หัวข้อ --}}
-                                <div class="subtitle" style="font-weight:600;margin-bottom:8px;">
-                                    {{ $c['indicator_code'] ? '[' . $c['indicator_code'] . '] ' : '' }}
-                                    {{ $c['indicator_name'] }}
-                                </div>
+                            {{-- หัวข้อ --}}
+                            <div class="subtitle" style="font-weight:600;margin-bottom:8px;">
+                                {{ $c['indicator_code'] ? '[' . $c['indicator_code'] . '] ' : '' }}
+                                {{ $c['indicator_name'] }}
+                            </div>
 
-                                {{-- กราฟ --}}
-                                <canvas id="chart-{{ $standard->id }}-{{ $c['indicator_id'] }}" width="400"
-                                    height="200"></canvas>
-                                <script id="data-{{ $standard->id }}-{{ $c['indicator_id'] }}" type="application/json">
-                                    @json(['years' => $c['years'], 'values' => $c['values']], JSON_UNESCAPED_UNICODE)
-                                </script>
+                            {{-- กราฟ --}}
+                            <canvas id="chart-{{ $standard->id }}-{{ $c['indicator_id'] }}" width="400"
+                                height="200"></canvas>
+                            <script id="data-{{ $standard->id }}-{{ $c['indicator_id'] }}" type="application/json">
+                                @json(['years' => $c['years'], 'values' => $c['values']], JSON_UNESCAPED_UNICODE)
+                            </script>
 
-                                {{-- ปุ่มดาวน์โหลด --}}
-                                <button data-html2canvas-ignore="true"  type="button" class="btn-download" data-target="card-{{ $c['indicator_id'] }}"
-                                    style="position:absolute;top:8px;right:8px;
+                            {{-- ปุ่มดาวน์โหลด --}}
+                            <button data-html2canvas-ignore="true" type="button" class="btn-download"
+                                data-target="card-{{ $c['indicator_id'] }}"
+                                style="position:absolute;top:8px;right:8px;
                                        background:#10B981;color:#fff;border:none;
                                        padding:4px 8px;border-radius:6px;cursor:pointer;
                                        font-size:12px;">
-                                    ดาวน์โหลด
-                                </button>
-                            </div>
-                        @endforeach
-                    </div>
-
-                    @if (count($bucket['indicators']) > 10)
-                        <div class="divider-btn" data-standard-id="{{ $standard->id }}">
-                            <span class="divider-line"></span>
-                            <button type="button" class="btn-show-more" data-standard-id="{{ $standard->id }}">
-                                แสดงเพิ่มเติม ▼
+                                ดาวน์โหลด
                             </button>
-                            <span class="divider-line"></span>
                         </div>
-                    @endif
-                @else
-                    <div style="color:#6b7280;margin-bottom:16px;">ไม่มีข้อมูลตัวชี้วัดที่มีการบันทึกผลลัพธ์</div>
-                @endif
-            @endforeach
-        </div>
+                    @endforeach
+                </div>
 
+                @if (count($bucket['indicators']) > 10)
+                    <div class="divider-btn" data-standard-id="{{ $standard->id }}">
+                        <span class="divider-line"></span>
+                        <button type="button" class="btn-show-more" data-standard-id="{{ $standard->id }}">
+                            แสดงเพิ่มเติม ▼
+                        </button>
+                        <span class="divider-line"></span>
+                    </div>
+                @endif
+            @else
+                <div style="color:#6b7280;margin-bottom:16px;">ไม่มีข้อมูลตัวชี้วัดที่มีการบันทึกผลลัพธ์</div>
+            @endif
+        @endforeach
     </div>
 
     <!-- Chart.js -->

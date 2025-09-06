@@ -21,7 +21,7 @@ class DashboardController extends Controller
         $yearsForFilter = Indicator::query()
             ->whereHas('assignments')
             ->whereNotNull('year')
-            ->selectRaw('DISTINCT CAST(year AS INT) AS y')
+            ->selectRaw('DISTINCT CAST(year AS UNSIGNED) AS y')
             ->orderBy('y')
             ->pluck('y');   // [2020,2021,...] เป็น int (Collection)
 
@@ -29,7 +29,7 @@ class DashboardController extends Controller
         $yearlyTotals = Indicator::query()
             ->whereHas('assignments')
             ->whereNotNull('year')
-            ->selectRaw('CAST(year AS INT) as year, SUM(score_acc) AS total_score, SUM(max_score) AS max_score')
+            ->selectRaw('CAST(year AS UNSIGNED) as year, SUM(score_acc) AS total_score, SUM(max_score) AS max_score')
             ->groupBy('year')
             ->orderBy('year')
             ->get();
@@ -80,7 +80,7 @@ class DashboardController extends Controller
 
                     // 3) เลขหลังขีด (เอาตัวท้ายสุด)
                  ->orderByRaw("
-                        COALESCE(NULLIF(regexp_replace(indicators.code, '.*-', ''), '')::int, 0) ASC
+                        COALESCE(NULLIF(SUBSTRING_INDEX(indicators.code, '-', -1), ''), 0) + 0 ASC
             ")
 
             // กันกรณีเลขเท่ากัน → เรียง code เต็ม
@@ -113,7 +113,7 @@ class DashboardController extends Controller
         $legendConfig = [
             ['key' => 'complete', 'label' => 'ผลการดำเนินงานครบถ้วนตามเกณฑ์มาตรการ', 'color' => '#22c55e'],
             ['key' => 'incomplete', 'label' => 'ผลการดำเนินงานยังไม่ครบถ้วนตามเกณฑ์', 'color' => '#f59e0b'],
-            ['key' => 'pending', 'label' => 'อยู่ระหว่างดำเนินการ', 'color' => '#ef4444'],
+            ['key' => 'pending', 'label' => 'อยู่ระหว่างดำเนินการ', 'color' => '#858e95'],
         ];
 
         // ====== 7) Dropdown filters อื่น ๆ ======
@@ -150,7 +150,7 @@ class DashboardController extends Controller
         $allYears = Indicator::query()
             ->whereHas('assignments')
             ->whereNotNull('year')
-            ->selectRaw('DISTINCT CAST(year AS INT) AS y')
+            ->selectRaw('DISTINCT CAST(year AS UNSIGNED) AS y')
             ->orderBy('y')
             ->pluck('y')
             ->toArray();
@@ -172,15 +172,15 @@ class DashboardController extends Controller
                 ->join('standards', 'standards.id', '=', 'categories.standard_id')
                 ->whereHas('assignments')
                 ->whereNotNull('indicators.year')
-                ->whereIn(DB::raw('CAST(indicators.year AS INT)'), $last5Years)
+                ->whereIn(DB::raw('CAST(indicators.year AS UNSIGNED)'), $last5Years)
                 ->whereIn('standards.id', $threeStandardIds)
                 ->selectRaw('
-                CAST(indicators.year AS INT) AS year,
+                CAST(indicators.year AS UNSIGNED) AS year,
                 standards.id AS standard_id,
                 SUM(indicators.score_acc) AS total_score
             ')
-                ->groupByRaw('CAST(indicators.year AS INT), standards.id')
-                ->orderByRaw('CAST(indicators.year AS INT)')
+                ->groupByRaw('CAST(indicators.year AS UNSIGNED), standards.id')
+                ->orderByRaw('CAST(indicators.year AS UNSIGNED)')
                 ->get();
 
             $series = [];
@@ -222,14 +222,14 @@ class DashboardController extends Controller
                 ->join('categories', 'categories.id', '=', 'indicators.categorie_id')
                 ->whereHas('assignments')
                 ->whereNotNull('indicators.year')
-                ->whereIn(DB::raw('CAST(indicators.year AS INT)'), $last5Years)
+                ->whereIn(DB::raw('CAST(indicators.year AS UNSIGNED)'), $last5Years)
                 ->selectRaw('
-        CAST(indicators.year AS INT) AS year,
+        CAST(indicators.year AS UNSIGNED) AS year,
         categories.name AS dim_name,
         SUM(indicators.score_acc) AS total_score
      ')
-                ->groupByRaw('CAST(indicators.year AS INT), categories.name')
-                ->orderByRaw('CAST(indicators.year AS INT)')
+                ->groupByRaw('CAST(indicators.year AS UNSIGNED), categories.name')
+                ->orderByRaw('CAST(indicators.year AS UNSIGNED)')
                 ->get();
 
             // 2) กำหนดลำดับชื่อ “7 ด้าน” ตามที่ต้องการแสดง (แก้ให้ตรงชื่อในฐานข้อมูลของคุณ)

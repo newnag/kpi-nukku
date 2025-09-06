@@ -2,17 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Indicator;
 use App\Models\Criteria;
 use App\Models\Evidence;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
+
 
 class EvidenceController extends Controller
 {
@@ -71,8 +70,8 @@ class EvidenceController extends Controller
         // 🔹 รายการตัวชี้วัด
         $indicators = \App\Models\Indicator::select('code', 'name')
             ->groupBy('code', 'name')
-            ->orderByRaw("split_part(code, '-', 1)")        // prefix เช่น NCS, NCP
-            ->orderByRaw("(split_part(code, '-', 2))::int") // เลขหลัง dash แปลงเป็น int
+            ->orderByRaw("SUBSTRING_INDEX(code, '-', 1)")        // prefix เช่น NCS, NCP
+            ->orderByRaw("CAST(SUBSTRING_INDEX(code, '-', -1) AS UNSIGNED)") // เลขหลัง dash แปลงเป็น int
             ->get();
 
 
@@ -104,22 +103,22 @@ class EvidenceController extends Controller
     public function create(Criteria $criteria)
     {
         // Log ตอนเข้าหน้า create
-        Log::info('=== EvidenceController@create ===', [
-            'criteria_param' => $criteria->id ?? null,
-        ]);
+        // Log::info('=== EvidenceController@create ===', [
+        //     'criteria_param' => $criteria->id ?? null,
+        // ]);
 
         $criterias = Criteria::orderBy('name')->get(['id', 'name']);
 
         if ($criterias->isEmpty()) {
             Log::warning('No criterias found when trying to create evidence.');
             return redirect()
-                ->route('criterias.index')
+                ->route('dashboard.index')
                 ->with('warning', 'ยังไม่มีเกณฑ์ที่ใช้งานอยู่ กรุณาเพิ่ม/เปิดใช้งานเกณฑ์ก่อน');
         }
 
-        Log::info('Render evidences.create view', [
-            'criterias_count' => $criterias->count(),
-        ]);
+        // Log::info('Render evidences.create view', [
+        //     'criterias_count' => $criterias->count(),
+        // ]);
 
         return view('evidences.create', [
             'criterias'   => $criterias,
@@ -419,13 +418,18 @@ class EvidenceController extends Controller
                     $evidence->detail      = null;
                     $evidence->status      = true;
                     $evidence->criteria_id = $criteria->id;
-                    $evidence->user_id     = auth()->id();
+                    $evidence->user_id     = Auth::id();
                     $evidence->name        = $originalName;
                     $evidence->type        = $extension;
                     $evidence->save();
 
-                    $uploadedFiles[]  = ['path' => $path];
-                    $savedEvidences[] = $evidence;
+                    $uploadedFiles[] = ['path' => $path];
+
+                    // Log::info('Evidence saved (file)', [
+                    //     'evidence_id' => $evidence->id,
+                    //     'name'        => $evidence->name,
+                    //     'type'        => $evidence->type,
+                    // ]);
                 }
             }
 
@@ -439,12 +443,16 @@ class EvidenceController extends Controller
                     $evidence->detail      = $request->input('detail');
                     $evidence->status      = true;
                     $evidence->criteria_id = $criteria->id;
-                    $evidence->user_id     = auth()->id();
+                    $evidence->user_id     = Auth::id();
                     $evidence->name        = $entry['name'];
                     $evidence->type        = "url";
                     $evidence->save();
 
-                    $savedEvidences[] = $evidence;
+                    // Log::info('Evidence saved (url)', [
+                    //     'evidence_id' => $evidence->id,
+                    //     'name'        => $evidence->name,
+                    //     'url'         => $entry['url'],
+                    // ]);
                 }
             }
 
@@ -455,21 +463,15 @@ class EvidenceController extends Controller
                 $evidence->detail      = $request->input('detail');
                 $evidence->status      = true;
                 $evidence->criteria_id = $criteria->id;
-                $evidence->user_id     = auth()->id();
+                $evidence->user_id     = Auth::id();
                 $evidence->name        = "รายละเอียดเพิ่มเติม";
                 $evidence->type        = "note";
                 $evidence->save();
 
-                $savedEvidences[] = $evidence;
-            }
-
-            // ✅ ส่ง JSON ถ้า request มาจาก fetch
-            if ($request->expectsJson()) {
-                return response()->json([
-                    'success'   => true,
-                    'message'   => 'บันทึกสำเร็จ',
-                    'evidences' => $savedEvidences, // 👈 ส่ง array
-                ]);
+                // Log::info('Evidence saved (note)', [
+                //     'evidence_id' => $evidence->id,
+                //     'name'        => $evidence->name,
+                // ]);
             }
 
             return redirect()->route('dashboardKpiUser.show', $indicator->id);
@@ -639,7 +641,7 @@ class EvidenceController extends Controller
         if (is_array($evidence->path) && isset($evidence->path['files'])) {
             foreach ($evidence->path['files'] as $file) {
                 if (!empty($file['path'])) {
-                    \Storage::disk('public')->delete($file['path']);
+                    Storage::disk('public')->delete($file['path']);
                 }
             }
         }

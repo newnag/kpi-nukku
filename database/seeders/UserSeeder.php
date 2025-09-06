@@ -13,40 +13,54 @@ class UserSeeder extends Seeder
     {
         $users = [
             [
-                // 'prefix' => 'นาย',
-                'name' => 'สมชาย ตัวอย่าง',
-                // 'employee_id' => 'EMP001',
-                'password' => Hash::make('password123'),
-                'email' => 'somchai@example.com',
+                'name' => 'Super Admin',
+                'password' => Hash::make('password'),
+                'email' => 'super@example.com',
                 'phone' => '0800000001',
                 'status' => true,
                 'department_id' => 1,
                 'remember_token' => Str::random(10),
-                'role' => 'Super Admin',
+                'role' => 'super_admin',
             ],
             [
-                // 'prefix' => 'นาย',
-                'name' => 'สมสี ตัวอย่าง',
-                // 'employee_id' => 'EMP002',
-                'password' => Hash::make('password123'),
-                'email' => 'somchi@example.com',
+                'name' => 'System Admin',
+                'password' => Hash::make('password'),
+                'email' => 'system@example.com',
                 'phone' => '0800000002',
                 'status' => true,
                 'department_id' => 1,
                 'remember_token' => Str::random(10),
-                'role' => 'QA Admin',
+                'role' => 'system_admin',
             ],
             [
-                // 'prefix' => 'นาย',
-                'name' => 'สมพงษ์ ตัวอย่าง',
-                // 'employee_id' => 'EMP003',
-                'password' => Hash::make('password123'),
-                'email' => 'sompong@example.com',
+                'name' => 'QA Admin',
+                'password' => Hash::make('password'),
+                'email' => 'qa@example.com',
                 'phone' => '0800000003',
                 'status' => true,
-                'department_id' => 1,
+                'department_id' => 2,
                 'remember_token' => Str::random(10),
-                'role' => 'User',
+                'role' => 'qa_admin',
+            ],
+            [
+                'name' => 'Administration Admin',
+                'password' => Hash::make('password'),
+                'email' => 'admin@example.com',
+                'phone' => '0800000004',
+                'status' => true,
+                'department_id' => 3,
+                'remember_token' => Str::random(10),
+                'role' => 'administration_admin',
+            ],
+            [
+                'name' => 'User',
+                'password' => Hash::make('password'),
+                'email' => 'user@example.com',
+                'phone' => '0800000005',
+                'status' => true,
+                'department_id' => 4,
+                'remember_token' => Str::random(10),
+                'role' => 'user',
             ],
         ];
 
@@ -54,8 +68,15 @@ class UserSeeder extends Seeder
             $role = $userData['role'];
             unset($userData['role']); // ลบ key 'role' ก่อน insert
 
-            $user = User::create($userData);
-            $user->assignRole($role); // กำหนดบทบาทให้ผู้ใช้
+            $user = User::updateOrCreate(
+                ['email' => $userData['email']], // ค้นหาตาม email
+                $userData // update หรือ create ด้วยข้อมูลนี้
+            );
+            
+            // ลบ role เก่าก่อน (ถ้ามี) แล้วกำหนด role ใหม่
+            $user->syncRoles([$role]);
+            
+            echo "Created user: {$userData['email']} with role: {$role}\n";
         }
     }
 }

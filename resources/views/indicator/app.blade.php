@@ -3,6 +3,7 @@
 @section('title', 'รายการตัวบ่งชี้')
 
 @section('header', 'รายการตัวบ่งชี้')
+@section('subheader', 'ระบบบริหารจัดการข้อมูลการรับรองสถาบันจากสภาการพยาบาล')
 
 @section('content')
     <div class="ml-3 mr-3 md:ml-9 md:mr-9 mb-9 space-y-5">
@@ -107,8 +108,14 @@
                                 <br>
                                 <label class="inline-flex items-center">
                                     <input type="checkbox" class="filter-option rounded text-blue-600" data-column="8"
-                                        data-value="ไม่ครบ">
-                                    <span class="ml-2 text-sm text-gray-700">ไม่ครบ</span>
+                                        data-value="ไม่ครบถ้วน">
+                                    <span class="ml-2 text-sm text-gray-700">ไม่ครบถ้วน</span>
+                                </label>
+                                <br>
+                                <label class="inline-flex items-center">
+                                    <input type="checkbox" class="filter-option rounded text-blue-600" data-column="8"
+                                        data-value="ครบถ้วน">
+                                    <span class="ml-2 text-sm text-gray-700">ครบถ้วน</span>
                                 </label>
                             </div>
 
@@ -142,7 +149,7 @@
                         stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                     </svg>
-                    <span class="hidden sm:inline">เพิ่มตัวบ่งชี้</span>
+                    <span class="hidden sm:inline">เพิ่มตัวชี้วัด</span>
                 </button>
             </div>
         </div>
@@ -252,7 +259,8 @@
                 @forelse($indicators as $indicator)
                     <tr class="hover:bg-gray-50 divide-y  divide-gray-200 ">
                         <td class="px-4 py-3 text-sm text-gray-900">{{ $indicator['year'] }}</td>
-                        <td class="px-4 py-3 text-sm text-gray-900 text-clip overflow-hidde">{{ $indicator['name'] }}</td>
+                        <td class="px-4 py-3 text-sm text-gray-900 text-clip overflow-hidde">{{ $indicator['name'] }}
+                        </td>
                         <td class="px-4 py-3 text-sm text-gray-900">{{ $indicator['code'] }}</td>
                         <td class="px-4 py-3 text-sm text-gray-900">
                             {{ $indicator['category']['name'] ?? 'ไม่ระบุ' }}
@@ -283,8 +291,13 @@
                         <td class="px-4 py-3 text-sm text-gray-900 text-center">
                             {{ number_format($indicator['max_score'], 2) ?? '0.00' }}
                         </td>
-                        <td class="px-4 py-3 text-sm">
-                            @switch($indicator['status'])
+                        @php
+                            $statusCode = (int) ($indicator['status'] ?? -1); // 0,1,2 or -1 (unknown)
+                        @endphp
+
+                        <td class="px-4 py-3 text-sm" data-search="{{ $statusCode }}" {{-- DataTables will use this for searching --}}
+                            data-order="{{ $statusCode }}"> {{-- DataTables will use this for ordering --}}
+                            @switch($statusCode)
                                 @case(0)
                                     <div
                                         class="flex justify-center items-center w-6 h-6 mx-auto rounded-full bg-green-100 text-green-600">
@@ -325,23 +338,39 @@
                                     </span>
                             @endswitch
                         </td>
-                        <td class="px-4 py-3 text-sm">
-                            @if ($indicator['evidences']->isNotEmpty())
-                                <span
-                                    class="flex justify-center text-center px-2 py-1 text-xs font-medium rounded-full 
-                                            bg-gray-100 text-gray-800">รอดำเนินการ
 
-                                </span>
-                            @else
-                                <span
-                                    class="flex justify-center text-center px-2 py-1 text-xs font-medium rounded-full 
-                                            bg-red-100 text-red-800">ไม่ครบ
+                        @php
+                            // Derive document status from criteria statuses (0/1/2)
+                            $criteria = collect($indicator['criteria'] ?? []);
 
-                                </span>
-                            @endif
+                            // Normalize to string to handle 0 vs "0"
+                            $has0 = $criteria->contains(fn($c) => (string) ($c['status'] ?? '') === '0');
+                            $has2 = $criteria->contains(fn($c) => (string) ($c['status'] ?? '') === '2');
+
+                            if ($criteria->isEmpty() || $has0) {
+                                $docText = 'รอดำเนินการ';
+                                $docOrder = 0;
+                                $badgeCls = 'bg-gray-100 text-gray-800';
+                            } elseif ($has2) {
+                                $docText = 'ครบถ้วน';
+                                $docOrder = 1;
+                                $badgeCls = 'bg-green-100 text-green-800';
+                            } else {
+                                $docText = 'ไม่ครบถ้วน';
+                                $docOrder = 2;
+                                $badgeCls = 'bg-red-100 text-red-800';
+                            }
+                        @endphp
+
+                        <td class="px-4 py-3 text-sm" data-search="{{ $docText }}"
+                            data-order="{{ $docOrder }}">
+                            <span
+                                class="flex justify-center text-center px-2 py-1 text-xs font-medium rounded-full {{ $badgeCls }}">
+                                {{ $docText }}
+                            </span>
                         </td>
                         <td class="px-4 py-3 text-sm">
-                            <button {{-- onclick="window.location.href='{{ route('indicator.show', $indicator['id']) }}'" --}}
+                            <a href="{{ route('indicator.show', $indicator['id']) }}"
                                 class="inline-flex items-center justify-center px-3 py-1 bg-white border border-blue-500 text-blue-500 rounded-full text-xs font-medium hover:bg-blue-500 hover:text-white">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 mr-1" fill="none"
                                     viewBox="0 0 24 24" stroke="currentColor">
@@ -350,8 +379,8 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                 </svg>
-                                ดูเพิ่มเติม
-                            </button>
+                                MORE
+                            </a>
                         </td>
                     </tr>
                     @empty
@@ -420,10 +449,6 @@
                 background-color: #1d4ed8 !important;
                 border-color: #1d4ed8;
             }
-
-            /* .dataTables_filter {
-                                                                                                                                        display: none;
-                                                                                                                                    } */
 
             @media (max-width: 768px) {
 
@@ -570,7 +595,7 @@
                 });
 
                 $('#add_indicator_button').on('click', function() {
-                    alert('add indicator functionality will be implemented here');
+                    window.location.href = "{{ route('indicator.create') }}";
                 });
 
                 // Sorting dropdown functionality
@@ -634,52 +659,49 @@
                     }
                 });
 
-                // Apply filters button
-                $('#apply-filters').on('click', function() {
-                    // Clear existing filters
-                    table.columns().search('').draw();
+                // helper: escape regex
+                const escapeRegex = s => s.toString().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                // helper: multiple exact choices
+                const makeExactRegex = (values) => `^(?:${values.map(escapeRegex).join('|')})$`;
 
-                    // Count active filters
+                $('#apply-filters').on('click', function() {
+                    // clear previous
+                    table.columns().search('');
+
                     let filterCount = 0;
 
-                    // Apply each filter
                     for (const column in activeFilters) {
                         if (activeFilters[column].length > 0) {
                             filterCount += activeFilters[column].length;
 
-                            // Create regex filter for multiple values
-                            const regex = activeFilters[column].map(v => {
-                                // For status columns (using icons or special text)
-                                if (column == 7) {
-                                    // Map numeric status to visual indicator to filter by
-                                    if (v === 0) return '✓'; // สมบูรณ์
-                                    if (v === 1) return '✕'; // ไม่สมบูรณ์ 
-                                    if (v === 2) return '⚠'; // อยู่ระหว่างดำเนินการ
-                                    return v;
-                                }
+                            if (column == 7) {
+                                // activeFilters['7'] already contains ["0","1","2"] from checkboxes
+                                const regex = makeExactRegex(activeFilters[column].map(String));
+                                table.column(7).search(regex, true, false); // regex = true, smart = false
+                                continue;
+                            }
 
-                                // Escape special regex characters
-                                return v.toString().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-                            }).join('|');
+                            if (column == 8) {
+                                // you kept text values ("รอดำเนินการ","ไม่ครบ") for column 8
+                                const regex = makeExactRegex(activeFilters[column].map(String));
+                                table.column(8).search(regex, true, false);
+                                continue;
+                            }
 
-                            // Apply the filter to this column
-                            table.column(column).search(regex, true, false);
+                            // (future other columns)
+                            const regex = makeExactRegex(activeFilters[column].map(String));
+                            table.column(Number(column)).search(regex, true, false);
                         }
                     }
 
-                    // Update button text to show filter count
-                    if (filterCount > 0) {
-                        $('#filter-button span').text('กรองข้อมูล (' + filterCount + ')');
-                    } else {
-                        $('#filter-button span').text('กรองข้อมูล');
-                    }
+                    $('#filter-button span').text(filterCount > 0 ? `กรองข้อมูล (${filterCount})` :
+                        'กรองข้อมูล');
 
-                    // Draw table with new filters
                     table.draw();
-
-                    // Close dropdown
                     $('#filter-dropdown').addClass('hidden');
                 });
+
+
 
                 // Clear filters button
                 $('#clear-filters').on('click', function() {
@@ -707,7 +729,7 @@
                     // $('.sort-icon').removeClass('sorting_asc sorting_desc').addClass('sorting');
                     // $('.sort-icon').css('opacity', '0.3');
                     // $('.sort-icon').css('transform', 'rotate(0deg)');
-                    
+
 
                 });
 

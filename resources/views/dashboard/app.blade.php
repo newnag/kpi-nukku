@@ -1,347 +1,338 @@
 @extends('layouts.app')
 @section('title', 'แดชบอร์ด')
+
+@section('header', 'แดชบอร์ด')
+@section('subheader', 'ระบบบริหารจัดการข้อมูลการรับรองสถาบันจากสภาการพยาบาล')
+
 @section('content')
+    <!-- ===== Card: กรองข้อมูลการประเมิน ===== -->
+    <div class="filter-card card">
+        <h2 class="card-title">กรองข้อมูลการประเมิน</h2>
 
-    <div class="dashboard-container">
-        <!-- Header -->
-        <div class="dashboard-header">
-            <h1>
-                แดชบอร์ด
-                <span class="subtitle">/ ระบบบริหารจัดการข้อมูลการรับรองสถาบันจากสภาการพยาบาล</span>
-            </h1>
-        </div>
-        <!-- ===== Card: กรองข้อมูลการประเมิน ===== -->
-        <div class="filter-card card">
-            <h2 class="card-title">กรองข้อมูลการประเมิน</h2>
-
-            <form id="filter-form" method="GET" action="{{ route('dashboard.index') }}">
-                <div class="form-grid">
-                    <div class="field">
-                        <label>ปีการประเมิน</label>
-                        <select id="filter-year" name="year">
-                            <option value="">ทั้งหมด</option>
-                            @foreach ($yearsForFilter as $y)
-                                <option value="{{ $y }}"
-                                    {{ (string) $displayYear === (string) $y ? 'selected' : '' }}>
-                                    {{ $y }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                    <div class="field">
-                        <label>รหัสตัวชี้วัด</label>
-                        <select id="filter-code" name="code">
-                            <option value="">ทั้งหมด</option>
-                        </select>
-                    </div>
-
-                    <div class="field">
-                        <label>มาตรฐานตัวชี้วัด</label>
-                        <select id="filter-standard" name="standard">
-                            <option value="">ทั้งหมด</option>
-                        </select>
-                    </div>
-
-                    <div class="field">
-                        <label>ด้านตัวชี้วัด</label>
-                        <select id="filter-dimension" name="dimension">
-                            <option value="">ทั้งหมด</option>
-                        </select>
-                    </div>
-
-                    <div class="field">
-                        <label>หน่วยงานที่รับผิดชอบ</label>
-                        <select id="filter-dept" name="dept">
-                            <option value="">ทั้งหมด</option>
-                        </select>
-                    </div>
-
-                    <div class="field">
-                        <label>ผู้รับผิดชอบในการรวบรวมข้อมูล</label>
-                        <select id="filter-collector" name="collector">
-                            <option value="">ทั้งหมด</option>
-                        </select>
-                    </div>
+        <form id="filter-form" method="GET" action="{{ route('dashboard.index') }}">
+            <div class="form-grid">
+                <div class="field">
+                    <label>ปีการประเมิน</label>
+                    <select id="filter-year" name="year">
+                        <option value="">ทั้งหมด</option>
+                        @foreach ($yearsForFilter as $y)
+                            <option value="{{ $y }}"
+                                {{ (string) $displayYear === (string) $y ? 'selected' : '' }}>
+                                {{ $y }}
+                            </option>
+                        @endforeach
+                    </select>
                 </div>
 
-                <div class="card-actions">
-                    <button type="button" id="reset-filters" class="btn btn-outline">ล้างค่า</button>
-                    <button type="button" id="apply-filters" class="btn btn-primary">กรองข้อมูล</button>
+                <div class="field">
+                    <label>รหัสตัวชี้วัด</label>
+                    <select id="filter-code" name="code">
+                        <option value="">ทั้งหมด</option>
+                    </select>
                 </div>
-            </form>
 
-        </div>
+                <div class="field">
+                    <label>มาตรฐานตัวชี้วัด</label>
+                    <select id="filter-standard" name="standard">
+                        <option value="">ทั้งหมด</option>
+                    </select>
+                </div>
 
-        <!-- Score Card -->
+                <div class="field">
+                    <label>ด้านตัวชี้วัด</label>
+                    <select id="filter-dimension" name="dimension">
+                        <option value="">ทั้งหมด</option>
+                    </select>
+                </div>
 
-        <div class="stat-title">
-            <h3> คะแนนทั้งหมดที่ได้ในแต่ละปี</h3>
+                <div class="field">
+                    <label>หน่วยงานที่รับผิดชอบ</label>
+                    <select id="filter-dept" name="dept">
+                        <option value="">ทั้งหมด</option>
+                    </select>
+                </div>
 
-        </div>
-        <div class="score-card">
-            <div class="score-header">
-                <span class="label">ปีการประเมิน</span>
-                <span class="year" id="display-year">{{ $displayYearText }}</span>
+                <div class="field">
+                    <label>ผู้รับผิดชอบในการรวบรวมข้อมูล</label>
+                    <select id="filter-collector" name="collector">
+                        <option value="">ทั้งหมด</option>
+                    </select>
+                </div>
             </div>
-            <hr />
-            <div class="score-body">
-                <span class="label-left">คะแนนที่ได้</span>
-                <div class="score-value">
-                    <span id="display-total">{{ number_format($totalScore) }}</span>
-                    <span class="divider">/</span>
-                    <span id="display-max">{{ number_format($maxScore) }}</span>
-                </div>
-                <span class="label-right">คะแนนเต็ม</span>
+
+            <div class="card-actions">
+                <button type="button" id="reset-filters" class="btn btn-outline">ล้างค่า</button>
+                <button type="button" id="apply-filters" class="btn btn-primary">กรองข้อมูล</button>
             </div>
+        </form>
+
+    </div>
+
+    <!-- Score Card -->
+
+    <div class="stat-title">
+        <h3> คะแนนทั้งหมดที่ได้ในแต่ละปี</h3>
+
+    </div>
+    <div class="score-card">
+        <div class="score-header">
+            <span class="label">ปีการประเมิน</span>
+            <span class="year" id="display-year">{{ $displayYearText }}</span>
         </div>
-
-
-        <!-- Stats Cards -->
-        <div class="stat-title">
-            <h3>สถานะทั้งหมดของตัวชี้วัดต่อปี</h3>
-            <span class="year"id="display-years">{{ $displayYearText }}</span>
+        <hr />
+        <div class="score-body">
+            <span class="label-left">คะแนนที่ได้</span>
+            <div class="score-value">
+                <span id="display-total">{{ number_format($totalScore) }}</span>
+                <span class="divider">/</span>
+                <span id="display-max">{{ number_format($maxScore) }}</span>
+            </div>
+            <span class="label-right">คะแนนเต็ม</span>
         </div>
-        <div class="stats-grid">
+    </div>
 
-            <!-- Card  ความพึงพอใจ -->
-            <div class="stat-card">
-                <div class="stat-header">
-                    <div class="stat-title">
 
-                    </div>
+    <!-- Stats Cards -->
+    <div class="stat-title">
+        <h3>สถานะทั้งหมดของตัวชี้วัดต่อปี</h3>
+        <span class="year"id="display-years">{{ $displayYearText }}</span>
+    </div>
+    <div class="stats-grid">
 
-                    <button class="btn-export"id="downloadCard">
-                        <!-- icon -->
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                            <path d="M9 12l3 3 3-3" stroke="#16a34a" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round" />
-                            <path d="M12 3v12" stroke="#16a34a" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round" />
-                            <path d="M5 21h14a2 2 0 0 0 2-2v-4" stroke="#16a34a" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round" />
-                            <path d="M3 15v4a2 2 0 0 0 2 2" stroke="#16a34a" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round" />
-                        </svg>
-                        EXPORT CHART (PNG)
-                    </button>
+        <!-- Card  ความพึงพอใจ -->
+        <div class="stat-card">
+            <div class="stat-header">
+                <div class="stat-title">
+
                 </div>
 
-                <div class="stat-body">
-                    <div class="chart-wrap">
-                        <canvas id="satisfactionChart" width="310px" height="260"></canvas>
-                    </div>
+                <button class="btn-export"id="downloadCard">
+                    <!-- icon -->
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                        <path d="M9 12l3 3 3-3" stroke="#16a34a" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                        <path d="M12 3v12" stroke="#16a34a" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                        <path d="M5 21h14a2 2 0 0 0 2-2v-4" stroke="#16a34a" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                        <path d="M3 15v4a2 2 0 0 0 2 2" stroke="#16a34a" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                    </svg>
+                    EXPORT CHART (PNG)
+                </button>
+            </div>
 
-                    <div class="legend-wrap">
+            <div class="stat-body">
+                <div class="chart-wrap">
+                    <canvas id="satisfactionChart" width="310px" height="260"></canvas>
+                </div>
 
-                        @php $totalStatus = array_sum($statusCounts); @endphp
+                <div class="legend-wrap">
 
-                        @foreach ($legendConfig as $item)
-                            @php
-                                $count = $statusCounts[$item['key']] ?? 0;
-                                $pct = $totalStatus > 0 ? number_format(($count / $totalStatus) * 100, 2) : '0.00';
-                            @endphp
-                            <div class="legend-item" data-key="{{ $item['key'] }}">
-                                <div class="legend-left">
-                                    <span class="dot" style="background:{{ $item['color'] }}"></span>
-                                    <div class="legend-text">
-                                        <div class="label">{{ $item['label'] }}</div>
-                                        <div class="subtext">
-                                            <strong class="legend-count">{{ $count }}</strong> indicator
-                                        </div>
+                    @php $totalStatus = array_sum($statusCounts); @endphp
+
+                    @foreach ($legendConfig as $item)
+                        @php
+                            $count = $statusCounts[$item['key']] ?? 0;
+                            $pct = $totalStatus > 0 ? number_format(($count / $totalStatus) * 100, 2) : '0.00';
+                        @endphp
+                        <div class="legend-item" data-key="{{ $item['key'] }}">
+                            <div class="legend-left">
+                                <span class="dot" style="background:{{ $item['color'] }}"></span>
+                                <div class="legend-text">
+                                    <div class="label">{{ $item['label'] }}</div>
+                                    <div class="subtext">
+                                        <strong class="legend-count">{{ $count }}</strong> indicator
                                     </div>
                                 </div>
-                                <div class="legend-right">
-                                    <div class="bar"
-                                        style="background:{{ $item['color'] }}; width: {{ $pct }}%;"></div>
-                                    <div class="pct legend-pct">{{ $pct }}%</div>
-                                </div>
                             </div>
-                        @endforeach
+                            <div class="legend-right">
+                                <div class="bar" style="background:{{ $item['color'] }}; width: {{ $pct }}%;">
+                                </div>
+                                <div class="pct legend-pct">{{ $pct }}%</div>
+                            </div>
+                        </div>
+                    @endforeach
 
 
-                    </div>
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Charts Section -->
-        <div class="charts-grid">
-            <div class="stat-title">
-                <h3>กราฟคะแนน 3 มาตรฐานตัวชี้วัด 5 ปีย้อนหลัง 2020-2024</h3>
+    <!-- Charts Section -->
+    <div class="charts-grid">
+        <div class="stat-title">
+            <h3>กราฟคะแนน 3 มาตรฐานตัวชี้วัด 5 ปีย้อนหลัง 2020-2024</h3>
 
+        </div>
+        <!-- Chart 1: การเข้าชม 5 ปีย้อนหลัง 2020-2024 -->
+        <div class="chart-card">
+            <div class="chart-header">
+                <h3></h3>
+                <button id="exportChart1" class="btn-export btn-export-in-card">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                        <path d="M9 12l3 3 3-3" stroke="#16a34a" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                        <path d="M12 3v12" stroke="#16a34a" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                        <path d="M5 21h14a2 2 0 0 0 2-2v-4" stroke="#16a34a" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                        <path d="M3 15v4a2 2 0 0 0 2 2" stroke="#16a34a" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                    </svg>
+                    EXPORT CHART (PNG)
+                </button>
             </div>
-            <!-- Chart 1: การเข้าชม 5 ปีย้อนหลัง 2020-2024 -->
-            <div class="chart-card">
-                <div class="chart-header">
-                    <h3></h3>
-                    <button id="exportChart1" class="btn-export btn-export-in-card">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                            <path d="M9 12l3 3 3-3" stroke="#16a34a" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round" />
-                            <path d="M12 3v12" stroke="#16a34a" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round" />
-                            <path d="M5 21h14a2 2 0 0 0 2-2v-4" stroke="#16a34a" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round" />
-                            <path d="M3 15v4a2 2 0 0 0 2 2" stroke="#16a34a" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round" />
-                        </svg>
-                        EXPORT CHART (PNG)
-                    </button>
-                </div>
-                <div class="chart-content">
-                    <canvas id="visitsChart"></canvas>
-                </div>
+            <div class="chart-content">
+                <canvas id="visitsChart"></canvas>
             </div>
-            <div class="stat-title">
-                <h3>กราฟคะแนน 7 ด้านการประเมิน ตามปี 2020-2024</h3>
+        </div>
+        <div class="stat-title">
+            <h3>กราฟคะแนน 7 ด้านการประเมิน ตามปี 2020-2024</h3>
 
+        </div>
+        <!-- Chart 2: สถิติเข้าชม 7 วันย้อนหลัง 2020-2024 -->
+        <div class="chart-card">
+            <div class="chart-header">
+                <h3></h3>
+                <button id="exportChart2" class="btn-export">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                        <path d="M9 12l3 3 3-3" stroke="#16a34a" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                        <path d="M12 3v12" stroke="#16a34a" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                        <path d="M5 21h14a2 2 0 0 0 2-2v-4" stroke="#16a34a" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                        <path d="M3 15v4a2 2 0 0 0 2 2" stroke="#16a34a" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                    </svg>
+                    EXPORT CHART (PNG)
+                </button>
             </div>
-            <!-- Chart 2: สถิติเข้าชม 7 วันย้อนหลัง 2020-2024 -->
-            <div class="chart-card">
-                <div class="chart-header">
-                    <h3></h3>
-                    <button id="exportChart2" class="btn-export">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                            <path d="M9 12l3 3 3-3" stroke="#16a34a" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round" />
-                            <path d="M12 3v12" stroke="#16a34a" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round" />
-                            <path d="M5 21h14a2 2 0 0 0 2-2v-4" stroke="#16a34a" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round" />
-                            <path d="M3 15v4a2 2 0 0 0 2 2" stroke="#16a34a" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round" />
-                        </svg>
-                        EXPORT CHART (PNG)
-                    </button>
-                </div>
 
 
-                <div class="chart-content">
-                    <canvas id="yearAsXChart"></canvas>
-                </div>
+            <div class="chart-content">
+                <canvas id="yearAsXChart"></canvas>
             </div>
-            <div class="stat-title">
-                <h3>รายการตัวบงชี้</h3>
+        </div>
+        <div class="stat-title">
+            <h3>รายการตัวบงชี้</h3>
 
+        </div>
+        <div class="containers">
+
+            <div class="chart-header">
+                <h3></h3>
+                <button id="exportExell" class="btn-export-excel">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                        <path d="M9 12l3 3 3-3" stroke="#16a34a" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                        <path d="M12 3v12" stroke="#16a34a" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                        <path d="M5 21h14a2 2 0 0 0 2-2v-4" stroke="#16a34a" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                        <path d="M3 15v4a2 2 0 0 0 2 2" stroke="#16a34a" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                    </svg>
+                    EXPORT TO EXCEL
+                </button>
             </div>
-            <div class="dashboard-containers">
+            <div class="dashboard-list">
+                <table class="table" id="dashboardTable">
 
-                <div class="chart-header">
-                    <h3></h3>
-                    <button id="exportExell" class="btn-export-excel">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                            <path d="M9 12l3 3 3-3" stroke="#16a34a" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round" />
-                            <path d="M12 3v12" stroke="#16a34a" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round" />
-                            <path d="M5 21h14a2 2 0 0 0 2-2v-4" stroke="#16a34a" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round" />
-                            <path d="M3 15v4a2 2 0 0 0 2 2" stroke="#16a34a" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round" />
-                        </svg>
-                        EXPORT TO EXCEL
-                    </button>
-                </div>
-                <div class="dashboard-list">
-                    <table class="table" id="dashboardTable">
+                    <thead>
+                        <tr>
+                            {{-- <th>ลำดับ</th> --}}
+                            <th>ปีการประเมิน</th>
+                            <th>ชื่อตัวบ่งชี้</th>
+                            <th>รหัส</th>
+                            <th>ประเภทตัวชี้วัด</th>
+                            <th>หน่วยงานที่รับผิดชอบ</th>
+                            <th>ผลลัพธ์</th>
+                            <th>คะแนนรวม</th>
+                            <th>สถานะตัวชี้วัด</th>
+                            {{-- <th>สถานะเอกสาร</th> --}}
+                        </tr>
+                    </thead>
+                    <tbody>
 
-                        <thead>
-                            <tr>
-                                {{-- <th>ลำดับ</th> --}}
-                                <th>ปีการประเมิน</th>
-                                <th>ชื่อตัวบ่งชี้</th>
-                                <th>รหัส</th>
-                                <th>ประเภทตัวชี้วัด</th>
-                                <th>หน่วยงานที่รับผิดชอบ</th>
-                                <th>ผลลัพธ์</th>
-                                <th>คะแนนรวม</th>
-                                <th>สถานะตัวชี้วัด</th>
-                                {{-- <th>สถานะเอกสาร</th> --}}
+                        @foreach ($indicators as $index => $indicator)
+                            @php
+                                $statusKey = match ((int) $indicator->status) {
+                                    2, 3 => 'complete', // ✅ รองรับทั้ง 2 และ 3
+                                    4 => 'incomplete',
+                                    0 => 'pending',
+                                    default => 'pending',
+                                };
+
+                                // ดึงข้อมูล standard และ dimension
+                                $standardName = $indicator->category->standard->name ?? '';
+                                $dimensionName = $indicator->category->name ?? '';
+                                $collectorName = $indicator->assignments->first()->collectorUser->name ?? '';
+                                $deptName = '';
+                                foreach ($indicator->assignments as $assignment) {
+                                    $deptName = optional($assignment->collectorUser?->department)->name ?? '';
+                                    if ($deptName) {
+                                        break;
+                                    } // หยุดเมื่อเจอแล้ว
+                                }
+                            @endphp
+                            <tr data-max="{{ (float) $indicator->max_score }}" data-standard="{{ $standardName }}"
+                                data-dimension="{{ $dimensionName }}" data-collector="{{ $collectorName }}"
+                                data-dept="{{ $deptName }}" data-status="{{ $statusKey }}">
+
+                                <td class="status-cell">{{ $indicator->year }}</td>
+                                <td>{{ $indicator->name }}</td>
+                                <td class="status-cell">{{ $indicator->code }}</td>
+                                <td class="status-cell">{{ $indicator->type }}</td>
+
+                                <td class="status-cell">
+                                    {{ $deptName ?: '-' }}
+                                </td>
+
+                                <td class="status-cell">{{ $indicator->score_acc }}</td>
+                                <td class="status-cell">{{ $indicator->max_score }}</td>
+                                <td class="status-cell">
+                                    @switch($indicator->status)
+                                        @case(0)
+                                            <span class="tip" data-tip="อยู่ระหว่างดำเนินการ"
+                                                aria-label="อยู่ระหว่างดำเนินการ" tabindex="0">
+                                                <i data-lucide="alert-triangle" class="status-icon text-danger"></i>
+                                            </span>
+                                        @break
+
+                                        @case(4)
+                                            <span class="tip" data-tip="ผลการดำเนินงานยังไม่ครบถ้วนตามเกณฑ์"
+                                                aria-label="ผลการดำเนินงานยังไม่ครบถ้วนตามเกณฑ์" tabindex="0">
+                                                <i data-lucide="clock" class="status-icon text-warn"></i>
+                                            </span>
+                                        @break
+
+                                        @case(2)
+                                        @case(3)
+                                            <span class="tip" data-tip="ผลการดำเนินงานครบถ้วนตามเกณฑ์มาตรการ"
+                                                aria-label="ผลการดำเนินงานครบถ้วนตามเกณฑ์มาตรการ" tabindex="0">
+                                                <i data-lucide="check-circle" class="status-icon text-success"></i>
+                                            </span>
+                                        @break
+
+                                        @default
+                                            <span class="tip" data-tip="สถานะไม่ระบุ ({{ $indicator->status }})"
+                                                aria-label="สถานะไม่ระบุ" tabindex="0">
+                                                <i data-lucide="help-circle" class="status-icon text-gray-500"></i>
+                                            </span>
+                                    @endswitch
+                                </td>
                             </tr>
-                        </thead>
-                        <tbody>
-
-                            @foreach ($indicators as $index => $indicator)
-                                @php
-                                    $statusKey = match ((int) $indicator->status) {
-                                        2, 3 => 'complete', // ✅ รองรับทั้ง 2 และ 3
-                                        4 => 'incomplete',
-                                        0 => 'pending',
-                                        default => 'pending',
-                                    };
-
-                                    // ดึงข้อมูล standard และ dimension
-                                    $standardName = $indicator->category->standard->name ?? '';
-                                    $dimensionName = $indicator->category->name ?? '';
-                                    $collectorName = $indicator->assignments->first()->collectorUser->name ?? '';
-                                    $deptName = '';
-                                    foreach ($indicator->assignments as $assignment) {
-                                        $deptName = optional($assignment->collectorUser?->department)->name ?? '';
-                                        if ($deptName) {
-                                            break;
-                                        } // หยุดเมื่อเจอแล้ว
-                                    }
-                                @endphp
-                                <tr data-max="{{ (float) $indicator->max_score }}" data-standard="{{ $standardName }}"
-                                    data-dimension="{{ $dimensionName }}" data-collector="{{ $collectorName }}"
-                                    data-dept="{{ $deptName }}" data-status="{{ $statusKey }}">
-
-                                    <td class="status-cell">{{ $indicator->year }}</td>
-                                    <td>{{ $indicator->name }}</td>
-                                    <td class="status-cell">{{ $indicator->code }}</td>
-                                    <td class="status-cell">{{ $indicator->type }}</td>
-
-                                    <td class="status-cell">
-                                        {{ $deptName ?: '-' }}
-                                    </td>
-
-                                    <td class="status-cell">{{ $indicator->score_acc }}</td>
-                                    <td class="status-cell">{{ $indicator->max_score }}</td>
-                                    <td class="status-cell">
-                                        @switch($indicator->status)
-                                            @case(0)
-                                                <span class="tip" data-tip="อยู่ระหว่างดำเนินการ"
-                                                    aria-label="อยู่ระหว่างดำเนินการ" tabindex="0">
-                                                    <i data-lucide="alert-triangle" class="status-icon text-danger"></i>
-                                                </span>
-                                            @break
-
-                                            @case(4)
-                                                <span class="tip" data-tip="ผลการดำเนินงานยังไม่ครบถ้วนตามเกณฑ์"
-                                                    aria-label="ผลการดำเนินงานยังไม่ครบถ้วนตามเกณฑ์" tabindex="0">
-                                                    <i data-lucide="clock" class="status-icon text-warn"></i>
-                                                </span>
-                                            @break
-
-                                            @case(2)
-                                            @case(3)
-                                                <span class="tip" data-tip="ผลการดำเนินงานครบถ้วนตามเกณฑ์มาตรการ"
-                                                    aria-label="ผลการดำเนินงานครบถ้วนตามเกณฑ์มาตรการ" tabindex="0">
-                                                    <i data-lucide="check-circle" class="status-icon text-success"></i>
-                                                </span>
-                                            @break
-
-                                            @default
-                                                <span class="tip" data-tip="สถานะไม่ระบุ ({{ $indicator->status }})"
-                                                    aria-label="สถานะไม่ระบุ" tabindex="0">
-                                                    <i data-lucide="help-circle" class="status-icon text-gray-500"></i>
-                                                </span>
-                                        @endswitch
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
+                        @endforeach
+                    </tbody>
+                </table>
             </div>
         </div>
-
-        <!-- ตารางเอกสารและหลักฐาน -->
-
-    </div>
     </div>
 
+    <!-- ตารางเอกสารและหลักฐาน -->
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/lucide@0.469.0/dist/umd/lucide.min.js"></script>
@@ -353,7 +344,7 @@
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
-   
+
 
     <script>
         document.getElementById('exportExell').addEventListener('click', function() {
@@ -1567,29 +1558,6 @@
             height: 320px;
         }
 
-        .dashboard-container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 24px;
-        }
-
-        .dashboard-header {
-            margin-bottom: 32px;
-        }
-
-        .dashboard-header h1 {
-            font-size: 32px;
-            font-weight: 700;
-            color: var(--gray-900);
-            margin: 0 0 8px 0;
-        }
-
-        .subtitle {
-            color: var(--gray-600);
-            font-size: 16px;
-            margin: 0;
-        }
-
         /* Stats Grid */
         .stats-grid {
             display: grid;
@@ -1880,7 +1848,7 @@
 
         /* Responsive */
         @media (max-width: 768px) {
-            .dashboard-container {
+            .container {
                 padding: 16px;
             }
 
@@ -2063,7 +2031,7 @@
         }
 
         /* ตัวเลือก: วาง tooltip ด้านล่าง (ถ้าพื้นที่ด้านบนไม่พอ)
-                                                                                                                                                                                                                                                                                                                                                               <span class="tip" data-tip="..." data-pos="bottom"> */
+                                                                                                                                                                                                                                                                                                                                                                       <span class="tip" data-tip="..." data-pos="bottom"> */
         .tip[data-pos="bottom"]::after {
             top: calc(100% + 10px);
             bottom: auto;
@@ -2505,7 +2473,7 @@
 
 
         /* ตาราง */
-        .dashboard-containers {
+        .containers {
             width: 100%;
             max-width: 1500px;
             margin: 0 auto;
