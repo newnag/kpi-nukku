@@ -63,6 +63,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::prefix('dashboardKpiUser')->name('dashboardKpiUser.')->middleware('permission:view-dashboard-kpi-user')->group(function () {
         Route::get('/', [DashboardKpiUserController::class, 'index'])->name('index');
         Route::get('/dashboardKpiUser/{id}', [DashboardKpiUserController::class, 'show'])
+        
             ->name('show')
             ->middleware('permission:show-dashboard-kpi-user');
     });
@@ -239,4 +240,11 @@ Route::middleware(['auth:sanctum'])->group(function () {
             ->whereNumber('id')
             ->middleware('permission:download-evidence');
     });
+
+Route::prefix('dashboardKpiUser')->name('dashboardKpiUser.')->group(function () {
+    Route::get('/', [DashboardKpiUserController::class, 'index'])->name('index');
+    Route::get('/dashboardKpiUser/{id}', [DashboardKpiUserController::class, 'show'])->name('show');
+    Route::put('/{id}/update-variables', [DashboardKpiUserController::class, 'saveVariables'])->name('saveVariables');
+});
+    
 });

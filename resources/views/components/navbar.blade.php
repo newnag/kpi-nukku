@@ -180,6 +180,16 @@
                     <i class="fa-solid fa-chart-column"></i> กราฟแสดงผลลัพธ์ตัวชี้วัด
                 </a>
             @endcan
+            @hasanyrole('user')
+                <a href="{{ route('dashboardKpiUser.index') }}"
+                    class="{{ request()->is('dashboardKpiUser*') ? 'active' : '' }}">
+                    <i class="fa-solid fa-gauge-high"></i> Dashboard ผู้ใช้งาน
+                </a>
+                <a href="{{ route('evidences.index') }}" class="{{ request()->is('evidences*') ? 'active' : '' }}">
+                    <i class="fa-solid fa-file"></i> หลักฐานของฉัน
+                </a>
+               
+            @endhasanyrole
 
 
             <!-- Indicators - Available to users with indicator permissions -->
@@ -201,7 +211,7 @@
                                 <i class="fa-solid fa-bell"></i> กำหนดวันแจ้งเตือน
                             </a>
                         @endcan
-                        @can('view-departments')    
+                        @can('view-departments')
                             <a href="{{ route('departments.index') }}">
                                 <i class="fa-solid fa-sitemap"></i> จัดการหน่วยงาน
                             </a>

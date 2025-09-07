@@ -30,7 +30,7 @@
                             d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
                     </svg>
                 </button>
-                <div id="sort-dropdown" class="dropdown-menu hidden" role="menu" aria-orientation="vertical">
+                <div id="sort-dropdown" class="dropdown-menus hidden" role="menu" aria-orientation="vertical">
                     <button class="dropdown-item sort-option" data-column="0" data-order="asc" role="menuitem">ปี
                         (น้อยไปมาก)</button>
                     <button class="dropdown-item sort-option" data-column="0" data-order="desc" role="menuitem">ปี
@@ -62,7 +62,7 @@
                     </svg>
                 </button>
 
-                <div id="filter-dropdown" class="dropdown-menu hidden">
+                <div id="filter-dropdown" class="dropdown-menus hidden">
                     <div style="padding:12px 12px;">
 
                         {{-- Section: ปี --}}
@@ -88,7 +88,7 @@
                         <div class="dropdown-divider"></div>
 
                         {{-- Section: ประเภทองค์กร --}}
-                        <h3 class="dropdown-title">ประเภทองค์กร</h3>
+                        <h3 class="dropdown-title">ประเภทตัวชี้วัด</h3>
                         <div class="dropdown-multiselect" id="typeDropdown">
                             <div class="dropdown-btn" onclick="toggleDropdown('typeDropdown')">
                                 <span id="type-label">เลือกประเภท</span>
@@ -116,20 +116,31 @@
                                 <span id="status-label">เลือกสถานะ</span>
                                 <i style="font-size:12px;">▼</i>
                             </div>
+                            @php
+                                $statusMap = [
+                                    0 => 'ดำเนินการ',
+                                    1 => 'ดำเนินการ',
+                                    2 => 'ดำเนินการ',
+                                    3 => 'ครบ',
+                                    4 => 'ไม่ครบ',
+                                ];
+
+                                $statusList = $indicators
+                                    ->pluck('status')
+                                    ->unique()
+                                    ->map(fn($s) => $statusMap[$s] ?? 'ไม่ทราบ');
+                            @endphp
+
                             <div class="dropdown-content">
-                                <label><input type="checkbox" class="filter-option status-option" data-column="7"
-                                        data-value="ดำเนินการ">
-                                    <span style="margin-left:6px;">อยู่ระหว่างดำเนินการ</span>
-                                </label>
-                                <label><input type="checkbox" class="filter-option status-option" data-column="7"
-                                        data-value="ครบ">
-                                    <span style="margin-left:6px;">ครบถ้วน</span>
-                                </label>
-                                <label><input type="checkbox" class="filter-option status-option" data-column="7"
-                                        data-value="ไม่ครบ">
-                                    <span style="margin-left:6px;">ไม่ครบ</span>
-                                </label>
+                                @foreach ($statusList as $statusText)
+                                    <label>
+                                        <input type="checkbox" class="filter-option status-option" data-column="7"
+                                            data-value="{{ $statusText }}">
+                                        <span style="margin-left:6px;">{{ $statusText }}</span>
+                                    </label>
+                                @endforeach
                             </div>
+
                         </div>
 
                         <div class="dropdown-divider"></div>
@@ -156,7 +167,7 @@
                             <th>ปี</th>
                             <th>ชื่อตัวบ่งชี้</th>
                             <th>รหัส</th>
-                            <th>ประเภทองค์กร</th>
+                            <th>ประเภทตัวชี้วัด</th>
                             <th>หน่วยงานที่รับผิดชอบ</th>
                             <th>คะแนนเต็ม</th>
                             <th>คะแนนรวม</th>
@@ -190,7 +201,8 @@
                                 <td class="status-cell">{{ $deptName ?: '-' }}</td>
                                 <td class="status-cell">{{ $indicator->score_acc }}</td>
                                 <td class="status-cell">{{ $indicator->max_score }}</td>
-                                <td class="status-cell">
+                                {{-- <td class="status-cell">
+
                                     @switch($indicator->status)
                                         @case(0)
                                             <span class="tooltip" data-tooltip="รอดำเนินการ">
@@ -229,7 +241,54 @@
                                     @endswitch
 
 
+                                </td> --}}
+                                <td class="status-cell"
+                                    data-search="@if (in_array($indicator->status, [0, 1, 2])) ดำเนินการ
+                 @elseif($indicator->status == 3)
+                    ครบ
+                 @elseif($indicator->status == 4)
+                    ไม่ครบ
+                 @else
+                    ไม่ทราบ @endif">
+
+                                    @switch($indicator->status)
+                                        @case(0)
+                                            <span class="tooltip" data-tooltip="รอดำเนินการ">
+                                                <i data-lucide="clock" class="status-icon text-warn"></i>
+                                            </span>
+                                        @break
+
+                                        @case(1)
+                                            <span class="tooltip" data-tooltip="รอดำเนินการ / บันทึกร่าง">
+                                                <i data-lucide="clock" class="status-icon text-warn"></i>
+                                            </span>
+                                        @break
+
+                                        @case(2)
+                                            <span class="tooltip" data-tooltip="รอดำเนินการ / บันทึกจริง">
+                                                <i data-lucide="clock" class="status-icon text-warn"></i>
+                                            </span>
+                                        @break
+
+                                        @case(3)
+                                            <span class="tooltip" data-tooltip="ผลการดำเนินงานครบถ้วนตามเกณฑ์มาตรการ">
+                                                <i data-lucide="check-circle" class="status-icon text-success"></i>
+                                            </span>
+                                        @break
+
+                                        @case(4)
+                                            <span class="tooltip" data-tooltip="ผลการดำเนินงานยังไม่ครบถ้วนตามเกณฑ์">
+                                                <i data-lucide="alert-triangle" class="status-icon text-danger"></i>
+                                            </span>
+                                        @break
+
+                                        @default
+                                            <span class="tooltip" data-tooltip="สถานะไม่ระบุ">
+                                                <i data-lucide="help-circle" class="status-icon text-gray-500"></i>
+                                            </span>
+                                    @endswitch
                                 </td>
+
                                 <td class="status-cell">
                                     @switch($indicator->doc_status)
                                         @case('ไม่ครบ')
@@ -274,195 +333,195 @@
     <!-- DataTables JS -->
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/lucide@0.469.0/dist/umd/lucide.min.js"></script>
+    @push('scripts')
+        <script>
+            let table;
 
-    <script>
-        let table;
-
-        $(function() {
-            // --- DataTable init ---
-            table = $('#evidenceTable').DataTable({
-                searching: true,
-                lengthChange: false,
-                dom: 'rtip',
-                order: [], // ไม่มี default sort
-                stateSave: false, // ปิดจำสถานะ (กัน order เด้งกลับ)
-                language: {
-                    paginate: {
-                        previous: 'ก่อนหน้า',
-                        next: 'ถัดไป'
-                    },
-                    info: "แสดง _START_ ถึง _END_ จากทั้งหมด _TOTAL_ รายการ",
-                    emptyTable: "ไม่พบข้อมูล",
-                    zeroRecords: "ไม่พบข้อมูลที่ตรงกับการค้นหา"
-                }
-            });
-            table.on('draw', function() {
-                if (window.lucide?.createIcons) lucide.createIcons();
-            });
-            // --- Custom search ---
-            let timer;
-            $('#custom-search')
-                .on('input', function() {
-                    clearTimeout(timer);
-                    const val = this.value;
-                    timer = setTimeout(() => table.search(val).draw(), 150);
-                })
-                .on('search', function() {
-                    if (this.value === '') table.search('').draw();
-                });
-
-            // --- Dropdown toggles ---
-            $('#sort-button').on('click', function(e) {
-                e.stopPropagation();
-                $('#sort-dropdown').toggleClass('hidden');
-                $('#filter-dropdown').addClass('hidden');
-            });
-
-            $('#filter-button').on('click', function(e) {
-                e.stopPropagation();
-                $('#filter-dropdown').toggleClass('hidden');
-                $('#sort-dropdown').addClass('hidden');
-            });
-
-            // ปิด dropdown เมื่อคลิกข้างนอก
-            $(document).on('click', function(e) {
-                if (!$(e.target).closest('#sort-dropdown-container, #filter-dropdown-container').length) {
-                    $('#sort-dropdown, #filter-dropdown').addClass('hidden');
-                }
-            });
-
-            // --- Sorting ---
-            $('#sort-dropdown').on('click', '.sort-option', function(e) {
-                e.stopPropagation();
-                const col = Number($(this).data('column'));
-                const order = String($(this).data('order'));
-                table.order([
-                    [col, order]
-                ]).draw(false);
-
-                $('#sort-button span').text('เรียงลำดับ: ' + $(this).text().trim());
-                $('#sort-dropdown').addClass('hidden');
-            });
-
-            // ล้างการเรียงลำดับ
-            $('#clear-sort').on('click', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-
-                table.order([]).draw(false);
-                table.order([
-                    [0, 'asc']
-                ]).draw(false);
-
-                $('#sort-button span').text('เรียงลำดับ');
-                $('#sort-dropdown').addClass('hidden');
-            });
-
-            // --- Filtering ---
-            let activeFilters = {};
-
-            $('.filter-option').on('change', function() {
-                const column = String($(this).data('column'));
-                const value = String($(this).data('value'));
-
-                if (!activeFilters[column]) activeFilters[column] = [];
-                if (this.checked) {
-                    if (!activeFilters[column].includes(value)) activeFilters[column].push(value);
-                } else {
-                    activeFilters[column] = activeFilters[column].filter(v => v !== value);
-                    if (activeFilters[column].length === 0) delete activeFilters[column];
-                }
-            });
-
-            // ใช้ตัวกรอง
-            $('#apply-filters').on('click', function() {
-                table.columns().every(function() {
-                    this.search('');
-                });
-
-                let filterCount = 0;
-
-                for (const column in activeFilters) {
-                    if (activeFilters[column].length > 0) {
-                        filterCount += activeFilters[column].length;
-
-                        const regex = activeFilters[column]
-                            .map(v => v.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
-                            .join('|');
-
-                        table.column(Number(column)).search(regex, true, false);
+            $(function() {
+                // --- DataTable init ---
+                table = $('#evidenceTable').DataTable({
+                    searching: true,
+                    lengthChange: false,
+                    dom: 'rtip',
+                    order: [], // ไม่มี default sort
+                    stateSave: false, // ปิดจำสถานะ (กัน order เด้งกลับ)
+                    language: {
+                        paginate: {
+                            previous: 'ก่อนหน้า',
+                            next: 'ถัดไป'
+                        },
+                        info: "แสดง _START_ ถึง _END_ จากทั้งหมด _TOTAL_ รายการ",
+                        emptyTable: "ไม่พบข้อมูล",
+                        zeroRecords: "ไม่พบข้อมูลที่ตรงกับการค้นหา"
                     }
-                }
+                });
+                table.on('draw', function() {
+                    if (window.lucide?.createIcons) lucide.createIcons();
+                });
+                // --- Custom search ---
+                let timer;
+                $('#custom-search')
+                    .on('input', function() {
+                        clearTimeout(timer);
+                        const val = this.value;
+                        timer = setTimeout(() => table.search(val).draw(), 150);
+                    })
+                    .on('search', function() {
+                        if (this.value === '') table.search('').draw();
+                    });
 
-                $('#filter-button span').text(filterCount > 0 ? `กรองข้อมูล (${filterCount})` :
-                    'กรองข้อมูล');
-                table.draw();
-                $('#filter-dropdown').addClass('hidden');
+                // --- Dropdown toggles ---
+                $('#sort-button').on('click', function(e) {
+                    e.stopPropagation();
+                    $('#sort-dropdown').toggleClass('hidden');
+                    $('#filter-dropdown').addClass('hidden');
+                });
+
+                $('#filter-button').on('click', function(e) {
+                    e.stopPropagation();
+                    $('#filter-dropdown').toggleClass('hidden');
+                    $('#sort-dropdown').addClass('hidden');
+                });
+
+                // ปิด dropdown เมื่อคลิกข้างนอก
+                $(document).on('click', function(e) {
+                    if (!$(e.target).closest('#sort-dropdown-container, #filter-dropdown-container').length) {
+                        $('#sort-dropdown, #filter-dropdown').addClass('hidden');
+                    }
+                });
+
+                // --- Sorting ---
+                $('#sort-dropdown').on('click', '.sort-option', function(e) {
+                    e.stopPropagation();
+                    const col = Number($(this).data('column'));
+                    const order = String($(this).data('order'));
+                    table.order([
+                        [col, order]
+                    ]).draw(false);
+
+                    $('#sort-button span').text('เรียงลำดับ: ' + $(this).text().trim());
+                    $('#sort-dropdown').addClass('hidden');
+                });
+
+                // ล้างการเรียงลำดับ
+                $('#clear-sort').on('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    table.order([]).draw(false);
+                    table.order([
+                        [0, 'asc']
+                    ]).draw(false);
+
+                    $('#sort-button span').text('เรียงลำดับ');
+                    $('#sort-dropdown').addClass('hidden');
+                });
+
+                // --- Filtering ---
+                let activeFilters = {};
+
+                $('.filter-option').on('change', function() {
+                    const column = String($(this).data('column'));
+                    const value = String($(this).data('value'));
+
+                    if (!activeFilters[column]) activeFilters[column] = [];
+                    if (this.checked) {
+                        if (!activeFilters[column].includes(value)) activeFilters[column].push(value);
+                    } else {
+                        activeFilters[column] = activeFilters[column].filter(v => v !== value);
+                        if (activeFilters[column].length === 0) delete activeFilters[column];
+                    }
+                });
+
+                // ใช้ตัวกรอง
+                $('#apply-filters').on('click', function() {
+                    table.columns().every(function() {
+                        this.search('');
+                    });
+
+                    let filterCount = 0;
+
+                    for (const column in activeFilters) {
+                        if (activeFilters[column].length > 0) {
+                            filterCount += activeFilters[column].length;
+
+                            const regex = activeFilters[column]
+                                .map(v => v.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+                                .join('|');
+
+                            table.column(Number(column)).search(regex, true, false);
+                        }
+                    }
+
+                    $('#filter-button span').text(filterCount > 0 ? `กรองข้อมูล (${filterCount})` :
+                        'กรองข้อมูล');
+                    table.draw();
+                    $('#filter-dropdown').addClass('hidden');
+                });
+
+                // ล้างตัวกรอง
+                $('#clear-filters').on('click', function(e) {
+                    e.preventDefault();
+
+                    $('.filter-option').prop('checked', false);
+                    activeFilters = {};
+                    $('#filter-button span').text('กรองข้อมูล');
+
+                    // reset label ทั้ง 2 dropdown
+                    $('#year-label').text('เลือกปี');
+                    $('#status-label').text('เลือกสถานะ');
+
+                    table.columns().search('').draw();
+                });
+
+
             });
+        </script>
+        <script>
+            function toggleDropdown(id) {
+                document.querySelectorAll('.dropdown-multiselect').forEach(el => {
+                    if (el.id !== id) el.classList.remove("open");
+                });
+                document.getElementById(id).classList.toggle("open");
+            }
 
-            // ล้างตัวกรอง
-            $('#clear-filters').on('click', function(e) {
-                e.preventDefault();
+            // อัปเดต label เมื่อเลือก
+            // อัปเดต label ของ multiselect
+            function setupDropdownLabel(dropdownId, labelId, defaultText) {
+                const checkboxes = document.querySelectorAll(`#${dropdownId} .filter-option`);
+                const label = document.getElementById(labelId);
 
-                $('.filter-option').prop('checked', false);
-                activeFilters = {};
-                $('#filter-button span').text('กรองข้อมูล');
+                checkboxes.forEach(cb => {
+                    cb.addEventListener('change', () => {
+                        const selected = Array.from(checkboxes)
+                            .filter(x => x.checked)
+                            .map(x => x.getAttribute('data-value'));
 
-                // reset label ทั้ง 2 dropdown
-                $('#year-label').text('เลือกปี');
-                $('#status-label').text('เลือกสถานะ');
+                        label.textContent = selected.length ? selected.join(', ') : defaultText;
+                    });
+                });
+            }
 
-                table.columns().search('').draw();
-            });
+            setupDropdownLabel('yearDropdown', 'year-label', 'เลือกปี');
+            setupDropdownLabel('typeDropdown', 'type-label', 'เลือกประเภท');
+            setupDropdownLabel('statusDropdown', 'status-label', 'เลือกสถานะ');
 
 
-        });
-    </script>
-    <script>
-        function toggleDropdown(id) {
-            document.querySelectorAll('.dropdown-multiselect').forEach(el => {
-                if (el.id !== id) el.classList.remove("open");
-            });
-            document.getElementById(id).classList.toggle("open");
-        }
-
-        // อัปเดต label เมื่อเลือก
-        // อัปเดต label ของ multiselect
-        function setupDropdownLabel(dropdownId, labelId, defaultText) {
-            const checkboxes = document.querySelectorAll(`#${dropdownId} .filter-option`);
-            const label = document.getElementById(labelId);
-
-            checkboxes.forEach(cb => {
-                cb.addEventListener('change', () => {
-                    const selected = Array.from(checkboxes)
-                        .filter(x => x.checked)
-                        .map(x => x.getAttribute('data-value'));
-
-                    label.textContent = selected.length ? selected.join(', ') : defaultText;
+            // ปิด dropdown ถ้าคลิกข้างนอก
+            document.addEventListener('click', function(e) {
+                const dropdowns = ['yearDropdown', 'statusDropdown'];
+                dropdowns.forEach(id => {
+                    const dropdown = document.getElementById(id);
+                    if (dropdown && !dropdown.contains(e.target)) {
+                        dropdown.classList.remove("open");
+                    }
                 });
             });
-        }
-
-        setupDropdownLabel('yearDropdown', 'year-label', 'เลือกปี');
-        setupDropdownLabel('typeDropdown', 'type-label', 'เลือกประเภท');
-        setupDropdownLabel('statusDropdown', 'status-label', 'เลือกสถานะ');
-
-
-        // ปิด dropdown ถ้าคลิกข้างนอก
-        document.addEventListener('click', function(e) {
-            const dropdowns = ['yearDropdown', 'statusDropdown'];
-            dropdowns.forEach(id => {
-                const dropdown = document.getElementById(id);
-                if (dropdown && !dropdown.contains(e.target)) {
-                    dropdown.classList.remove("open");
-                }
-            });
-        });
-    </script>
-    <script>
-        lucide.createIcons();
-    </script>
-
+        </script>
+        <script>
+            lucide.createIcons();
+        </script>
+    @endpush
     <!-- ========== CSS ========== -->
     <style>
         :root {
@@ -613,12 +672,27 @@
             text-align: left;
         }
 
-        .dropdown-menu {
+        /* .dropdown-menus {
+                        position: absolute;
+                        left: 0;
+                        top: 100%;
+                        margin-top: 8px;
+                        width: 192px;
+                        background: var(--white);
+                        border-radius: 6px;
+                        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, .1), 0 4px 6px -2px rgba(0, 0, 0, .05);
+                        border: 1px solid rgba(0, 0, 0, .05);
+                        z-index: 9999;
+                        padding: 4px 0;
+                        display: block;
+                    } */
+        .dropdown-menus {
             position: absolute;
             left: 0;
             top: 100%;
             margin-top: 8px;
-            width: 192px;
+            width: 100%;
+            /* ✅ ใช้ 100% ของ container (เท่าปุ่ม) */
             background: var(--white);
             border-radius: 6px;
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, .1), 0 4px 6px -2px rgba(0, 0, 0, .05);
@@ -626,9 +700,13 @@
             z-index: 9999;
             padding: 4px 0;
             display: block;
+            box-sizing: border-box;
+            /* ✅ กัน padding บวกเกิน */
+            min-width: max-content;
+            /* ✅ กัน dropdown เล็กเกินถ้ามีข้อความยาว */
         }
 
-        .dropdown-menu.hidden {
+        .dropdown-menus.hidden {
             display: none !important;
         }
 
