@@ -15,7 +15,7 @@ class DashboardKpiUserController extends Controller
     {
         // สมมติว่าลองใช้ id ปลอมก่อน (เวลาใช้จริงเปลี่ยนเป็น Auth::id())
 
-     $userId = Auth::id();
+        $userId = Auth::id();
 
         $indicators = Indicator::query()
             ->whereHas('assignments', fn($q) => $q->where('collector', $userId))
@@ -89,23 +89,48 @@ class DashboardKpiUserController extends Controller
             }
         }
 
-        // ✅ update status
         if ($request->has('status')) {
             $indicator->status = $request->status;
         }
 
         $indicator->save();
-        // return response()->json([
-        //     'success' => true,
-        //     'message' => $request->status == 1
-        //         ? 'บันทึกฉบับร่างเรียบร้อย ✅'
-        //         : 'บันทึกจริงสำเร็จ 🚀',
-        // ]);
 
-        return redirect()
-            ->route('dashboardKpiUser.index')
-            ->with('success', $request->status == 1
-                ? 'บันทึกฉบับร่างเรียบร้อย '
-                : 'บันทึกจริงสำเร็จ ');
+        // ✅ ส่ง JSON กลับไป
+        return redirect()->route('dashboardKpiUser.index')
+        ->with('success', 'บันทึกข้อมูลเรียบร้อยแล้ว');
     }
+
+
+    // public function saveVariables(Request $request, $id)
+    // {
+    //     $indicator = Indicator::findOrFail($id);
+
+    //     if ($request->has('variables')) {
+    //         foreach ($request->variables as $varId => $value) {
+    //             Variable::updateOrCreate(
+    //                 ['id' => $varId, 'indicator_id' => $indicator->id],
+    //                 ['value' => $value]
+    //             );
+    //         }
+    //     }
+
+    //     // ✅ update status
+    //     if ($request->has('status')) {
+    //         $indicator->status = $request->status;
+    //     }
+
+    //     $indicator->save();
+    //     // return response()->json([
+    //     //     'success' => true,
+    //     //     'message' => $request->status == 1
+    //     //         ? 'บันทึกฉบับร่างเรียบร้อย ✅'
+    //     //         : 'บันทึกจริงสำเร็จ 🚀',
+    //     // ]);
+
+    //     return redirect()
+    //         ->route('dashboardKpiUser.index')
+    //         ->with('success', $request->status == 1
+    //             ? 'บันทึกฉบับร่างเรียบร้อย '
+    //             : 'บันทึกจริงสำเร็จ ');
+    // }
 }

@@ -317,7 +317,7 @@
 
                     @if (!in_array($indicator->status, [2, 3, 4]))
                         <!-- ปุ่มบันทึกฉบับร่าง -->
-                        <button type="submit" class="btn-outline save-btn" data-status="1">
+                        <button type="submit" class="btn-outlines save-btn" data-status="1">
                             <i class="fa fa-save"></i> บันทึกฉบับร่าง
                         </button>
 
@@ -935,7 +935,7 @@
 
     .btns-primary,
     .btns-secondary,
-    .btn-outline,
+    .btn-outlines,
     .btn-info {
         display: inline-flex;
         align-items: center;
@@ -975,13 +975,13 @@
         background: #EBF7FF;
     }
 
-    .btn-outline {
+    .btn-outlines {
         background: #ffffff;
         border: 1.5px solid #398ECA;
         color: #398ECA;
     }
 
-    .btn-outline:hover {
+    .btn-outlines:hover {
         background: #dbeafe;
     }
 
