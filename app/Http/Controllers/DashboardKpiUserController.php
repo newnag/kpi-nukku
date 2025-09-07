@@ -14,7 +14,8 @@ class DashboardKpiUserController extends Controller
     public function index(Request $request)
     {
         // สมมติว่าลองใช้ id ปลอมก่อน (เวลาใช้จริงเปลี่ยนเป็น Auth::id())
-        $userId = 1;
+
+     $userId = Auth::id();
 
         $indicators = Indicator::query()
             ->whereHas('assignments', fn($q) => $q->where('collector', $userId))

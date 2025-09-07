@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Criteria;
 use App\Models\Evidence;
+use App\Models\Indicator;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Storage;
@@ -15,17 +16,102 @@ use Illuminate\Support\Facades\Log;
 
 class EvidenceController extends Controller
 {
+    // public function index(Request $request)
+    // {
+    //     // เริ่มต้น query + preload ความสัมพันธ์
+    //     $query = Evidence::with(['criteria.indicator', 'user']);
+
+    //     // กรอง criteria_id
+    //     if ($request->filled('criteria_id')) {
+    //         $query->where('criteria_id', (int) $request->input('criteria_id'));
+    //     }
+
+    //     // กรอง user_id
+    //     if ($request->filled('user_id')) {
+    //         $query->where('user_id', (int) $request->input('user_id'));
+    //     }
+
+    //     // กรอง status
+    //     if ($request->has('status') && $request->input('status') !== '') {
+    //         $status = $request->input('status');
+    //         if (in_array($status, ['0', '1', 0, 1, true, false], true)) {
+    //             $query->where('status', (int) $status);
+    //         }
+    //     }
+
+    //     // กรอง type
+    //     if ($request->filled('type')) {
+    //         $query->where('type', $request->input('type'));
+    //     }
+
+    //     // ✅ กรอง indicator
+    //     if ($request->filled('indicator_id')) {
+    //         $query->whereHas('criteria.indicator', function ($q) use ($request) {
+    //             $q->where('id', (int) $request->input('indicator_id'));
+    //         });
+    //     }
+
+    //     // 🔹 รายการประเภทไฟล์
+    //     $fileTypes = (clone $query)
+    //         ->select('type')
+    //         ->whereNotNull('type')
+    //         ->distinct()
+    //         ->orderBy('type')
+    //         ->pluck('type');
+
+    //     // 🔹 รายการผู้ใช้
+    //     $fileUsers = (clone $query)
+    //         ->join('users', 'evidence.user_id', '=', 'users.id')
+    //         ->select('users.name')
+    //         ->whereNotNull('users.name')
+    //         ->distinct()
+    //         ->orderBy('users.name')
+    //         ->pluck('users.name');
+
+    //     // 🔹 รายการตัวชี้วัด
+    //     $indicators = Indicator::select('code', 'name')
+    //         ->groupBy('code', 'name')
+    //         ->orderByRaw("split_part(code, '-', 1)")            // prefix ก่อน '-'
+    //         ->orderByRaw("(split_part(code, '-', 2))::int")     // ตัวเลขหลัง '-'
+    //         ->get();
+
+
+    //     // Pagination
+    //     $perPage   = (int) $request->input('per_page', 5000);
+    //     $evidences = $query->paginate($perPage)->withQueryString();
+
+    //     // คำนวณ total_size
+    //     $evidences->getCollection()->transform(function ($evidence) {
+    //         $totalSize = 0;
+    //         if (!empty($evidence->path['files'])) {
+    //             foreach ($evidence->path['files'] as $f) {
+    //                 $totalSize += $f['size'] ?? 0;
+    //             }
+    //         }
+    //         $evidence->total_size = $totalSize;
+    //         $evidence->total_size_human = $this->formatFileSize($totalSize);
+    //         return $evidence;
+    //     });
+
+    //     return view('evidences.app', compact('evidences', 'fileTypes', 'fileUsers', 'indicators'));
+    // }
+
     public function index(Request $request)
     {
         // เริ่มต้น query + preload ความสัมพันธ์
         $query = Evidence::with(['criteria.indicator', 'user']);
+
+        // 🟢 ถ้า role = user → แสดงเฉพาะของตัวเอง
+        if (auth()->user()->hasRole('user')) {
+            $query->where('user_id', auth()->id());
+        }
 
         // กรอง criteria_id
         if ($request->filled('criteria_id')) {
             $query->where('criteria_id', (int) $request->input('criteria_id'));
         }
 
-        // กรอง user_id
+        // กรอง user_id (แต่ user ปกติไม่ควรเลือก user_id อื่นได้อยู่แล้ว)
         if ($request->filled('user_id')) {
             $query->where('user_id', (int) $request->input('user_id'));
         }
@@ -58,22 +144,24 @@ class EvidenceController extends Controller
             ->orderBy('type')
             ->pluck('type');
 
-        // 🔹 รายการผู้ใช้
-        $fileUsers = (clone $query)
-            ->join('users', 'evidence.user_id', '=', 'users.id')
-            ->select('users.name')
-            ->whereNotNull('users.name')
-            ->distinct()
-            ->orderBy('users.name')
-            ->pluck('users.name');
+        // 🔹 รายการผู้ใช้ (เฉพาะ role อื่น ๆ เท่านั้นถึงจะเห็น user list)
+        $fileUsers = collect();
+        if (!auth()->user()->hasRole('user')) {
+            $fileUsers = (clone $query)
+                ->join('users', 'evidence.user_id', '=', 'users.id')
+                ->select('users.name')
+                ->whereNotNull('users.name')
+                ->distinct()
+                ->orderBy('users.name')
+                ->pluck('users.name');
+        }
 
         // 🔹 รายการตัวชี้วัด
-        $indicators = \App\Models\Indicator::select('code', 'name')
+        $indicators = Indicator::select('code', 'name')
             ->groupBy('code', 'name')
-            ->orderByRaw("SUBSTRING_INDEX(code, '-', 1)")        // prefix เช่น NCS, NCP
-            ->orderByRaw("CAST(SUBSTRING_INDEX(code, '-', -1) AS UNSIGNED)") // เลขหลัง dash แปลงเป็น int
+            ->orderByRaw("split_part(code, '-', 1)")            // prefix ก่อน '-'
+            ->orderByRaw("(split_part(code, '-', 2))::int")     // ตัวเลขหลัง '-'
             ->get();
-
 
         // Pagination
         $perPage   = (int) $request->input('per_page', 5000);
@@ -94,7 +182,6 @@ class EvidenceController extends Controller
 
         return view('evidences.app', compact('evidences', 'fileTypes', 'fileUsers', 'indicators'));
     }
-
 
 
     /**

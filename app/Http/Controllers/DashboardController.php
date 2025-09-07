@@ -21,7 +21,7 @@ class DashboardController extends Controller
         $yearsForFilter = Indicator::query()
             ->whereHas('assignments')
             ->whereNotNull('year')
-            ->selectRaw('DISTINCT CAST(year AS UNSIGNED) AS y')
+            ->selectRaw('DISTINCT CAST(year AS INTEGER) AS y')
             ->orderBy('y')
             ->pluck('y');   // [2020,2021,...] เป็น int (Collection)
 
@@ -29,7 +29,7 @@ class DashboardController extends Controller
         $yearlyTotals = Indicator::query()
             ->whereHas('assignments')
             ->whereNotNull('year')
-            ->selectRaw('CAST(year AS UNSIGNED) as year, SUM(score_acc) AS total_score, SUM(max_score) AS max_score')
+            ->selectRaw('CAST(year AS INTEGER) as year, SUM(score_acc) AS total_score, SUM(max_score) AS max_score')
             ->groupBy('year')
             ->orderBy('year')
             ->get();
@@ -78,10 +78,11 @@ class DashboardController extends Controller
         END
     ")
 
-                    // 3) เลขหลังขีด (เอาตัวท้ายสุด)
-                 ->orderByRaw("
-                        COALESCE(NULLIF(SUBSTRING_INDEX(indicators.code, '-', -1), ''), 0) + 0 ASC
-            ")
+            // 3) เลขหลังขีด (เอาตัวท้ายสุด)
+            ->orderByRaw("
+    COALESCE(NULLIF(SPLIT_PART(indicators.code, '-', 2), ''), '0')::int ASC
+")
+
 
             // กันกรณีเลขเท่ากัน → เรียง code เต็ม
             ->orderBy('indicators.code', 'asc')
@@ -150,7 +151,7 @@ class DashboardController extends Controller
         $allYears = Indicator::query()
             ->whereHas('assignments')
             ->whereNotNull('year')
-            ->selectRaw('DISTINCT CAST(year AS UNSIGNED) AS y')
+            ->selectRaw('DISTINCT CAST(year AS INTEGER) AS y')
             ->orderBy('y')
             ->pluck('y')
             ->toArray();
@@ -172,15 +173,15 @@ class DashboardController extends Controller
                 ->join('standards', 'standards.id', '=', 'categories.standard_id')
                 ->whereHas('assignments')
                 ->whereNotNull('indicators.year')
-                ->whereIn(DB::raw('CAST(indicators.year AS UNSIGNED)'), $last5Years)
+                ->whereIn(DB::raw('CAST(indicators.year AS INTEGER)'), $last5Years)
                 ->whereIn('standards.id', $threeStandardIds)
                 ->selectRaw('
-                CAST(indicators.year AS UNSIGNED) AS year,
+                CAST(indicators.year AS INTEGER) AS year,
                 standards.id AS standard_id,
                 SUM(indicators.score_acc) AS total_score
             ')
-                ->groupByRaw('CAST(indicators.year AS UNSIGNED), standards.id')
-                ->orderByRaw('CAST(indicators.year AS UNSIGNED)')
+                ->groupByRaw('CAST(indicators.year AS INTEGER), standards.id')
+                ->orderByRaw('CAST(indicators.year AS INTEGER)')
                 ->get();
 
             $series = [];
@@ -222,14 +223,14 @@ class DashboardController extends Controller
                 ->join('categories', 'categories.id', '=', 'indicators.categorie_id')
                 ->whereHas('assignments')
                 ->whereNotNull('indicators.year')
-                ->whereIn(DB::raw('CAST(indicators.year AS UNSIGNED)'), $last5Years)
+                ->whereIn(DB::raw('CAST(indicators.year AS INTEGER)'), $last5Years)
                 ->selectRaw('
-        CAST(indicators.year AS UNSIGNED) AS year,
+        CAST(indicators.year AS INTEGER) AS year,
         categories.name AS dim_name,
         SUM(indicators.score_acc) AS total_score
      ')
-                ->groupByRaw('CAST(indicators.year AS UNSIGNED), categories.name')
-                ->orderByRaw('CAST(indicators.year AS UNSIGNED)')
+                ->groupByRaw('CAST(indicators.year AS INTEGER), categories.name')
+                ->orderByRaw('CAST(indicators.year AS INTEGER)')
                 ->get();
 
             // 2) กำหนดลำดับชื่อ “7 ด้าน” ตามที่ต้องการแสดง (แก้ให้ตรงชื่อในฐานข้อมูลของคุณ)
@@ -499,7 +500,4 @@ class DashboardController extends Controller
             'filters'          => $filters,
         ]);
     }
-
- }
-
-  
+}
