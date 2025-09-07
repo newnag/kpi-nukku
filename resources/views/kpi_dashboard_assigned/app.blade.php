@@ -1,769 +1,563 @@
 @extends('layouts.app')
-@section('title', 'รายการตัวบ่งชี้')
+
+@section('title', 'รายการตัวบ่งชี้ที่ได้รับมอบหมาย')
+
+@section('header', 'รายการตัวบ่งชี้ที่ได้รับมอบหมาย')
+@section('subheader', 'ระบบบริหารจัดการข้อมูลการรับรองสถาบันจากสภาการพยาบาล')
+
 @section('content')
-
-    <div class="evidence-container">
-        <h1>รายการตัวบ่งชี้</h1>
-
-        <!-- Controls -->
-        <div class="controls">
-            <!-- Search -->
-            <div class="search-box" style="width:100%; max-width:420px;">
-                <div class="icon">
-                    <!-- search icon -->
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor" style="color:#9ca3af;">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                    </svg>
+    <div class="ml-3 mr-3 md:ml-9 md:mr-9 mb-9 space-y-5">
+        <div class="flex flex-col md:flex-row md:justify-between gap-4 md:gap-2">
+            <!-- Search & Filter Controls Group -->
+            <div class="flex flex-wrap gap-2">
+                <!-- Search -->
+                <div class="relative w-full sm:w-auto bg-white rounded-lg shadow-sm">
+                    <div class="absolute inset-y-0 left-3 flex items-center pointer-events-none">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                    </div>
+                    <input id="custom-search" type="text"
+                        class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none w-full"
+                        placeholder="ค้นหารายการตัวบ่งชี้">
                 </div>
-                <input type="text" id="custom-search" class="search-input" placeholder="ค้นหารายการตัวบ่งชี้">
-            </div>
 
-            <!-- Sort -->
-            <div class="dropdown" id="sort-dropdown-container">
-                <button id="sort-button" class="btn">
-                    <span>เรียงลำดับ</span>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
-                    </svg>
-                </button>
-                <div id="sort-dropdown" class="dropdown-menu hidden" role="menu" aria-orientation="vertical">
-                    <button class="dropdown-item sort-option" data-column="0" data-order="asc" role="menuitem">ปี
-                        (น้อยไปมาก)</button>
-                    <button class="dropdown-item sort-option" data-column="0" data-order="desc" role="menuitem">ปี
-                        (มากไปน้อย)</button>
-                    <button class="dropdown-item sort-option" data-column="1" data-order="asc" role="menuitem">ชื่อตัวบ่งชี้
-                        (A-Z)</button>
-                    <button class="dropdown-item sort-option" data-column="1" data-order="desc"
-                        role="menuitem">ชื่อตัวบ่งชี้
-                        (Z-A)</button>
-                    <button class="dropdown-item sort-option" data-column="4" data-order="desc" role="menuitem">คะแนนเต็ม
-                        (มากไปน้อย)</button>
-                    <button class="dropdown-item sort-option" data-column="4" data-order="asc" role="menuitem">คะแนนเต็ม
-                        (น้อยไปมาก)</button>
-                    <div class="dropdown-divider"></div>
-                    <button id="clear-sort" type="button" class="dropdown-item"
-                        style="color:#4b5563;">ล้างการเรียงลำดับ</button>
-                </div>
-            </div>
-
-            <!-- Filter -->
-            <div class="dropdown" id="filter-dropdown-container">
-                <button id="filter-button" class="btn">
-                    <span>กรองข้อมูล</span>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
-                    </svg>
-                </button>
-
-                <div id="filter-dropdown" class="dropdown-menu hidden">
-                    <div style="padding:12px 12px;">
-                        {{-- Section: ปี --}}
-                        <h3 class="dropdown-title">ปี</h3>
-                        <div class="dropdown-multiselect" id="yearDropdown">
-                            <div class="dropdown-btn" onclick="toggleDropdown('yearDropdown')">
-                                <span id="year-label">เลือกปี</span>
-                                <i style="font-size:12px;">▼</i>
-                            </div>
-                            <div class="dropdown-content">
-                                <label style="display:flex; align-items:center; margin-bottom:4px;">
-                                    <input type="checkbox" class="filter-option year-option" data-column="0"
-                                        data-value="2568">
-                                    <span style="margin-left:6px; font-size:14px; color:#374151;">2568</span>
-                                </label>
-                                <label style="display:flex; align-items:center; margin-bottom:4px;">
-                                    <input type="checkbox" class="filter-option year-option" data-column="0"
-                                        data-value="2567">
-                                    <span style="margin-left:6px; font-size:14px; color:#374151;">2567</span>
-                                </label>
-                            </div>
+                <!-- Sort -->
+                <div class="relative inline-block text-left" id="sort-dropdown-container">
+                    <button id="sort-button"
+                        class="h-fit border border-gray-300 rounded-lg px-4 py-2 bg-white text-gray-700 hover:bg-gray-100 flex items-center gap-2">
+                        <span>เรียงลำดับ</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
+                        </svg>
+                    </button>
+                    <div id="sort-dropdown"
+                        class="hidden absolute left-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-10">
+                        <div class="py-1" role="menu" aria-orientation="vertical">
+                            <button
+                                class="sort-option text-left block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                data-column="0" data-order="asc" role="menuitem">ปี (น้อยไปมาก)</button>
+                            <button
+                                class="sort-option text-left block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                data-column="0" data-order="desc" role="menuitem">ปี (มากไปน้อย)</button>
+                            <button
+                                class="sort-option text-left block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                data-column="1" data-order="asc" role="menuitem">ชื่อตัวบ่งชี้ (A-Z)</button>
+                            <button
+                                class="sort-option text-left block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                data-column="1" data-order="desc" role="menuitem">ชื่อตัวบ่งชี้ (Z-A)</button>
+                            <button
+                                class="sort-option text-left block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                data-column="6" data-order="asc" role="menuitem">คะแนนรวม (น้อยไปมาก)</button>
+                            <button
+                                class="sort-option text-left block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                data-column="6" data-order="desc" role="menuitem">คะแนนรวม (มากไปน้อย)</button>
+                            <button id="clear-sort"
+                                class="text-left block w-full px-4 py-2 text-sm text-gray-600 hover:bg-gray-100">ล้างตัวเรียงลำดับ</button>
                         </div>
+                    </div>
+                </div>
 
-                        <div class="dropdown-divider"></div>
-
-                        {{-- Section: สถานะ --}}
-                        <h3 class="dropdown-title">สถานะตัวบ่งชี้</h3>
-                        <div class="dropdown-multiselect" id="statusDropdown">
-                            <div class="dropdown-btn" onclick="toggleDropdown('statusDropdown')">
-                                <span id="status-label">เลือกสถานะ</span>
-                                <i style="font-size:12px;">▼</i>
+                <!-- Filter -->
+                <div class="relative inline-block text-left" id="filter-dropdown-container">
+                    <button id="filter-button"
+                        class="h-fit border border-gray-300 rounded-lg px-4 py-2 bg-white text-gray-700 hover:bg-gray-100 flex items-center gap-2">
+                        <span>กรองข้อมูล</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+                        </svg>
+                    </button>
+                    <div id="filter-dropdown"
+                        class="hidden absolute left-0 mt-2 w-72 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-10">
+                        <div class="py-2 px-3">
+                            <!-- ปี -->
+                            <h3 class="text-sm font-medium text-gray-900 mb-2">ปี</h3>
+                            <div class="flex flex-wrap gap-3 mb-3">
+                                @php
+                                    $years = collect($indicators)->pluck('year')->unique()->sort()->values();
+                                @endphp
+                                @foreach ($years as $y)
+                                    <label class="inline-flex items-center">
+                                        <input type="checkbox" class="filter-option rounded text-blue-600" data-column="0"
+                                            data-value="{{ $y }}">
+                                        <span class="ml-2 text-sm text-gray-700">{{ $y }}</span>
+                                    </label>
+                                @endforeach
                             </div>
-                            <div class="dropdown-content">
-                                <label style="display:flex; align-items:center; margin-bottom:4px;">
-                                    <input type="checkbox" class="filter-option status-option" data-column="6"
+
+                            <div class="border-t border-gray-200 my-3"></div>
+
+                            <!-- สถานะตัวชี้วัด -->
+                            <h3 class="text-sm font-medium text-gray-900 mb-2">สถานะตัวชี้วัด</h3>
+                            <div class="space-y-2">
+                                <label class="inline-flex items-center">
+                                    <input type="checkbox" class="filter-option rounded text-blue-600" data-column="7"
+                                        data-value="0">
+                                    <span class="ml-2 text-sm text-gray-700">สมบูรณ์</span>
+                                </label><br>
+                                <label class="inline-flex items-center">
+                                    <input type="checkbox" class="filter-option rounded text-blue-600" data-column="7"
+                                        data-value="1">
+                                    <span class="ml-2 text-sm text-gray-700">ไม่ครบถ้วน</span>
+                                </label><br>
+                                <label class="inline-flex items-center">
+                                    <input type="checkbox" class="filter-option rounded text-blue-600" data-column="7"
+                                        data-value="2">
+                                    <span class="ml-2 text-sm text-gray-700">อยู่ระหว่างดำเนินการ</span>
+                                </label>
+                            </div>
+
+                            <div class="border-t border-gray-200 my-3"></div>
+
+                            <!-- สถานะเอกสาร -->
+                            <h3 class="text-sm font-medium text-gray-900 mb-2">สถานะเอกสาร</h3>
+                            <div class="space-y-2">
+                                <label class="inline-flex items-center">
+                                    <input type="checkbox" class="filter-option rounded text-blue-600" data-column="8"
                                         data-value="รอดำเนินการ">
-                                    <span style="margin-left:6px; font-size:14px; color:#374151;">รอดำเนินการ</span>
-                                </label>
-                                <label style="display:flex; align-items:center; margin-bottom:4px;">
-                                    <input type="checkbox" class="filter-option status-option" data-column="6"
+                                    <span class="ml-2 text-sm text-gray-700">รอดำเนินการ</span>
+                                </label><br>
+                                <label class="inline-flex items-center">
+                                    <input type="checkbox" class="filter-option rounded text-blue-600" data-column="8"
                                         data-value="ไม่ครบ">
-                                    <span style="margin-left:6px; font-size:14px; color:#374151;">ไม่ครบ</span>
+                                    <span class="ml-2 text-sm text-gray-700">ไม่ครบถ้วน</span>
+                                </label><br>
+                                <label class="inline-flex items-center">
+                                    <input type="checkbox" class="filter-option rounded text-blue-600" data-column="8"
+                                        data-value="ครบ">
+                                    <span class="ml-2 text-sm text-gray-700">ครบถ้วน</span>
                                 </label>
                             </div>
-                        </div>
 
-                        <div class="dropdown-divider"></div>
-                        {{-- Buttons --}}
-                        <div style="display:flex; justify-content:space-between; gap:12px;">
-                            <button id="clear-filters" class="btn" style="padding:6px 10px;">ล้างตัวกรอง</button>
-                            <button id="apply-filters" class="btn btn-primary"
-                                style="padding:6px 10px;">ใช้ตัวกรอง</button>
+                            <div class="border-t border-gray-200 my-3"></div>
+
+                            <div class="flex justify-between">
+                                <button id="clear-filters"
+                                    class="text-sm text-gray-600 hover:text-gray-900">ล้างตัวกรอง</button>
+                                <button id="apply-filters"
+                                    class="text-sm text-white bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded">
+                                    ใช้ตัวกรอง
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-        </div>
-
-        <!-- ตารางรายการตัวบ่งชี้ -->
-        <div class="evidence-containers">
-            <div class="evidence-list">
-                <table class="table" id="evidenceTable">
-                    <thead>
-                        <tr>
-                            <th>ปี</th>
-                            <th>ชื่อตัวบ่งชี้</th>
-                            <th>รหัส</th>
-                            <th>ประเภทองค์กร</th>
-                            <th>หน่วยงานที่รับผิดชอบ</th>
-                            <th>คะแนนเต็ม</th>
-                            <th>คะแนนรวม</th>
-                            <th>สถานะตัวบ่งชี้</th>
-                            <th>สถานะเอกสาร</th>
-                            <th>จัดการ</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($indicators as $indicator)
-                            @php
-                                $standardName = $indicator->category->standard->name ?? '';
-                                $dimensionName = $indicator->category->name ?? '';
-                                $collectorName = $indicator->assignments->first()->collectorUser->name ?? '';
-                                $deptName = '';
-                                foreach ($indicator->assignments as $assignment) {
-                                    $deptName = optional($assignment->collectorUser?->department)->name ?? '';
-                                    if ($deptName) {
-                                        break;
-                                    }
-                                }
-                            @endphp
-                            <tr data-max="{{ (float) $indicator->max_score }}" data-standard="{{ $standardName }}"
-                                data-dimension="{{ $dimensionName }}" data-collector="{{ $collectorName }}"
-                                data-dept="{{ $deptName }}" data-status="{{ $indicator->status_key }}">
-
-                                <td class="status-cell">{{ $indicator->year }}</td>
-                                <td>{{ $indicator->name }}</td>
-                                <td class="status-cell">{{ $indicator->code }}</td>
-                                <td class="status-cell">{{ $indicator->type }}</td>
-                                <td class="status-cell">{{ $deptName ?: '-' }}</td>
-                                <td class="status-cell">{{ $indicator->score_acc }}</td>
-                                <td class="status-cell">{{ $indicator->max_score }}</td>
-                                <td class="status-cell">
-                                    @switch($indicator->status)
-                                        @case(0)
-                                            <i data-lucide="alert-triangle" class="status-icon text-danger"
-                                                title="อยู่ระหว่างดำเนินการ"></i>
-                                        @break
-
-                                        @case(4)
-                                            <i data-lucide="clock" class="status-icon text-warn"
-                                                title="ผลการดำเนินงานยังไม่ครบถ้วนตามเกณฑ์"></i>
-                                        @break
-
-                                        @case(2)
-                                        @case(3)
-                                            <i data-lucide="check-circle" class="status-icon text-success"
-                                                title="ผลการดำเนินงานครบถ้วนตามเกณฑ์มาตรการ"></i>
-                                        @break
-
-                                        @default
-                                            <i data-lucide="help-circle" class="status-icon text-gray-500"
-                                                title="สถานะไม่ระบุ"></i>
-                                    @endswitch
-                                </td>
-                                <td class="status-cell">
-                                    @switch($indicator->doc_status)
-                                        @case('ไม่ครบ')
-                                            <i data-lucide="x-circle" class="status-icon text-danger"
-                                                title="ผลการดำเนินงานยังไม่ครบถ้วนตามเกณฑ์"></i>
-                                        @break
-
-                                        @case('ครบ')
-                                            <i data-lucide="check-circle" class="status-icon text-success"
-                                                title="ผลการดำเนินงานครบถ้วนตามเกณฑ์"></i>
-                                        @break
-
-                                        @default
-                                            <i data-lucide="help-circle" class="status-icon text-gray-400" title="ไม่ทราบ"></i>
-                                    @endswitch
-                                </td>
-                                <td>
-                                    <div class="evidence-actions">
-                                        <a href="{{ route('dashboardKpiUser.show', $indicator->id) }}" class="btn-edit"
-                                            title="ทำการประเมิน">
-                                            <i data-lucide="edit" style="margin-right:4px;"></i> ทำการประเมิน
-                                        </a>
-                                    </div>
-                                </td>
-
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+            <!-- (Optional) Right-side actions -->
+            <div class="flex flex-wrap gap-3">
+                <!-- Place for future actions if needed -->
             </div>
         </div>
     </div>
 
-    <!-- jQuery -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <!-- DataTables CSS -->
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
-    <!-- DataTables JS -->
+    <div class="border border-gray-200 rounded-lg shadow-sm overflow-x-auto">
+        <table id="assignedTable" class="w-full">
+            <thead>
+                <tr>
+                    <th class="w-16 px-4 py-3 text-sm font-medium text-gray-900 cursor-pointer select-none">
+                        <div class="flex items-center justify-between">
+                            <span>ปี</span>
+                            <svg class="sort-icon w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
+                            </svg>
+                        </div>
+                    </th>
+                    <th class="px-4 py-3 text-sm font-medium text-gray-900 cursor-pointer select-none">
+                        <div class="flex items-center justify-between">
+                            <span>ชื่อตัวบ่งชี้</span>
+                            <svg class="sort-icon w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
+                            </svg>
+                        </div>
+                    </th>
+                    <th class="px-4 py-3 text-sm font-medium text-gray-900 cursor-pointer select-none">
+                        <div class="flex items-center justify-between">
+                            <span>รหัส</span>
+                            <svg class="sort-icon w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
+                            </svg>
+                        </div>
+                    </th>
+                    <th
+                        class="px-4 py-3 text-sm font-medium text-gray-900 cursor-pointer select-none hidden md:table-cell">
+                        <div class="flex items-center justify-between">
+                            <span>ประเภทองค์กร</span>
+                            <svg class="sort-icon w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
+                            </svg>
+                        </div>
+                    </th>
+                    <th
+                        class="px-4 py-3 text-sm font-medium text-gray-900 cursor-pointer select-none hidden md:table-cell">
+                        <div class="flex items-center justify-between">
+                            <span>หน่วยงานที่รับผิดชอบ</span>
+                            <svg class="sort-icon w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
+                            </svg>
+                        </div>
+                    </th>
+                    <th class="px-4 py-3 text-sm font-medium text-gray-900 cursor-pointer select-none">
+                        <div class="flex items-center justify-between">
+                            <span>คะแนนเต็ม</span>
+                            <svg class="sort-icon w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
+                            </svg>
+                        </div>
+                    </th>
+                    <th class="px-4 py-3 text-sm font-medium text-gray-900 cursor-pointer select-none">
+                        <div class="flex items-center justify-between">
+                            <span>คะแนนรวม</span>
+                            <svg class="sort-icon w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
+                            </svg>
+                        </div>
+                    </th>
+                    <th class="px-4 py-3 text-sm font-medium text-gray-900 cursor-pointer select-none">
+                        <div class="flex items-center justify-between">
+                            <span>สถานะตัวบ่งชี้</span>
+                            <svg class="sort-icon w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
+                            </svg>
+                        </div>
+                    </th>
+                    <th
+                        class="px-4 py-3 text-sm font-medium text-gray-900 cursor-pointer select-none hidden sm:table-cell">
+                        <div class="flex items-center justify-between">
+                            <span>สถานะเอกสาร</span>
+                            <svg class="sort-icon w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
+                            </svg>
+                        </div>
+                    </th>
+                    <th class="px-4 py-3 text-sm font-medium text-gray-900">จัดการ</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white">
+                @foreach ($indicators as $indicator)
+                    @php
+                        $standardName = $indicator->category->standard->name ?? '';
+                        $dimensionName = $indicator->category->name ?? '';
+                        $collectorName = $indicator->assignments->first()->collectorUser->name ?? '';
+                        $deptName = '';
+                        foreach ($indicator->assignments as $assignment) {
+                            $deptName = optional($assignment->collectorUser?->department)->name ?? '';
+                            if ($deptName) {
+                                break;
+                            }
+                        }
+
+                        // Status mapping for sorting/filtering:
+                        // 0 = complete, 1 = not complete, 2 = in progress
+                        $statusRaw = (int) ($indicator->status ?? -1);
+                        if ($statusRaw === 2 || $statusRaw === 3) {
+                            $statusCode = 0;
+                            $statusText = 'สมบูรณ์';
+                            $badgeCls = 'bg-green-100 text-green-800';
+                        } elseif ($statusRaw === 4) {
+                            $statusCode = 1;
+                            $statusText = 'ไม่ครบถ้วน';
+                            $badgeCls = 'bg-red-100 text-red-800';
+                        } else {
+                            $statusCode = 2;
+                            $statusText = 'อยู่ระหว่างดำเนินการ';
+                            $badgeCls = 'bg-yellow-100 text-yellow-800';
+                        }
+
+                        // Document status uses backend strings ("ไม่ครบ","ครบ", or others)
+                        $doc = $indicator->doc_status;
+                        if ($doc === 'ครบ') {
+                            $docText = 'ครบถ้วน';
+                            $docOrder = 1;
+                            $docCls = 'bg-green-100 text-green-800';
+                        } elseif ($doc === 'ไม่ครบ') {
+                            $docText = 'ไม่ครบถ้วน';
+                            $docOrder = 2;
+                            $docCls = 'bg-red-100 text-red-800';
+                        } else {
+                            $docText = 'รอดำเนินการ';
+                            $docOrder = 0;
+                            $docCls = 'bg-gray-100 text-gray-800';
+                        }
+                    @endphp
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-4 py-3 text-sm text-gray-900">{{ $indicator->year }}</td>
+                        <td class="px-4 py-3 text-sm text-gray-900">{{ $indicator->name }}</td>
+                        <td class="px-4 py-3 text-sm text-gray-900">{{ $indicator->code }}</td>
+                        <td class="px-4 py-3 text-sm text-gray-900 hidden md:table-cell">
+                            {{ $indicator->type }}
+                        </td>
+                        <td class="px-4 py-3 text-sm text-gray-900 hidden md:table-cell">
+                            {{ $deptName ?: '-' }}
+                        </td>
+                        <!-- คะแนนเต็ม (max_score) -->
+                        <td class="px-4 py-3 text-sm text-gray-900 text-center">
+                            {{ number_format((float) $indicator->max_score, 2) }}
+                        </td>
+                        <!-- คะแนนรวม (score_acc) -->
+                        <td class="px-4 py-3 text-sm text-gray-900 text-center">
+                            {{ number_format((float) $indicator->score_acc, 2) }}
+                        </td>
+
+                        <!-- สถานะตัวบ่งชี้ -->
+                        <td class="px-4 py-3 place-items-center" data-search="{{ $statusCode }}"
+                            data-order="{{ $statusCode }}">
+                            @if ($statusCode === 0)
+                                <div class=" text-green-600">
+                                    <i data-lucide="check-circle-2" class="w-5 h-5"></i>
+                                </div>
+                            @elseif ($statusCode === 1)
+                                <div class=" text-red-600">
+                                    <i data-lucide="x-circle" class="w-5 h-5"></i>
+                                </div>
+                            @else
+                                <div class=" text-yellow-600">
+                                    <i data-lucide="timer" class="w-5 h-5"></i>
+                                </div>
+                            @endif
+                        </td>
+
+                        <!-- สถานะเอกสาร -->
+                        <td class="px-4 py-3 place-items-center"
+                            data-search="{{ $doc === 'ครบ' ? 'ครบ' : ($doc === 'ไม่ครบ' ? 'ไม่ครบ' : 'รอดำเนินการ') }}"
+                            data-order="{{ $docOrder }}">
+                            @if ($doc === 'ครบ')
+                                <div class=" text-green-600">
+                                    <i data-lucide="check-circle-2" class="w-5 h-5"></i>
+                                    {{-- <span class="text-xs font-medium">ครบถ้วน</span> --}}
+                                </div>
+                            @elseif ($doc === 'ไม่ครบ')
+                                <div class=" text-red-600">
+                                    <i data-lucide="x-circle" class="w-5 h-5"></i>
+                                    {{-- <span class="text-xs font-medium">ไม่ครบถ้วน</span> --}}
+                                </div>
+                            @else
+                                <div class=" text-gray-600">
+                                    <i data-lucide="clock" class="w-5 h-5"></i>
+                                    {{-- <span class="text-xs font-medium">รอดำเนินการ</span> --}}
+                                </div>
+                            @endif
+                        </td>
+
+                        <!-- Actions -->
+                        <td class="px-4 py-3 text-sm">
+                            <a href="{{ route('dashboardKpiUser.show', $indicator->id) }}"
+                                class="inline-flex items-center justify-center px-3 py-1 bg-white border border-blue-500 text-blue-500 rounded-full text-xs font-medium hover:bg-blue-500 hover:text-white">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 mr-1" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 4v16m8-8H4" />
+                                </svg>
+                                ทำการประเมิน
+                            </a>
+                        </td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
+@endsection
+
+@push('styles')
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.dataTables.min.css">
+    <style>
+        /* DataTables + Tailwind polish (minimal) */
+        table.dataTable thead th {
+            position: relative;
+            background-color: #f9fafb;
+            border-bottom: 1px solid #e5e7eb;
+            font-weight: 600;
+        }
+
+        table.dataTable thead .sorting:after,
+        table.dataTable thead .sorting_asc:after,
+        table.dataTable thead .sorting_desc:after {
+            display: none;
+        }
+
+        table.dataTable thead th:hover {
+            background-color: #f3f4f6;
+        }
+
+        table.dataTable thead th .sort-icon {
+            opacity: .3;
+            transition: transform .2s ease, opacity .2s ease;
+        }
+
+        table.dataTable thead th.sorting_asc .sort-icon {
+            opacity: 1;
+            color: #2563eb;
+            transform: rotate(180deg);
+        }
+
+        table.dataTable thead th.sorting_desc .sort-icon {
+            opacity: 1;
+            color: #2563eb;
+        }
+
+        @media (max-width: 640px) {
+            table.dataTable {
+                font-size: .875rem;
+            }
+
+            table.dataTable thead th,
+            table.dataTable tbody td {
+                padding: 8px 4px;
+            }
+
+            table.dataTable thead th .sort-icon {
+                display: none;
+            }
+
+            table.dataTable thead th.sorting,
+            table.dataTable thead th.sorting_asc,
+            table.dataTable thead th.sorting_desc {
+                padding-right: 8px;
+            }
+        }
+    </style>
+@endpush
+
+@push('scripts')
+    <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/lucide@0.469.0/dist/umd/lucide.min.js"></script>
-
     <script>
-        let table;
-
         $(function() {
-            // --- DataTable init ---
-            table = $('#evidenceTable').DataTable({
+            // Initialize DataTable
+            const table = new DataTable('#assignedTable', {
                 searching: true,
-                lengthChange: false,
-                dom: 'rtip',
-                order: [], // ไม่มี default sort
-                stateSave: false, // ปิดจำสถานะ (กัน order เด้งกลับ)
                 language: {
                     paginate: {
                         previous: 'ก่อนหน้า',
                         next: 'ถัดไป'
                     },
                     info: "แสดง _START_ ถึง _END_ จากทั้งหมด _TOTAL_ รายการ",
+                    lengthMenu: "แสดง _MENU_ รายการต่อหน้า",
                     emptyTable: "ไม่พบข้อมูล",
                     zeroRecords: "ไม่พบข้อมูลที่ตรงกับการค้นหา"
-                }
+                },
+                dom: '<"flex flex-col md:flex-row justify-between items-center p-3"<"flex-1 hidden"f><"flex"l>>' +
+                    't' +
+                    '<"flex flex-col md:flex-row justify-between items-center p-3"<"flex-1"i><"flex"p>>',
             });
-            table.on('draw', function() {
+
+            // Lucide refresh on draw
+            $('#assignedTable').on('draw.dt', function() {
                 if (window.lucide?.createIcons) lucide.createIcons();
             });
-            // --- Custom search ---
-            let timer;
-            $('#custom-search')
-                .on('input', function() {
-                    clearTimeout(timer);
-                    const val = this.value;
-                    timer = setTimeout(() => table.search(val).draw(), 150);
-                })
-                .on('search', function() {
-                    if (this.value === '') table.search('').draw();
-                });
 
-            // --- Dropdown toggles ---
+            // Custom search
+            $('#custom-search').on('keyup input', function() {
+                table.search(this.value).draw();
+            }).on('search', function() {
+                if (this.value === '') table.search('').draw();
+            });
+
+            // Sort dropdown
             $('#sort-button').on('click', function(e) {
                 e.stopPropagation();
                 $('#sort-dropdown').toggleClass('hidden');
                 $('#filter-dropdown').addClass('hidden');
             });
 
+            // Filter dropdown
             $('#filter-button').on('click', function(e) {
                 e.stopPropagation();
                 $('#filter-dropdown').toggleClass('hidden');
                 $('#sort-dropdown').addClass('hidden');
             });
 
-            // ปิด dropdown เมื่อคลิกข้างนอก
+            // Close dropdowns when clicking outside
             $(document).on('click', function(e) {
                 if (!$(e.target).closest('#sort-dropdown-container, #filter-dropdown-container').length) {
                     $('#sort-dropdown, #filter-dropdown').addClass('hidden');
                 }
             });
 
-            // --- Sorting ---
-            $('#sort-dropdown').on('click', '.sort-option', function(e) {
-                e.stopPropagation();
-                const col = Number($(this).data('column'));
+            // Handle sort options
+            $('.sort-option').on('click', function() {
+                const column = Number($(this).data('column'));
                 const order = String($(this).data('order'));
-                table.order([
-                    [col, order]
-                ]).draw(false);
-
-                $('#sort-button span').text('เรียงลำดับ: ' + $(this).text().trim());
+                table.order([column, order]).draw();
+                $('#sort-button span').text('เรียงลำดับ: ' + $(this).text().trim().substring(0, 18) +
+                    '...');
                 $('#sort-dropdown').addClass('hidden');
             });
 
-            // ล้างการเรียงลำดับ
-            $('#clear-sort').on('click', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-
-                table.order([]).draw(false);
-                table.order([
-                    [0, 'asc']
-                ]).draw(false);
-
+            // Clear sort
+            $('#clear-sort').on('click', function() {
                 $('#sort-button span').text('เรียงลำดับ');
+                table.order([]).draw();
                 $('#sort-dropdown').addClass('hidden');
             });
 
-            // --- Filtering ---
-            let activeFilters = {};
+            // ===== Filtering =====
+            const escapeRegex = s => s.toString().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            const makeExactRegex = values => `^(?:${values.map(v => escapeRegex(String(v))).join('|')})$`;
+
+            let activeFilters = {}; // { columnIndex: [values] }
 
             $('.filter-option').on('change', function() {
-                const column = String($(this).data('column'));
-                const value = String($(this).data('value'));
-
-                if (!activeFilters[column]) activeFilters[column] = [];
-                if (this.checked) {
-                    if (!activeFilters[column].includes(value)) activeFilters[column].push(value);
+                const col = String($(this).data('column'));
+                const val = String($(this).data('value'));
+                if (!activeFilters[col]) activeFilters[col] = [];
+                if ($(this).is(':checked')) {
+                    if (!activeFilters[col].includes(val)) activeFilters[col].push(val);
                 } else {
-                    activeFilters[column] = activeFilters[column].filter(v => v !== value);
-                    if (activeFilters[column].length === 0) delete activeFilters[column];
+                    activeFilters[col] = activeFilters[col].filter(v => v !== val);
+                    if (!activeFilters[col].length) delete activeFilters[col];
                 }
             });
 
-            // ใช้ตัวกรอง
             $('#apply-filters').on('click', function() {
-                table.columns().every(function() {
-                    this.search('');
-                });
+                // Clear previous column searches
+                table.columns().search('');
 
-                let filterCount = 0;
-
-                for (const column in activeFilters) {
-                    if (activeFilters[column].length > 0) {
-                        filterCount += activeFilters[column].length;
-
-                        const regex = activeFilters[column]
-                            .map(v => v.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
-                            .join('|');
-
-                        table.column(Number(column)).search(regex, true, false);
+                let count = 0;
+                for (const col in activeFilters) {
+                    if (activeFilters[col].length > 0) {
+                        count += activeFilters[col].length;
+                        const regex = makeExactRegex(activeFilters[col]);
+                        table.column(Number(col)).search(regex, true, false);
                     }
                 }
 
-                $('#filter-button span').text(filterCount > 0 ? `กรองข้อมูล (${filterCount})` :
-                    'กรองข้อมูล');
+                $('#filter-button span').text(count > 0 ? `กรองข้อมูล (${count})` : 'กรองข้อมูล');
                 table.draw();
                 $('#filter-dropdown').addClass('hidden');
             });
 
-            // ล้างตัวกรอง
-            $('#clear-filters').on('click', function(e) {
-                e.preventDefault();
-
+            $('#clear-filters').on('click', function() {
                 $('.filter-option').prop('checked', false);
                 activeFilters = {};
                 $('#filter-button span').text('กรองข้อมูล');
-
-                // reset label ทั้ง 2 dropdown
-                $('#year-label').text('เลือกปี');
-                $('#status-label').text('เลือกสถานะ');
-
                 table.columns().search('').draw();
             });
-
-
         });
     </script>
-    <script>
-        function toggleDropdown(id) {
-            document.querySelectorAll('.dropdown-multiselect').forEach(el => {
-                if (el.id !== id) el.classList.remove("open");
-            });
-            document.getElementById(id).classList.toggle("open");
-        }
-
-        // อัปเดต label เมื่อเลือก
-        function setupDropdownLabel(dropdownId, labelId) {
-            const checkboxes = document.querySelectorAll(`#${dropdownId} .filter-option`);
-            const label = document.getElementById(labelId);
-
-            checkboxes.forEach(cb => {
-                cb.addEventListener('change', () => {
-                    const selected = Array.from(checkboxes)
-                        .filter(x => x.checked)
-                        .map(x => x.getAttribute('data-value'));
-
-                    label.textContent = selected.length ?
-                        selected.join(', ') :
-                        (dropdownId === 'yearDropdown' ?
-                            'เลือกปี' :
-                            'เลือกสถานะ');
-                });
-            });
-        }
-
-        setupDropdownLabel('yearDropdown', 'year-label');
-        setupDropdownLabel('statusDropdown', 'status-label');
-
-        // ปิด dropdown ถ้าคลิกข้างนอก
-        document.addEventListener('click', function(e) {
-            const dropdowns = ['yearDropdown', 'statusDropdown'];
-            dropdowns.forEach(id => {
-                const dropdown = document.getElementById(id);
-                if (dropdown && !dropdown.contains(e.target)) {
-                    dropdown.classList.remove("open");
-                }
-            });
-        });
-    </script>
-    <script>
-        lucide.createIcons();
-    </script>
-
-    <!-- ========== CSS ========== -->
-    <style>
-        :root {
-            --blue-600: #2563eb;
-            --blue-700: #1d4ed8;
-            --green-100: #dcfce7;
-            --green-600: #16a34a;
-            --green-700: #15803d;
-            --yellow-100: #fef3c7;
-            --yellow-600: #d97706;
-            --yellow-700: #b45309;
-            --red-100: #fee2e2;
-            --red-600: #dc2626;
-            --red-700: #b91c1c;
-            --gray-50: #f9fafb;
-            --gray-100: #f3f4f6;
-            --gray-200: #e5e7eb;
-            --gray-300: #d1d5db;
-            --gray-400: #9ca3af;
-            --gray-700: #374151;
-            --ring: #3b82f6;
-            --white: #fff;
-            --shadow: 0 1px 2px rgba(0, 0, 0, .06), 0 1px 3px rgba(0, 0, 0, .1);
-            --radius: 8px;
-            --gap-2: 8px;
-            --gap-3: 12px;
-            --pad-2: 8px;
-            --pad-3: 12px;
-            --pad-4: 16px;
-        }
-
-        .hidden {
-            display: none !important;
-        }
-
-        .evidence-container {
-            max-width: 1500px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        .evidence-container h1 {
-            margin: 0 0 8px;
-            font-size: 24px;
-            color: #111827;
-        }
-
-        .controls {
-            display: flex;
-            flex-wrap: wrap;
-            gap: var(--gap-2);
-            align-items: center;
-            margin: 16px 0;
-        }
-
-        /* Search box */
-        .search-box {
-            position: relative;
-            background: var(--white);
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-        }
-
-        .search-box .icon {
-            position: absolute;
-            inset: 0 auto 0 12px;
-            display: flex;
-            align-items: center;
-            pointer-events: none;
-        }
-
-        .search-input {
-            padding: 8px 16px 8px 40px;
-            width: 100%;
-            outline: 0;
-            border: 1px solid var(--gray-300);
-            border-radius: var(--radius);
-        }
-
-        .search-input:focus {
-            border-color: var(--ring);
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, .2);
-        }
-
-        /* ปุ่ม */
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 16px;
-            border-radius: var(--radius);
-            font: inherit;
-            cursor: pointer;
-            border: 0;
-            background: var(--white);
-            color: var(--gray-700);
-            border: 1px solid var(--gray-300);
-            transition: .15s background-color ease;
-        }
-
-        .btn:hover {
-            background: var(--gray-100);
-        }
-
-        .btn-primary {
-            background: var(--blue-600);
-            color: var(--white);
-            border-color: transparent;
-        }
-
-        .btn-primary:hover {
-            background: var(--blue-700);
-        }
-
-        /* Dropdown */
-        .dropdown {
-            position: relative;
-            display: inline-block;
-            text-align: left;
-        }
-
-        .dropdown-menu {
-            position: absolute;
-            left: 0;
-            top: 100%;
-            margin-top: 8px;
-            width: 192px;
-            background: var(--white);
-            border-radius: 6px;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, .1), 0 4px 6px -2px rgba(0, 0, 0, .05);
-            border: 1px solid rgba(0, 0, 0, .05);
-            z-index: 9999;
-            padding: 4px 0;
-            display: block;
-        }
-
-        .dropdown-menu.hidden {
-            display: none !important;
-        }
-
-        .dropdown-item {
-            display: block;
-            width: 100%;
-            text-align: left;
-            padding: 8px 16px;
-            font-size: 14px;
-            color: #374151;
-            background: transparent;
-            border: 0;
-        }
-
-        .dropdown-item:hover {
-            background: var(--gray-100);
-        }
-
-        .dropdown-divider {
-            height: 1px;
-            background: var(--gray-200);
-            margin: 12px 0;
-        }
-
-        .dropdown-title {
-            font-size: 14px;
-            font-weight: 600;
-            color: #111827;
-            margin-bottom: 8px;
-        }
-
-        .filter-option {
-            accent-color: var(--blue-600);
-        }
-
-        /* ตาราง */
-        .evidence-containers {
-            width: 100%;
-            max-width: 1500px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-        }
-
-        .evidence-list {
-            background: white;
-            border-radius: 10px;
-            padding: 30px;
-            border: 2px solid #C2D9EB;
-            margin-top: 40px;
-            margin-bottom: 40px;
-            margin-left: 60px;
-            margin-right: 60px;
-        }
-
-        .table {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 0;
-        }
-
-        .table thead th {
-            text-align: left;
-            font-weight: 600;
-            background: var(--gray-50);
-            border-bottom: 1px solid var(--gray-200);
-            padding: 12px;
-            font-size: 14px;
-        }
-
-        .table tbody td {
-            padding: 12px;
-            border-bottom: 1px solid var(--gray-200);
-            font-size: 14px;
-            vertical-align: middle;
-        }
-
-        /* Status badges */
-        .status-badge {
-            display: inline-flex;
-            align-items: center;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 12px;
-            font-weight: 500;
-        }
-
-        .status-completed {
-            background: var(--green-100);
-            color: var(--green-700);
-        }
-
-        .status-warning {
-            background: var(--yellow-100);
-            color: var(--yellow-700);
-        }
-
-        .status-error {
-            background: var(--red-100);
-            color: var(--red-700);
-        }
-
-        /* Action buttons */
-        .evidence-actions {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-
-        .btn-edit {
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            padding: 6px 12px;
-            border-radius: 6px;
-            border: 1px solid var(--blue-600);
-            background: var(--white);
-            cursor: pointer;
-            font-size: 12px;
-            white-space: nowrap;
-            color: var(--blue-600);
-        }
-
-        .btn-edit:hover {
-            background: #eff6ff;
-        }
-
-        .dataTables_length,
-        .dataTables_filter {
-            display: none;
-        }
-
-        /* Responsive */
-        @media (min-width: 768px) {
-            .controls {
-                flex-wrap: nowrap;
-            }
-
-            .controls .search-box {
-                flex: 1 1 420px;
-                max-width: none;
-            }
-        }
-
-        .controls>* {
-            flex-shrink: 0;
-        }
-
-        /* Table responsive */
-        @media (max-width: 768px) {
-            .evidence-actions {
-                flex-direction: column;
-            }
-
-            .table {
-                font-size: 12px;
-            }
-
-            .evidence-list {
-                margin-left: 20px;
-                margin-right: 20px;
-                padding: 20px;
-            }
-        }
-
-        i[data-lucide] {
-            display: inline-block;
-            vertical-align: middle;
-        }
-
-        .dropdown-multiselect {
-            position: relative;
-            display: inline-block;
-            width: 220px;
-        }
-
-        .dropdown-multiselect .dropdown-btn {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            width: 100%;
-            padding: 6px 10px;
-            border: 1px solid #d1d5db;
-            border-radius: 6px;
-            background: #fff;
-            cursor: pointer;
-            font-size: 14px;
-        }
-
-        .dropdown-multiselect .dropdown-content {
-            display: none;
-            position: absolute;
-            top: 100%;
-            left: 0;
-            width: 100%;
-            max-height: 220px;
-            overflow-y: auto;
-            border: 1px solid #d1d5db;
-            border-radius: 6px;
-            background: #fff;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-            z-index: 20;
-            padding: 8px;
-        }
-
-        .dropdown-multiselect.open .dropdown-content {
-            display: block;
-        }
-    </style>
-
-@endsection
+@endpush
