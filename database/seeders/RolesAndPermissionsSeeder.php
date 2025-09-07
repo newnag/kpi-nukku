@@ -219,33 +219,33 @@ class RolesAndPermissionsSeeder extends Seeder
         $user = Role::firstOrCreate(['name' => 'user']);
         $user->syncPermissions([
             // ===== Indicator =====
-            'view-indicator-dashboard',
+            // 'view-indicator-dashboard',
 
-            // ===== Users =====
-            'view-users',
+            // // ===== Users =====
+            // 'view-users',
 
-            // ===== Departments=====
-            'view-departments',
-            'create-departments',
-            'edit-departments',
-            'delete-departments',
+            // // ===== Departments=====
+            // 'view-departments',
+            // 'create-departments',
+            // 'edit-departments',
+            // 'delete-departments',
 
-            // ===== Categories =====
-            'view-categories',
-            'create-categories',
-            'edit-categories',
-            'delete-categories',
+            // // ===== Categories =====
+            // 'view-categories',
+            // 'create-categories',
+            // 'edit-categories',
+            // 'delete-categories',
 
-            // ===== Standards =====
-            'view-standards',
-            'create-standards',
-            'edit-standards',
-            'delete-standards',
+            // // ===== Standards =====
+            // 'view-standards',
+            // 'create-standards',
+            // 'edit-standards',
+            // 'delete-standards',
 
-            // ===== Settings =====
-            'view-settings',
-            'create-settings',
-            'edit-settings',
+            // // ===== Settings =====
+            // 'view-settings',
+            // 'create-settings',
+            // 'edit-settings',
 
             // ===== Evidences =====
             'view-evidence',
@@ -254,16 +254,16 @@ class RolesAndPermissionsSeeder extends Seeder
             'delete-evidence',
             'download-evidence',
 
-            // ===== Dashboard =====
-            'view-dashboard',
-            'export-dashboard',
+            // // ===== Dashboard =====
+            // 'view-dashboard',
+            // 'export-dashboard',
 
             // ===== Dashboard KPI per User =====
             'view-dashboard-kpi-user',
             'show-dashboard-kpi-user',
 
-            // ===== Auth/โปรไฟล์พื้นฐาน (เผื่อใช้) =====
-            'edit-profile'
+            // // ===== Auth/โปรไฟล์พื้นฐาน (เผื่อใช้) =====
+            // 'edit-profile'
         ]);
 
         $this->command->info('✅ Roles and permissions created successfully!');

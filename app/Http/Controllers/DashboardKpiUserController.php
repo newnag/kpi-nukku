@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Assignment;
 
 use App\Models\Indicator;
+use App\Models\Variable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -13,7 +14,8 @@ class DashboardKpiUserController extends Controller
     public function index(Request $request)
     {
         // สมมติว่าลองใช้ id ปลอมก่อน (เวลาใช้จริงเปลี่ยนเป็น Auth::id())
-        $userId = 1;
+
+     $userId = Auth::id();
 
         $indicators = Indicator::query()
             ->whereHas('assignments', fn($q) => $q->where('collector', $userId))
@@ -24,7 +26,18 @@ class DashboardKpiUserController extends Controller
                     ->with(['collectorUser:id,name,department_id', 'collectorUser.department:id,name']),
                 'criterias:id,indicator_id,status'
             ])
+            ->orderByRaw("
+        CASE LEFT(code, 3)
+            WHEN 'NCS' THEN 1
+            WHEN 'NCO' THEN 2
+            WHEN 'NCP' THEN 3
+            ELSE 4
+        END
+    ")
+            ->orderByRaw("CAST(split_part(code, '-', 2) AS INTEGER)")
             ->get()
+
+
             ->map(function ($indicator) {
                 $totalCriteria = $indicator->criterias->count();
                 $completed = $indicator->criterias->where('status', 1)->count(); // สมมติว่า 1 = ผ่าน/ครบ
@@ -48,21 +61,51 @@ class DashboardKpiUserController extends Controller
         return view('kpi_dashboard_assigned.app', compact('indicators'));
     }
 
-
-
     public function show($id)
     {
         $indicator = Indicator::with([
             'category.standard',
-            'assignments.collectorUser.department', // 👈 เพิ่มบรรทัดนี้
-
-            'criterias.evidences.user.department'
+            'assignments.collectorUser.department',
+            'criterias.evidences.user.department',
+            'variables',
+            'formulas.variables',
+            'checklistItems',
         ])->findOrFail($id);
 
+        $criteria_id = optional($indicator->criterias->first())->id;
+
+        return view('kpi_dashboard_assigned.show', compact('indicator', 'criteria_id'));
+    }
+    public function saveVariables(Request $request, $id)
+    {
+        $indicator = Indicator::findOrFail($id);
+
+        if ($request->has('variables')) {
+            foreach ($request->variables as $varId => $value) {
+                Variable::updateOrCreate(
+                    ['id' => $varId, 'indicator_id' => $indicator->id],
+                    ['value' => $value]
+                );
+            }
+        }
+
+        // ✅ update status
+        if ($request->has('status')) {
+            $indicator->status = $request->status;
+        }
+
+        $indicator->save();
         // return response()->json([
-        //     'success'   => true,
-        //     'indicator' => $indicator
+        //     'success' => true,
+        //     'message' => $request->status == 1
+        //         ? 'บันทึกฉบับร่างเรียบร้อย ✅'
+        //         : 'บันทึกจริงสำเร็จ 🚀',
         // ]);
-        return view('kpi_dashboard_assigned.show', compact('indicator'));
+
+        return redirect()
+            ->route('dashboardKpiUser.index')
+            ->with('success', $request->status == 1
+                ? 'บันทึกฉบับร่างเรียบร้อย '
+                : 'บันทึกจริงสำเร็จ ');
     }
 }

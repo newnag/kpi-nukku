@@ -19,13 +19,12 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-
         $credentials = $request->validate([
             'email' => ['required', 'string'],
             'password' => ['required', 'string'],
         ]);
 
-        $key = Str::lower($request->input('email')).'|'.$request->ip();
+        $key = Str::lower($request->input('email')) . '|' . $request->ip();
         $maxAttempts = 5;
         $decaySeconds = 60;
 
@@ -56,22 +55,24 @@ class AuthController extends Controller
         Auth::login($user);
         $request->session()->regenerate(); // prevent session fixation
 
-        // กำหนด path redirect ตาม role (ส่งกลับไปให้ JS ใช้ window.location.href = response.data.redirect)
-        $redirect = '/dashboard';
-        // if ($user->hasRole('admin')) {
-        //     $redirect = '/dashboard';
-        // } elseif ($user->hasRole('ผู้บริหาร')) {
-        //     $redirect = '/manager-dashboard';
-        // } elseif ($user->hasRole('ผู้ประเมิน')) {
-        //     $redirect = '/evaluator-dashboard';
-        // } elseif ($user->hasRole('ผู้รับการประเมิน')) {
-        //     $redirect = '/evaluatee-dashboard';
-        // } elseif ($user->hasRole('กรรมการ')) {
-        //     $redirect = '/director-dashboard';
-        // }
+        // ✅ เช็ก role ของ $user
+        // $redirect = '/dashboard'; // default
+
+        if ($user->hasRole('super_admin')) {
+            $redirect = '/dashboard';
+        } elseif ($user->hasRole('system_admin')) {
+            $redirect = '/manager-dashboard';
+        } elseif ($user->hasRole('qa_admin')) {
+            $redirect = '/evaluator-dashboard';
+        } elseif ($user->hasRole('administration_admin')) {
+            $redirect = '/evaluatee-dashboard';
+        } elseif ($user->hasRole('user')) {
+            $redirect = '/dashboardKpiUser';
+        }
 
         return response()->json(['redirect' => $redirect]);
     }
+
 
     public function logout(Request $request)
     {

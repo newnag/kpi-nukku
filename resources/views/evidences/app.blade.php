@@ -234,217 +234,215 @@
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <!-- DataTables CSS -->
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    
     <!-- DataTables JS -->
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/lucide@0.469.0/dist/umd/lucide.min.js"></script>
+    @push('scripts')
+        <script>
+            let table;
 
-    <script>
-        let table;
-
-        // ฟังก์ชันดาวน์โหลดไฟล์
-        function downloadFile(evidenceId) {
-            window.location.href = "{{ route('evidences.download', ':id') }}".replace(':id', evidenceId);
-        }
-
-        $(function() {
-            // --- DataTable init ---
-            table = $('#evidenceTable').DataTable({
-                searching: true,
-                lengthChange: false,
-                dom: 'rtip',
-                order: [], // ไม่มี default sort
-                stateSave: false, // ปิดจำสถานะ (กัน order เด้งกลับ)
-                language: {
-                    paginate: {
-                        previous: 'ก่อนหน้า',
-                        next: 'ถัดไป'
-                    },
-                    info: "แสดง _START_ ถึง _END_ จากทั้งหมด _TOTAL_ รายการ",
-                    emptyTable: "ไม่พบข้อมูล",
-                    zeroRecords: "ไม่พบข้อมูลที่ตรงกับการค้นหา"
-                }
-            });
-            table.on('draw', function() {
-                if (window.lucide?.createIcons) lucide.createIcons();
-            });
-            // --- Custom search ---
-            let timer;
-            $('#custom-search')
-                .on('input', function() {
-                    clearTimeout(timer);
-                    const val = this.value;
-                    timer = setTimeout(() => table.search(val).draw(), 150);
-                })
-                .on('search', function() {
-                    if (this.value === '') table.search('').draw();
-                });
-
-            // --- Dropdown toggles ---
-            $('#sort-button').on('click', function(e) {
-                e.stopPropagation();
-                $('#sort-dropdown').toggleClass('hidden');
-                $('#filter-dropdown').addClass('hidden');
-            });
-
-            $('#filter-button').on('click', function(e) {
-                e.stopPropagation();
-                $('#filter-dropdown').toggleClass('hidden');
-                $('#sort-dropdown').addClass('hidden');
-            });
-
-            // ปิด dropdown เมื่อคลิกข้างนอก
-            $(document).on('click', function(e) {
-                if (!$(e.target).closest('#sort-dropdown-container, #filter-dropdown-container').length) {
-                    $('#sort-dropdown, #filter-dropdown').addClass('hidden');
-                }
-            });
-
-            // --- Sorting ---
-            $('#sort-dropdown').on('click', '.sort-option', function(e) {
-                e.stopPropagation();
-                const col = Number($(this).data('column'));
-                const order = String($(this).data('order'));
-                table.order([
-                    [col, order]
-                ]).draw(false);
-
-                $('#sort-button span').text('เรียงลำดับ: ' + $(this).text().trim());
-                $('#sort-dropdown').addClass('hidden');
-            });
-
-            // ล้างการเรียงลำดับ
-            $('#clear-sort').on('click', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-
-                table.order([]).draw(false);
-                table.order([
-                    [0, 'asc']
-                ]).draw(false);
-
-                $('#sort-button span').text('เรียงลำดับ');
-                $('#sort-dropdown').addClass('hidden');
-            });
-
-            // --- Filtering ---
-            let activeFilters = {};
-
-            $('.filter-option').on('change', function() {
-                const column = String($(this).data('column'));
-                const value = String($(this).data('value'));
-
-                if (!activeFilters[column]) activeFilters[column] = [];
-                if (this.checked) {
-                    if (!activeFilters[column].includes(value)) activeFilters[column].push(value);
-                } else {
-                    activeFilters[column] = activeFilters[column].filter(v => v !== value);
-                    if (activeFilters[column].length === 0) delete activeFilters[column];
-                }
-            });
-
-            // ใช้ตัวกรอง
-            $('#apply-filters').on('click', function() {
-                table.columns().every(function() {
-                    this.search('');
-                });
-
-                let filterCount = 0;
-
-                for (const column in activeFilters) {
-                    if (activeFilters[column].length > 0) {
-                        filterCount += activeFilters[column].length;
-
-                        const regex = activeFilters[column]
-                            .map(v => v.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
-                            .join('|');
-
-                        table.column(Number(column)).search(regex, true, false);
-                    }
-                }
-
-                $('#filter-button span').text(filterCount > 0 ? `กรองข้อมูล (${filterCount})` :
-                    'กรองข้อมูล');
-                table.draw();
-                $('#filter-dropdown').addClass('hidden');
-            });
-
-            // ล้างตัวกรอง
-            $('#clear-filters').on('click', function(e) {
-                e.preventDefault();
-
-                $('.filter-option').prop('checked', false);
-                activeFilters = {};
-                $('#filter-button span').text('กรองข้อมูล');
-
-                // reset label ทั้ง 2 dropdown
-                $('#type-label').text('เลือกประเภทไฟล์');
-                $('#user-label').text('เลือกผู้ใช้งาน');
-                $('#indicator-label').text('เลือกตัวชี้วัด');
-
-                table.columns().search('').draw();
-            });
-
-
-        });
-    </script>
-    <script>
-        function toggleDropdown(id) {
-            document.querySelectorAll('.dropdown-multiselect').forEach(el => {
-                if (el.id !== id) el.classList.remove("open");
-            });
-            document.getElementById(id).classList.toggle("open");
-        }
-
-        // อัปเดต label เมื่อเลือก
-        function setupDropdownLabel(dropdownId, labelId) {
-            const checkboxes = document.querySelectorAll(`#${dropdownId} .filter-option`);
-            const label = document.getElementById(labelId);
-
-            checkboxes.forEach(cb => {
-                cb.addEventListener('change', () => {
-                    const selected = Array.from(checkboxes)
-                        .filter(x => x.checked)
-                        .map(x => x.getAttribute('data-value'));
-
-                    label.textContent = selected.length ?
-                        selected.join(', ') :
-                        (dropdownId === 'typeDropdown' ?
-                            'เลือกประเภทไฟล์' :
-                            (dropdownId === 'userDropdown' ?
-                                'เลือกผู้ใช้งาน' :
-                                'เลือกตัวชี้วัด'));
-                });
-            });
-        }
-
-        setupDropdownLabel('typeDropdown', 'type-label');
-        setupDropdownLabel('userDropdown', 'user-label');
-        setupDropdownLabel('indicatorDropdown', 'indicator-label');
-
-        // checkboxes.forEach(cb => {
-        //     cb.addEventListener('change', () => {
-        //         const selected = Array.from(checkboxes)
-        //             .filter(x => x.checked)
-        //             .map(x => x.getAttribute('data-value'));
-
-        //         label.textContent = selected.length ?
-        //             selected.join(', ') :
-        //             'เลือกประเภทไฟล์';
-        //     });
-        // });
-
-        // ปิด dropdown ถ้าคลิกข้างนอก
-        document.addEventListener('click', function(e) {
-            const dropdown = document.getElementById("typeDropdown");
-            if (!dropdown.contains(e.target)) {
-                dropdown.classList.remove("open");
+            // ฟังก์ชันดาวน์โหลดไฟล์
+            function downloadFile(evidenceId) {
+                window.location.href = "{{ route('evidences.download', ':id') }}".replace(':id', evidenceId);
             }
-        });
-    </script>
-    <script>
-       ห
-    </script>
+
+            $(function() {
+                // --- DataTable init ---
+                table = $('#evidenceTable').DataTable({
+                    searching: true,
+                    lengthChange: false,
+                    dom: 'rtip',
+                    order: [], // ไม่มี default sort
+                    stateSave: false, // ปิดจำสถานะ (กัน order เด้งกลับ)
+                    language: {
+                        paginate: {
+                            previous: 'ก่อนหน้า',
+                            next: 'ถัดไป'
+                        },
+                        info: "แสดง _START_ ถึง _END_ จากทั้งหมด _TOTAL_ รายการ",
+                        emptyTable: "ไม่พบข้อมูล",
+                        zeroRecords: "ไม่พบข้อมูลที่ตรงกับการค้นหา"
+                    }
+                });
+                table.on('draw', function() {
+                    if (window.lucide?.createIcons) lucide.createIcons();
+                });
+                // --- Custom search ---
+                let timer;
+                $('#custom-search')
+                    .on('input', function() {
+                        clearTimeout(timer);
+                        const val = this.value;
+                        timer = setTimeout(() => table.search(val).draw(), 150);
+                    })
+                    .on('search', function() {
+                        if (this.value === '') table.search('').draw();
+                    });
+
+                // --- Dropdown toggles ---
+                $('#sort-button').on('click', function(e) {
+                    e.stopPropagation();
+                    $('#sort-dropdown').toggleClass('hidden');
+                    $('#filter-dropdown').addClass('hidden');
+                });
+
+                $('#filter-button').on('click', function(e) {
+                    e.stopPropagation();
+                    $('#filter-dropdown').toggleClass('hidden');
+                    $('#sort-dropdown').addClass('hidden');
+                });
+
+                // ปิด dropdown เมื่อคลิกข้างนอก
+                $(document).on('click', function(e) {
+                    if (!$(e.target).closest('#sort-dropdown-container, #filter-dropdown-container').length) {
+                        $('#sort-dropdown, #filter-dropdown').addClass('hidden');
+                    }
+                });
+
+                // --- Sorting ---
+                $('#sort-dropdown').on('click', '.sort-option', function(e) {
+                    e.stopPropagation();
+                    const col = Number($(this).data('column'));
+                    const order = String($(this).data('order'));
+                    table.order([
+                        [col, order]
+                    ]).draw(false);
+
+                    $('#sort-button span').text('เรียงลำดับ: ' + $(this).text().trim());
+                    $('#sort-dropdown').addClass('hidden');
+                });
+
+                // ล้างการเรียงลำดับ
+                $('#clear-sort').on('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    table.order([]).draw(false);
+                    table.order([
+                        [0, 'asc']
+                    ]).draw(false);
+
+                    $('#sort-button span').text('เรียงลำดับ');
+                    $('#sort-dropdown').addClass('hidden');
+                });
+
+                // --- Filtering ---
+                let activeFilters = {};
+
+                $('.filter-option').on('change', function() {
+                    const column = String($(this).data('column'));
+                    const value = String($(this).data('value'));
+
+                    if (!activeFilters[column]) activeFilters[column] = [];
+                    if (this.checked) {
+                        if (!activeFilters[column].includes(value)) activeFilters[column].push(value);
+                    } else {
+                        activeFilters[column] = activeFilters[column].filter(v => v !== value);
+                        if (activeFilters[column].length === 0) delete activeFilters[column];
+                    }
+                });
+
+                // ใช้ตัวกรอง
+                $('#apply-filters').on('click', function() {
+                    table.columns().every(function() {
+                        this.search('');
+                    });
+
+                    let filterCount = 0;
+
+                    for (const column in activeFilters) {
+                        if (activeFilters[column].length > 0) {
+                            filterCount += activeFilters[column].length;
+
+                            const regex = activeFilters[column]
+                                .map(v => v.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+                                .join('|');
+
+                            table.column(Number(column)).search(regex, true, false);
+                        }
+                    }
+
+                    $('#filter-button span').text(filterCount > 0 ? `กรองข้อมูล (${filterCount})` :
+                        'กรองข้อมูล');
+                    table.draw();
+                    $('#filter-dropdown').addClass('hidden');
+                });
+
+                // ล้างตัวกรอง
+                $('#clear-filters').on('click', function(e) {
+                    e.preventDefault();
+
+                    $('.filter-option').prop('checked', false);
+                    activeFilters = {};
+                    $('#filter-button span').text('กรองข้อมูล');
+
+                    // reset label ทั้ง 2 dropdown
+                    $('#type-label').text('เลือกประเภทไฟล์');
+                    $('#user-label').text('เลือกผู้ใช้งาน');
+                    $('#indicator-label').text('เลือกตัวชี้วัด');
+
+                    table.columns().search('').draw();
+                });
+
+
+            });
+        </script>
+        <script>
+            function toggleDropdown(id) {
+                document.querySelectorAll('.dropdown-multiselect').forEach(el => {
+                    if (el.id !== id) el.classList.remove("open");
+                });
+                document.getElementById(id).classList.toggle("open");
+            }
+
+            // อัปเดต label เมื่อเลือก
+            function setupDropdownLabel(dropdownId, labelId) {
+                const checkboxes = document.querySelectorAll(`#${dropdownId} .filter-option`);
+                const label = document.getElementById(labelId);
+
+                checkboxes.forEach(cb => {
+                    cb.addEventListener('change', () => {
+                        const selected = Array.from(checkboxes)
+                            .filter(x => x.checked)
+                            .map(x => x.getAttribute('data-value'));
+
+                        label.textContent = selected.length ?
+                            selected.join(', ') :
+                            (dropdownId === 'typeDropdown' ?
+                                'เลือกประเภทไฟล์' :
+                                (dropdownId === 'userDropdown' ?
+                                    'เลือกผู้ใช้งาน' :
+                                    'เลือกตัวชี้วัด'));
+                    });
+                });
+            }
+
+            setupDropdownLabel('typeDropdown', 'type-label');
+            setupDropdownLabel('userDropdown', 'user-label');
+            setupDropdownLabel('indicatorDropdown', 'indicator-label');
+
+            // checkboxes.forEach(cb => {
+            //     cb.addEventListener('change', () => {
+            //         const selected = Array.from(checkboxes)
+            //             .filter(x => x.checked)
+            //             .map(x => x.getAttribute('data-value'));
+
+            //         label.textContent = selected.length ?
+            //             selected.join(', ') :
+            //             'เลือกประเภทไฟล์';
+            //     });
+            // });
+
+            // ปิด dropdown ถ้าคลิกข้างนอก
+            document.addEventListener('click', function(e) {
+                const dropdown = document.getElementById("typeDropdown");
+                if (!dropdown.contains(e.target)) {
+                    dropdown.classList.remove("open");
+                }
+            });
+        </script>
+    @endpush
 
     <!-- ========== CSS ========== -->
     <style>
