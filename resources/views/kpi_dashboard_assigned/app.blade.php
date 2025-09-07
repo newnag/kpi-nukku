@@ -1,24 +1,28 @@
 @extends('layouts.app')
-@section('title', 'รายการตัวบ่งชี้')
+
+@section('title', 'รายการตัวบ่งชี้ที่ได้รับมอบหมาย')
+
+@section('header', 'รายการตัวบ่งชี้ที่ได้รับมอบหมาย')
+@section('subheader', 'ระบบบริหารจัดการข้อมูลการรับรองสถาบันจากสภาการพยาบาล')
+
 @section('content')
-
-    <div class="evidence-container">
-        <h1>รายการตัวบ่งชี้</h1>
-
-        <!-- Controls -->
-        <div class="controls">
-            <!-- Search -->
-            <div class="search-box" style="width:100%; max-width:420px;">
-                <div class="icon">
-                    <!-- search icon -->
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor" style="color:#9ca3af;">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                    </svg>
+    <div class="ml-3 mr-3 md:ml-9 md:mr-9 mb-9 space-y-5">
+        <div class="flex flex-col md:flex-row md:justify-between gap-4 md:gap-2">
+            <!-- Search & Filter Controls Group -->
+            <div class="flex flex-wrap gap-2">
+                <!-- Search -->
+                <div class="relative w-full sm:w-auto bg-white rounded-lg shadow-sm">
+                    <div class="absolute inset-y-0 left-3 flex items-center pointer-events-none">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                    </div>
+                    <input id="custom-search" type="text"
+                        class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none w-full"
+                        placeholder="ค้นหารายการตัวบ่งชี้">
                 </div>
-                <input type="text" id="custom-search" class="search-input" placeholder="ค้นหารายการตัวบ่งชี้">
-            </div>
 
             <!-- Sort -->
             <div class="dropdown" id="sort-dropdown-container">
@@ -106,6 +110,8 @@
                                 @endforeach
                             </div>
                         </div>
+                    </div>
+                </div>
 
                         <div class="dropdown-divider"></div>
 
@@ -326,11 +332,293 @@
         </div>
     </div>
 
-    <!-- jQuery -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <!-- DataTables CSS -->
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
-    <!-- DataTables JS -->
+    <div class="border border-gray-200 rounded-lg shadow-sm overflow-x-auto">
+        <table id="assignedTable" class="w-full">
+            <thead>
+                <tr>
+                    <th class="w-16 px-4 py-3 text-sm font-medium text-gray-900 cursor-pointer select-none">
+                        <div class="flex items-center justify-between">
+                            <span>ปี</span>
+                            <svg class="sort-icon w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
+                            </svg>
+                        </div>
+                    </th>
+                    <th class="px-4 py-3 text-sm font-medium text-gray-900 cursor-pointer select-none">
+                        <div class="flex items-center justify-between">
+                            <span>ชื่อตัวบ่งชี้</span>
+                            <svg class="sort-icon w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
+                            </svg>
+                        </div>
+                    </th>
+                    <th class="px-4 py-3 text-sm font-medium text-gray-900 cursor-pointer select-none">
+                        <div class="flex items-center justify-between">
+                            <span>รหัส</span>
+                            <svg class="sort-icon w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
+                            </svg>
+                        </div>
+                    </th>
+                    <th
+                        class="px-4 py-3 text-sm font-medium text-gray-900 cursor-pointer select-none hidden md:table-cell">
+                        <div class="flex items-center justify-between">
+                            <span>ประเภทองค์กร</span>
+                            <svg class="sort-icon w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
+                            </svg>
+                        </div>
+                    </th>
+                    <th
+                        class="px-4 py-3 text-sm font-medium text-gray-900 cursor-pointer select-none hidden md:table-cell">
+                        <div class="flex items-center justify-between">
+                            <span>หน่วยงานที่รับผิดชอบ</span>
+                            <svg class="sort-icon w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
+                            </svg>
+                        </div>
+                    </th>
+                    <th class="px-4 py-3 text-sm font-medium text-gray-900 cursor-pointer select-none">
+                        <div class="flex items-center justify-between">
+                            <span>คะแนนเต็ม</span>
+                            <svg class="sort-icon w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
+                            </svg>
+                        </div>
+                    </th>
+                    <th class="px-4 py-3 text-sm font-medium text-gray-900 cursor-pointer select-none">
+                        <div class="flex items-center justify-between">
+                            <span>คะแนนรวม</span>
+                            <svg class="sort-icon w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
+                            </svg>
+                        </div>
+                    </th>
+                    <th class="px-4 py-3 text-sm font-medium text-gray-900 cursor-pointer select-none">
+                        <div class="flex items-center justify-between">
+                            <span>สถานะตัวบ่งชี้</span>
+                            <svg class="sort-icon w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
+                            </svg>
+                        </div>
+                    </th>
+                    <th
+                        class="px-4 py-3 text-sm font-medium text-gray-900 cursor-pointer select-none hidden sm:table-cell">
+                        <div class="flex items-center justify-between">
+                            <span>สถานะเอกสาร</span>
+                            <svg class="sort-icon w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
+                            </svg>
+                        </div>
+                    </th>
+                    <th class="px-4 py-3 text-sm font-medium text-gray-900">จัดการ</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white">
+                @foreach ($indicators as $indicator)
+                    @php
+                        $standardName = $indicator->category->standard->name ?? '';
+                        $dimensionName = $indicator->category->name ?? '';
+                        $collectorName = $indicator->assignments->first()->collectorUser->name ?? '';
+                        $deptName = '';
+                        foreach ($indicator->assignments as $assignment) {
+                            $deptName = optional($assignment->collectorUser?->department)->name ?? '';
+                            if ($deptName) {
+                                break;
+                            }
+                        }
+
+                        // Status mapping for sorting/filtering:
+                        // 0 = complete, 1 = not complete, 2 = in progress
+                        $statusRaw = (int) ($indicator->status ?? -1);
+                        if ($statusRaw === 2 || $statusRaw === 3) {
+                            $statusCode = 0;
+                            $statusText = 'สมบูรณ์';
+                            $badgeCls = 'bg-green-100 text-green-800';
+                        } elseif ($statusRaw === 4) {
+                            $statusCode = 1;
+                            $statusText = 'ไม่ครบถ้วน';
+                            $badgeCls = 'bg-red-100 text-red-800';
+                        } else {
+                            $statusCode = 2;
+                            $statusText = 'อยู่ระหว่างดำเนินการ';
+                            $badgeCls = 'bg-yellow-100 text-yellow-800';
+                        }
+
+                        // Document status uses backend strings ("ไม่ครบ","ครบ", or others)
+                        $doc = $indicator->doc_status;
+                        if ($doc === 'ครบ') {
+                            $docText = 'ครบถ้วน';
+                            $docOrder = 1;
+                            $docCls = 'bg-green-100 text-green-800';
+                        } elseif ($doc === 'ไม่ครบ') {
+                            $docText = 'ไม่ครบถ้วน';
+                            $docOrder = 2;
+                            $docCls = 'bg-red-100 text-red-800';
+                        } else {
+                            $docText = 'รอดำเนินการ';
+                            $docOrder = 0;
+                            $docCls = 'bg-gray-100 text-gray-800';
+                        }
+                    @endphp
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-4 py-3 text-sm text-gray-900">{{ $indicator->year }}</td>
+                        <td class="px-4 py-3 text-sm text-gray-900">{{ $indicator->name }}</td>
+                        <td class="px-4 py-3 text-sm text-gray-900">{{ $indicator->code }}</td>
+                        <td class="px-4 py-3 text-sm text-gray-900 hidden md:table-cell">
+                            {{ $indicator->type }}
+                        </td>
+                        <td class="px-4 py-3 text-sm text-gray-900 hidden md:table-cell">
+                            {{ $deptName ?: '-' }}
+                        </td>
+                        <!-- คะแนนเต็ม (max_score) -->
+                        <td class="px-4 py-3 text-sm text-gray-900 text-center">
+                            {{ number_format((float) $indicator->max_score, 2) }}
+                        </td>
+                        <!-- คะแนนรวม (score_acc) -->
+                        <td class="px-4 py-3 text-sm text-gray-900 text-center">
+                            {{ number_format((float) $indicator->score_acc, 2) }}
+                        </td>
+
+                        <!-- สถานะตัวบ่งชี้ -->
+                        <td class="px-4 py-3 place-items-center" data-search="{{ $statusCode }}"
+                            data-order="{{ $statusCode }}">
+                            @if ($statusCode === 0)
+                                <div class=" text-green-600">
+                                    <i data-lucide="check-circle-2" class="w-5 h-5"></i>
+                                </div>
+                            @elseif ($statusCode === 1)
+                                <div class=" text-red-600">
+                                    <i data-lucide="x-circle" class="w-5 h-5"></i>
+                                </div>
+                            @else
+                                <div class=" text-yellow-600">
+                                    <i data-lucide="timer" class="w-5 h-5"></i>
+                                </div>
+                            @endif
+                        </td>
+
+                        <!-- สถานะเอกสาร -->
+                        <td class="px-4 py-3 place-items-center"
+                            data-search="{{ $doc === 'ครบ' ? 'ครบ' : ($doc === 'ไม่ครบ' ? 'ไม่ครบ' : 'รอดำเนินการ') }}"
+                            data-order="{{ $docOrder }}">
+                            @if ($doc === 'ครบ')
+                                <div class=" text-green-600">
+                                    <i data-lucide="check-circle-2" class="w-5 h-5"></i>
+                                    {{-- <span class="text-xs font-medium">ครบถ้วน</span> --}}
+                                </div>
+                            @elseif ($doc === 'ไม่ครบ')
+                                <div class=" text-red-600">
+                                    <i data-lucide="x-circle" class="w-5 h-5"></i>
+                                    {{-- <span class="text-xs font-medium">ไม่ครบถ้วน</span> --}}
+                                </div>
+                            @else
+                                <div class=" text-gray-600">
+                                    <i data-lucide="clock" class="w-5 h-5"></i>
+                                    {{-- <span class="text-xs font-medium">รอดำเนินการ</span> --}}
+                                </div>
+                            @endif
+                        </td>
+
+                        <!-- Actions -->
+                        <td class="px-4 py-3 text-sm">
+                            <a href="{{ route('dashboardKpiUser.show', $indicator->id) }}"
+                                class="inline-flex items-center justify-center px-3 py-1 bg-white border border-blue-500 text-blue-500 rounded-full text-xs font-medium hover:bg-blue-500 hover:text-white">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 mr-1" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 4v16m8-8H4" />
+                                </svg>
+                                ทำการประเมิน
+                            </a>
+                        </td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
+@endsection
+
+@push('styles')
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.dataTables.min.css">
+    <style>
+        /* DataTables + Tailwind polish (minimal) */
+        table.dataTable thead th {
+            position: relative;
+            background-color: #f9fafb;
+            border-bottom: 1px solid #e5e7eb;
+            font-weight: 600;
+        }
+
+        table.dataTable thead .sorting:after,
+        table.dataTable thead .sorting_asc:after,
+        table.dataTable thead .sorting_desc:after {
+            display: none;
+        }
+
+        table.dataTable thead th:hover {
+            background-color: #f3f4f6;
+        }
+
+        table.dataTable thead th .sort-icon {
+            opacity: .3;
+            transition: transform .2s ease, opacity .2s ease;
+        }
+
+        table.dataTable thead th.sorting_asc .sort-icon {
+            opacity: 1;
+            color: #2563eb;
+            transform: rotate(180deg);
+        }
+
+        table.dataTable thead th.sorting_desc .sort-icon {
+            opacity: 1;
+            color: #2563eb;
+        }
+
+        @media (max-width: 640px) {
+            table.dataTable {
+                font-size: .875rem;
+            }
+
+            table.dataTable thead th,
+            table.dataTable tbody td {
+                padding: 8px 4px;
+            }
+
+            table.dataTable thead th .sort-icon {
+                display: none;
+            }
+
+            table.dataTable thead th.sorting,
+            table.dataTable thead th.sorting_asc,
+            table.dataTable thead th.sorting_desc {
+                padding-right: 8px;
+            }
+        }
+    </style>
+@endpush
+
+@push('scripts')
+    <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/lucide@0.469.0/dist/umd/lucide.min.js"></script>
     @push('scripts')

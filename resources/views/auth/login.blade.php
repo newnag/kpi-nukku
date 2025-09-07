@@ -1,7 +1,6 @@
 @extends('layouts.app')
 
 @section('title', 'เข้าสู่ระบบ')
-@section('header', '')
 
 @section('content')
 <div class="h-full bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center p-4">
