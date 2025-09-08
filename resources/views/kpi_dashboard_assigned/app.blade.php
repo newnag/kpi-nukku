@@ -6,7 +6,7 @@
 @section('subheader', 'ระบบบริหารจัดการข้อมูลการรับรองสถาบันจากสภาการพยาบาล')
 
 @section('content')
-     <div class="evidence-container">
+    <div class="evidence-container">
 
         <!-- Controls -->
         <div class="controls">
@@ -315,12 +315,24 @@
                                 </td>
                                 <td>
                                     <div class="evidence-actions">
-                                        <a href="{{ route('dashboardKpiUser.show', $indicator->id) }}" class="btn-edit"
-                                            title="ทำการประเมิน">
-                                            <i data-lucide="edit" style="margin-right:4px;"></i> ทำการประเมิน
-                                        </a>
+                                        @role('user')
+                                            <a href="{{ route('dashboardKpiUser.show', $indicator->id) }}"
+                                                class="btn-edit flex items-center gap-1" title="ทำการประเมิน">
+                                                <i data-lucide="edit"></i>
+                                                <span>ทำการประเมิน</span>
+                                            </a>
+                                            @elserole('super_admin|system_admin|qa_admin')
+                                            <a href="{{ route('dashboardKpiUser.show', $indicator->id) }}"
+                                                class="btn-view flex items-center gap-1" title="ตรวจสอบ">
+                                                <i data-lucide="eye"></i>
+                                                <span>ตรวจสอบ</span>
+                                            </a>
+                                        @endrole
                                     </div>
                                 </td>
+
+
+
 
                             </tr>
                         @endforeach
@@ -330,7 +342,7 @@
         </div>
     </div>
 
-  
+
 @endsection
 
 @push('styles')
@@ -653,7 +665,7 @@
         .evidence-container {
             max-width: 1500px;
             margin: 0 auto;
-            
+
         }
 
         .evidence-container h1 {
@@ -737,19 +749,19 @@
         }
 
         /* .dropdown-menus {
-                        position: absolute;
-                        left: 0;
-                        top: 100%;
-                        margin-top: 8px;
-                        width: 192px;
-                        background: var(--white);
-                        border-radius: 6px;
-                        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, .1), 0 4px 6px -2px rgba(0, 0, 0, .05);
-                        border: 1px solid rgba(0, 0, 0, .05);
-                        z-index: 9999;
-                        padding: 4px 0;
-                        display: block;
-                    } */
+                                        position: absolute;
+                                        left: 0;
+                                        top: 100%;
+                                        margin-top: 8px;
+                                        width: 192px;
+                                        background: var(--white);
+                                        border-radius: 6px;
+                                        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, .1), 0 4px 6px -2px rgba(0, 0, 0, .05);
+                                        border: 1px solid rgba(0, 0, 0, .05);
+                                        z-index: 9999;
+                                        padding: 4px 0;
+                                        display: block;
+                                    } */
         .dropdown-menus {
             position: absolute;
             left: 0;
@@ -983,5 +995,3 @@
             display: block;
         }
     </style>
-
-

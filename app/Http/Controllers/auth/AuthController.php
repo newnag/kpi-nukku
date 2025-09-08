@@ -61,11 +61,11 @@ class AuthController extends Controller
         if ($user->hasRole('super_admin')) {
             $redirect = '/dashboard';
         } elseif ($user->hasRole('system_admin')) {
-            $redirect = '/manager-dashboard';
+            $redirect = '/dashboard';
         } elseif ($user->hasRole('qa_admin')) {
-            $redirect = '/evaluator-dashboard';
+            $redirect = '/dashboard';
         } elseif ($user->hasRole('administration_admin')) {
-            $redirect = '/evaluatee-dashboard';
+            $redirect = '/dashboard';
         } elseif ($user->hasRole('user')) {
             $redirect = '/dashboardKpiUser';
         }

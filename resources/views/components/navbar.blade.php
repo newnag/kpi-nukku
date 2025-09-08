@@ -188,17 +188,21 @@
                 <a href="{{ route('evidences.index') }}" class="{{ request()->is('evidences*') ? 'active' : '' }}">
                     <i class="fa-solid fa-file"></i> หลักฐานของฉัน
                 </a>
-               
             @endhasanyrole
 
 
             <!-- Indicators - Available to users with indicator permissions -->
             @can('view-indicator-dashboard')
                 <a href="{{ route('indicator.index') }}" class="{{ request()->is('indicator*') ? 'active' : '' }}">
-                    <i class="fa-solid fa-bullseye"></i> จัดการตัวชี้วัด
+                    <i class="fa-solid fa-sliders"></i> จัดการตัวชี้วัด
                 </a>
             @endcan
-
+            @hasanyrole('super_admin|system_admin|qa_admin')
+                <a href="{{ route('dashboardKpiUser.index') }}"
+                    class="{{ request()->routeIs('dashboardKpiUser.*') ? 'active' : '' }}">
+                    <i class="fa-solid fa-chart-line"></i> ตรวจสอบตัวชี้วัด
+                </a>
+            @endhasanyrole
             <!-- Settings - Only for super_admin and system_admin roles -->
             @hasanyrole('super_admin|system_admin')
                 <div class="dropdown" id="settingsDropdown">
