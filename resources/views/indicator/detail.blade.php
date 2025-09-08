@@ -157,8 +157,8 @@ $statusBadgeClass =
 $statusDotClass = $opt['dot'] ?? 'bg-slate-500';
     @endphp
 
-    <div class="w-full px-4 sm:px-6 lg:px-8">
-        <div class="max-w-4xl mx-auto">
+    <div class="max-w-1200px mx-auto px-5">
+        <div class="w-full max-w-1200px mx-auto">
             {{-- Header --}}
             <div class="banner rounded-t-2xl border border-slate-200 p-5 ">
                 <h1 class="text-2xl sm:text-3xl text-center font-bold">รายละเอียดตัวชี้วัด</h1>
@@ -386,3 +386,11 @@ $statusDotClass = $opt['dot'] ?? 'bg-slate-500';
         </div>
     </div>
 @endsection
+
+@push('styles')
+<style>
+    .max-w-1200px {
+        max-width: 1200px;
+    }
+</style>
+@endpush
