@@ -17,8 +17,8 @@
 @section('content')
     <form action="{{ route('indicator.store') }}" method="POST" x-data="{ score_acc: @js(old('max_score', '')) }">
         @csrf
-        <div class="w-full px-4 sm:px-6 lg:px-8">
-            <div class="max-w-4xl mx-auto">
+        <div class="max-w-1200px mx-auto px-5">
+            <div class="w-full max-w-1200px mx-auto">
                 <div class="banner rounded-t-2xl border border-slate-200 p-5 ">
                     <h1 class="text-2xl sm:text-3xl text-center font-bold">เพิ่มตัวชี้วัด</h1>
                 </div>
@@ -39,7 +39,7 @@
                                     placeholder="กรุณาเลือกมาตรฐานตัวชี้วัด" required />
                                 <x-select name="category_id" :options="$categories ?? []" label="ด้านตัวชี้วัด"
                                     placeholder="กรุณาเลือกด้าน" searchable required />
-                                <x-select name="type" :options="['เชิงคุณภาพ', 'เชิงปริมาณ']" label="ประเภทตัวชี้วัด"
+                                <x-select name="type" :options="['คุณภาพ' => 'คุณภาพ', 'ปริมาณ' => 'ปริมาณ' , 'คุณภาพ/ปริมาณ' => 'คุณภาพ/ปริมาณ' ]" label="ประเภทตัวชี้วัด"
                                     placeholder="กรุณาเลือกประเภท" required />
                                 <x-input name="deadline" type="date" label="วันสิ้นสุดการประเมิน" required />
                             </div>
@@ -280,4 +280,12 @@
     <script src="https://cdn.jsdelivr.net/npm/trumbowyg@2.31.0/dist/trumbowyg.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/trumbowyg@2.31.0/dist/plugins/justify/trumbowyg.justify.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/trumbowyg@2.31.0/dist/plugins/table/trumbowyg.table.min.js"></script>
+@endpush
+
+@push('styles')
+<style>
+    .max-w-1200px {
+        max-width: 1200px;
+    }
+</style>
 @endpush

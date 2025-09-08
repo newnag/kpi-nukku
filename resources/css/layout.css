@@ -12,7 +12,7 @@ body {
     background: #f8f9fa;
     margin: 0;
     padding: 0;
-    min-height: 100vh; /* Use min-height instead of height */
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
     line-height: 1.6;
@@ -21,15 +21,22 @@ body {
 /* ===== LAYOUT COMPONENTS ===== */
 
 /* Main Content */
-main {
-    flex: 1; /* Take remaining space */
+.main-content {
+    flex: 1;
     width: 100%;
     background-color: rgb(248, 250, 252);
     position: relative;
 }
 
+/* Container for main content */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
 /* ===== FOOTER ===== */
-footer {
+.main-footer {
     background: #fff;
     padding: 1rem;
     border-top: 1px solid #ddd;
@@ -37,15 +44,7 @@ footer {
     font-size: 14px;
     color: #666;
     width: 100%;
-    /* Footer will naturally appear below main content */
-}
-
-/* ===== CONTENT WRAPPER ===== */
-.content-wrapper {
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 1.5rem;
-    /* Remove min-height and flex properties to allow natural content flow */
+    margin-top: auto;
 }
 
 /* ===== PAGE HEADER ===== */
@@ -98,6 +97,7 @@ footer {
     position: relative;
     /* Remove flex property to allow natural content flow */
 }
+
 
 /* ===== FORM CONTAINERS ===== */
 .form-container {
@@ -489,11 +489,11 @@ footer {
 
 /* Mobile First Approach */
 @media (max-width: 640px) {
-    main {
+    .main-content {
         overflow-x: hidden; /* Prevent horizontal scrolling on mobile */
     }
 
-    .content-wrapper {
+    .container {
         padding: 1rem;
     }
 
@@ -563,8 +563,8 @@ footer {
 
 /* Tablet */
 @media (min-width: 641px) and (max-width: 1024px) {
-    .content-wrapper {
-        padding: 1.25rem;
+    .container {
+        padding: 1.5rem;
     }
 
     .page-header {
@@ -587,7 +587,7 @@ footer {
 
 /* Desktop */
 @media (min-width: 1025px) {
-    .content-wrapper {
+    .container {
         padding: 2rem;
     }
 
@@ -598,7 +598,7 @@ footer {
 
 /* Large Desktop */
 @media (min-width: 1400px) {
-    .content-wrapper {
+    .container {
         padding: 2.5rem;
     }
 
@@ -718,10 +718,6 @@ footer {
 
 /* ===== PRINT STYLES ===== */
 @media print {
-    .content-wrapper {
-        padding: 0;
-        max-width: none;
-    }
 
     .page-header {
         background: none;
