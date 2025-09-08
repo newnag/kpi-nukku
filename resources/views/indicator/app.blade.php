@@ -79,20 +79,31 @@
                             <div class="space-y-2">
                                 <label class="inline-flex items-center">
                                     <input type="checkbox" class="filter-option rounded text-blue-600" data-column="7"
-                                        data-value="0">
+                                        data-value="3">
                                     <span class="ml-2 text-sm text-gray-700">สมบูรณ์</span>
                                 </label>
                                 <br>
                                 <label class="inline-flex items-center">
                                     <input type="checkbox" class="filter-option rounded text-blue-600" data-column="7"
-                                        data-value="1">
+                                        data-value="4">
                                     <span class="ml-2 text-sm text-gray-700">ไม่สมบูรณ์</span>
                                 </label>
                                 <br>
                                 <label class="inline-flex items-center">
                                     <input type="checkbox" class="filter-option rounded text-blue-600" data-column="7"
-                                        data-value="2">
+                                        data-value="0">
                                     <span class="ml-2 text-sm text-gray-700">อยู่ระหว่างดำเนินการ</span>
+                                </label>
+                                <br>
+                                <label class="inline-flex items-center">
+                                    <input type="checkbox" class="filter-option rounded text-blue-600" data-column="7"
+                                        data-value="1">
+                                    <span class="ml-2 text-sm text-gray-700">บันทึกฉบับร่าง</span>
+                                </label>
+                                <label class="inline-flex items-center">
+                                    <input type="checkbox" class="filter-option rounded text-blue-600" data-column="7"
+                                        data-value="2">
+                                    <span class="ml-2 text-sm text-gray-700">บันทึกฉบับจริง</span>
                                 </label>
                             </div>
 
@@ -116,6 +127,29 @@
                                     <input type="checkbox" class="filter-option rounded text-blue-600" data-column="8"
                                         data-value="ครบถ้วน">
                                     <span class="ml-2 text-sm text-gray-700">ครบถ้วน</span>
+                                </label>
+                            </div>
+
+                            <div class="border-t border-gray-200 my-3"></div>
+
+                            <h3 class="text-sm font-medium text-gray-900 mb-2">ประเภทตัวชี้วัด</h3>
+                            <div class="space-y-2">
+                                <label class="inline-flex items-center">
+                                    <input type="checkbox" class="filter-option rounded text-blue-600" data-column="3"
+                                        data-value="คุณภาพ">
+                                    <span class="ml-2 text-sm text-gray-700">คุณภาพ</span>
+                                </label>
+                                <br>
+                                <label class="inline-flex items-center">
+                                    <input type="checkbox" class="filter-option rounded text-blue-600" data-column="3"
+                                        data-value="ปริมาณ">
+                                    <span class="ml-2 text-sm text-gray-700">ปริมาณ</span>
+                                </label>
+                                <br>
+                                <label class="inline-flex items-center">
+                                    <input type="checkbox" class="filter-option rounded text-blue-600" data-column="3"
+                                        data-value="คุณภาพ/ปริมาณ">
+                                    <span class="ml-2 text-sm text-gray-700">คุณภาพ/ปริมาณ</span>
                                 </label>
                             </div>
 
@@ -263,7 +297,7 @@
                         </td>
                         <td class="px-4 py-3 text-sm text-gray-900">{{ $indicator['code'] }}</td>
                         <td class="px-4 py-3 text-sm text-gray-900">
-                            {{ $indicator['category']['name'] ?? 'ไม่ระบุ' }}
+                            {{ $indicator['type'] ?? 'ไม่ระบุ' }}
                         </td>
                         <td class="px-4 py-3 text-sm text-gray-900">
                             @php
@@ -292,13 +326,12 @@
                             {{ number_format($indicator['max_score'], 2) ?? '0.00' }}
                         </td>
                         @php
-                            $statusCode = (int) ($indicator['status'] ?? -1); // 0,1,2 or -1 (unknown)
+                            $statusCode = (int) ($indicator['status'] ?? -1);
                         @endphp
 
-                        <td class="px-4 py-3 text-sm" data-search="{{ $statusCode }}" {{-- DataTables will use this for searching --}}
-                            data-order="{{ $statusCode }}"> {{-- DataTables will use this for ordering --}}
+                        <td class="px-4 py-3 text-sm" data-search="{{ $statusCode }}" data-order="{{ $statusCode }}">
                             @switch($statusCode)
-                                @case(0)
+                                @case(3)
                                     <div
                                         class="flex justify-center items-center w-6 h-6 mx-auto rounded-full bg-green-100 text-green-600">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
@@ -309,7 +342,7 @@
                                     </div>
                                 @break
 
-                                @case(1)
+                                @case(4)
                                     <div
                                         class="flex justify-center items-center w-6 h-6 mx-auto rounded-full bg-red-100 text-red-600">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
@@ -320,7 +353,7 @@
                                     </div>
                                 @break
 
-                                @case(2)
+                                @default
                                     <div
                                         class="flex justify-center items-center w-6 h-6 mx-auto rounded-full bg-yellow-100 text-yellow-600">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
@@ -329,13 +362,6 @@
                                                 d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                                         </svg>
                                     </div>
-                                @break
-
-                                @default
-                                    <span
-                                        class="flex justify-center items-center px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-800">
-                                        ไม่ระบุ
-                                    </span>
                             @endswitch
                         </td>
 
