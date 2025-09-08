@@ -258,58 +258,59 @@
                                     @switch($indicator->status)
                                         @case(0)
                                             <span class="tooltip" data-tooltip="รอดำเนินการ">
-                                                <i data-lucide="clock" class="status-icon text-warn"></i>
+                                                <i data-lucide="clock" class="w-5 h-5 text-yellow-500"></i>
                                             </span>
                                         @break
 
                                         @case(1)
                                             <span class="tooltip" data-tooltip="รอดำเนินการ / บันทึกร่าง">
-                                                <i data-lucide="clock" class="status-icon text-warn"></i>
+                                                <i data-lucide="clock" class="w-5 h-5 text-yellow-500"></i>
                                             </span>
                                         @break
 
                                         @case(2)
                                             <span class="tooltip" data-tooltip="รอดำเนินการ / บันทึกจริง">
-                                                <i data-lucide="clock" class="status-icon text-warn"></i>
+                                                <i data-lucide="clock" class="w-5 h-5 text-yellow-500"></i>
                                             </span>
                                         @break
 
                                         @case(3)
                                             <span class="tooltip" data-tooltip="ผลการดำเนินงานครบถ้วนตามเกณฑ์มาตรการ">
-                                                <i data-lucide="check-circle" class="status-icon text-success"></i>
+                                                <i data-lucide="check-circle" class="w-5 h-5 text-green-500"></i>
                                             </span>
                                         @break
 
                                         @case(4)
                                             <span class="tooltip" data-tooltip="ผลการดำเนินงานยังไม่ครบถ้วนตามเกณฑ์">
-                                                <i data-lucide="alert-triangle" class="status-icon text-danger"></i>
+                                                <i data-lucide="alert-triangle" class="w-5 h-5 text-red-500"></i>
                                             </span>
                                         @break
 
                                         @default
                                             <span class="tooltip" data-tooltip="สถานะไม่ระบุ">
-                                                <i data-lucide="help-circle" class="status-icon text-gray-500"></i>
+                                                <i data-lucide="help-circle" class="w-5 h-5 text-gray-400"></i>
                                             </span>
                                     @endswitch
+
                                 </td>
 
                                 <td class="status-cell">
                                     @switch($indicator->doc_status)
                                         @case('ไม่ครบ')
                                             <span class="tooltip" data-tooltip="ผลการดำเนินงานยังไม่ครบถ้วนตามเกณฑ์">
-                                                <i data-lucide="x-circle" class="status-icon text-danger"></i>
+                                                <i data-lucide="x-circle" class="w-5 h-5 text-red-500"></i>
                                             </span>
                                         @break
 
                                         @case('ครบ')
                                             <span class="tooltip" data-tooltip="ผลการดำเนินงานครบถ้วนตามเกณฑ์">
-                                                <i data-lucide="check-circle" class="status-icon text-success"></i>
+                                                <i data-lucide="check-circle" class="w-5 h-5 text-green-500"></i>
                                             </span>
                                         @break
 
                                         @default
                                             <span class="tooltip" data-tooltip="ไม่ทราบ">
-                                                <i data-lucide="help-circle" class="status-icon text-gray-400"></i>
+                                                <i data-lucide="help-circle" class="w-5 h-5 text-gray-400"></i>
                                             </span>
                                     @endswitch
                                 </td>
@@ -546,6 +547,7 @@
                     // reset label ทั้ง 2 dropdown
                     $('#year-label').text('เลือกปี');
                     $('#status-label').text('เลือกสถานะ');
+                    $('#type-label').text('เลือกประเภท');
 
                     table.columns().search('').draw();
                 });
@@ -640,12 +642,12 @@
             position: absolute;
             bottom: 125%;
             /* tooltip อยู่ด้านบน */
-            left: 50%;
-            transform: translateX(-50%);
-            background: #333;
+            /* left: 50%; */
+            /* transform: translateX(-50%);
+                        background: #333; */
             color: #fff;
             font-size: 12px;
-            padding: 5px 8px;
+            /* padding: 5px 8px; */
             border-radius: 6px;
             white-space: nowrap;
             opacity: 0;
@@ -749,19 +751,19 @@
         }
 
         /* .dropdown-menus {
-                                        position: absolute;
-                                        left: 0;
-                                        top: 100%;
-                                        margin-top: 8px;
-                                        width: 192px;
-                                        background: var(--white);
-                                        border-radius: 6px;
-                                        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, .1), 0 4px 6px -2px rgba(0, 0, 0, .05);
-                                        border: 1px solid rgba(0, 0, 0, .05);
-                                        z-index: 9999;
-                                        padding: 4px 0;
-                                        display: block;
-                                    } */
+                                                    position: absolute;
+                                                    left: 0;
+                                                    top: 100%;
+                                                    margin-top: 8px;
+                                                    width: 192px;
+                                                    background: var(--white);
+                                                    border-radius: 6px;
+                                                    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, .1), 0 4px 6px -2px rgba(0, 0, 0, .05);
+                                                    border: 1px solid rgba(0, 0, 0, .05);
+                                                    z-index: 9999;
+                                                    padding: 4px 0;
+                                                    display: block;
+                                                } */
         .dropdown-menus {
             position: absolute;
             left: 0;
