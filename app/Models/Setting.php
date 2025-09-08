@@ -13,7 +13,7 @@ class Setting extends Model
         'message',
     ];
 
-    public $timestamps = false; // ใช้ timestamps ถ้า migration มี $table->timestamps()
+    public $timestamps = false;
 
     protected $casts = [
         'notify_date1' => 'date',
