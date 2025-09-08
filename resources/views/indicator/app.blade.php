@@ -9,8 +9,8 @@
     <div class="ml-3 mr-3 md:ml-9 md:mr-9 mb-9 space-y-5">
         <div class=" flex flex-col md:flex-row md:justify-between gap-4 md:gap-2">
             <!-- Search & Filter Controls Group -->
-            <div class="flex flex-wrap gap-2">
-                <div class="relative w-full sm:w-auto bg-white rounded-lg shadow-sm">
+            <div class="flex flex-wrap gap-2 ">
+                <div class="relative w-full sm:w-auto bg-white rounded-lg shadow-sm ">
                     <div class="absolute inset-y-0 left-3 flex items-center pointer-events-none">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24"
                             stroke="currentColor">

@@ -25,7 +25,7 @@
 
             <!-- Sort -->
             <div class="dropdown" id="sort-dropdown-container">
-                <button id="sort-button" class="btn">
+                <button id="sort-button" class="btns">
                     <span>เรียงลำดับ</span>
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor">
@@ -56,7 +56,7 @@
 
             {{-- Filter --}}
             <div class="dropdown" id="filter-dropdown-container">
-                <button id="filter-button" class="btn">
+                <button id="filter-button" class="btns">
                     <span>กรองข้อมูล</span>
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor">
@@ -293,27 +293,27 @@
                                     @endswitch
 
                                 </td>
-
                                 <td class="status-cell">
                                     @switch($indicator->doc_status)
                                         @case('ไม่ครบ')
-                                            <span class="tooltip" data-tooltip="ผลการดำเนินงานยังไม่ครบถ้วนตามเกณฑ์">
-                                                <i data-lucide="x-circle" class="w-5 h-5 text-red-500"></i>
+                                            <span class="px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-700">
+                                                ไม่ครบ
                                             </span>
                                         @break
 
                                         @case('ครบ')
-                                            <span class="tooltip" data-tooltip="ผลการดำเนินงานครบถ้วนตามเกณฑ์">
-                                                <i data-lucide="check-circle" class="w-5 h-5 text-green-500"></i>
+                                            <span class="px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-700">
+                                                ครบ
                                             </span>
                                         @break
 
                                         @default
-                                            <span class="tooltip" data-tooltip="ไม่ทราบ">
-                                                <i data-lucide="help-circle" class="w-5 h-5 text-gray-400"></i>
+                                            <span class="px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-700">
+                                                รอดำเนินการ
                                             </span>
                                     @endswitch
                                 </td>
+
                                 <td>
                                     <div class="evidence-actions">
                                         @role('user')
@@ -644,7 +644,7 @@
             /* tooltip อยู่ด้านบน */
             /* left: 50%; */
             /* transform: translateX(-50%);
-                        background: #333; */
+                            background: #333; */
             color: #fff;
             font-size: 12px;
             /* padding: 5px 8px; */
@@ -714,7 +714,7 @@
         }
 
         /* ปุ่ม */
-        .btn {
+        .btns {
             display: inline-flex;
             align-items: center;
             gap: 8px;
@@ -725,11 +725,11 @@
             border: 0;
             background: var(--white);
             color: var(--gray-700);
-            border: 1px solid var(--gray-300);
+           border: 1px solid var(--gray-300); 
             transition: .15s background-color ease;
         }
 
-        .btn:hover {
+        .btns:hover {
             background: var(--gray-100);
         }
 
@@ -751,19 +751,19 @@
         }
 
         /* .dropdown-menus {
-                                                    position: absolute;
-                                                    left: 0;
-                                                    top: 100%;
-                                                    margin-top: 8px;
-                                                    width: 192px;
-                                                    background: var(--white);
-                                                    border-radius: 6px;
-                                                    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, .1), 0 4px 6px -2px rgba(0, 0, 0, .05);
-                                                    border: 1px solid rgba(0, 0, 0, .05);
-                                                    z-index: 9999;
-                                                    padding: 4px 0;
-                                                    display: block;
-                                                } */
+                                                        position: absolute;
+                                                        left: 0;
+                                                        top: 100%;
+                                                        margin-top: 8px;
+                                                        width: 192px;
+                                                        background: var(--white);
+                                                        border-radius: 6px;
+                                                        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, .1), 0 4px 6px -2px rgba(0, 0, 0, .05);
+                                                        border: 1px solid rgba(0, 0, 0, .05);
+                                                        z-index: 9999;
+                                                        padding: 4px 0;
+                                                        display: block;
+                                                    } */
         .dropdown-menus {
             position: absolute;
             left: 0;
@@ -912,6 +912,24 @@
         }
 
         .btn-edit:hover {
+            background: #eff6ff;
+        }
+        .btn-view  {
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 6px 12px;
+            border-radius: 6px;
+            border: 1px solid var(--green-600);
+            background: var(--white);
+            cursor: pointer;
+            font-size: 12px;
+            white-space: nowrap;
+            color: var(--green-600);
+        }
+
+        .btn-view :hover {
             background: #eff6ff;
         }
 
