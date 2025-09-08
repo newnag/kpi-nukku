@@ -84,15 +84,17 @@ $checklist = collect($dg('checklistItems', []))
 // ---------- Variable & Formula ----------
 $vf = (array) $dg('variable_formula', []);
 
-// variables อนุญาตทั้งสตริง หรืออ็อบเจ็กต์ {variable_name, type, value}
+// variables อนุญาตทั้งสตริง หรืออ็อบเจ็กต์ {variable_name, label_name, type, value}
 $variablesVF = collect(data_get($vf, 'variables', []))
     ->map(function ($v) {
         $var = data_get($v, 'variable_name');
+        $label = data_get($v, 'label_name');
         $vtype = data_get($v, 'type');
         $value = data_get($v, 'value', null);
 
         return [
             'var' => trim((string) $var),
+            'label' => trim((string) $label),
             'vtype' => trim((string) $vtype),
             'value' => $value,
         ];
@@ -291,6 +293,8 @@ $statusDotClass = $opt['dot'] ?? 'bg-slate-500';
                                                     <th class="px-3 py-2 text-left font-semibold border-b border-slate-200">
                                                         ตัวแปร</th>
                                                     <th class="px-3 py-2 text-left font-semibold border-b border-slate-200">
+                                                        ป้ายชื่อ</th>
+                                                    <th class="px-3 py-2 text-left font-semibold border-b border-slate-200">
                                                         ประเภท</th>
                                                     <th class="px-3 py-2 text-left font-semibold border-b border-slate-200">
                                                         ค่าเริ่มต้น</th>
@@ -300,7 +304,12 @@ $statusDotClass = $opt['dot'] ?? 'bg-slate-500';
                                                 @foreach ($variablesVF as $v)
                                                     <tr class="odd:bg-white even:bg-slate-50">
                                                         <td class="px-3 py-2 font-medium">{{ $v['var'] ?: '-' }}</td>
-                                                        <td class="px-3 py-2">{{ $v['vtype'] ?: '-' }}</td>
+                                                        <td class="px-3 py-2 text-slate-600">{{ $v['label'] ?: '-' }}</td>
+                                                        <td class="px-3 py-2">
+                                                            <span class="px-2 py-1 text-xs rounded-full {{ $v['vtype'] === 'defined' ? 'bg-blue-100 text-blue-800' : ($v['vtype'] === 'input' ? 'bg-green-100 text-green-800' : 'bg-purple-100 text-purple-800') }}">
+                                                                {{ $v['vtype'] === 'defined' ? 'defined' : ($v['vtype'] === 'input' ? 'input' : 'output') }}
+                                                            </span>
+                                                        </td>
                                                         <td class="px-3 py-2">
                                                             {{ is_null($v['value']) ? '-' : (is_bool($v['value']) ? ($v['value'] ? 'true' : 'false') : $v['value']) }}
                                                         </td>

@@ -39,8 +39,8 @@
         const variable = {
             id: Date.now() + Math.random(),
             dbId: v.id ?? null,
-            variable_name: v.variable_name ?? v.name ?? '',
-            label_name: v.label_name ?? v.variable_name ?? v.name ?? '',
+            variable_name: v.variable_name ?? '',
+            label_name: v.label_name ?? '',
             type: (v.type ?? 'defined'),
             value: ((v.type ?? 'defined') === 'defined') ? (v.value ?? '') : ''
         };
@@ -72,9 +72,12 @@
 
     add() {
         const label = (this.newLabel || '').trim();
-        if (!label) { this.showToast?.('กรุณากรอกป้ายชื่อ (label_name)', 'error'); return; }
+        if (!label) { 
+            alert('กรุณากรอกป้ายชื่อ (label_name)'); 
+            return; 
+        }
         if (this.newType === 'output' && this.hasOutputVariable) {
-            this.showToast?.('สามารถมีตัวแปรประเภท Output ได้เพียง 1 ตัวเท่านั้น', 'error');
+            alert('สามารถมีตัวแปรประเภท Output ได้เพียง 1 ตัวเท่านั้น');
             return;
         }
 
@@ -201,7 +204,7 @@ initializeVariableNames();" class="space-y-5">
             </div>
 
             <span class="md:w-28 text-sm text-slate-600 md:text-left">
-                <span x-text="v.type === 'defined' ? 'Static' : (v.type === 'input' ? 'Input' : 'Output')"></span>
+                <span x-text="v.type === 'defined' ? 'defined' : (v.type === 'input' ? 'input' : 'output')"></span>
             </span>
 
             <div class="flex items-center gap-2">

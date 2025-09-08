@@ -127,7 +127,7 @@ class IndicatorController extends Controller
             // Custom scoring
             'scoring.variables'                       => 'nullable|array',
             'scoring.variables.*.variable_name'      => 'required|string|max:100',
-            'scoring.variables.*.label_name'         => 'nullable|string|max:100',
+            'scoring.variables.*.label_name'         => 'required|string|max:100',
             'scoring.variables.*.type'               => 'required|in:defined,input,output',
             'scoring.variables.*.value'              => 'nullable|numeric',
             'scoring.condition'                      => 'nullable|string',
@@ -259,7 +259,7 @@ class IndicatorController extends Controller
             'scoring.variables'                       => 'nullable|array',
             'scoring.variables.*.id'                  => 'nullable|integer|exists:variables,id',
             'scoring.variables.*.variable_name'       => 'required|string|max:100',
-            'scoring.variables.*.label_name'          => 'nullable|string|max:100',
+            'scoring.variables.*.label_name'          => 'required|string|max:100',
             'scoring.variables.*.type'                => 'required|in:defined,input,output',
             'scoring.variables.*.value'               => 'nullable|numeric',
             'scoring.condition'                       => 'nullable|string',
@@ -481,13 +481,13 @@ class IndicatorController extends Controller
             $type      = (string) ($v['type'] ?? 'defined'); // defined|input|output
             $value     = array_key_exists('value', $v) ? $v['value'] : null;
 
-            if ($name === '') {
-                continue;
+            if ($name === '' || $label === '') {
+                continue; // Skip if either name or label is empty
             }
 
             $createdVars[] = $indicator->variables()->create([
                 'variable_name' => $name,
-                'label_name'    => $label ?: $name,
+                'label_name'    => $label,
                 'type'          => $type,
                 'value'         => $type === 'defined' ? $value : null,
             ]);
