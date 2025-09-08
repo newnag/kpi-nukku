@@ -39,7 +39,7 @@
                                     placeholder="กรุณาเลือกมาตรฐานตัวชี้วัด" required />
                                 <x-select name="category_id" :options="$categories ?? []" label="ด้านตัวชี้วัด"
                                     placeholder="กรุณาเลือกด้าน" searchable required />
-                                <x-select name="type" :options="['เชิงคุณภาพ', 'เชิงปริมาณ']" label="ประเภทตัวชี้วัด"
+                                <x-select name="type" :options="['เชิงคุณภาพ' => 'เชิงคุณภาพ', 'เชิงปริมาณ' => 'เชิงปริมาณ']" label="ประเภทตัวชี้วัด"
                                     placeholder="กรุณาเลือกประเภท" required />
                                 <x-input name="deadline" type="date" label="วันสิ้นสุดการประเมิน" required />
                             </div>
