@@ -1,9 +1,11 @@
 @extends('layouts.app')
 @section('title', 'เอกสารและหลักฐาน')
+@section('header', 'เอกสารและหลักฐาน')
+@section('subheader', 'ระบบบริหารจัดการข้อมูลการรับรองสถาบันจากสภาการพยาบาล')
 @section('content')
 
     <div class="evidence-container">
-        <h1>เอกสารและหลักฐาน</h1>
+      
 
         <!-- Controls -->
         <div class="controls">
@@ -473,7 +475,7 @@
         .evidence-container {
             max-width: 1500px;
             margin: 0 auto;
-            padding: 20px;
+            
         }
 
         .evidence-container h1 {

@@ -13,34 +13,41 @@ class DashboardKpiUserController extends Controller
 {
     public function index(Request $request)
     {
-        // สมมติว่าลองใช้ id ปลอมก่อน (เวลาใช้จริงเปลี่ยนเป็น Auth::id())
+        $user   = Auth::user();
+        $userId = $user->id;
 
-     $userId = Auth::id();
+        $query = Indicator::query();
 
-        $indicators = Indicator::query()
-            ->whereHas('assignments', fn($q) => $q->where('collector', $userId))
+        // ✅ ใช้ Spatie เช็ค role
+        if ($user->hasRole('user')) {
+            $query->whereHas('assignments', fn($q) => $q->where('collector', $userId));
+        }
+
+        $indicators = $query
             ->with([
                 'category:id,name,standard_id',
                 'category.standard:id,name',
-                'assignments' => fn($q) => $q->where('collector', $userId)
-                    ->with(['collectorUser:id,name,department_id', 'collectorUser.department:id,name']),
+                'assignments' => function ($q) use ($user) {
+                    if ($user->hasRole('user')) {
+                        $q->where('collector', $user->id);
+                    }
+                    $q->with(['collectorUser:id,name,department_id', 'collectorUser.department:id,name']);
+                },
                 'criterias:id,indicator_id,status'
             ])
             ->orderByRaw("
-        CASE LEFT(code, 3)
-            WHEN 'NCS' THEN 1
-            WHEN 'NCO' THEN 2
-            WHEN 'NCP' THEN 3
-            ELSE 4
-        END
-    ")
+            CASE LEFT(code, 3)
+                WHEN 'NCS' THEN 1
+                WHEN 'NCO' THEN 2
+                WHEN 'NCP' THEN 3
+                ELSE 4
+            END
+        ")
             ->orderByRaw("CAST(split_part(code, '-', 2) AS INTEGER)")
             ->get()
-
-
             ->map(function ($indicator) {
                 $totalCriteria = $indicator->criterias->count();
-                $completed = $indicator->criterias->where('status', 1)->count(); // สมมติว่า 1 = ผ่าน/ครบ
+                $completed     = $indicator->criterias->where('status', 1)->count();
 
                 if ($totalCriteria === 0) {
                     $indicator->doc_status = 'รอดำเนินการ';
@@ -52,14 +59,17 @@ class DashboardKpiUserController extends Controller
 
                 $indicator->status_key = match ((int) $indicator->status) {
                     2, 3 => 'complete',
-                    4 => 'incomplete',
-                    0 => 'pending',
+                    4    => 'incomplete',
+                    0    => 'pending',
                     default => 'pending',
                 };
+
                 return $indicator;
             });
+
         return view('kpi_dashboard_assigned.app', compact('indicators'));
     }
+
 
     public function show($id)
     {
@@ -89,23 +99,48 @@ class DashboardKpiUserController extends Controller
             }
         }
 
-        // ✅ update status
         if ($request->has('status')) {
             $indicator->status = $request->status;
         }
 
         $indicator->save();
-        // return response()->json([
-        //     'success' => true,
-        //     'message' => $request->status == 1
-        //         ? 'บันทึกฉบับร่างเรียบร้อย ✅'
-        //         : 'บันทึกจริงสำเร็จ 🚀',
-        // ]);
 
-        return redirect()
-            ->route('dashboardKpiUser.index')
-            ->with('success', $request->status == 1
-                ? 'บันทึกฉบับร่างเรียบร้อย '
-                : 'บันทึกจริงสำเร็จ ');
+        // ✅ ส่ง JSON กลับไป
+        return redirect()->route('dashboardKpiUser.index')
+            ->with('success', 'บันทึกข้อมูลเรียบร้อยแล้ว');
     }
+
+
+    // public function saveVariables(Request $request, $id)
+    // {
+    //     $indicator = Indicator::findOrFail($id);
+
+    //     if ($request->has('variables')) {
+    //         foreach ($request->variables as $varId => $value) {
+    //             Variable::updateOrCreate(
+    //                 ['id' => $varId, 'indicator_id' => $indicator->id],
+    //                 ['value' => $value]
+    //             );
+    //         }
+    //     }
+
+    //     // ✅ update status
+    //     if ($request->has('status')) {
+    //         $indicator->status = $request->status;
+    //     }
+
+    //     $indicator->save();
+    //     // return response()->json([
+    //     //     'success' => true,
+    //     //     'message' => $request->status == 1
+    //     //         ? 'บันทึกฉบับร่างเรียบร้อย ✅'
+    //     //         : 'บันทึกจริงสำเร็จ 🚀',
+    //     // ]);
+
+    //     return redirect()
+    //         ->route('dashboardKpiUser.index')
+    //         ->with('success', $request->status == 1
+    //             ? 'บันทึกฉบับร่างเรียบร้อย '
+    //             : 'บันทึกจริงสำเร็จ ');
+    // }
 }

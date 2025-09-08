@@ -214,190 +214,7 @@ class EvidenceController extends Controller
         ]);
     }
 
-    // public function store(Request $request)
-    // {
-    //     Log::info('=== EvidenceController@store ===', [
-    //         'criteria_id' => $request->input('criteria_id'),
-    //     ]);
 
-    //     $request->validate([
-    //         'criteria_id'       => 'required|integer|exists:criterias,id',
-    //         'files.*'           => 'nullable|file|mimes:pdf,jpg,jpeg,png,doc,docx|max:10240',
-    //         'additional_urls'   => 'nullable|array',
-    //         'additional_urls.*' => 'nullable|url|max:2048',
-    //         'url_names'         => 'nullable|array',
-    //         'url_names.*'       => 'nullable|string|max:255',
-    //         'detail'            => 'nullable|string|max:65535',
-    //     ]);
-
-    //     try {
-    //         $urls     = collect($request->input('additional_urls', []));
-    //         $urlNames = collect($request->input('url_names', []));
-
-    //         // จับคู่ url + name
-    //         $urlEntries = $urls
-    //             ->filter(fn($u) => filled($u))
-    //             ->values()
-    //             ->map(function ($url, $i) use ($urlNames) {
-    //                 return [
-    //                     'url'  => $url,
-    //                     'name' => $urlNames->get($i) ?: 'หลักฐาน URL',
-    //                 ];
-    //             });
-
-    //         $hasFiles  = $request->hasFile('files');
-    //         $hasUrls   = $urlEntries->isNotEmpty();
-    //         $hasDetail = filled($request->input('detail'));
-
-    //         Log::info('Evidence input check', [
-    //             'hasFiles'  => $hasFiles,
-    //             'hasUrls'   => $hasUrls,
-    //             'hasDetail' => $hasDetail,
-    //         ]);
-
-    //         if (!$hasFiles && !$hasUrls && !$hasDetail) {
-    //             return back()->withInput()->withErrors([
-    //                 'general' => 'กรุณาระบุข้อมูลอย่างน้อย 1 รายการ (ไฟล์, URL หรือรายละเอียด)',
-    //             ]);
-    //         }
-
-    //         // ✅ chain: criteria -> indicator -> category -> standard
-    //         $criteria  = Criteria::with('indicator.category.standard')->findOrFail($request->criteria_id);
-    //         $indicator = $criteria->indicator;
-    //         $category  = $indicator->category;
-    //         $standard  = $category->standard;
-
-    //         if (!$indicator || !$category || !$standard) {
-    //             return back()->withErrors([
-    //                 'general' => 'กรุณาตรวจสอบว่าตัวชี้วัดนี้มีการผูกกับหมวดหมู่และมาตรฐานแล้ว',
-    //             ]);
-    //         }
-
-    //         // ใช้ slug กันชื่อไทย/ช่องว่าง
-    //         $standardSegment = $this->safeFolderSegment($standard->name ?? '', 'standard-' . $standard->name);
-    //         $categorySegment = $this->safeFolderSegment($category->name ?? '', 'category-' . $category->name);
-
-    //         $folder = implode('/', [
-    //             'evidences',
-    //             'year',
-    //             $indicator->year,
-    //             $standardSegment,
-    //             $categorySegment,
-    //             $indicator->code,
-    //         ]);
-
-    //         Log::info('Resolved folder path', [
-    //             'folder' => $folder,
-    //         ]);
-
-    //         $uploadedFiles = [];
-
-    //         // ========== 1) ถ้ามีไฟล์ → loop แล้วบันทึกเป็นหลาย record ==========
-    //         if ($hasFiles) {
-    //             foreach ($request->file('files') as $file) {
-    //                 $originalName = $file->getClientOriginalName();
-    //                 $extension    = strtolower($file->getClientOriginalExtension());
-    //                 $filename     = uniqid() . '_' . Str::random(10) . '.' . $extension;
-
-    //                 $path = $file->storeAs($folder, $filename, 'public');
-
-    //                 $payload = [
-    //                     'files' => [[
-    //                         'original_name' => $originalName,
-    //                         'stored_name'   => $filename,
-    //                         'path'          => $path,
-    //                         'size'          => $file->getSize(),
-    //                         'mime_type'     => $file->getMimeType(),
-    //                         'icon'          => $this->getFileTypeIcon($file->getMimeType()),
-    //                         'size_human'    => $this->formatFileSize($file->getSize()),
-    //                     ]]
-    //                 ];
-
-    //                 $evidence = new Evidence();
-    //                 $evidence->path        = $payload;
-    //                 $evidence->detail      = null;
-    //                 $evidence->status      = true;
-    //                 $evidence->criteria_id = $criteria->id;
-    //                 $evidence->user_id     = auth()->id();
-    //                 $evidence->name        = $originalName;
-    //                 $evidence->type        = $extension;
-    //                 $evidence->save();
-
-    //                 $uploadedFiles[] = ['path' => $path];
-
-    //                 Log::info('Evidence saved (file)', [
-    //                     'evidence_id' => $evidence->id,
-    //                     'name'        => $evidence->name,
-    //                     'type'        => $evidence->type,
-    //                 ]);
-    //             }
-    //         }
-
-    //         // ========== 2) ถ้ามี URL → บันทึกเป็น record แยก ==========
-    //         if ($hasUrls) {
-    //             foreach ($urlEntries as $entry) {
-    //                 $payload = ['urls' => [$entry['url']]];
-
-    //                 $evidence = new Evidence();
-    //                 $evidence->path        = $payload;
-    //                 $evidence->detail      = $request->input('detail');
-    //                 $evidence->status      = true;
-    //                 $evidence->criteria_id = $criteria->id;
-    //                 $evidence->user_id     = auth()->id();
-    //                 $evidence->name        = $entry['name'];
-    //                 $evidence->type        = "url";
-    //                 $evidence->save();
-
-    //                 Log::info('Evidence saved (url)', [
-    //                     'evidence_id' => $evidence->id,
-    //                     'name'        => $evidence->name,
-    //                     'url'         => $entry['url'],
-    //                 ]);
-    //             }
-    //         }
-
-    //         // ========== 3) ถ้ามีแค่ Detail ==========
-    //         if (!$hasUrls && $hasDetail) {
-    //             $evidence = new Evidence();
-    //             $evidence->path        = [];
-    //             $evidence->detail      = $request->input('detail');
-    //             $evidence->status      = true;
-    //             $evidence->criteria_id = $criteria->id;
-    //             $evidence->user_id     = auth()->id();
-    //             $evidence->name        = "รายละเอียดเพิ่มเติม";
-    //             $evidence->type        = "note";
-    //             $evidence->save();
-
-    //             Log::info('Evidence saved (note)', [
-    //                 'evidence_id' => $evidence->id,
-    //                 'name'        => $evidence->name,
-    //             ]);
-    //         }
-    //         if ($request->expectsJson()) {
-    //             return response()->json([
-    //                 'success' => true,
-    //                 'message' => 'บันทึกสำเร็จ',
-    //             ]);
-    //         }
-
-    //         return redirect()->route('dashboardKpiUser.show', $indicator->id);
-    //     } catch (\Throwable $e) {
-    //         Log::error('Evidence store error', [
-    //             'exception' => $e->getMessage(),
-    //         ]);
-
-    //         // rollback ลบไฟล์ที่อัปโหลดแล้วถ้าเกิด error
-    //         if (!empty($uploadedFiles)) {
-    //             foreach ($uploadedFiles as $f) {
-    //                 Storage::disk('public')->delete($f['path'] ?? null);
-    //             }
-    //         }
-
-    //         return back()->withInput()->withErrors([
-    //             'general' => 'เกิดข้อผิดพลาดในการบันทึกข้อมูล กรุณาลองใหม่อีกครั้ง',
-    //         ]);
-    //     }
-    // }
 
     public function store(Request $request)
     {
@@ -561,7 +378,15 @@ class EvidenceController extends Controller
                 // ]);
             }
 
-            return redirect()->route('dashboardKpiUser.show', $indicator->id);
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'บันทึกหลักฐานเรียบร้อยแล้ว',
+                ]);
+            }
+
+            return redirect()->route('dashboardKpiUser.show', $indicator->id)
+                ->with('success', 'บันทึกหลักฐานเรียบร้อยแล้ว');
         } catch (\Throwable $e) {
             Log::error('Evidence store error', [
                 'exception' => $e->getMessage(),
