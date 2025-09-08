@@ -3,8 +3,8 @@
 @section('title', 'เข้าสู่ระบบ')
 
 @section('content')
-    <div class="h-full bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center p-4">
-        <div class="max-w-md w-full">
+    <div class="flex items-center justify-center">
+        <div class="max-w-md w-full my-12">
             <!-- Main Card -->
             <div class="bg-white/80 backdrop-blur-sm shadow-2xl rounded-3xl p-8 border border-white/20 ">
                 <!-- Logo Section -->
