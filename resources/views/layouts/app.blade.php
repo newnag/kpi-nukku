@@ -20,52 +20,52 @@
 </head>
 
 <body>
-
     <!-- Navbar -->
     <x-navbar />
 
-    <!-- Main -->
-    <main>
-        @if (!empty($breadcrumbs))
-            <ul class="breadcrumb">
-                <li><a href="{{ route('dashboard.index') }}"><i class="fas fa-home"></i></a></li>
-                @foreach ($breadcrumbs as $breadcrumb)
-                    @if ($loop->last)
-                        <li>{{ $breadcrumb['title'] }}</li>
-                    @else
-                        <li><a href="{{ $breadcrumb['url'] }}">{{ $breadcrumb['title'] }}</a></li>
-                    @endif
-                @endforeach
-            </ul>
-        @endif
+    <!-- Main Content Area -->
+    <main class="main-content">
+        <div class="container">
+            @if (!empty($breadcrumbs))
+                <ul class="breadcrumb">
+                    <li><a href="{{ route('dashboard.index') }}"><i class="fas fa-home"></i></a></li>
+                    @foreach ($breadcrumbs as $breadcrumb)
+                        @if ($loop->last)
+                            <li>{{ $breadcrumb['title'] }}</li>
+                        @else
+                            <li><a href="{{ $breadcrumb['url'] }}">{{ $breadcrumb['title'] }}</a></li>
+                        @endif
+                    @endforeach
+                </ul>
+            @endif
 
-        <!-- Flash Messages -->
-        {{-- @if (session('success'))
-                <div class="alert alert-success">
-                    <span>{{ session('success') }}</span>
-                    <button onclick="this.parentElement.remove()">×</button>
-                </div>
-            @endif
-            @if (session('error'))
-                <div class="alert alert-danger">
-                    <span>{{ session('error') }}</span>
-                    <button onclick="this.parentElement.remove()">×</button>
-                </div>
-            @endif
-            @if (session('warning'))
-                <div class="alert alert-warning">
-                    <span>{{ session('warning') }}</span>
-                    <button onclick="this.parentElement.remove()">×</button>
-                </div>
-            @endif --}}
-        <div class="content-wrapper">
-            @if(View::hasSection('header') || View::hasSection('subheader'))
+            <!-- Flash Messages -->
+            {{-- @if (session('success'))
+                    <div class="alert alert-success">
+                        <span>{{ session('success') }}</span>
+                        <button onclick="this.parentElement.remove()">×</button>
+                    </div>
+                @endif
+                @if (session('error'))
+                    <div class="alert alert-danger">
+                        <span>{{ session('error') }}</span>
+                        <button onclick="this.parentElement.remove()">×</button>
+                    </div>
+                @endif
+                @if (session('warning'))
+                    <div class="alert alert-warning">
+                        <span>{{ session('warning') }}</span>
+                        <button onclick="this.parentElement.remove()">×</button>
+                    </div>
+                @endif --}}
+                
+            @if (View::hasSection('header') || View::hasSection('subheader'))
                 <div class="page-header">
                     <div class="page-header-content">
                         <h1 class="page-title">
                             @yield('header')
                         </h1>
-                        @if(View::hasSection('subheader'))
+                        @if (View::hasSection('subheader'))
                             <p class="page-subtitle">
                                 @yield('subheader')
                             </p>
@@ -73,19 +73,17 @@
                     </div>
                 </div>
             @endif
+            
             <div class="page-content">
                 @yield('content')
             </div>
+            
+            <x-toasts />
         </div>
-        <x-toasts />
     </main>
 
     <!-- Footer -->
-    {{-- <footer class="static bottom-0 w-full bg-gray-800 text-white text-center py-4">
-        &copy; {{ date('Y') }} ระบบบริหารจัดการข้อมูลการรับรองสถาบันจากสภาการพยาบาล — Version 1.0.0
-    </footer> --}}
-
-    <footer>
+    <footer class="main-footer">
         &copy; {{ date('Y') }} ระบบบริหารจัดการข้อมูลการรับรองสถาบันจากสภาการพยาบาล — Version 1.0.0
     </footer>
 
