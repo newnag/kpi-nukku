@@ -27,14 +27,53 @@
         <!-- เปลี่ยนจาก canvas เป็น div สำหรับ ApexCharts -->
         <div id="scoreLineChart"></div>
     </div>
+    <div class="chart-card summary-card">
+        <h2 class="card-title">คะแนนรวมมาตรฐานตามปี</h2>
+
+        <!-- ✅ Checkbox ปี -->
+        <div id="year-filters-standard" style="margin-bottom:10px;">
+            @foreach ($filters['years'] as $y)
+                <label style="margin-right:10px;">
+                    <input type="checkbox" class="year-checkbox-std" value="{{ $y }}" checked>
+                    {{ $y }}
+                </label>
+            @endforeach
+        </div>
+
+        <!-- ✅ Grid 3 คอลัมน์ -->
+      <div class="charts-of-standards">
+    @foreach ($chartsStandardBars as $chart)
+        <div class="chart-card standard-card">
+            <h3 style="margin-bottom:10px;">{{ $chart['name'] }}</h3>
+            <div id="stdChart-{{ $chart['id'] }}" style="height:300px;"></div>
+
+            <script type="application/json" id="stdData-{{ $chart['id'] }}">
+                {!! json_encode([
+                    'labels' => $chart['labels'],
+                    'scores' => $chart['scores'],
+                    'max'    => $chart['max'],
+                ], JSON_UNESCAPED_UNICODE) !!}
+            </script>
+        </div>
+    @endforeach
+</div>
+
+    </div>
 
 
-    <div class="filter-card card">
 
+    <!-- Toggle Switch -->
+    <div style="align-items:center;gap:8px;margin-bottom:12px;text-align: right;margin-top: 20px;">
+        <label class="switch">
+            <input type="checkbox" id="toggle-filter">
+            <span class="slider round"></span>
+        </label>
+        <span>กรองข้อมูล</span>
+    </div>
 
-
+    <!-- ฟิลเตอร์ -->
+    <div class="filter-card card" id="filter-panel" style="display:none;">
         <h2 class="card-title">กรองข้อมูลการประเมิน</h2>
-
         <div class="form-grid">
             <div class="field">
                 <label>ปีการประเมิน</label>
@@ -42,28 +81,24 @@
                     <option value="">ทั้งหมด</option>
                 </select>
             </div>
-
             <div class="field">
                 <label>รหัสตัวชี้วัด</label>
                 <select id="filter-code">
                     <option value="">ทั้งหมด</option>
                 </select>
             </div>
-
             <div class="field">
                 <label>มาตรฐานตัวชี้วัด</label>
                 <select id="filter-standard">
                     <option value="">ทั้งหมด</option>
                 </select>
             </div>
-
             <div class="field">
                 <label>ด้านตัวชี้วัด</label>
                 <select id="filter-dimension">
                     <option value="">ทั้งหมด</option>
                 </select>
             </div>
-
             <div class="field">
                 <label>ประเภทตัวชี้วัด</label>
                 <select id="filter-type">
@@ -77,6 +112,7 @@
             <button type="button" id="apply-filters" class="btn btn-primary">กรองข้อมูล</button>
         </div>
     </div>
+
 
     {{-- กราฟ --}}
     <div class="charts-grid">
@@ -171,6 +207,107 @@
     <!-- โหลด ApexCharts -->
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const charts = {};
+            const originals = {};
+
+            document.querySelectorAll('[id^="stdData-"]').forEach(el => {
+                const id = el.id.replace('stdData-', '');
+                const payload = JSON.parse(el.textContent);
+
+                originals[id] = payload;
+
+                const options = {
+                    chart: {
+                        type: 'bar',
+                        height: 300,
+                        toolbar: {
+                            show: false
+                        }
+                    },
+                    series: [{
+                            name: "คะแนนที่ได้",
+                            data: payload.scores
+                        },
+                        {
+                            name: "คะแนนเต็ม",
+                            data: payload.max
+                        }
+                    ],
+                    xaxis: {
+                        categories: payload.labels,
+                        title: {
+                            text: "ปีการประเมิน"
+                        }
+                    },
+                    yaxis: {
+                        title: {
+                            text: "คะแนน"
+                        }
+                    },
+                    dataLabels: {
+                        enabled: true,
+                        formatter: val => val.toLocaleString('th-TH')
+                    },
+                    colors: ['#3b82f6', '#9ca3af'],
+                    legend: {
+                        position: 'top'
+                    }
+                };
+
+                const chart = new ApexCharts(document.querySelector(`#stdChart-${id}`), options);
+                chart.render();
+                charts[id] = chart;
+            });
+
+            // === filter by year ===
+            function applyYearFilter() {
+                const years = Array.from(document.querySelectorAll('.year-checkbox-std:checked'))
+                    .map(cb => String(cb.value));
+
+                Object.entries(charts).forEach(([id, chart]) => {
+                    const orig = originals[id];
+                    const idxs = orig.labels.map((y, i) => years.includes(String(y)) ? i : -1).filter(i =>
+                        i >= 0);
+
+                    const newLabels = idxs.map(i => orig.labels[i]);
+                    const newScores = idxs.map(i => orig.scores[i]);
+                    const newMax = idxs.map(i => orig.max[i]);
+
+                    chart.updateOptions({
+                        xaxis: {
+                            categories: newLabels
+                        },
+                        series: [{
+                                name: "คะแนนที่ได้",
+                                data: newScores
+                            },
+                            {
+                                name: "คะแนนเต็ม",
+                                data: newMax
+                            }
+                        ]
+                    }, true, true);
+                });
+            }
+
+            document.querySelectorAll('.year-checkbox-std').forEach(cb => {
+                cb.addEventListener('change', applyYearFilter);
+            });
+        });
+    </script>
+
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const toggle = document.getElementById("toggle-filter");
+            const panel = document.getElementById("filter-panel");
+
+            toggle.addEventListener("change", () => {
+                panel.style.display = toggle.checked ? "block" : "none";
+            });
+        });
+
         (function() {
             const yearlyTotals = @json($yearlyTotals);
             // yearlyTotals = [{year:2025, score:735, max:740}, ...]
@@ -595,338 +732,7 @@
         })();
     </script>
 
-    {{-- <script>
-        (function() {
-            // ===== ปลั๊กอินพื้นหลังสีขาว =====
-            const whiteBgPlugin = {
-                id: 'whiteBackground',
-                beforeDraw(chart, args, opts) {
-                    const {
-                        ctx,
-                        width,
-                        height
-                    } = chart;
-                    ctx.save();
-                    ctx.globalCompositeOperation = 'destination-over';
-                    ctx.fillStyle = (opts && opts.color) || '#ffffff';
-                    ctx.fillRect(0, 0, width, height);
-                    ctx.restore();
-                }
-            };
-            if (window.Chart && !Chart.registry.plugins.get('whiteBackground')) {
-                Chart.register(whiteBgPlugin);
-            }
 
-            // ===== ปลั๊กอินแสดงคะแนนบนแท่ง =====
-            const valueLabelsPlugin = {
-                id: 'valueLabels',
-                afterDatasetsDraw(chart, args, opts) {
-                    const {
-                        ctx,
-                        data
-                    } = chart;
-                    const ds = chart.getDatasetMeta(0);
-                    if (!ds || !ds.data) return;
-
-                    const fmt = (n) => Number(n ?? 0).toLocaleString('th-TH', {
-                        maximumFractionDigits: 2
-                    });
-                    const color = opts?.color || '#374151';
-                    const fontSize = opts?.fontSize || 12;
-                    const yOffset = opts?.yOffset ?? 6;
-
-                    ctx.save();
-                    ctx.font =
-                        `700 ${fontSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
-                    ctx.fillStyle = color;
-                    ctx.textAlign = 'center';
-                    ctx.textBaseline = 'bottom';
-
-                    ds.data.forEach((elem, i) => {
-                        const value = data.datasets[0].data[i];
-                        if (!value) return;
-                        const {
-                            x,
-                            y
-                        } = elem.tooltipPosition();
-                        const ty = y - yOffset;
-                        ctx.fillText(fmt(value), x, ty);
-                    });
-
-                    ctx.restore();
-                }
-            };
-            if (!Chart.registry.plugins.get('valueLabels')) {
-                Chart.register(valueLabelsPlugin);
-            }
-
-            const FILTERS = @json($filters, JSON_UNESCAPED_UNICODE);
-            const $year = document.getElementById('filter-year');
-            const $code = document.getElementById('filter-code');
-            const $std = document.getElementById('filter-standard');
-            const $dim = document.getElementById('filter-dimension');
-            const $type = document.getElementById('filter-type');
-
-            function fillSelect(sel, items, mapper) {
-                [...sel.querySelectorAll('option')].forEach(o => {
-                    if (o.value) o.remove();
-                });
-                (items || []).forEach(it => {
-                    const opt = document.createElement('option');
-                    if (mapper) {
-                        const {
-                            value,
-                            label
-                        } = mapper(it);
-                        opt.value = value;
-                        opt.textContent = label;
-                    } else {
-                        opt.value = it;
-                        opt.textContent = it;
-                    }
-                    sel.appendChild(opt);
-                });
-            }
-
-            function sortCodes(codes) {
-                return (codes || []).slice().sort((a, b) => {
-                    const ma = String(a).match(/^([A-Za-z]+)[- ]?(\d+)$/i);
-                    const mb = String(b).match(/^([A-Za-z]+)[- ]?(\d+)$/i);
-                    const prefixA = ma ? ma[1].toUpperCase() : String(a);
-                    const prefixB = mb ? mb[1].toUpperCase() : String(b);
-                    const numA = ma ? parseInt(ma[2], 10) : 0;
-                    const numB = mb ? parseInt(mb[2], 10) : 0;
-                    if (prefixA === prefixB) return numA - numB;
-                    return prefixA.localeCompare(prefixB, 'th');
-                });
-            }
-            fillSelect($year, (FILTERS.years || []).slice().sort());
-            fillSelect($code, sortCodes(FILTERS.codes));
-            fillSelect(
-                $std,
-                (FILTERS.standards || []).slice().sort((a, b) => a.name.localeCompare(b.name, 'th')),
-                it => ({
-                    value: String(it.id),
-                    label: it.name
-                })
-            );
-            fillSelect($dim, (FILTERS.dimensions || []).slice().sort());
-            fillSelect($type, (FILTERS.types || []).slice().sort());
-
-            const chartInstances = {};
-            const chartOriginals = {};
-
-            function initChartsFromInlineJSON() {
-                const COLOR_PALETTE = [
-                    '#667eea', '#764ba2', '#f093fb', '#f5576c',
-                    '#4facfe', '#00f2fe', '#43e97b', '#38f9d7',
-                    '#ffecd2', '#fcb69f', '#a8edea', '#fed6e3'
-                ];
-
-                const YEAR_GRADIENTS = {
-                    '2020': ['#667eea', '#764ba2'],
-                    '2021': ['#f093fb', '#f5576c'],
-                    '2022': ['#4facfe', '#00f2fe'],
-                    '2023': ['#43e97b', '#38f9d7'],
-                    '2024': ['#ffecd2', '#fcb69f'],
-                    '2025': ['#a8edea', '#fed6e3'],
-                };
-
-                const getGradient = (ctx, year) => {
-                    const colors = YEAR_GRADIENTS[String(year)] || ['#6b7280', '#9ca3af'];
-                    const gradient = ctx.createLinearGradient(0, 0, 0, 200);
-                    gradient.addColorStop(0, colors[0]);
-                    gradient.addColorStop(1, colors[1]);
-                    return gradient;
-                };
-
-                document.querySelectorAll('canvas[id^="chart-"]').forEach(cv => {
-                    const canvasId = cv.id;
-                    const key = canvasId.replace(/^chart-/, '');
-                    const dataEl = document.getElementById('data-' + key);
-                    if (!dataEl) return;
-
-                    let payload = {
-                        years: [],
-                        values: []
-                    };
-                    try {
-                        payload = JSON.parse(dataEl.textContent || '{}');
-                    } catch {}
-
-                    const years = (payload.years || []).map(y => String(y));
-                    const values = (payload.values || []).map(v => Number(v));
-                    const maxValues = (payload.max_values || []).map(v => Number(v));
-                    chartOriginals[canvasId] = {
-                        years,
-                        values,
-                        maxValues 
-                    };
-
-                    const ctx = cv.getContext('2d');
-                    const backgroundColors = years.map(year => getGradient(ctx, year));
-
-                    chartInstances[canvasId] = new Chart(ctx, {
-                        type: 'bar',
-                        data: {
-                            labels: years.slice(),
-                            datasets: [{
-                                    label: 'คะแนนที่ได้',
-                                    data: values.slice(),
-                                    backgroundColor: backgroundColors,
-                                    borderRadius: {
-                                        topLeft: 12,
-                                        topRight: 12
-                                    },
-                                    borderSkipped: false,
-                                },
-                                {
-                                    label: 'คะแนนเต็ม',
-                                    data: maxValues.slice(),
-                                    backgroundColor: 'rgba(156,163,175,0.3)', // สีเทาโปร่ง ๆ
-                                    borderRadius: {
-                                        topLeft: 12,
-                                        topRight: 12
-                                    },
-                                    borderSkipped: false,
-                                }
-                            ]
-                        },
-                        options: {
-                            plugins: {
-                                legend: {
-                                    display: true
-                                },
-                                tooltip: {
-                                    callbacks: {
-                                        label: (context) => {
-                                            if (context.dataset.label === 'คะแนนที่ได้') {
-                                                return `คะแนน: ${context.raw}`;
-                                            } else {
-                                                return `เต็ม: ${context.raw}`;
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    });
-
-                });
-            }
-
-            function bindShowMore() {
-                document.querySelectorAll('.btn-show-more').forEach(btn => {
-                    btn.addEventListener('click', function() {
-                        const sid = this.dataset.standardId;
-                        const container = document.querySelector(
-                            `.charts-of-standard[data-standard-id="${sid}"]`);
-                        if (!container) return;
-                        const cards = container.querySelectorAll('.chart-card[data-index]');
-                        const isExpanded = this.classList.contains('expanded');
-                        if (!isExpanded) {
-                            cards.forEach(c => c.style.display = '');
-                            this.textContent = 'แสดงน้อยลง';
-                            this.classList.add('expanded');
-                        } else {
-                            cards.forEach(c => {
-                                const idx = parseInt(c.dataset.index, 5);
-                                c.style.display = idx < 5 ? '' : 'none';
-                            });
-                            this.textContent = 'แสดงเพิ่มเติม';
-                            this.classList.remove('expanded');
-                        }
-                    });
-                });
-            }
-
-            function applyFilters() {
-                const vYear = String($year.value || '');
-                const vCode = $code.value,
-                    vStd = $std.value,
-                    vDim = $dim.value,
-                    vType = $type.value;
-
-                document.querySelectorAll('.chart-card').forEach(card => {
-                    // ✅ ข้าม summary card
-                    if (card.classList.contains('summary-card')) return;
-
-                    let show = true;
-                    if (vStd && card.dataset.standard !== vStd) show = false;
-                    if (vDim && (card.dataset.dimension || '') !== vDim) show = false;
-                    if (vType && (card.dataset.type || '') !== vType) show = false;
-                    if (vCode && (card.dataset.code || '') !== vCode) show = false;
-                    if (vYear) {
-                        try {
-                            const raw = JSON.parse(card.getAttribute('data-years') || '[]');
-                            const years = (raw || []).map(y => String(y));
-                            if (!years.includes(vYear)) show = false;
-                        } catch {}
-                    }
-                    card.style.display = show ? '' : 'none';
-                });
-
-                document.querySelectorAll('.charts-of-standard').forEach(group => {
-                    const anyVisible = !![...group.querySelectorAll('.chart-card')].find(
-                        c => c.style.display !== 'none'
-                    );
-                    const title = group.previousElementSibling;
-                    group.style.display = anyVisible ? '' : 'none';
-                    if (title && title.classList.contains('stat-title'))
-                        title.style.display = anyVisible ? '' : 'none';
-                });
-
-                Object.entries(chartInstances).forEach(([canvasId, inst]) => {
-                    const orig = chartOriginals[canvasId];
-                    if (!orig) return;
-                    if (vYear) {
-                        const idxs = [];
-                        orig.years.forEach((y, i) => {
-                            if (String(y) === vYear) idxs.push(i);
-                        });
-                        inst.data.labels = idxs.map(i => orig.years[i]);
-                        inst.data.datasets[0].data = idxs.map(i => orig.values[i]);
-                    } else {
-                        inst.data.labels = orig.years.slice();
-                        inst.data.datasets[0].data = orig.values.slice();
-                    }
-                    inst.update();
-                });
-            }
-
-
-            function resetFilters() {
-                [$year, $code, $std, $dim, $type].forEach(sel => {
-                    if (sel) sel.selectedIndex = 0;
-                });
-                document.querySelectorAll('.chart-card').forEach(c => c.style.display = '');
-                document.querySelectorAll('.charts-of-standard,.stat-title').forEach(el => el.style.display = '');
-                Object.entries(chartInstances).forEach(([canvasId, inst]) => {
-                    const orig = chartOriginals[canvasId] || {
-                        years: [],
-                        values: []
-                    };
-                    inst.data.labels = orig.years.slice();
-                    inst.data.datasets[0].data = orig.values.slice();
-                    inst.update();
-                });
-                document.querySelectorAll('.btn-show-more.expanded').forEach(btn => {
-                    btn.classList.remove('expanded');
-                    btn.textContent = 'แสดงเพิ่มเติม';
-                });
-            }
-
-            document.getElementById('apply-filters').addEventListener('click', applyFilters);
-            document.getElementById('reset-filters').addEventListener('click', () => {
-                resetFilters();
-                applyFilters();
-            });
-
-            // init
-            initChartsFromInlineJSON();
-            bindShowMore();
-        })();
-    </script> --}}
     <style>
         :root {
             --blue-50: #eff6ff;
@@ -944,6 +750,20 @@
             --gray-700: #374151;
             --gray-800: #1f2937;
             --gray-900: #111827;
+        }
+
+        .charts-of-standards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            /* ✅ 3 คอลัมน์ */
+            gap: 20px;
+        }
+
+        .standard-card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 16px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, .06);
         }
 
         .chart-card canvas {
@@ -1000,11 +820,12 @@
         /* การ์ดกราฟ: คงขนาดพอดีมือ */
         .chart-card {
             flex: 0 0 320px;
-            /* ความกว้างการ์ดคงที่ 320px */
             background: #fff;
             border-radius: 16px;
             padding: 16px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, .06);
+            margin-bottom: 24px;
+            /* ✅ เพิ่มระยะห่าง */
         }
 
         /* แคนวาสไม่ขยาย */

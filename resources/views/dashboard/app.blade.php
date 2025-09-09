@@ -19,28 +19,7 @@
     <x-filter :years="$yearsForFilter" :standards="$allStandards->pluck('name')" :departments="$departments" :collectors="$collectors" :dimensions="$dimensionNames" :action="route('dashboard.index')"
         :selectedYear="$displayYear" />
 
-    <!-- Score Card -->
-
-    {{-- <div class="stat-title">
-        <h3> คะแนนทั้งหมดที่ได้ในแต่ละปี</h3>
-
-    </div>
-    <div class="score-card">
-        <div class="score-header">
-            <span class="label">ปีการประเมิน</span>
-            <span class="year" id="display-year">{{ $displayYearText }}</span>
-        </div>
-        <hr />
-        <div class="score-body">
-            <span class="label-left">คะแนนที่ได้</span>
-            <div class="score-value">
-                <span id="display-total">{{ number_format($totalScore) }}</span>
-                <span class="divider">/</span>
-                <span id="display-max">{{ number_format($maxScore) }}</span>
-            </div>
-            <span class="label-right">คะแนนเต็ม</span>
-        </div>
-    </div> --}}
+  
 
 
     <!-- Stats Cards -->

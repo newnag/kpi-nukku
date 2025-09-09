@@ -394,7 +394,7 @@ class DashboardController extends Controller
         indicators.year,
         SUM(indicators.score_acc) as total_score,
         SUM(indicators.max_score) as max_score
-    ')
+     ')
             ->groupBy(
                 'standards.id',
                 'standards.name',
@@ -556,6 +556,61 @@ class DashboardController extends Controller
             'chartsByStandard' => $chartsByStandard,
             'filters'          => $filters,
             'yearlyTotals'     => $yearlyTotals,
+            'chartsStandardBars' => $this->buildChartStandardsPerStandard($standards),
         ]);
     }
+private function buildChartStandardsPerStandard($standards)
+{
+    $allYears = Indicator::whereNotNull('year')
+        ->distinct()
+        ->orderBy('year')
+        ->pluck('year')
+        ->map(fn($y) => (int) $y)
+        ->toArray();
+
+    $rows = Indicator::query()
+        ->join('categories', 'categories.id', '=', 'indicators.categorie_id')
+        ->join('standards', 'standards.id', '=', 'categories.standard_id')
+        ->whereHas('assignments')
+        ->whereNotNull('indicators.year')
+        ->selectRaw('
+            CAST(indicators.year AS INTEGER) as year,
+            standards.id as sid,
+            SUM(indicators.score_acc) as total_score,
+            SUM(indicators.max_score) as max_score
+        ')
+        ->groupByRaw('CAST(indicators.year AS INTEGER), standards.id')
+        ->orderByRaw('CAST(indicators.year AS INTEGER)')
+        ->get();
+
+    // เตรียม matrix
+    $series = [];
+    foreach ($standards as $std) {
+        foreach ($allYears as $y) {
+            $series[$std->id][$y] = ['score' => 0.0, 'max' => 0.0];
+        }
+    }
+    foreach ($rows as $r) {
+        $series[$r->sid][$r->year] = [
+            'score' => (float) $r->total_score,
+            'max'   => (float) $r->max_score,
+        ];
+    }
+
+    // ส่งออก
+    $charts = [];
+    foreach ($standards as $i => $std) {
+        $charts[] = [
+            'id' => $std->id,
+            'name' => $std->name,
+            'labels' => $allYears,
+            'scores' => array_column($series[$std->id], 'score'),
+            'max'    => array_column($series[$std->id], 'max'),
+        ];
+    }
+
+    return $charts;
+}
+
+
 }
