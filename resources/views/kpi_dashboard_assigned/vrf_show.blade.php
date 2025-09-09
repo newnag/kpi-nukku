@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', '')
+@section('title', 'testtttttt')
 @section('content')
     <div class="dashboard-container">
         <div class="card indicator-card">
@@ -336,6 +336,7 @@
         </div>
 
     </div>
+
 @endsection
 @push('scripts')
     <link
