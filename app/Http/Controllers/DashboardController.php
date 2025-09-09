@@ -33,6 +33,9 @@ class DashboardController extends Controller
             ->groupBy('year')
             ->orderBy('year')
             ->get();
+        // ====== X) นับจำนวนตัวชี้วัด แยกตามปี ======
+
+
 
         // ปีล่าสุด: ใช้จาก summary ถ้ามี ไม่งั้น fallback ไปที่ปีทั้งหมด
         $latestFromTotals = $yearlyTotals->max('year');
@@ -43,7 +46,11 @@ class DashboardController extends Controller
         $displayYear = $request->filled('year')
             ? (int) $request->input('year')
             : (int) $latestYear;
-
+        $indicatorCount = Indicator::query()
+            ->whereHas('assignments')
+            ->whereNotNull('year')
+            ->where('year', $displayYear)   // ✅ นับเฉพาะปีที่เลือก
+            ->count();
         // หาข้อมูลคะแนนของปีที่เลือก
         $currentYearData = $displayYear !== null
             ? $yearlyTotals->firstWhere('year', (int) $displayYear)
@@ -76,12 +83,12 @@ class DashboardController extends Controller
             WHEN indicators.code LIKE 'NCO-%' THEN 3
             ELSE 99
         END
-    ")
+            ")
 
             // 3) เลขหลังขีด (เอาตัวท้ายสุด)
             ->orderByRaw("
-    COALESCE(NULLIF(SPLIT_PART(indicators.code, '-', 2), ''), '0')::int ASC
-")
+              COALESCE(NULLIF(SPLIT_PART(indicators.code, '-', 2), ''), '0')::int ASC
+                ")
 
 
             // กันกรณีเลขเท่ากัน → เรียง code เต็ม
@@ -112,10 +119,23 @@ class DashboardController extends Controller
 
         // ====== 6) Config ของ Chart/Legend ======
         $legendConfig = [
-            ['key' => 'complete', 'label' => 'ผลการดำเนินงานครบถ้วนตามเกณฑ์มาตรการ', 'color' => '#22c55e'],
-            ['key' => 'incomplete', 'label' => 'ผลการดำเนินงานยังไม่ครบถ้วนตามเกณฑ์', 'color' => '#f59e0b'],
-            ['key' => 'pending', 'label' => 'อยู่ระหว่างดำเนินการ', 'color' => '#858e95'],
+            [
+                'key'   => 'complete',
+                'label' => 'ผลการดำเนินงานครบถ้วนตามเกณฑ์มาตรการ',
+                'color' => '#22c55e', // เขียวสด
+            ],
+            [
+                'key'   => 'incomplete',
+                'label' => 'ผลการดำเนินงานยังไม่ครบถ้วนตามเกณฑ์',
+                'color' => '#facc15', // เหลือง
+            ],
+            [
+                'key'   => 'pending',
+                'label' => 'อยู่ระหว่างดำเนินการ',
+                'color' => '#ef4444', // แดงสด
+            ],
         ];
+
 
         // ====== 7) Dropdown filters อื่น ๆ ======
         $allStandards = Standard::orderBy('name')->get(['id', 'name']);
@@ -309,7 +329,9 @@ class DashboardController extends Controller
             'yearsForFilter',
             'last5Years',          // ถ้าจะใช้บน Blade
             'chart',               // กราฟ 3 มาตรฐาน (ของเดิม)
-            'chartYearAsX'  // ✅ ปีละ 7 แท่ง = รวม 3 มาตรฐานต่อด้าน
+            'chartYearAsX',
+            'indicatorCount' // ✅ ปีละ 7 แท่ง = รวม 3 มาตรฐานต่อด้าน
+
         ));
     }
 
