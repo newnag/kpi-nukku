@@ -48,19 +48,7 @@
 
                 <div class="info-row">
                     <span class="label">สถานะตัวชี้วัด:</span>
-                    @if ($indicator->status == 0)
-                        <span class="status-chip orange">รอดำเนินการ</span>
-                    @elseif ($indicator->status == 1)
-                        <span class="status-chip orange">รอดำเนินการ / บันทึกร่าง</span>
-                    @elseif ($indicator->status == 2)
-                        <span class="status-chip orange">รอดำเนินการ / บันทึกจริง</span>
-                    @elseif ($indicator->status == 3)
-                        <span class="status-chip green">ผลการดำเนินงานครบถ้วนตามเกณฑ์มาตรการ</span>
-                    @elseif ($indicator->status == 4)
-                        <span class="status-chip red">ผลการดำเนินงานไม่ครบถ้วนตามเกณฑ์มาตรการ</span>
-                    @else
-                        <span class="status-chip">ไม่ทราบสถานะ</span>
-                    @endif
+                    <x-status-badge :status="$indicator->status" size="sm" />
                 </div>
 
             </div>
@@ -83,9 +71,15 @@
                             <div class="criteria-title">
                                 {{ $criteria->sequence }}. {!! $criteria->name !!}
                             </div>
-                            <div class="criteria-actions" x-data="{ open{{ $criteria->id }}: false }">
+                            <div class="criteria-status">
+                                test
+                            </div>
+                        </div>
+
+                        <div class="criteria-content">
+                            <div class="criteria-evidence" x-data="{ open{{ $criteria->id }}: false }">
                                 <!-- ปุ่มเปิด popup -->
-                                <button @click="open{{ $criteria->id }} = true" class="btn-add">
+                                <button @click="open{{ $criteria->id }} = true" class="btn-adds">
                                     เพิ่มหลักฐาน <i class="fa fa-upload"></i>
                                 </button>
 
@@ -201,69 +195,75 @@
 
                                 </div>
                             </div>
-                        </div>
 
-                        <!-- คำอธิบายเกณฑ์ -->
-                        @if ($criteria->description)
-                            <div class="criteria-description">
-                                {!! $criteria->description !!}
-                            </div>
-                        @endif
-
-                        <!-- หลักฐานของเกณฑ์นี้ -->
-                        <div class="evidence-list evidence-list-{{ $criteria->id }}">
-                            @forelse($criteria->evidences as $evidence)
-                                @php
-                                    $type = strtolower($evidence->type ?? '');
-                                    $name = strtolower($evidence->name ?? '');
-                                @endphp
-
-                                <div class="evidence-item" id="evidence-{{ $evidence->id }}">
-                                    <span class="evidence-icon">
-                                        @if (Str::endsWith($type, 'pdf'))
-                                            <i data-lucide="file-text" style="color:#dc2626;"></i>
-                                        @elseif (Str::endsWith($type, 'doc') || Str::endsWith($type, 'docx') || Str::endsWith($name, '.docx'))
-                                            <i data-lucide="file-text" style="color:#2563eb;"></i>
-                                        @elseif (Str::endsWith($type, 'ppt') || Str::endsWith($type, 'pptx') || Str::endsWith($name, '.pptx'))
-                                            <i data-lucide="presentation" style="color:#eb7e25;"></i>
-                                        @elseif (in_array($type, ['jpg', 'jpeg', 'png', 'gif', 'image']))
-                                            <i data-lucide="image" style="color:#16a34a;"></i>
-                                        @elseif (Str::endsWith($type, 'xls') || Str::endsWith($type, 'xlsx') || Str::contains($name, '.xls'))
-                                            <i data-lucide="file-spreadsheet" style="color:#059669;"></i>
-                                        @elseif ($type === 'url')
-                                            <i data-lucide="link" style="color:#9333ea;"></i>
-                                        @elseif ($type === 'note')
-                                            <i data-lucide="sticky-note" style="color:#f59e0b;"></i>
-                                        @else
-                                            <i data-lucide="file" style="color:#6b7280;"></i>
-                                        @endif
-                                    </span>
-
-                                    <span class="evidence-name">
-                                        @if ($evidence->type === 'url')
-                                            @php
-                                                // ถ้า path เก็บเป็น JSON หรือ array
-                                                $urls = is_array($evidence->path)
-                                                    ? $evidence->path
-                                                    : json_decode($evidence->path, true);
-                                                $firstUrl = $urls['urls'][0] ?? '#';
-                                            @endphp
-                                            <a href="{{ $firstUrl }}" target="_blank"
-                                                class="text-blue-600 underline hover:text-blue-800">
-                                                {{ $evidence->name }}
-                                            </a>
-                                        @else
-                                            {{ $evidence->name }}
-                                        @endif
-                                    </span>
-
-                                    <button class="btn-delete" data-id="{{ $evidence->id }}" title="ลบหลักฐาน">
-                                        x
-                                    </button>
+                            <!-- คำอธิบายเกณฑ์ -->
+                            @if ($criteria->description)
+                                <div class="criteria-description">
+                                    {!! $criteria->description !!}
                                 </div>
-                            @empty
-                                <div class="evidence-empty">ยังไม่มีหลักฐานแนบ</div>
-                            @endforelse
+                            @endif
+
+                            <!-- หลักฐานของเกณฑ์นี้ -->
+                            <div class="evidence-list evidence-list-{{ $criteria->id }}">
+                                @forelse($criteria->evidences as $evidence)
+                                    @php
+                                        $type = strtolower($evidence->type ?? '');
+                                        $name = strtolower($evidence->name ?? '');
+                                    @endphp
+
+                                    <div class="evidence-item" id="evidence-{{ $evidence->id }}">
+                                        <span class="evidence-icon">
+                                            @if (Str::endsWith($type, 'pdf'))
+                                                <i data-lucide="file-text" style="color:#dc2626;"></i>
+                                            @elseif (Str::endsWith($type, 'doc') || Str::endsWith($type, 'docx') || Str::endsWith($name, '.docx'))
+                                                <i data-lucide="file-text" style="color:#2563eb;"></i>
+                                            @elseif (Str::endsWith($type, 'ppt') || Str::endsWith($type, 'pptx') || Str::endsWith($name, '.pptx'))
+                                                <i data-lucide="presentation" style="color:#eb7e25;"></i>
+                                            @elseif (in_array($type, ['jpg', 'jpeg', 'png', 'gif', 'image']))
+                                                <i data-lucide="image" style="color:#16a34a;"></i>
+                                            @elseif (Str::endsWith($type, 'xls') || Str::endsWith($type, 'xlsx') || Str::contains($name, '.xls'))
+                                                <i data-lucide="file-spreadsheet" style="color:#059669;"></i>
+                                            @elseif ($type === 'url')
+                                                <i data-lucide="link" style="color:#9333ea;"></i>
+                                            @elseif ($type === 'note')
+                                                <i data-lucide="sticky-note" style="color:#f59e0b;"></i>
+                                            @else
+                                                <i data-lucide="file" style="color:#6b7280;"></i>
+                                            @endif
+                                        </span>
+
+                                        <span class="evidence-name">
+                                            @if ($evidence->type === 'url')
+                                                @php
+                                                    // ถ้า path เก็บเป็น JSON หรือ array
+                                                    $urls = is_array($evidence->path)
+                                                        ? $evidence->path
+                                                        : json_decode($evidence->path, true);
+                                                    $firstUrl = $urls['urls'][0] ?? '#';
+                                                @endphp
+                                                <a href="{{ $firstUrl }}" target="_blank"
+                                                    class="text-blue-600 underline hover:text-blue-800">
+                                                    {{ $evidence->name }}
+                                                </a>
+                                            @else
+                                                {{ $evidence->name }}
+                                            @endif
+                                        </span>
+
+                                        <div class="space-x-3 flex items-center justify-center">
+                                            <label class="switch " title="เปลี่ยนสถานะหลักฐาน">
+                                                <input type="checkbox">
+                                                <span class="slider round"></span>
+                                            </label>
+                                            <button class="btn-delete" data-id="{{ $evidence->id }}" title="ลบหลักฐาน">
+                                                ลบ
+                                            </button>
+                                        </div>
+                                    </div>
+                                @empty
+                                    <div class="evidence-empty">ยังไม่มีหลักฐานแนบ</div>
+                                @endforelse
+                            </div>
                         </div>
                     </div>
                 @empty
@@ -1095,20 +1095,36 @@
         color: #1f2937;
     }
 
+    .criteria-status {
+        /* font-weight: 600;
+        font-size: 14px; */
+        color: #1f2937;
+    }
+
     .criteria-description {
         font-size: 13px;
         color: #6b7280;
         margin-bottom: 12px;
     }
 
-    .criteria-actions {
-        display: flex;
-        align-items: stretch;
-        gap: 8px;
-        flex-direction: column;
+    .criteria-content {
+        padding: 10px;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
     }
 
-    .btn-add {
+    .criteria-evidence {
+        /* display: flex; */
+        /* align-items: stretch; */
+        /* gap: 8px; */
+        /* flex-direction: column; */
+
+        padding: 10px;
+        display: flex;
+        justify-content: center;
+    }
+
+    .btn-adds {
         background: #EBF7FF;
         border: 1px solid #398ECA;
         border-radius: 20px;
@@ -1133,7 +1149,7 @@
         box-sizing: border-box;
     }
 
-    .btn-add:hover {
+    .btn-adds:hover {
         background: #dbeafe;
     }
 
