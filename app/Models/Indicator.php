@@ -24,7 +24,7 @@ class Indicator extends Model
         'score_acc',
         'max_score',
         'type',
-        'categorie_id', // <-- matches migration
+        'categorie_id',
     ];
 
     protected $hidden = ['created_at', 'updated_at'];

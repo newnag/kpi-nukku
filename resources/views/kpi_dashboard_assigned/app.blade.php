@@ -323,7 +323,7 @@
                                                 <span>ทำการประเมิน</span>
                                             </a>
                                             @elserole('super_admin|system_admin|qa_admin')
-                                            <a href="{{ route('dashboardKpiUser.show', $indicator->id) }}"
+                                            <a href="{{ route('dashboardKpiAdmin.show', $indicator->id) }}"
                                                 class="btn-view flex items-center gap-1" title="ตรวจสอบ">
                                                 <i data-lucide="eye"></i>
                                                 <span>ตรวจสอบ</span>

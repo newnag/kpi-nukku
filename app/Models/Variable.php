@@ -8,6 +8,7 @@ class Variable extends Model
 {
     protected $fillable = [
         'variable_name',
+        'label_name',
         'type',        // <-- matches migration
         'value',
         'indicator_id',

@@ -5,6 +5,7 @@ use App\Http\Controllers\CategorieController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DashboardExportController;
 use App\Http\Controllers\DashboardKpiUserController;
+use App\Http\Controllers\DashboardKpiAdminController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\EvidenceController;
 use App\Http\Controllers\IndicatorController;
@@ -12,6 +13,7 @@ use App\Http\Controllers\SettingController;
 use App\Http\Controllers\StandardController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
+use SebastianBergmann\CodeCoverage\Report\Html\Dashboard;
 
 /*
 |--------------------------------------------------------------------------
@@ -63,7 +65,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::prefix('dashboardKpiUser')->name('dashboardKpiUser.')->middleware('permission:view-dashboard-kpi-user')->group(function () {
         Route::get('/', [DashboardKpiUserController::class, 'index'])->name('index');
         Route::get('/dashboardKpiUser/{id}', [DashboardKpiUserController::class, 'show'])
-        
+
             ->name('show')
             ->middleware('permission:show-dashboard-kpi-user');
     });
@@ -74,12 +76,12 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/', [IndicatorController::class, 'index'])
             ->name('index')
             ->middleware('permission:view-indicator-dashboard');
-        
+
         // View
         Route::get('/{id}/show', [IndicatorController::class, 'show'])
             ->name('show')
             ->middleware('permission:view-indicator');
-        
+
         // Create
         Route::get('/create', [IndicatorController::class, 'create'])
             ->name('create')
@@ -87,7 +89,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('/store', [IndicatorController::class, 'store'])
             ->name('store')
             ->middleware('permission:create-indicator');
-        
+
         // Edit & Update
         Route::get('/{id}/edit', [IndicatorController::class, 'edit'])
             ->name('edit')
@@ -95,7 +97,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::put('/{id}', [IndicatorController::class, 'update'])
             ->name('update')
             ->middleware('permission:edit-indicator');
-        
+
         // Delete
         Route::delete('/{id}', [IndicatorController::class, 'delete'])
             ->name('delete')
@@ -106,7 +108,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::prefix('users')->name('users.')->middleware('permission:view-users')->group(function () {
         // View
         Route::get('/', [UserController::class, 'index'])->name('index');
-        
+
         // Create
         Route::get('/create', [UserController::class, 'create'])
             ->name('create')
@@ -114,7 +116,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('/', [UserController::class, 'store'])
             ->name('store')
             ->middleware('permission:create-users');
-        
+
         // Edit & Update
         Route::get('/{id}/edit', [UserController::class, 'edit'])
             ->name('edit')
@@ -122,7 +124,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::put('/{id}', [UserController::class, 'update'])
             ->name('update')
             ->middleware('permission:edit-users');
-        
+
         // Delete
         Route::delete('/{id}', [UserController::class, 'destroy'])
             ->name('destroy')
@@ -133,17 +135,17 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::prefix('departments')->name('departments.')->middleware('permission:view-departments')->group(function () {
         // View
         Route::get('/', [DepartmentController::class, 'index'])->name('index');
-        
+
         // Create
         Route::post('/store', [DepartmentController::class, 'store'])
             ->name('store')
             ->middleware('permission:create-departments');
-        
+
         // Update
         Route::put('/{id}', [DepartmentController::class, 'update'])
             ->name('update')
             ->middleware('permission:edit-departments');
-        
+
         // Delete
         Route::delete('/{id}', [DepartmentController::class, 'destroy'])
             ->name('destroy')
@@ -154,17 +156,17 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::prefix('categories')->name('categories.')->middleware('permission:view-categories')->group(function () {
         // View
         Route::get('/', [CategorieController::class, 'index'])->name('index');
-        
+
         // Create
         Route::post('/store', [CategorieController::class, 'store'])
             ->name('store')
             ->middleware('permission:create-categories');
-        
+
         // Update
         Route::put('/{id}', [CategorieController::class, 'update'])
             ->name('update')
             ->middleware('permission:edit-categories');
-        
+
         // Delete
         Route::delete('/{id}', [CategorieController::class, 'destroy'])
             ->name('destroy')
@@ -175,17 +177,17 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::prefix('standards')->name('standards.')->middleware('permission:view-standards')->group(function () {
         // View
         Route::get('/', [StandardController::class, 'index'])->name('index');
-        
+
         // Create
         Route::post('/store', [StandardController::class, 'store'])
             ->name('store')
             ->middleware('permission:create-standards');
-        
+
         // Update
         Route::put('/{id}', [StandardController::class, 'update'])
             ->name('update')
             ->middleware('permission:edit-standards');
-        
+
         // Delete
         Route::delete('/{id}', [StandardController::class, 'destroy'])
             ->name('destroy')
@@ -196,12 +198,12 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::prefix('settings')->name('settings.')->middleware('permission:view-settings')->group(function () {
         // View
         Route::get('/', [SettingController::class, 'index'])->name('index');
-        
+
         // Create
         Route::post('/store', [SettingController::class, 'store'])
             ->name('store')
             ->middleware('permission:create-settings');
-        
+
         // Update
         Route::put('/{id}', [SettingController::class, 'update'])
             ->name('update')
@@ -213,7 +215,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         // View
         Route::get('/', [EvidenceController::class, 'index'])->name('index');
         Route::get('criteria/{criteriaId}/evidences', [EvidenceController::class, 'getByCriteria']);
-        
+
         // Create
         Route::get('/create/{criteria}', [EvidenceController::class, 'create'])
             ->name('create')
@@ -221,19 +223,19 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('/store', [EvidenceController::class, 'store'])
             ->name('store')
             ->middleware('permission:create-evidence');
-        
+
         // Update
         Route::put('/{id}', [EvidenceController::class, 'update'])
             ->name('update')
             ->middleware('permission:edit-evidence');
         Route::patch('/{id}/toggle-status', [EvidenceController::class, 'toggleStatus'])
             ->middleware('permission:edit-evidence');
-        
+
         // Delete
         Route::delete('/{id}', [EvidenceController::class, 'destroy'])
             ->name('destroy')
             ->middleware('permission:delete-evidence');
-        
+
         // Download
         Route::get('/{id}/download', [EvidenceController::class, 'download'])
             ->name('download')
@@ -241,10 +243,20 @@ Route::middleware(['auth:sanctum'])->group(function () {
             ->middleware('permission:download-evidence');
     });
 
-Route::prefix('dashboardKpiUser')->name('dashboardKpiUser.')->group(function () {
-    Route::get('/', [DashboardKpiUserController::class, 'index'])->name('index');
-    Route::get('/dashboardKpiUser/{id}', [DashboardKpiUserController::class, 'show'])->name('show');
-    Route::put('/{id}/update-variables', [DashboardKpiUserController::class, 'saveVariables'])->name('saveVariables');
+    Route::prefix('dashboardKpiUser')->name('dashboardKpiUser.')->group(function () {
+        Route::get('/', [DashboardKpiUserController::class, 'index'])->name('index');
+        Route::get('/dashboardKpiUser/{id}', [DashboardKpiUserController::class, 'show'])->name('show');
+        Route::put('/{id}/update-variables', [DashboardKpiUserController::class, 'saveVariables'])->name('saveVariables');
+    });
+
+    Route::prefix('dashboardKpiUser')->name('dashboardKpiUser.')->group(function () {
+        Route::get('/', [DashboardKpiUserController::class, 'index'])->name('index');
+        Route::get('/dashboardKpiUser/{id}', [DashboardKpiUserController::class, 'show'])->name('show');
+        Route::put('/{id}/update-variables', [DashboardKpiUserController::class, 'saveVariables'])->name('saveVariables');
+    });
 });
-    
+
+Route::prefix('/test')->name('dashboardKpiAdmin.')->group(function () {
+    Route::get('/', [DashboardKpiAdminController::class, 'index'])->name('index');
+    Route::get('/dashboardKpiUser/{id}', [DashboardKpiAdminController::class, 'show'])->name('show');
 });

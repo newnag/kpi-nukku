@@ -2,14 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Assignment;
-
-use App\Models\Indicator;
-use App\Models\Variable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Indicator;
+use App\Models\Variable;
+use Illuminate\Database\Eloquent\Casts\Json;
 
-class DashboardKpiUserController extends Controller
+class DashboardKpiAdminController extends Controller
 {
     public function index(Request $request)
     {
@@ -76,7 +75,6 @@ class DashboardKpiUserController extends Controller
         return view('kpi_dashboard_assigned.app', compact('indicators'));
     }
 
-
     public function show($id)
     {
         $indicator = Indicator::with([
@@ -90,8 +88,14 @@ class DashboardKpiUserController extends Controller
 
         $criteria_id = optional($indicator->criterias->first())->id;
 
-        return view('kpi_dashboard_assigned.show', compact('indicator', 'criteria_id'));
+        return view('kpi_dashboard_assigned.vrf_show', compact('indicator', 'criteria_id'));
+
+        // return response()->json([
+        //     'indicator'  => $indicator,
+        //     'criteria_id' => $criteria_id,
+        // ]);
     }
+
     public function saveVariables(Request $request, $id)
     {
         $indicator = Indicator::findOrFail($id);
@@ -116,37 +120,4 @@ class DashboardKpiUserController extends Controller
             ->with('success', 'บันทึกข้อมูลเรียบร้อยแล้ว');
     }
 
-
-    // public function saveVariables(Request $request, $id)
-    // {
-    //     $indicator = Indicator::findOrFail($id);
-
-    //     if ($request->has('variables')) {
-    //         foreach ($request->variables as $varId => $value) {
-    //             Variable::updateOrCreate(
-    //                 ['id' => $varId, 'indicator_id' => $indicator->id],
-    //                 ['value' => $value]
-    //             );
-    //         }
-    //     }
-
-    //     // ✅ update status
-    //     if ($request->has('status')) {
-    //         $indicator->status = $request->status;
-    //     }
-
-    //     $indicator->save();
-    //     // return response()->json([
-    //     //     'success' => true,
-    //     //     'message' => $request->status == 1
-    //     //         ? 'บันทึกฉบับร่างเรียบร้อย ✅'
-    //     //         : 'บันทึกจริงสำเร็จ 🚀',
-    //     // ]);
-
-    //     return redirect()
-    //         ->route('dashboardKpiUser.index')
-    //         ->with('success', $request->status == 1
-    //             ? 'บันทึกฉบับร่างเรียบร้อย '
-    //             : 'บันทึกจริงสำเร็จ ');
-    // }
 }
