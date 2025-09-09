@@ -696,11 +696,11 @@
                 }, {}) : {};
             const getLatestYear = () => {
                 const years = Array.isArray(window.ALL_YEARS) ? window.ALL_YEARS : [];
-                const nums = years
-                    .map((y) => Number(String(y).replace(/[^0-9-]/g, '')))
-                    .filter((n) => !isNaN(n));
-                return nums.length ? Math.max(...nums).toString() : '';
+                const nums = years.map(y => parseInt(String(y), 10)).filter(n => !isNaN(n));
+                return nums.length ? Math.max(...nums) : '';
             };
+            const idxYear = $('#dashboardTable thead th').map((i, th) => $(th).text().trim()).get()
+                .findIndex(h => h.includes('ปีการประเมิน'));
 
             $(function() {
                 // 1) Init DataTable
@@ -739,9 +739,9 @@
                 // 3) Select element
                 const $year = $('#filter-year'),
                     $code = $('#filter-code'),
+                    $dept = $('#filter-dept'),
                     $std = $('#filter-standard'),
                     $dim = $('#filter-dimension'),
-                    $dept = $('#filter-dept'),
                     $collector = $('#filter-collector');
 
                 // 4) เติม option …
@@ -955,37 +955,37 @@
                     if (settings.nTable !== document.getElementById('dashboardTable')) return true;
 
                     const vYear = $year.val();
-                    const vCode = $code.val();
-                    const vDept = $dept.val();
-                    const vStd = $std.val();
-                    const vDim = $dim.val();
-                    const vCollector = $collector.val();
+                    const yearVal = idxYear !== -1 ? String(data[idxYear]).trim() : '';
+                    const yearNum = parseInt(yearVal, 10);
+                    const vYearNum = parseInt(vYear, 10);
 
-                    const yearVal = idxYear !== -1 ? stripHtml(data[idxYear]) : '';
-                    const codeVal = idxCode !== -1 ? stripHtml(data[idxCode]) : '';
-                    const deptVal = idxDept !== -1 ? stripHtml(data[idxDept]) : '';
+                    if (vYear && yearNum !== vYearNum) return false;
 
-                    // อ่านค่า data-* จาก DOM ของแถว
+                    const codeVal = $code.val();
+                    const deptVal = $dept.val();
+                    const stdVal = $std.val();
+                    const dimVal = $dim.val();
+                    const collectorVal = $collector.val();
+
                     const node = table.row(dataIndex).node();
-                    const stdVal = node?.dataset?.standard || '';
-                    const dimVal = node?.dataset?.dimension || '';
-                    const colVal = node?.dataset?.collector || '';
-                    const rowStatus = node?.dataset?.status || '';
+                    if (codeVal && String(data[3]).trim() !== codeVal) return false;
+                    if (deptVal && String(data[5]).trim() !== deptVal) return false;
+                    if (stdVal && (node?.dataset?.standard || '') !== stdVal) return false;
+                    if (dimVal && (node?.dataset?.dimension || '') !== dimVal) return false;
+                    if (collectorVal && (node?.dataset?.collector || '') !== collectorVal) return false;
 
-                    // ===== กรองตาม filter ที่เลือกใน form =====
-                    if (vYear && yearVal !== vYear) return false;
-                    if (vCode && codeVal !== vCode) return false;
-                    if (vDept && deptVal !== vDept) return false;
-                    if (vStd && stdVal !== vStd) return false;
-                    if (vDim && dimVal !== vDim) return false;
-                    if (vCollector && colVal !== vCollector) return false;
-
-                    // ===== กรองตามสถานะจาก pie chart (window.selectedStatusFilter) =====
-                    if (window.selectedStatusFilter && rowStatus !== window.selectedStatusFilter)
+                    if (window.selectedStatusFilter && (node?.dataset?.status || '') !== window
+                        .selectedStatusFilter) {
                         return false;
-
+                    }
                     return true;
                 });
+
+                const latestYear = getLatestYear();
+                if (latestYear) {
+                    $year.val(latestYear).trigger('change');
+                }
+
 
                 // 7) ฟิลเตอร์แถว (ให้ DataTables เป็นคนกรองเอง)
                 function applyFilters() {
@@ -999,6 +999,7 @@
                 let chartKeys = [],
                     chartLabels = [],
                     chartColors = [];
+
                 if (donutCanvas) {
                     const donutCtx = donutCanvas.getContext('2d');
                     chartLabels = @json(array_column($legendConfig, 'label'));
@@ -1015,7 +1016,7 @@
                             datasets: [{
                                 data: dataValues,
                                 backgroundColor: chartColors,
-                                borderColor: '#fff',
+                                borderColor: '#ffffff',
                                 borderWidth: 2,
                                 hoverOffset: 6,
                             }],
@@ -1046,7 +1047,7 @@
                                         },
                                     },
                                 },
-                                // ⭐ ใส่เปอร์เซ็นต์ในวงกลม
+                                // ✅ แสดง % ในวงกลม
                                 datalabels: {
                                     color: '#fff',
                                     font: {
@@ -1057,16 +1058,32 @@
                                         const total = ctx.chart.data.datasets[0].data.reduce((a,
                                             b) => a + b, 0);
                                         const pct = total > 0 ? (value / total * 100).toFixed(1) :
-                                        0;
+                                            0;
                                         return pct + '%';
                                     }
                                 }
+                            },
+                            // ✅ คลิก slice เพื่อ filter DataTable
+                            onClick: (evt, elements) => {
+                                if (elements.length > 0) {
+                                    const index = elements[0].index;
+                                    const key = chartKeys[
+                                        index]; // เช่น complete/incomplete/pending
+
+                                    // toggle filter: ถ้าคลิกซ้ำ → ยกเลิก
+                                    if (window.selectedStatusFilter === key) {
+                                        window.selectedStatusFilter = null;
+                                    } else {
+                                        window.selectedStatusFilter = key;
+                                    }
+
+                                    // กรอง DataTable
+                                    table.draw();
+                                }
                             }
                         },
-                        plugins: [ChartDataLabels] // ⭐ เปิดใช้งาน plugin
+                        plugins: [ChartDataLabels] // ⭐ enable datalabels
                     });
-
-
                 }
 
                 // ====== ฟังก์ชัน Export ทั้งการ์ดเป็น PNG ======
@@ -1183,7 +1200,7 @@
                 //         'page'); // จะเรียก updateSummary()/updateDonutAndLegend() ต่อเอง
                 // });
                 $(document).off('click.reset', '#reset-filters').on('click.reset', '#reset-filters', function(
-                    e) {
+                e) {
                     e.preventDefault();
                     e.stopPropagation();
 
@@ -1191,6 +1208,12 @@
                     $('.filter-card select').each(function() {
                         $(this).prop('selectedIndex', 0).val('').trigger('change');
                     });
+
+                    // ✅ ตั้งค่า "ปีล่าสุด" กลับเข้าไป
+                    const latestYear = getLatestYear();
+                    if (latestYear) {
+                        $('#filter-year').val(latestYear).trigger('change');
+                    }
 
                     // ล้างกล่องค้นหา
                     $('#custom-search').val('');
@@ -1208,9 +1231,11 @@
                     // ใช้ one-time listener รอให้ draw เสร็จ
                     table.one('draw', function() {
                         updateSummary();
-                        updateDonutAndLegend(); // ตอนนี้ค่าจะตรงแล้ว
+                        updateDonutAndLegend();
+                        updateIndicatorTotal();
                     });
                 });
+
 
                 let timer;
                 $('#custom-search')
@@ -1808,7 +1833,7 @@
         }
 
         /* ตัวเลือก: วาง tooltip ด้านล่าง (ถ้าพื้นที่ด้านบนไม่พอ)
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           <span class="tip" data-tip="..." data-pos="bottom"> */
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               <span class="tip" data-tip="..." data-pos="bottom"> */
         .tip[data-pos="bottom"]::after {
             top: calc(100% + 10px);
             bottom: auto;

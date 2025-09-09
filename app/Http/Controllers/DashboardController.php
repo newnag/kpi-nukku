@@ -167,7 +167,7 @@ class DashboardController extends Controller
             ->orderBy('name')
             ->get();
 
-        // ====== 8) เตรียมช่วงปี 5 ปีย้อนหลังที่มีจริง ======
+
         $allYears = Indicator::query()
             ->whereHas('assignments')
             ->whereNotNull('year')
@@ -298,14 +298,14 @@ class DashboardController extends Controller
             }
         } // end if last5Years
         // ====== 9) DEBUG LOG ======
-        Log::info('==== DASHBOARD DEBUG ====');
-        Log::info('Selected Year param: ' . ($request->input('year') ?? 'NULL'));
-        Log::info('Latest Year: ' . ($latestYear ?? 'NULL'));
-        Log::info('Display Year (int): ' . ($displayYear ?? 'NULL'));
-        Log::info('Indicators Count (filtered): ' . $indicators->count());
-        Log::info('Total Score: ' . $totalScore . ' / Max: ' . $maxScore);
-        Log::info('Status Counts: ' . json_encode($statusCounts));
-        Log::info('==========================');
+        // Log::info('==== DASHBOARD DEBUG ====');
+        // Log::info('Selected Year param: ' . ($request->input('year') ?? 'NULL'));
+        // Log::info('Latest Year: ' . ($latestYear ?? 'NULL'));
+        // Log::info('Display Year (int): ' . ($displayYear ?? 'NULL'));
+        // Log::info('Indicators Count (filtered): ' . $indicators->count());
+        // Log::info('Total Score: ' . $totalScore . ' / Max: ' . $maxScore);
+        // Log::info('Status Counts: ' . json_encode($statusCounts));
+        // Log::info('==========================');
 
         // ====== 10) RETURN VIEW ======
         return view('dashboard.app', compact(
@@ -355,10 +355,17 @@ class DashboardController extends Controller
             }
         }
 
-        // -------- 1) ช่วงปีที่ต้องแสดง --------
-        $current = (int) date('Y');
-        $start5 = $current - 4;
-        $yearRange = is_null($pickedYear) ? range($start5, $current) : [$pickedYear];
+        // -------- 1) ช่วงปีที่ต้องแสดง (ดึงจาก DB จริง) --------
+        if (is_null($pickedYear)) {
+            $yearRange = Indicator::whereNotNull('year')
+                ->distinct()
+                ->orderBy('year')
+                ->pluck('year')
+                ->map(fn($y) => (int) $y)
+                ->toArray();
+        } else {
+            $yearRange = [$pickedYear];
+        }
         $yearRangeStr = array_map('strval', $yearRange);
 
         // -------- 2) รายชื่อมาตรฐาน --------
@@ -372,21 +379,22 @@ class DashboardController extends Controller
             ->whereNotNull('indicators.year')
             ->when(
                 !is_null($pickedYear),
-                fn($q) => $q->where('indicators.year', $pickedYear),                    // ปีเดียว
-                fn($q) => $q->whereBetween('indicators.year', [$start5, $current])      // 5 ปี
+                fn($q) => $q->where('indicators.year', $pickedYear),
+                fn($q) => $q->whereIn('indicators.year', $yearRange)
             )
             ->selectRaw('
-            standards.id   as standard_id,
-            standards.name as standard_name,
-            categories.id  as category_id,
-            categories.name as category_name,
-            indicators.id  as indicator_id,
-            indicators.name as indicator_name,
-            indicators.code as indicator_code,
-            indicators.type as indicator_type,
-            indicators.year,
-            SUM(indicators.score_acc) as total_score
-        ')
+        standards.id   as standard_id,
+        standards.name as standard_name,
+        categories.id  as category_id,
+        categories.name as category_name,
+        indicators.id  as indicator_id,
+        indicators.name as indicator_name,
+        indicators.code as indicator_code,
+        indicators.type as indicator_type,
+        indicators.year,
+        SUM(indicators.score_acc) as total_score,
+        SUM(indicators.max_score) as max_score
+    ')
             ->groupBy(
                 'standards.id',
                 'standards.name',
@@ -402,6 +410,7 @@ class DashboardController extends Controller
             ->orderBy('indicators.code')
             ->orderBy('indicators.year')
             ->get();
+
 
         // -------- 4) ฟังก์ชัน normalize รหัส indicator --------
         $normalize = function ($c) {
@@ -425,7 +434,6 @@ class DashboardController extends Controller
                 'standard_name' => $r->standard_name,
                 'indicators'    => [],
             ];
-
             $chartsByStandard[$sid]['indicators'][$code] ??= [
                 'indicator_id'   => $r->indicator_id,
                 'indicator_key'  => $code,
@@ -436,24 +444,31 @@ class DashboardController extends Controller
                 'category_name'  => $r->category_name,
                 'years'          => [],
                 'values'         => [],
+                'max_values'     => [], // ✅ เพิ่มตรงนี้
             ];
 
             $cb = &$chartsByStandard[$sid]['indicators'][$code];
-            $cb['years'][]  = (string) $r->year;
-            $cb['values'][] = (float) $r->total_score;
+            $cb['years'][]      = (string) $r->year;
+            $cb['values'][]     = (float) $r->total_score;
+            $cb['max_values'][] = (float) $r->max_score; // ✅ เก็บ max
+
         }
 
         // -------- 6) บังคับ labels/data และ sort indicators --------
         foreach ($chartsByStandard as $sid => &$bucket) {
             foreach ($bucket['indicators'] as &$ind) {
-                $map = [];
+                $mapScore = [];
+                $mapMax   = [];
                 foreach ($ind['years'] as $i => $y) {
                     $yy = (string) $y;
-                    $map[$yy] = ($map[$yy] ?? 0) + (float) $ind['values'][$i];
+                    $mapScore[$yy] = ($mapScore[$yy] ?? 0) + (float) $ind['values'][$i];
+                    $mapMax[$yy]   = ($mapMax[$yy] ?? 0) + (float) $ind['max_values'][$i];
                 }
-                $ind['years']  = $yearRangeStr;
-                $ind['values'] = array_map(fn($y) => (float) ($map[$y] ?? 0), $yearRangeStr);
+                $ind['years']      = array_values($yearRangeStr);
+                $ind['values']     = array_map(fn($y) => (float) ($mapScore[$y] ?? 0), $yearRangeStr);
+                $ind['max_values'] = array_map(fn($y) => (float) ($mapMax[$y] ?? 0), $yearRangeStr);
             }
+
 
             // ✅ sort indicators ตาม indicator_code
             usort($bucket['indicators'], function ($a, $b) use ($prefixOrder) {
@@ -473,9 +488,15 @@ class DashboardController extends Controller
         unset($bucket);
 
         // -------- 7) Filters สำหรับดรอปดาวน์ --------
-        $filterYears = range($start5, $current);
-        if (!is_null($pickedYear) && !in_array($pickedYear, $filterYears, true)) {
-            $filterYears[] = $pickedYear;
+        $filterYears = Indicator::whereNotNull('year')
+            ->distinct()
+            ->orderBy('year')
+            ->pluck('year')
+            ->map(fn($y) => (string) $y)
+            ->toArray();
+
+        if (!is_null($pickedYear) && !in_array((string) $pickedYear, $filterYears, true)) {
+            $filterYears[] = (string) $pickedYear;
             sort($filterYears);
         }
 
@@ -507,7 +528,7 @@ class DashboardController extends Controller
         });
 
         $filters = [
-            'years'      => array_map('strval', $filterYears),
+            'years'      => $filterYears,
             'codes'      => $codesUnique,
             'standards'  => $allStandards,
             'dimensions' => $allDimensions,
@@ -515,11 +536,26 @@ class DashboardController extends Controller
             'pickedYear' => $pickedYear,
             'range'      => ['start' => reset($yearRange), 'end' => end($yearRange)],
         ];
+        $yearlyTotals = Indicator::query()
+            ->whereHas('assignments')
+            ->whereNotNull('year')
+            ->selectRaw('CAST(year AS INTEGER) as year, SUM(score_acc) as total_score, SUM(max_score) as max_score')
+            ->groupBy('year')
+            ->orderBy('year')
+            ->get()
+            ->map(fn($r) => [
+                'year'  => (int) $r->year,
+                'score' => (float) $r->total_score,
+                'max'   => (float) $r->max_score,
+            ])
+            ->toArray();
+
 
         return view('dashboard.result', [
             'standards'        => $standards,
             'chartsByStandard' => $chartsByStandard,
             'filters'          => $filters,
+            'yearlyTotals'     => $yearlyTotals,
         ]);
     }
 }
