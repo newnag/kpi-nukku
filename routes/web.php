@@ -257,6 +257,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 });
 
 Route::prefix('/test')->name('dashboardKpiAdmin.')->group(function () {
-    Route::get('/', [DashboardKpiAdminController::class, 'index'])->name('index');
     Route::get('/dashboardKpiUser/{id}', [DashboardKpiAdminController::class, 'show'])->name('show');
+    Route::put('/{id}/update-variables', [DashboardKpiAdminController::class, 'saveVariables'])->name('saveVariables');
+    Route::put('/dashboardKpiAdmin/{id}/update-status', [DashboardKpiAdminController::class, 'updateStatus'])->name('updateStatus');
 });

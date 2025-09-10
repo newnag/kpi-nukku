@@ -1,22 +1,24 @@
 @extends('layouts.app')
+
 @section('title', 'testtttttt')
+
 @section('content')
+
+    @php
+        $locked = in_array($indicator->status, [3, 4]);
+    @endphp
+
     <div class="dashboard-container">
         <div class="card indicator-card">
-            <!-- ชื่อหัวข้อ -->
             <h1 class="indicator-title">
                 {{ $indicator->name }} ({{ $indicator->code }})
             </h1>
-
-            <!-- Tabs -->
             <div class="indicator-tabs">
                 <span class="tab ">{{ $indicator->category->standard->name ?? '-' }}</span>
                 <span class="tab-divider">|</span>
                 <span class="tab">{{ $indicator->category->name ?? '-' }}</span>
             </div>
             <hr class="tab-divider">
-
-            <!-- ข้อมูล -->
             <div class="info-block">
                 <div class="info-row">
                     <span class="label">หน่วยงานที่รับผิดชอบ:</span>
@@ -72,7 +74,13 @@
                                 {{ $criteria->sequence }}. {!! $criteria->name !!}
                             </div>
                             <div class="criteria-status">
-                                test
+                                <select name="criterias[{{ $criteria->id }}][status]" class="criteria-status-select"
+                                    form="variables-form" data-criteria-id="{{ $criteria->id }}">
+                                    <option value="0" {{ ($criteria->status ?? 0) == 0 ? 'selected' : '' }}>
+                                        รอดำเนินการ</option>
+                                    <option value="1" {{ ($criteria->status ?? 0) == 1 ? 'selected' : '' }}>ยืนยัน
+                                    </option>
+                                </select>
                             </div>
                         </div>
 
@@ -100,7 +108,7 @@
 
 
                                         <div class="evidence-containers">
-                                            <div class="header-containers">เพิ่มใหม่หลักฐาน</div>
+                                            <div class="header-containers">เพิ่มหลักฐานใหม่</div>
 
                                             <!-- ฟอร์มเพิ่มหลักฐาน -->
                                             <div class="evidence-form">
@@ -251,10 +259,15 @@
                                         </span>
 
                                         <div class="space-x-3 flex items-center justify-center">
-                                            <label class="switch " title="เปลี่ยนสถานะหลักฐาน">
-                                                <input type="checkbox">
-                                                <span class="slider round"></span>
-                                            </label>
+                                            <select name="evidences[{{ $evidence->id }}][status]" {{-- ✅ เพิ่ม name --}}
+                                                id="evidence-{{ $evidence->id }}" data-criteria-id="{{ $criteria->id }}"
+                                                form="variables-form">
+                                                <option value="false" {{ $evidence->status ? '' : 'selected' }}>
+                                                    รอดำเนินการ</option>
+                                                <option value="true" {{ $evidence->status ? 'selected' : '' }}>ยืนยัน
+                                                </option>
+                                            </select>
+
                                             <button class="btn-delete" data-id="{{ $evidence->id }}" title="ลบหลักฐาน">
                                                 ลบ
                                             </button>
@@ -278,7 +291,7 @@
                 </div>
             </div>
 
-            <form id="variables-form" action="{{ route('dashboardKpiUser.saveVariables', $indicator->id) }}"
+            <form id="variables-form" action="{{ route('dashboardKpiAdmin.saveVariables', $indicator->id) }}"
                 method="POST">
                 @csrf
                 @method('PUT')
@@ -299,7 +312,7 @@
                                 <input type="number" name="variables[{{ $variable->id }}]"
                                     value="{{ old('variables.' . $variable->id, $variable->value) }}"
                                     placeholder="กรุณากรอกร้อยละเป็นตัวเลข" class="variable-input"
-                                    {{ $indicator->status == 2 ? 'readonly' : '' }}>
+                                    {{ $indicator->status == 3 ? 'readonly' : '' }}>
                             </div>
                         @empty
                             <p class="text-gray-500">ยังไม่มีตัวแปรที่ต้องกรอกเอง</p>
@@ -308,36 +321,66 @@
                 @endif
 
                 <!-- ✅ hidden status -->
-                <input type="hidden" name="status" id="status-input">
+                <input type="hidden" name="status" id="status-input" value="{{ $indicator->status ?? 2 }}">
 
                 <div class="action-bts">
-                    <button type="button" class="btns-secondary" onclick="history.back()">
+                    <button type="button" class="btns-secondary"
+                        onclick="location.href='{{ route('dashboardKpiUser.index') }}'">
                         <i class="fa fa-undo"></i> กลับ
                     </button>
 
-                    @if (!in_array($indicator->status, [2, 3, 4]))
-                        <!-- ปุ่มบันทึกฉบับร่าง -->
-                        <button type="submit" class="btn-outlines save-btn" data-status="1">
-                            <i class="fa fa-save"></i> บันทึกฉบับร่าง
-                        </button>
+                    <button type="submit" class="btns-primary" id="save-results-btn">
+                        <i class="fa fa-save"></i> บันทึกผลลัพ
+                    </button>
 
-                        <!-- ปุ่มบันทึกจริง -->
-                        <button type="submit" class="btns-primary save-btn" data-status="2">
-                            <i class="fa fa-save"></i> บันทึก
-                        </button>
-                    @endif
+                    <x-modal title="เปลี่ยนสถานะตัวชี้วัด" size="sm" :context="'status'">
+                        <x-slot:trigger>
+                            <button type="button" class="btn-outlines">
+                                {{-- @if ($locked) disabled @endif> --}}
+                                <i class="fa-solid fa-gear"></i>เปลี่ยนสถานะตัวชี้วัด
+                            </button>
+                        </x-slot:trigger>
+
+                        {{-- เนื้อหาในโมดัลแทน dropdown เดิม --}}
+                        <div class="space-y-2">
+                            <button type="button"
+                                class="status-choice w-full text-left px-4 py-2 rounded hover:bg-slate-50"
+                                data-status="1">
+                                1 — บันทึกร่าง
+                            </button>
+                            <button type="button"
+                                class="status-choice w-full text-left px-4 py-2 rounded hover:bg-slate-50"
+                                data-status="2">
+                                2 — บันทึกจริง
+                            </button>
+                            <hr class="my-1 border-slate-200">
+                            <button type="button"
+                                class="status-choice w-full text-left px-4 py-2 rounded hover:bg-slate-50"
+                                data-status="3">
+                                3 — ผลการดำเนินงานครบถ้วนตามเกณฑ์มาตรฐาน
+                            </button>
+                            <button type="button"
+                                class="status-choice w-full text-left px-4 py-2 rounded hover:bg-slate-50"
+                                data-status="4">
+                                4 — ผลการดำเนินงานไม่ครบถ้วนตามเกณฑ์มาตรฐาน
+                            </button>
+                        </div>
+
+                        <x-slot:footer>
+                            <div class="flex justify-end gap-2">
+                                <button type="button" class="btns-secondary" @click="$dispatch('modal:close')">
+                                    ปิด
+                                </button>
+                            </div>
+                        </x-slot:footer>
+                    </x-modal>
                 </div>
             </form>
-
-
-
-
-
         </div>
 
     </div>
-
 @endsection
+
 @push('scripts')
     <link
         href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;600&family=Kanit:wght@400;600&family=Sarabun:wght@400;600&display=swap"
@@ -355,214 +398,170 @@
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Trumbowyg/2.27.3/plugins/fontfamily/trumbowyg.fontfamily.min.js">
     </script>
-@endpush
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    {{-- <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const saveResultsBtn = document.getElementById('save-results-btn');
+            const form = document.getElementById('variables-form');
 
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-        const form = document.getElementById("variables-form");
-        const statusInput = document.getElementById("status-input");
-
-        // ดักทุกปุ่มที่มี class .save-btn
-        document.querySelectorAll(".save-btn").forEach(btn => {
-            btn.addEventListener("click", function() {
-                const status = this.getAttribute("data-status");
-
-                // ใส่ค่า status ลง hidden input
-                statusInput.value = status;
-
-                // ส่ง form
+            saveResultsBtn.addEventListener('click', () => {
+                form.action = '{{ route('dashboardKpiAdmin.saveVariables', $indicator->id) }}';
                 form.submit();
             });
         });
-    });
-</script>
-<script>
-    // กัน error ถ้าไม่ได้โหลด lucide
-    if (window.lucide && typeof lucide.createIcons === 'function') {
-        lucide.createIcons();
-    }
-    // ================= ปุ่มบันทึกตัวแปร =================
-    document.querySelectorAll('.save-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const status = this.dataset.status;
+    </script> --}}
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const form = document.getElementById("variables-form");
+            const statusInput = document.getElementById("status-input");
+
+            // ดักทุกปุ่มที่มี class .save-btn
+            document.querySelectorAll(".save-btn").forEach(btn => {
+                btn.addEventListener("click", function() {
+                    const status = this.getAttribute("data-status");
+
+                    // ใส่ค่า status ลง hidden input
+                    statusInput.value = status;
+
+                    // ส่ง form
+                    form.submit();
+                });
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const statusInput = document.getElementById('status-input');
             const form = document.getElementById('variables-form');
-            const formData = new FormData(form);
-            formData.set('status', status); // อัปเดทค่า status
 
-            fetch(form.action, {
-                    method: "POST",
-                    body: formData,
-                    headers: {
-                        "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content,
-                        "Accept": "application/json"
-                    }
-                })
-                .then(async res => {
-                    const text = await res.text();
-                    try {
-                        return JSON.parse(text);
-                    } catch (err) {
-                        console.error("Response is not JSON:", text);
-                        throw err;
-                    }
-                })
-                .then(data => {
-                    if (data.success) {
-                        Swal.fire({
-                            toast: true,
-                            position: 'top-end',
-                            icon: 'success',
-                            title: data.message || 'บันทึกสำเร็จ',
-                            showConfirmButton: false,
-                            timer: 2000
-                        });
-                    } else {
-                        Swal.fire({
-                            toast: true,
-                            position: 'top-end',
-                            icon: 'error',
-                            title: data.message || 'เกิดข้อผิดพลาด',
-                            showConfirmButton: false,
-                            timer: 2000
-                        });
-                    }
-                })
-                .catch(err => {
-                    console.error("Fetch error:", err);
-                    Swal.fire({
-                        toast: true,
-                        position: 'top-end',
-                        icon: 'error',
-                        title: 'ไม่สามารถบันทึกได้',
-                        showConfirmButton: false,
-                        timer: 2000
-                    });
+            document.querySelectorAll('.status-choice').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const val = btn.getAttribute('data-status') || '';
+                    statusInput.value = val;
+                    // ปิดโมดัล
+                    window.dispatchEvent(new CustomEvent('modal:close'));
+                    // ส่งฟอร์ม
+                    form.submit();
                 });
+            });
         });
-    });
+        // ✅ Template render หลักฐานใหม่ ให้เหมือน Blade
+        function renderEvidenceItem(ev) {
+            let icon = '<i data-lucide="file" style="color:#6b7280;"></i>'; // default
+            if (ev.type === 'pdf') {
+                icon = '<i data-lucide="file-text" style="color:#dc2626;"></i>';
+            } else if (['doc', 'docx'].includes(ev.type)) {
+                icon = '<i data-lucide="file-text" style="color:#2563eb;"></i>';
+            } else if (['ppt', 'pptx'].includes(ev.type)) {
+                icon = '<i data-lucide="presentation" style="color:#eb7e25;"></i>';
+            } else if (['jpg', 'jpeg', 'png', 'gif', 'image'].includes(ev.type)) {
+                icon = '<i data-lucide="image" style="color:#16a34a;"></i>';
+            } else if (ev.type === 'xls' || ev.type === 'xlsx') {
+                icon = '<i data-lucide="file-spreadsheet" style="color:#059669;"></i>';
+            } else if (ev.type === 'url') {
+                icon = '<i data-lucide="link" style="color:#9333ea;"></i>';
+            } else if (ev.type === 'note') {
+                icon = '<i data-lucide="sticky-note" style="color:#f59e0b;"></i>';
+            }
 
+            let nameHtml = ev.name;
+            if (ev.type === 'url' && ev.path?.urls?.[0]) {
+                nameHtml = `<a href="${ev.path.urls[0]}" target="_blank" class="text-blue-600 underline hover:text-blue-800">
+        ${ev.name}
+    </a>`;
+            }
 
-
-    // ✅ Template render หลักฐานใหม่ ให้เหมือน Blade
-    function renderEvidenceItem(ev) {
-        let icon = '<i data-lucide="file" style="color:#6b7280;"></i>'; // default
-        if (ev.type === 'pdf') {
-            icon = '<i data-lucide="file-text" style="color:#dc2626;"></i>';
-        } else if (['doc', 'docx'].includes(ev.type)) {
-            icon = '<i data-lucide="file-text" style="color:#2563eb;"></i>';
-        } else if (['ppt', 'pptx'].includes(ev.type)) {
-            icon = '<i data-lucide="presentation" style="color:#eb7e25;"></i>';
-        } else if (['jpg', 'jpeg', 'png', 'gif', 'image'].includes(ev.type)) {
-            icon = '<i data-lucide="image" style="color:#16a34a;"></i>';
-        } else if (ev.type === 'xls' || ev.type === 'xlsx') {
-            icon = '<i data-lucide="file-spreadsheet" style="color:#059669;"></i>';
-        } else if (ev.type === 'url') {
-            icon = '<i data-lucide="link" style="color:#9333ea;"></i>';
-        } else if (ev.type === 'note') {
-            icon = '<i data-lucide="sticky-note" style="color:#f59e0b;"></i>';
-        }
-
-        let nameHtml = ev.name;
-        if (ev.type === 'url' && ev.path?.urls?.[0]) {
-            nameHtml = `<a href="${ev.path.urls[0]}" target="_blank"
-                      class="text-blue-600 underline hover:text-blue-800">
-                        ${ev.name}
-                    </a>`;
-        }
-
-        return `
-        <div class="evidence-item" id="evidence-${ev.id}">
-            <span class="evidence-icon">${icon}</span>
-            <span class="evidence-name">${nameHtml}</span>
-            <button class="btn-delete" data-id="${ev.id}" title="ลบหลักฐาน">x</button>
-        </div>
+            return `
+    <div class="evidence-item" id="evidence-${ev.id}">
+        <span class="evidence-icon">${icon}</span>
+        <span class="evidence-name">${nameHtml}</span>
+        <button class="btn-delete" data-id="${ev.id}" title="ลบหลักฐาน">x</button>
+    </div>
     `;
-    }
+        }
 
+        document.addEventListener('DOMContentLoaded', function() {
+            const fileHandlers = {};
+            const editorInitialized = {};
+            const form = document.getElementById("evidence-form-{{ $criteria->id }}");
 
-    document.addEventListener('DOMContentLoaded', function() {
-        const fileHandlers = {};
-        const editorInitialized = {};
-        const form = document.getElementById("evidence-form-{{ $criteria->id }}");
+            form.addEventListener("submit", function(e) {
+                    e.preventDefault();
 
-        form.addEventListener("submit", function(e) {
-            e.preventDefault();
+                    let formData = new FormData(form);
 
-            let formData = new FormData(form);
-
-            fetch(form.action, {
-                    method: "POST",
-                    body: formData,
-                    headers: {
-                        "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content,
-                        "Accept": "application/json" // ✅ บังคับ Laravel ส่ง JSON
-                    }
-                })
-                .then(async res => {
-                    const text = await res.text();
-                    try {
-                        return JSON.parse(text);
-                    } catch (err) {
-                        console.error("Response is not JSON:", text);
-                        throw err;
-                    }
-                })
-                .then(data => {
-                    if (data.success) {
-                        Swal.fire({
-                            toast: true,
-                            position: 'top-end',
-                            icon: 'success',
-                            title: data.message || 'บันทึกสำเร็จ',
-                            showConfirmButton: false,
-                            timer: 2000
-                        });
-
-                        const list = document.querySelector(
-                            `.evidence-list-${form.querySelector('[name="criteria_id"]').value}`
-                        );
-                        if (list && data.evidences && Array.isArray(data.evidences)) {
-                            data.evidences.forEach(ev => {
-                                list.insertAdjacentHTML("beforeend", renderEvidenceItem(
-                                    ev));
-
-                                // bind ปุ่มลบทันที
-                                const deleteBtn = list.querySelector(
-                                    `#evidence-${ev.id} .btn-delete`);
-                                deleteBtn.addEventListener("click", () => handleDelete(ev
-                                    .id));
-                            });
-                            if (window.lucide?.createIcons) lucide.createIcons();
-                        }
-
-
-
-                        // ✅ ปิด popup หลัง Toast
-                        setTimeout(() => {
-                            // ถ้าใช้ Alpine variable เช่น open{{ $criteria->id }}
-                            window[`open{{ $criteria->id }}`] = false;
-
-                            // fallback force ปิด DOM
-                            const popup = form.closest('[x-show]');
-                            if (popup) {
-                                popup.style.display = 'none';
+                    fetch(form.action, {
+                            method: "POST",
+                            body: formData,
+                            headers: {
+                                "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content,
+                                "Accept": "application/json" // ✅ บังคับ Laravel ส่ง JSON
                             }
-                        }, 800);
+                        })
+                        .then(async res => {
+                            const text = await res.text();
+                            try {
+                                return JSON.parse(text);
+                            } catch (err) {
+                                console.error("Response is not JSON:", text);
+                                throw err;
+                            }
+                        })
+                        .then(data => {
+                                if (data.success) {
+                                    Swal.fire({
+                                        toast: true,
+                                        position: 'top-end',
+                                        icon: 'success',
+                                        title: data.message || 'บันทึกสำเร็จ',
+                                        showConfirmButton: false,
+                                        timer: 2000
+                                    });
 
-                        // ✅ reset form หลังบันทึกเสร็จ
-                        form.reset();
-                    } else {
-                        Swal.fire({
-                            toast: true,
-                            position: 'top-end',
-                            icon: 'error',
-                            title: data.message || 'เกิดข้อผิดพลาด ⚠️',
-                            showConfirmButton: false,
-                            timer: 2000
-                        });
-                    }
-                })
+                                    const list = document.querySelector(
+                                        `.evidence-list-${form.querySelector('[name="criteria_id"]').value}`
+                                    );
+                                    if (list && data.evidences && Array.isArray(data.evidences)) {
+                                        data.evidences.forEach(ev => {
+                                            list.insertAdjacentHTML("beforeend", renderEvidenceItem(
+                                                ev));
+
+                                            // bind ปุ่มลบทันที
+                                            const deleteBtn = list.querySelector(
+                                                `#evidence-${ev.id} .btn-delete`);
+                                            deleteBtn.addEventListener("click", () => handleDelete(ev
+                                                .id));
+                                        });
+                                    }
+                                    if (window.lucide?.createIcons) lucide.createIcons();
+                                }
+
+
+
+                                // ✅ ปิด popup หลัง Toast
+                                setTimeout(() => {
+                                    // ถ้าใช้ Alpine variable เช่น open{{ $criteria->id }}
+                                    window[`open{{ $criteria->id }}`] = false;
+
+                                    // fallback force ปิด DOM
+                                    const popup = form.closest('[x-show]');
+                                    if (popup) {
+                                        popup.style.display = 'none';
+                                    }
+                                }, 800);
+
+                                // ✅ reset form หลังบันทึกเสร็จ
+                                form.reset();
+                            } else {
+                                Swal.fire({
+                                    toast: true,
+                                    position: 'top-end',
+                                    icon: 'error',
+                                    title: data.message || 'เกิดข้อผิดพลาด ⚠️',
+                                    showConfirmButton: false,
+                                    timer: 2000
+                                });
+                            }
+                        })
                 .catch(err => {
                     console.error("Fetch error:", err);
                     Swal.fire({
@@ -574,7 +573,7 @@
                         timer: 2000
                     });
                 });
-        });
+            });
 
 
         /*** ---------- File Upload Handler Class ---------- ***/
@@ -629,17 +628,15 @@
                 const el = document.createElement('div');
                 el.className = 'file-item';
                 el.innerHTML = `
-                    <div class="file-icon">
-                        <i data-lucide="file-text" style="width:20px;height:20px;color:#ef4444;"></i>
-                    </div>
-                    <span class="file-name" title="${file.name}">${file.name}</span>
-                    <span class="file-size">${this.formatFileSize(file.size)}</span>
-                    <button type="button" class="remove-file" aria-label="ลบไฟล์"
-                        data-name="${encodeURIComponent(file.name)}" 
-                        data-size="${file.size}"
-                        data-criteria="${this.criteriaId}">
-                        <i data-lucide="x" style="width:16px;height:16px;"></i>
-                    </button>`;
+    <div class="file-icon">
+        <i data-lucide="file-text" style="width:20px;height:20px;color:#ef4444;"></i>
+    </div>
+    <span class="file-name" title="${file.name}">${file.name}</span>
+    <span class="file-size">${this.formatFileSize(file.size)}</span>
+    <button type="button" class="remove-file" aria-label="ลบไฟล์" data-name="${encodeURIComponent(file.name)}"
+        data-size="${file.size}" data-criteria="${this.criteriaId}">
+        <i data-lucide="x" style="width:16px;height:16px;"></i>
+    </button>`;
                 this.filesList.appendChild(el);
                 el.querySelector('.remove-file').addEventListener('click', e => {
                     const btn = e.currentTarget;
@@ -716,17 +713,13 @@
                 const row = document.createElement('div');
                 row.className = `form-group url-row`;
                 row.innerHTML = `
-                    <input type="text" name="url_names[]" 
-                        class="form-input url-name url-name-${this.criteriaId}" 
-                        placeholder="ชื่อหลักฐาน URL">
-                    <input type="url" name="additional_urls[]" 
-                        class="form-input url-input url-input-${this.criteriaId}" 
-                        placeholder="วาง URL เพิ่มเติม">
-                    <button type="button" 
-                        class="add-url-btn add-url-btn-${this.criteriaId}" 
-                        aria-label="เพิ่ม URL">
-                        <i data-lucide="plus" style="width:16px;height:16px;"></i>
-                    </button>`;
+    <input type="text" name="url_names[]" class="form-input url-name url-name-${this.criteriaId}"
+        placeholder="ชื่อหลักฐาน URL">
+    <input type="url" name="additional_urls[]" class="form-input url-input url-input-${this.criteriaId}"
+        placeholder="วาง URL เพิ่มเติม">
+    <button type="button" class="add-url-btn add-url-btn-${this.criteriaId}" aria-label="เพิ่ม URL">
+        <i data-lucide="plus" style="width:16px;height:16px;"></i>
+    </button>`;
                 this.urlSection.appendChild(row);
                 if (window.lucide?.createIcons) lucide.createIcons();
                 row.querySelector(`input.url-input-${this.criteriaId}`)?.focus();
@@ -905,10 +898,9 @@
             new URLHandler({{ $criteria->id }});
             observePopupVisibility({{ $criteria->id }});
         @endforeach
-    });
-</script>
-
-
+        });
+    </script>
+@endpush
 
 <style>
     /* ---- Base ---- */
@@ -1109,7 +1101,7 @@
 
     .criteria-content {
         padding: 10px;
-        border: 1px solid #e5e7eb;
+        border: 1px solid #f0f9ff;
         border-radius: 12px;
     }
 
@@ -1194,14 +1186,10 @@
         margin-right: 6px;
     }
 
-
-
-
     .file-icon {
         flex-shrink: 0;
     }
-</style>
-<style>
+
     :root {
         --blue: #398ECA;
         --green: #22c55e;
@@ -1439,8 +1427,7 @@
         /* red-500 */
         color: #858e95;
     }
-</style>
-<style>
+
     .trumbowyg-editor ol,
     .trumbowyg-editor ul {
         list-style-position: inside;
