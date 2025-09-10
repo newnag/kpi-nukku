@@ -4,6 +4,7 @@
 namespace App\Exports;
 
 use App\Models\Indicator;
+use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Concerns\FromQuery;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
@@ -20,18 +21,6 @@ class IndicatorsExport implements FromQuery, WithHeadings, WithMapping, ShouldAu
     public function query()
     {
         $q = Indicator::query()
-            ->whereHas('assignments')
-            ->leftJoin('categories', 'categories.id', '=', 'indicators.categorie_id')
-            ->leftJoin('standards', 'standards.id', '=', 'categories.standard_id')
-            ->leftJoin('assignments', 'assignments.indicator_id', '=', 'indicators.id')
-            ->leftJoin('users as collector_users', 'collector_users.id', '=', 'assignments.collector')
-            ->leftJoin('departments', 'departments.id', '=', 'collector_users.department_id')
-            ->with([
-                'category:id,name,standard_id',
-                'category.standard:id,name',
-                'assignments.collectorUser' => fn($q) => $q->select('id', 'name', 'department_id'),
-                'assignments.collectorUser.department:id,name',
-            ])
             ->select([
                 'indicators.id',
                 'indicators.name',
@@ -43,9 +32,61 @@ class IndicatorsExport implements FromQuery, WithHeadings, WithMapping, ShouldAu
                 'indicators.status',
                 'categories.name as category_name',
                 'standards.name as standard_name',
-                'departments.name as dept_name',
-            ]);
+                DB::raw('MAX(departments.name) as dept_name') // ✅ เลือกอันเดียว
+            ])
+            ->leftJoin('categories', 'categories.id', '=', 'indicators.categorie_id')
+            ->leftJoin('standards', 'standards.id', '=', 'categories.standard_id')
+            ->leftJoin('assignments', 'assignments.indicator_id', '=', 'indicators.id')
+            ->leftJoin('users as collector_users', 'collector_users.id', '=', 'assignments.collector')
+            ->leftJoin('departments', 'departments.id', '=', 'collector_users.department_id')
+            ->whereExists(fn($sq) => $sq->select(DB::raw(1))
+                ->from('assignments')
+                ->whereColumn('indicators.id', 'assignments.indicator_id'))
+            ->groupBy([
+                'indicators.id',
+                'indicators.name',
+                'indicators.code',
+                'indicators.type',
+                'indicators.year',
+                'indicators.score_acc',
+                'indicators.max_score',
+                'indicators.status',
+                'categories.name',
+                'standards.name'
+            ])
+            ->orderBy('indicators.year')
+            ->orderByRaw("
+        CASE
+            WHEN indicators.code LIKE 'NCS-%' THEN 1
+            WHEN indicators.code LIKE 'NCP-%' THEN 2
+            WHEN indicators.code LIKE 'NCO-%' THEN 3
+            ELSE 99
+        END
+    ")
+            ->orderByRaw("
+        COALESCE(
+            NULLIF(split_part(indicators.code, '-', array_length(string_to_array(indicators.code, '-'), 1)), ''),
+            '0'
+        )::int ASC
+    ")
+            ->orderBy('indicators.code', 'asc');
+        // ✅ กันซ้ำ
 
+        $status = request()->get('status'); // complete / incomplete / pending
+
+        if ($status) {
+            switch ($status) {
+                case 'complete':
+                    $q->whereIn('indicators.status', [2, 3]);
+                    break;
+                case 'incomplete':
+                    $q->where('indicators.status', [4]);
+                    break;
+                case 'pending':
+                    $q->whereIn('indicators.status', [0, 1]);
+                    break;
+            }
+        }
         // ===== ฟิลเตอร์ =====
         $y   = $this->filters['year']         ?? null;
         $std = $this->filters['standard_id']  ?? null;   // อาจเป็น id หรือชื่อ
@@ -80,15 +121,14 @@ class IndicatorsExport implements FromQuery, WithHeadings, WithMapping, ShouldAu
         if ($st !== '') {
             $q->where('indicators.status', $st);
         }
-
         if ($dep !== null && $dep !== '') {
             if (is_numeric($dep)) {
                 $q->where('collector_users.department_id', (int)$dep);
             } else {
                 $q->where('departments.name', 'ILIKE', $dep);
-                // หรือ contains: $q->where('departments.name', 'ILIKE', "%{$dep}%");
             }
         }
+
 
         if ($code) {
             $q->where('indicators.code', 'ILIKE', "%{$code}%");
@@ -99,18 +139,6 @@ class IndicatorsExport implements FromQuery, WithHeadings, WithMapping, ShouldAu
             $q->orderBy('indicators.year', 'asc');
         }
 
-        $q->orderByRaw("
-        CASE
-            WHEN indicators.code LIKE 'NCS-%' THEN 1
-            WHEN indicators.code LIKE 'NCP-%' THEN 2
-            WHEN indicators.code LIKE 'NCO-%' THEN 3
-            ELSE 99
-        END
-    ");
-        $q->orderByRaw("
-        COALESCE(NULLIF(SUBSTRING_INDEX(indicators.code, '-', -1), ''), 0) + 0 ASC
-    ");
-        $q->orderBy('indicators.code', 'asc');
 
         return $q;
     }
@@ -122,8 +150,8 @@ class IndicatorsExport implements FromQuery, WithHeadings, WithMapping, ShouldAu
             'ชื่อตัวบ่งชี้',
             'รหัส',
             'ประเภทตัวชี้วัด',
-            'มาตรฐาน',
-            'มิติ/หมวด',
+            'มาตรฐานการประเมิน',
+            'ด้านการประเมิน',
             'หน่วยงานที่รับผิดชอบ',
             'ผลลัพธ์ (score_acc)',
             'คะแนนรวม (max_score)',
@@ -148,9 +176,9 @@ class IndicatorsExport implements FromQuery, WithHeadings, WithMapping, ShouldAu
             (float)($row->score_acc ?? 0),
             (float)($row->max_score ?? 0),
             match ((int)($row->status ?? -1)) {
-                0 => 'อยู่ระหว่างดำเนินการ',
-                1 => 'ยังไม่ครบถ้วนตามเกณฑ์',
-                2, 3 => 'ครบถ้วนตามเกณฑ์มาตรการ',
+                0 => 'อยู่ระหว่างดำเนินการ',            // pending
+                1 => 'ผลการดำเนินงานยังไม่ครบถ้วนตามเกณฑ์', // incomplete
+                2, 3 => 'ผลการดำเนินงานครบถ้วนตามเกณฑ์มาตรการ', // complete
                 default => 'ไม่ระบุ',
             },
         ];
