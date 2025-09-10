@@ -25,7 +25,10 @@
         </div>
 
         <!-- เปลี่ยนจาก canvas เป็น div สำหรับ ApexCharts -->
-        <div id="scoreLineChart"></div>
+          <div class="chart-card ">
+      <div id="scoreLineChart" ></div>
+        </div>
+  
     </div>
     <div class="chart-card summary-card">
         <h2 class="card-title">คะแนนรวมมาตรฐานตามปี</h2>
@@ -41,25 +44,55 @@
         </div>
 
         <!-- ✅ Grid 3 คอลัมน์ -->
-      <div class="charts-of-standards">
-    @foreach ($chartsStandardBars as $chart)
-        <div class="chart-card standard-card">
-            <h3 style="margin-bottom:10px;">{{ $chart['name'] }}</h3>
-            <div id="stdChart-{{ $chart['id'] }}" style="height:300px;"></div>
+        <div class="charts-of-standards">
+            @foreach ($chartsStandardBars as $chart)
+                <div class="chart-card standard-card">
+                    <h3 style="margin-bottom:10px;">{{ $chart['name'] }}</h3>
+                    <div id="stdChart-{{ $chart['id'] }}" style="height:300px;"></div>
 
-            <script type="application/json" id="stdData-{{ $chart['id'] }}">
+                    <script type="application/json" id="stdData-{{ $chart['id'] }}">
                 {!! json_encode([
                     'labels' => $chart['labels'],
                     'scores' => $chart['scores'],
                     'max'    => $chart['max'],
                 ], JSON_UNESCAPED_UNICODE) !!}
             </script>
+                </div>
+            @endforeach
         </div>
-    @endforeach
-</div>
 
     </div>
 
+    <div class="chart-card summary-card">
+        <h2 class="card-title">คะแนนรวมตามด้าน</h2>
+
+        <!-- ✅ Checkbox ปี -->
+        <div id="year-filters-dim" style="margin-bottom:10px;">
+            @foreach ($filters['years'] as $y)
+                <label style="margin-right:10px;">
+                    <input type="checkbox" class="year-checkbox-dim" value="{{ $y }}" checked>
+                    {{ $y }}
+                </label>
+            @endforeach
+        </div>
+
+        <div class="charts-of-dimensions">
+            @foreach ($chartDimensions as $chart)
+                <div class="chart-card dim-card">
+                    <h3 style="margin-bottom:10px;">{{ $chart['name'] }}</h3>
+                    <div id="dimChart-{{ $chart['id'] }}" style="height:300px;"></div>
+
+                    <script type="application/json" id="dimData-{{ $chart['id'] }}">
+                    {!! json_encode([
+                        'labels' => $chart['labels'],
+                        'scores' => $chart['scores'],
+                        'max'    => $chart['max'],
+                    ], JSON_UNESCAPED_UNICODE) !!}
+                </script>
+                </div>
+            @endforeach
+        </div>
+    </div>
 
 
     <!-- Toggle Switch -->
@@ -113,86 +146,103 @@
         </div>
     </div>
 
+    <div class="chart-card ">
 
-    {{-- กราฟ --}}
-    <div class="charts-grid">
-        @foreach ($standards as $standard)
-            <div class="stat-title" style="margin:12px 0 8px;">
-                <h3>กราฟผลลัพธ์ {{ $standard->name }}</h3>
+        <div class="search-box flex-1 max-w-[420px]">
+
+            <div class="icon">
+                <!-- search icon -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor" style="color:#9ca3af;">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
             </div>
+            <input type="text" id="custom-search" class="search-input" placeholder="ค้นหารายการตัวบ่งชี้">
+        </div>
 
-            @php $bucket = $chartsByStandard[$standard->id] ?? null; @endphp
+        <div class="charts-grid">
+            @foreach ($standards as $standard)
+                <div class="stat-title" style="margin:12px 0 8px;">
+                    <h3>กราฟผลลัพธ์ {{ $standard->name }}</h3>
+                </div>
 
-            @if ($bucket && !empty($bucket['indicators']))
-                <div class="charts-of-standard" data-standard-id="{{ $standard->id }}"
-                    style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,2fr));gap:20px;">
+                @php $bucket = $chartsByStandard[$standard->id] ?? null; @endphp
 
-                    @foreach ($bucket['indicators'] as $i => $c)
-                        <div class="chart-card enhanced-chart-card" id="card-{{ $c['indicator_id'] }}"
-                            data-standard="{{ $standard->id }}" data-dimension="{{ $c['category_name'] }}"
-                            data-type="{{ $c['indicator_type'] }}" data-code="{{ $c['indicator_code'] }}"
-                            data-years='@json($c['years'])' data-index="{{ $i }}"
-                            style="{{ $i >= 5 ? 'display:none;' : '' }};background:#fff;border-radius:16px;
+                @if ($bucket && !empty($bucket['indicators']))
+                    <div class="charts-of-standard" data-standard-id="{{ $standard->id }}"
+                        style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,2fr));gap:20px;">
+
+                        @foreach ($bucket['indicators'] as $i => $c)
+                            <div class="chart-card enhanced-chart-card" id="card-{{ $c['indicator_id'] }}"
+                                data-standard="{{ $standard->id }}" data-dimension="{{ $c['category_name'] }}"
+                                data-type="{{ $c['indicator_type'] }}" data-code="{{ $c['indicator_code'] }}"
+                                data-years='@json($c['years'])' data-index="{{ $i }}"
+                                style="{{ $i >= 5 ? 'display:none;' : '' }};background:#fff;border-radius:16px;
                                 padding:20px;box-shadow:0 4px 20px rgba(0,0,0,.08);position:relative;
                                 border: 1px solid rgba(0,0,0,0.05);">
 
-                            {{-- หัวข้อ --}}
-                            <div class="chart-header"
-                                style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-                                <div class="chart-title" style="font-weight:700;color:#1f2937;font-size:14px;">
-                                    {{ $c['indicator_code'] ? '[' . $c['indicator_code'] . '] ' : '' }}
-                                    {{ $c['indicator_name'] }}
-                                </div>
+                                {{-- หัวข้อ --}}
+                                <div class="chart-header"
+                                    style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                                    <div class="chart-title" style="font-weight:700;color:#1f2937;font-size:14px;">
+                                        {{ $c['indicator_code'] ? '[' . $c['indicator_code'] . '] ' : '' }}
+                                        {{ $c['indicator_name'] }}
+                                    </div>
 
-                                <button data-html2canvas-ignore="true" type="button" class="btn-download"
-                                    data-target="card-{{ $c['indicator_id'] }}"
-                                    style="background:#fff;border:1px solid #ddd;
+                                    <button data-html2canvas-ignore="true" type="button" class="btn-download"
+                                        data-target="card-{{ $c['indicator_id'] }}"
+                                        style="background:#fff;border:1px solid #ddd;
            padding:6px;border-radius:8px;cursor:pointer;
            line-height:1;display:flex;align-items:center;
            justify-content:center;transition:all .2s ease;">
-                                    <!-- SVG icon -->
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none"
-                                        viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                            d="M12 4v12m0 0l-4-4m4 4l4-4M4 20h16" />
-                                    </svg>
-                                </button>
+                                        <!-- SVG icon -->
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+                                            fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                d="M12 4v12m0 0l-4-4m4 4l4-4M4 20h16" />
+                                        </svg>
+                                    </button>
+
+                                </div>
+
+                                {{-- กราฟ --}}
+                                <div class="chart-wrapper" style="position:relative;height:220px;margin-bottom:10px;">
+                                    <div id="chart-{{ $standard->id }}-{{ $c['indicator_id'] }}" style="height:220px;">
+                                    </div>
+                                </div>
+                                <script id="data-{{ $standard->id }}-{{ $c['indicator_id'] }}" type="application/json">
+                                    {!! json_encode(
+                                        [
+                                            'years' => $c['years'],
+                                            'values' => $c['values'],
+                                            'max_values' => $c['max_values'],
+                                        ],
+                                        JSON_UNESCAPED_UNICODE,
+                                    ) !!}
+                                </script>
 
                             </div>
-
-                            {{-- กราฟ --}}
-                            <div class="chart-wrapper" style="position:relative;height:220px;margin-bottom:10px;">
-                                <div id="chart-{{ $standard->id }}-{{ $c['indicator_id'] }}" style="height:220px;"></div>
-                            </div>
-                            <script id="data-{{ $standard->id }}-{{ $c['indicator_id'] }}" type="application/json">
-                                {!! json_encode(
-                                    [
-                                        'years' => $c['years'],
-                                        'values' => $c['values'],
-                                        'max_values' => $c['max_values'],
-                                    ],
-                                    JSON_UNESCAPED_UNICODE,
-                                ) !!}
-                            </script>
-
-                        </div>
-                    @endforeach
-                </div>
-
-                @if (count($bucket['indicators']) > 10)
-                    <div class="divider-btn" data-standard-id="{{ $standard->id }}">
-                        <span class="divider-line"></span>
-                        <button type="button" class="btn-show-more" data-standard-id="{{ $standard->id }}">
-                            แสดงเพิ่มเติม ▼
-                        </button>
-                        <span class="divider-line"></span>
+                        @endforeach
                     </div>
+
+                    @if (count($bucket['indicators']) > 10)
+                        <div class="divider-btn" data-standard-id="{{ $standard->id }}">
+                            <span class="divider-line"></span>
+                            <button type="button" class="btn-show-more" data-standard-id="{{ $standard->id }}">
+                                แสดงเพิ่มเติม ▼
+                            </button>
+                            <span class="divider-line"></span>
+                        </div>
+                    @endif
+                @else
+                    <div style="color:#6b7280;margin-bottom:16px;">ไม่มีข้อมูลตัวชี้วัดที่มีการบันทึกผลลัพธ์</div>
                 @endif
-            @else
-                <div style="color:#6b7280;margin-bottom:16px;">ไม่มีข้อมูลตัวชี้วัดที่มีการบันทึกผลลัพธ์</div>
-            @endif
-        @endforeach
+            @endforeach
+        </div>
     </div>
+    {{-- กราฟ --}}
+
 
     <!-- Chart.js -->
     <!-- Chart.js -->
@@ -206,6 +256,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
     <!-- โหลด ApexCharts -->
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+
     <script>
         document.addEventListener("DOMContentLoaded", () => {
             const charts = {};
@@ -296,8 +347,96 @@
             });
         });
     </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const chartsDim = {};
+            const originalsDim = {};
 
+            document.querySelectorAll('[id^="dimData-"]').forEach(el => {
+                const id = el.id.replace('dimData-', '');
+                const payload = JSON.parse(el.textContent);
 
+                originalsDim[id] = payload;
+
+                const options = {
+                    chart: {
+                        type: 'bar',
+                        height: 300,
+                        toolbar: {
+                            show: false
+                        }
+                    },
+                    series: [{
+                            name: "คะแนนที่ได้",
+                            data: payload.scores
+                        },
+                        {
+                            name: "คะแนนเต็ม",
+                            data: payload.max
+                        }
+                    ],
+                    xaxis: {
+                        categories: payload.labels,
+                        title: {
+                            text: "ปีการประเมิน"
+                        }
+                    },
+                    yaxis: {
+                        title: {
+                            text: "คะแนน"
+                        }
+                    },
+                    dataLabels: {
+                        enabled: true,
+                        formatter: val => val.toLocaleString('th-TH')
+                    },
+                    colors: ['#10b981', '#9ca3af'], // เขียว + เทา
+                    legend: {
+                        position: 'top'
+                    }
+                };
+
+                const chart = new ApexCharts(document.querySelector(`#dimChart-${id}`), options);
+                chart.render();
+                chartsDim[id] = chart;
+            });
+
+            // === filter by year ===
+            function applyDimYearFilter() {
+                const years = Array.from(document.querySelectorAll('.year-checkbox-dim:checked'))
+                    .map(cb => String(cb.value));
+
+                Object.entries(chartsDim).forEach(([id, chart]) => {
+                    const orig = originalsDim[id];
+                    const idxs = orig.labels.map((y, i) => years.includes(String(y)) ? i : -1).filter(i =>
+                        i >= 0);
+
+                    const newLabels = idxs.map(i => orig.labels[i]);
+                    const newScores = idxs.map(i => orig.scores[i]);
+                    const newMax = idxs.map(i => orig.max[i]);
+
+                    chart.updateOptions({
+                        xaxis: {
+                            categories: newLabels
+                        },
+                        series: [{
+                                name: "คะแนนที่ได้",
+                                data: newScores
+                            },
+                            {
+                                name: "คะแนนเต็ม",
+                                data: newMax
+                            }
+                        ]
+                    }, true, true);
+                });
+            }
+
+            document.querySelectorAll('.year-checkbox-dim').forEach(cb => {
+                cb.addEventListener('change', applyDimYearFilter);
+            });
+        });
+    </script>
     <script>
         document.addEventListener("DOMContentLoaded", () => {
             const toggle = document.getElementById("toggle-filter");
@@ -461,6 +600,13 @@
         });
     </script>
     <script>
+        document.getElementById('custom-search').addEventListener('input', function() {
+            const q = this.value.toLowerCase();
+            document.querySelectorAll('.enhanced-chart-card').forEach(card => {
+                const title = card.querySelector('.chart-title')?.textContent.toLowerCase() || '';
+                card.style.display = title.includes(q) ? '' : 'none';
+            });
+        });
         (function() {
             const FILTERS = @json($filters, JSON_UNESCAPED_UNICODE);
             const $year = document.getElementById('filter-year');
@@ -750,6 +896,51 @@
             --gray-700: #374151;
             --gray-800: #1f2937;
             --gray-900: #111827;
+        }
+
+        .search-box {
+            /* margin-left: 60px; */
+            margin-top: 30px;
+            position: relative;
+            background: var(--white);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+        }
+
+        .search-box .icon {
+            position: absolute;
+            inset: 0 auto 0 12px;
+            display: flex;
+            align-items: center;
+            pointer-events: none;
+        }
+
+        .search-input {
+            padding: 8px 16px 8px 40px;
+            width: 100%;
+            outline: 0;
+            border: 1px solid var(--gray-300);
+            border-radius: var(--radius);
+        }
+
+        .search-input:focus {
+            border-color: var(--ring);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, .2);
+        }
+
+
+        .charts-of-dimensions {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            /* ✅ 3 คอลัมน์ */
+            gap: 20px;
+        }
+
+        .dim-card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 16px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, .06);
         }
 
         .charts-of-standards {

@@ -557,60 +557,114 @@ class DashboardController extends Controller
             'filters'          => $filters,
             'yearlyTotals'     => $yearlyTotals,
             'chartsStandardBars' => $this->buildChartStandardsPerStandard($standards),
+            'chartDimensions'  => $this->buildChartDimensionsPerYear(),
         ]);
     }
-private function buildChartStandardsPerStandard($standards)
-{
-    $allYears = Indicator::whereNotNull('year')
-        ->distinct()
-        ->orderBy('year')
-        ->pluck('year')
-        ->map(fn($y) => (int) $y)
-        ->toArray();
+    private function buildChartStandardsPerStandard($standards)
+    {
+        $allYears = Indicator::whereNotNull('year')
+            ->distinct()
+            ->orderBy('year')
+            ->pluck('year')
+            ->map(fn($y) => (int) $y)
+            ->toArray();
 
-    $rows = Indicator::query()
-        ->join('categories', 'categories.id', '=', 'indicators.categorie_id')
-        ->join('standards', 'standards.id', '=', 'categories.standard_id')
-        ->whereHas('assignments')
-        ->whereNotNull('indicators.year')
-        ->selectRaw('
+        $rows = Indicator::query()
+            ->join('categories', 'categories.id', '=', 'indicators.categorie_id')
+            ->join('standards', 'standards.id', '=', 'categories.standard_id')
+            ->whereHas('assignments')
+            ->whereNotNull('indicators.year')
+            ->selectRaw('
             CAST(indicators.year AS INTEGER) as year,
             standards.id as sid,
             SUM(indicators.score_acc) as total_score,
             SUM(indicators.max_score) as max_score
         ')
-        ->groupByRaw('CAST(indicators.year AS INTEGER), standards.id')
-        ->orderByRaw('CAST(indicators.year AS INTEGER)')
-        ->get();
+            ->groupByRaw('CAST(indicators.year AS INTEGER), standards.id')
+            ->orderByRaw('CAST(indicators.year AS INTEGER)')
+            ->get();
 
-    // เตรียม matrix
-    $series = [];
-    foreach ($standards as $std) {
-        foreach ($allYears as $y) {
-            $series[$std->id][$y] = ['score' => 0.0, 'max' => 0.0];
+        // เตรียม matrix
+        $series = [];
+        foreach ($standards as $std) {
+            foreach ($allYears as $y) {
+                $series[$std->id][$y] = ['score' => 0.0, 'max' => 0.0];
+            }
         }
+        foreach ($rows as $r) {
+            $series[$r->sid][$r->year] = [
+                'score' => (float) $r->total_score,
+                'max'   => (float) $r->max_score,
+            ];
+        }
+
+        // ส่งออก
+        $charts = [];
+        foreach ($standards as $i => $std) {
+            $charts[] = [
+                'id' => $std->id,
+                'name' => $std->name,
+                'labels' => $allYears,
+                'scores' => array_column($series[$std->id], 'score'),
+                'max'    => array_column($series[$std->id], 'max'),
+            ];
+        }
+
+        return $charts;
     }
-    foreach ($rows as $r) {
-        $series[$r->sid][$r->year] = [
-            'score' => (float) $r->total_score,
-            'max'   => (float) $r->max_score,
-        ];
+    private function buildChartDimensionsPerYear()
+    {
+        // ปีทั้งหมด
+        $allYears = Indicator::whereNotNull('year')
+            ->distinct()
+            ->orderBy('year')
+            ->pluck('year')
+            ->map(fn($y) => (int) $y)
+            ->toArray();
+
+        // ✅ ดึงรวมตาม "ด้าน" (categories.name) แทน category ย่อย
+        $rows = Indicator::query()
+            ->join('categories', 'categories.id', '=', 'indicators.categorie_id')
+            ->whereHas('assignments')
+            ->whereNotNull('indicators.year')
+            ->selectRaw('
+            CAST(indicators.year AS INTEGER) as year,
+            categories.name as dim_name,
+            SUM(indicators.score_acc) as total_score,
+            SUM(indicators.max_score) as max_score
+        ')
+            ->groupByRaw('CAST(indicators.year AS INTEGER), categories.name')
+            ->orderByRaw('CAST(indicators.year AS INTEGER)')
+            ->get();
+
+        // เตรียม matrix [ด้าน][ปี]
+        $series = [];
+        $dimNames = [];
+
+        foreach ($rows as $r) {
+            $dim = trim($r->dim_name);
+            $dimNames[$dim] = $dim;
+            foreach ($allYears as $y) {
+                $series[$dim][$y] ??= ['score' => 0.0, 'max' => 0.0];
+            }
+            $series[$dim][$r->year] = [
+                'score' => (float) $r->total_score,
+                'max'   => (float) $r->max_score,
+            ];
+        }
+
+        // สร้าง chart object
+        $charts = [];
+        foreach ($series as $dim => $data) {
+            $charts[] = [
+                'id'     => md5($dim),
+                'name'   => $dim,
+                'labels' => $allYears,
+                'scores' => array_column($data, 'score'),
+                'max'    => array_column($data, 'max'),
+            ];
+        }
+
+        return $charts;
     }
-
-    // ส่งออก
-    $charts = [];
-    foreach ($standards as $i => $std) {
-        $charts[] = [
-            'id' => $std->id,
-            'name' => $std->name,
-            'labels' => $allYears,
-            'scores' => array_column($series[$std->id], 'score'),
-            'max'    => array_column($series[$std->id], 'max'),
-        ];
-    }
-
-    return $charts;
-}
-
-
 }
