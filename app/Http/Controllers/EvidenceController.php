@@ -16,17 +16,104 @@ use Illuminate\Support\Facades\Log;
 
 class EvidenceController extends Controller
 {
+    public function index(Request $request)
+    {
+        // preload ความสัมพันธ์ครบ
+        $query = Evidence::with([
+            'criteria.indicator.category.standard',
+            'criteria.indicator.assignments.collectorUser.department',
+            'user'
+        ]);
+
+        // 🟢 ถ้า role = user → แสดงเฉพาะของตัวเอง
+        if (auth()->user()->hasRole('user')) {
+            $query->where('user_id', auth()->id());
+        }
+
+        // filter ต่างๆ (optionally)
+        if ($request->filled('criteria_id')) {
+            $query->where('criteria_id', (int) $request->input('criteria_id'));
+        }
+
+        if ($request->filled('user_id')) {
+            $query->where('user_id', (int) $request->input('user_id'));
+        }
+
+        if ($request->has('status') && $request->input('status') !== '') {
+            $query->where('status', (int) $request->input('status'));
+        }
+
+        if ($request->filled('type')) {
+            $query->where('type', $request->input('type'));
+        }
+
+        if ($request->filled('indicator_id')) {
+            $query->whereHas('criteria.indicator', function ($q) use ($request) {
+                $q->where('id', (int) $request->input('indicator_id'));
+            });
+        }
+
+        // ✅ Dropdown data
+        $years = Indicator::whereNotNull('year')->distinct()->orderByDesc('year')->pluck('year');
+        $standards = \App\Models\Standard::select('name')->distinct()->orderBy('name')->pluck('name');
+        $dimensions = \App\Models\Category::select('name')->distinct()->orderBy('name')->pluck('name');
+        $departments = \App\Models\Department::select('name')->distinct()->orderBy('name')->pluck('name');
+        $collectors = \App\Models\User::whereHas('assignments')
+            ->select('name')->distinct()->orderBy('name')->pluck('name');
+        $fileTypes = Evidence::whereNotNull('type')->distinct()->orderBy('type')->pluck('type');
+        $statusMap = [
+            0 => 'รอดำเนินการ',
+            1 => 'รอดำเนินการ / บันทึกร่าง',
+            2 => 'รอดำเนินการ / บันทึกจริง',
+            3 => 'ครบถ้วนตามเกณฑ์',
+            4 => 'ยังไม่ครบถ้วนตามเกณฑ์',
+        ];
+        $statusList = Indicator::pluck('status')->unique()->map(fn($s) => $statusMap[$s] ?? 'ไม่ทราบ');
+        // Pagination
+        $perPage = (int) $request->input('per_page', 1000);
+        $evidences = $query->paginate($perPage)->withQueryString();
+
+        // คำนวณขนาดไฟล์รวม
+        $evidences->getCollection()->transform(function ($evidence) {
+            $totalSize = 0;
+            if (!empty($evidence->path['files'])) {
+                foreach ($evidence->path['files'] as $f) {
+                    $totalSize += $f['size'] ?? 0;
+                }
+            }
+            $evidence->total_size = $totalSize;
+            $evidence->total_size_human = $this->formatFileSize($totalSize);
+            return $evidence;
+        });
+
+        return view('evidences.app', compact(
+            'evidences',
+            'years',
+            'standards',
+            'dimensions',
+            'departments',
+            'collectors',
+            'fileTypes',
+            'statusList',
+        ));
+    }
+
     // public function index(Request $request)
     // {
     //     // เริ่มต้น query + preload ความสัมพันธ์
     //     $query = Evidence::with(['criteria.indicator', 'user']);
+
+    //     // 🟢 ถ้า role = user → แสดงเฉพาะของตัวเอง
+    //     if (auth()->user()->hasRole('user')) {
+    //         $query->where('user_id', auth()->id());
+    //     }
 
     //     // กรอง criteria_id
     //     if ($request->filled('criteria_id')) {
     //         $query->where('criteria_id', (int) $request->input('criteria_id'));
     //     }
 
-    //     // กรอง user_id
+    //     // กรอง user_id (แต่ user ปกติไม่ควรเลือก user_id อื่นได้อยู่แล้ว)
     //     if ($request->filled('user_id')) {
     //         $query->where('user_id', (int) $request->input('user_id'));
     //     }
@@ -59,14 +146,17 @@ class EvidenceController extends Controller
     //         ->orderBy('type')
     //         ->pluck('type');
 
-    //     // 🔹 รายการผู้ใช้
-    //     $fileUsers = (clone $query)
-    //         ->join('users', 'evidence.user_id', '=', 'users.id')
-    //         ->select('users.name')
-    //         ->whereNotNull('users.name')
-    //         ->distinct()
-    //         ->orderBy('users.name')
-    //         ->pluck('users.name');
+    //     // 🔹 รายการผู้ใช้ (เฉพาะ role อื่น ๆ เท่านั้นถึงจะเห็น user list)
+    //     $fileUsers = collect();
+    //     if (!auth()->user()->hasRole('user')) {
+    //         $fileUsers = (clone $query)
+    //             ->join('users', 'evidence.user_id', '=', 'users.id')
+    //             ->select('users.name')
+    //             ->whereNotNull('users.name')
+    //             ->distinct()
+    //             ->orderBy('users.name')
+    //             ->pluck('users.name');
+    //     }
 
     //     // 🔹 รายการตัวชี้วัด
     //     $indicators = Indicator::select('code', 'name')
@@ -74,7 +164,6 @@ class EvidenceController extends Controller
     //         ->orderByRaw("split_part(code, '-', 1)")            // prefix ก่อน '-'
     //         ->orderByRaw("(split_part(code, '-', 2))::int")     // ตัวเลขหลัง '-'
     //         ->get();
-
 
     //     // Pagination
     //     $perPage   = (int) $request->input('per_page', 5000);
@@ -95,93 +184,6 @@ class EvidenceController extends Controller
 
     //     return view('evidences.app', compact('evidences', 'fileTypes', 'fileUsers', 'indicators'));
     // }
-
-    public function index(Request $request)
-    {
-        // เริ่มต้น query + preload ความสัมพันธ์
-        $query = Evidence::with(['criteria.indicator', 'user']);
-
-        // 🟢 ถ้า role = user → แสดงเฉพาะของตัวเอง
-        if (auth()->user()->hasRole('user')) {
-            $query->where('user_id', auth()->id());
-        }
-
-        // กรอง criteria_id
-        if ($request->filled('criteria_id')) {
-            $query->where('criteria_id', (int) $request->input('criteria_id'));
-        }
-
-        // กรอง user_id (แต่ user ปกติไม่ควรเลือก user_id อื่นได้อยู่แล้ว)
-        if ($request->filled('user_id')) {
-            $query->where('user_id', (int) $request->input('user_id'));
-        }
-
-        // กรอง status
-        if ($request->has('status') && $request->input('status') !== '') {
-            $status = $request->input('status');
-            if (in_array($status, ['0', '1', 0, 1, true, false], true)) {
-                $query->where('status', (int) $status);
-            }
-        }
-
-        // กรอง type
-        if ($request->filled('type')) {
-            $query->where('type', $request->input('type'));
-        }
-
-        // ✅ กรอง indicator
-        if ($request->filled('indicator_id')) {
-            $query->whereHas('criteria.indicator', function ($q) use ($request) {
-                $q->where('id', (int) $request->input('indicator_id'));
-            });
-        }
-
-        // 🔹 รายการประเภทไฟล์
-        $fileTypes = (clone $query)
-            ->select('type')
-            ->whereNotNull('type')
-            ->distinct()
-            ->orderBy('type')
-            ->pluck('type');
-
-        // 🔹 รายการผู้ใช้ (เฉพาะ role อื่น ๆ เท่านั้นถึงจะเห็น user list)
-        $fileUsers = collect();
-        if (!auth()->user()->hasRole('user')) {
-            $fileUsers = (clone $query)
-                ->join('users', 'evidence.user_id', '=', 'users.id')
-                ->select('users.name')
-                ->whereNotNull('users.name')
-                ->distinct()
-                ->orderBy('users.name')
-                ->pluck('users.name');
-        }
-
-        // 🔹 รายการตัวชี้วัด
-        $indicators = Indicator::select('code', 'name')
-            ->groupBy('code', 'name')
-            ->orderByRaw("split_part(code, '-', 1)")            // prefix ก่อน '-'
-            ->orderByRaw("(split_part(code, '-', 2))::int")     // ตัวเลขหลัง '-'
-            ->get();
-
-        // Pagination
-        $perPage   = (int) $request->input('per_page', 5000);
-        $evidences = $query->paginate($perPage)->withQueryString();
-
-        // คำนวณ total_size
-        $evidences->getCollection()->transform(function ($evidence) {
-            $totalSize = 0;
-            if (!empty($evidence->path['files'])) {
-                foreach ($evidence->path['files'] as $f) {
-                    $totalSize += $f['size'] ?? 0;
-                }
-            }
-            $evidence->total_size = $totalSize;
-            $evidence->total_size_human = $this->formatFileSize($totalSize);
-            return $evidence;
-        });
-
-        return view('evidences.app', compact('evidences', 'fileTypes', 'fileUsers', 'indicators'));
-    }
 
 
     /**

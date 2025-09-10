@@ -230,6 +230,12 @@
                                 <i class="fa-solid fa-users"></i> จัดการผู้ใช้งาน
                             </a>
                         @endcan
+                        @can('view-evidence')
+                            <a href="{{ route('evidences.index') }}">
+                                <i class="fa-solid fa-folder-open"></i> จัดการหลักฐาน
+                            </a>
+                        @endcan
+
                     </div>
                 </div>
             @endhasanyrole

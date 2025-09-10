@@ -90,6 +90,85 @@
 
                         <div class="dropdown-divider"></div>
 
+
+                        {{-- Section: มาตรฐาน --}}
+                        <h3 class="dropdown-title">มาตรฐาน</h3>
+                        <div class="dropdown-multiselect" id="standardDropdown">
+                            <div class="dropdown-btn" onclick="toggleDropdown('standardDropdown')">
+                                <span id="standard-label">เลือกมาตรฐาน</span>
+                                <i style="font-size:12px;">▼</i>
+                            </div>
+                            <div class="dropdown-content">
+                                @foreach ($indicators->pluck('category.standard.name')->unique() as $std)
+                                    <label>
+                                        <input type="checkbox" class="filter-option standard-option" data-column="1"
+                                            data-value="{{ $std }}">
+                                        <span style="margin-left:6px;">{{ $std }}</span>
+                                    </label>
+                                @endforeach
+                            </div>
+                        </div>
+
+                        <div class="dropdown-divider"></div>
+
+                        {{-- Section: ด้าน --}}
+                        <h3 class="dropdown-title">ด้าน</h3>
+                        <div class="dropdown-multiselect" id="dimensionDropdown">
+                            <div class="dropdown-btn" onclick="toggleDropdown('dimensionDropdown')">
+                                <span id="dimension-label">เลือกด้าน</span>
+                                <i style="font-size:12px;">▼</i>
+                            </div>
+                            <div class="dropdown-content">
+                                @foreach ($indicators->pluck('category.name')->unique() as $dim)
+                                    <label>
+                                        <input type="checkbox" class="filter-option dimension-option" data-column="2"
+                                            data-value="{{ $dim }}">
+                                        <span style="margin-left:6px;">{{ $dim }}</span>
+                                    </label>
+                                @endforeach
+                            </div>
+                        </div>
+
+                        <div class="dropdown-divider"></div>
+
+                        {{-- Section: ผู้รับผิดชอบ --}}
+                        <h3 class="dropdown-title">ผู้รับผิดชอบ</h3>
+                        <div class="dropdown-multiselect" id="collectorDropdown">
+                            <div class="dropdown-btn" onclick="toggleDropdown('collectorDropdown')">
+                                <span id="collector-label">เลือกผู้รับผิดชอบ</span>
+                                <i style="font-size:12px;">▼</i>
+                            </div>
+                            <div class="dropdown-content">
+                                @foreach ($indicators->map(fn($i) => $i->assignments->first()->collectorUser->name ?? '-')->unique() as $collector)
+                                    <label>
+                                        <input type="checkbox" class="filter-option collector-option" data-column="??"
+                                            data-value="{{ $collector }}">
+                                        <span style="margin-left:6px;">{{ $collector }}</span>
+                                    </label>
+                                @endforeach
+                            </div>
+                        </div>
+
+                        <div class="dropdown-divider"></div>
+
+                        {{-- Section: หน่วยงานที่รับผิดชอบ --}}
+                        <h3 class="dropdown-title">หน่วยงานที่รับผิดชอบ</h3>
+                        <div class="dropdown-multiselect" id="deptDropdown">
+                            <div class="dropdown-btn" onclick="toggleDropdown('deptDropdown')">
+                                <span id="dept-label">เลือกหน่วยงาน</span>
+                                <i style="font-size:12px;">▼</i>
+                            </div>
+                            <div class="dropdown-content">
+                                @foreach ($indicators->map(fn($i) => $i->assignments->first()?->collectorUser?->department->name ?? '-')->unique() as $dept)
+                                    <label>
+                                        <input type="checkbox" class="filter-option dept-option" data-column="6"
+                                            data-value="{{ $dept }}">
+                                        <span style="margin-left:6px;">{{ $dept }}</span>
+                                    </label>
+                                @endforeach
+                            </div>
+                        </div>
+                        <div class="dropdown-divider"></div>
                         {{-- Section: ประเภทองค์กร --}}
                         <h3 class="dropdown-title">ประเภทตัวชี้วัด</h3>
                         <div class="dropdown-multiselect" id="typeDropdown">
@@ -121,11 +200,11 @@
                             </div>
                             @php
                                 $statusMap = [
-                                    0 => 'ดำเนินการ',
-                                    1 => 'ดำเนินการ',
-                                    2 => 'ดำเนินการ',
-                                    3 => 'ครบ',
-                                    4 => 'ไม่ครบ',
+                                    0 => 'รอดำเนินการ',
+                                    1 => 'รอดำเนินการ / บันทึกร่าง',
+                                    2 => 'รอดำเนินการ / บันทึกจริง',
+                                    3 => 'ผลการดำเนินงานครบถ้วนตามเกณฑ์มาตรการ',
+                                    4 => 'ผลการดำเนินงานยังไม่ครบถ้วนตามเกณฑ์',
                                 ];
 
                                 $statusList = $indicators
@@ -137,7 +216,7 @@
                             <div class="dropdown-content">
                                 @foreach ($statusList as $statusText)
                                     <label>
-                                        <input type="checkbox" class="filter-option status-option" data-column="7"
+                                        <input type="checkbox" class="filter-option status-option" data-column="9"
                                             data-value="{{ $statusText }}">
                                         <span style="margin-left:6px;">{{ $statusText }}</span>
                                     </label>
@@ -169,6 +248,8 @@
                     <thead>
                         <tr>
                             <th>ปี</th>
+                            <th>มาตรฐานตัวชี้วัด</th>
+                            <th>ด้านตัวชี้วัด</th>
                             <th>ชื่อตัวบ่งชี้</th>
                             <th>รหัส</th>
                             <th>ประเภทตัวชี้วัด</th>
@@ -199,116 +280,79 @@
                                 data-dept="{{ $deptName }}" data-status="{{ $indicator->status_key }}">
 
                                 <td class="status-cell">{{ $indicator->year }}</td>
+                                <td class="status-cell">{{ $standardName ?: '-' }}</td>
+                                <td class="status-cell">{{ $dimensionName ?: '-' }}</td>
                                 <td>{{ $indicator->name }}</td>
                                 <td class="status-cell">{{ $indicator->code }}</td>
                                 <td class="status-cell">{{ $indicator->type }}</td>
                                 <td class="status-cell">{{ $deptName ?: '-' }}</td>
                                 <td class="status-cell">{{ $indicator->score_acc }}</td>
                                 <td class="status-cell">{{ $indicator->max_score }}</td>
-                                {{-- <td class="status-cell">
 
-                                    @switch($indicator->status)
-                                        @case(0)
-                                            <span class="tooltip" data-tooltip="รอดำเนินการ">
-                                                <i data-lucide="clock" class="status-icon text-warn"></i>
-                                            </span>
-                                        @break
-
-                                        @case(1)
-                                            <span class="tooltip" data-tooltip="รอดำเนินการ / บันทึกร่าง">
-                                                <i data-lucide="clock" class="status-icon text-warn"></i>
-                                            </span>
-                                        @break
-
-                                        @case(2)
-                                            <span class="tooltip" data-tooltip="รอดำเนินการ / บันทึกจริง">
-                                                <i data-lucide="clock" class="status-icon text-warn"></i>
-                                            </span>
-                                        @break
-
-                                        @case(3)
-                                            <span class="tooltip" data-tooltip="ผลการดำเนินงานครบถ้วนตามเกณฑ์มาตรการ">
-                                                <i data-lucide="check-circle" class="status-icon text-success"></i>
-                                            </span>
-                                        @break
-
-                                        @case(4)
-                                            <span class="tooltip" data-tooltip="ผลการดำเนินงานยังไม่ครบถ้วนตามเกณฑ์">
-                                                <i data-lucide="alert-triangle" class="status-icon text-danger"></i>
-                                            </span>
-                                        @break
-
-                                        @default
-                                            <span class="tooltip" data-tooltip="สถานะไม่ระบุ">
-                                                <i data-lucide="help-circle" class="status-icon text-gray-500"></i>
-                                            </span>
-                                    @endswitch
-
-
-                                </td> --}}
-                                <td class="status-cell"
-                                    data-search="@if (in_array($indicator->status, [0, 1, 2])) ดำเนินการ
-                 @elseif($indicator->status == 3)
-                    ครบ
-                 @elseif($indicator->status == 4)
-                    ไม่ครบ
-                 @else
-                    ไม่ทราบ @endif">
-
+                                <td class="status-cell">
                                     @switch($indicator->status)
                                         @case(0)
                                             <span class="tooltip" data-tooltip="รอดำเนินการ">
                                                 <i data-lucide="clock" class="w-5 h-5 text-yellow-500"></i>
+                                                <span class="sr-only">รอดำเนินการ</span>
                                             </span>
                                         @break
 
                                         @case(1)
                                             <span class="tooltip" data-tooltip="รอดำเนินการ / บันทึกร่าง">
                                                 <i data-lucide="clock" class="w-5 h-5 text-yellow-500"></i>
+                                                <span class="sr-only">รอดำเนินการ / บันทึกร่าง</span>
                                             </span>
                                         @break
 
                                         @case(2)
                                             <span class="tooltip" data-tooltip="รอดำเนินการ / บันทึกจริง">
                                                 <i data-lucide="clock" class="w-5 h-5 text-yellow-500"></i>
+                                                <span class="sr-only">รอดำเนินการ / บันทึกจริง</span>
                                             </span>
                                         @break
 
                                         @case(3)
                                             <span class="tooltip" data-tooltip="ผลการดำเนินงานครบถ้วนตามเกณฑ์มาตรการ">
                                                 <i data-lucide="check-circle" class="w-5 h-5 text-green-500"></i>
+                                                <span class="sr-only">ผลการดำเนินงานครบถ้วนตามเกณฑ์มาตรการ</span>
                                             </span>
                                         @break
 
                                         @case(4)
                                             <span class="tooltip" data-tooltip="ผลการดำเนินงานยังไม่ครบถ้วนตามเกณฑ์">
                                                 <i data-lucide="alert-triangle" class="w-5 h-5 text-red-500"></i>
+                                                <span class="sr-only">ผลการดำเนินงานยังไม่ครบถ้วนตามเกณฑ์</span>
                                             </span>
                                         @break
 
                                         @default
                                             <span class="tooltip" data-tooltip="สถานะไม่ระบุ">
                                                 <i data-lucide="help-circle" class="w-5 h-5 text-gray-400"></i>
+                                                <span class="sr-only">สถานะไม่ระบุ</span>
                                             </span>
                                     @endswitch
-
                                 </td>
+
                                 <td class="status-cell">
                                     @switch($indicator->doc_status)
                                         @case('ไม่ครบ')
-                                            <span class="px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-700">
+                                            <span
+                                                class=" status-badge px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-700">
                                                 ไม่ครบ
                                             </span>
                                         @break
 
                                         @case('ครบ')
-                                            <span class="px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-700">
+                                            <span
+                                                class="status-badge px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-700">
                                                 ครบ
                                             </span>
                                         @break
 
                                         @default
-                                            <span class="px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-700">
+                                            <span
+                                                class="status-badge px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-700">
                                                 รอดำเนินการ
                                             </span>
                                     @endswitch
@@ -403,6 +447,17 @@
                 padding-right: 8px;
             }
         }
+
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            /* อย่างน้อย 250px ถ้ามีที่ว่างจะแบ่ง 1fr */
+            gap: 16px 24px;
+            max-height: 70vh;
+            overflow-y: auto;
+            padding: 16px;
+            box-sizing: border-box;
+        }
     </style>
 @endpush
 
@@ -419,6 +474,7 @@
                 table = $('#evidenceTable').DataTable({
                     searching: true,
                     lengthChange: false,
+
                     dom: 'rtip',
                     order: [], // ไม่มี default sort
                     stateSave: false, // ปิดจำสถานะ (กัน order เด้งกลับ)
@@ -581,6 +637,11 @@
             }
 
             setupDropdownLabel('yearDropdown', 'year-label', 'เลือกปี');
+            setupDropdownLabel('standardDropdown', 'standard-label', 'เลือกมาตรฐาน');
+            setupDropdownLabel('dimensionDropdown', 'dimension-label', 'เลือกด้าน');
+            setupDropdownLabel('collectorDropdown', 'collector-label', 'เลือกผู้รับผิดชอบ');
+            setupDropdownLabel('deptDropdown', 'dept-label', 'เลือกหน่วยงาน');
+
             setupDropdownLabel('typeDropdown', 'type-label', 'เลือกประเภท');
             setupDropdownLabel('statusDropdown', 'status-label', 'เลือกสถานะ');
 
@@ -631,6 +692,23 @@
             --pad-4: 16px;
         }
 
+        #filter-dropdown {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px 24px;
+            max-height: 70vh;
+            overflow-y: auto;
+            padding: 16px;
+            box-sizing: border-box;
+        }
+
+        #filter-dropdown .dropdown-title {
+            grid-column: span 2;
+            /* ✅ ให้หัวข้อใหญ่กินเต็มแถว */
+            margin-top: 8px;
+        }
+
+
         .tooltip {
             position: relative;
             display: inline-block;
@@ -644,7 +722,7 @@
             /* tooltip อยู่ด้านบน */
             /* left: 50%; */
             /* transform: translateX(-50%);
-                            background: #333; */
+                                                                            background: #333; */
             color: #fff;
             font-size: 12px;
             /* padding: 5px 8px; */
@@ -725,7 +803,7 @@
             border: 0;
             background: var(--white);
             color: var(--gray-700);
-           border: 1px solid var(--gray-300); 
+            border: 1px solid var(--gray-300);
             transition: .15s background-color ease;
         }
 
@@ -750,20 +828,7 @@
             text-align: left;
         }
 
-        /* .dropdown-menus {
-                                                        position: absolute;
-                                                        left: 0;
-                                                        top: 100%;
-                                                        margin-top: 8px;
-                                                        width: 192px;
-                                                        background: var(--white);
-                                                        border-radius: 6px;
-                                                        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, .1), 0 4px 6px -2px rgba(0, 0, 0, .05);
-                                                        border: 1px solid rgba(0, 0, 0, .05);
-                                                        z-index: 9999;
-                                                        padding: 4px 0;
-                                                        display: block;
-                                                    } */
+
         .dropdown-menus {
             position: absolute;
             left: 0;
@@ -816,6 +881,13 @@
             margin-bottom: 8px;
         }
 
+        .dropdown-multiselect .dropdown-btn span,
+        .dropdown-multiselect .dropdown-content span {
+            white-space: normal;
+            /* ✅ ข้อความยาวจะตัดบรรทัด */
+            word-break: break-word;
+        }
+
         .filter-option {
             accent-color: var(--blue-600);
         }
@@ -838,8 +910,8 @@
             border: 2px solid #C2D9EB;
             margin-top: 40px;
             margin-bottom: 40px;
-            margin-left: 60px;
-            margin-right: 60px;
+            margin-left: 40px;
+            margin-right: 40px;
         }
 
         .table {
@@ -868,10 +940,17 @@
         .status-badge {
             display: inline-flex;
             align-items: center;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 12px;
+            justify-content: center;
+            min-width: 64px;
+            /* กำหนดความกว้างขั้นต่ำ ให้ badge กว้างเท่ากัน */
+            padding: 4px 10px;
+            border-radius: 9999px;
+            /* pill shape */
+            font-size: 13px;
             font-weight: 500;
+            line-height: 1.4;
+            text-align: center;
+            white-space: nowrap;
         }
 
         .status-completed {
@@ -914,7 +993,8 @@
         .btn-edit:hover {
             background: #eff6ff;
         }
-        .btn-view  {
+
+        .btn-view {
             text-decoration: none;
             display: inline-flex;
             align-items: center;
@@ -979,7 +1059,10 @@
         .dropdown-multiselect {
             position: relative;
             display: inline-block;
-            width: 200px;
+            width: 100%;
+            /* ✅ ให้กว้างเต็ม cell ของ grid */
+            min-width: 200px;
+            /* ✅ แต่ไม่ต่ำกว่า 200px */
         }
 
         .dropdown-multiselect .dropdown-btn {
@@ -1013,5 +1096,25 @@
 
         .dropdown-multiselect.open .dropdown-content {
             display: block;
+        }
+
+        .dropdown-content label {
+            display: flex;
+            /* ✅ จัด checkbox + text เป็น flex */
+            align-items: center;
+            /* ✅ ให้ text อยู่กึ่งกลาง checkbox */
+            gap: 6px;
+            /* ✅ ระยะห่างระหว่างกล่องกับข้อความ */
+            margin-bottom: 6px;
+            /* ✅ ระยะห่างระหว่างแถว */
+            font-size: 14px;
+            color: #374151;
+            /* เทาเข้ม */
+            cursor: pointer;
+        }
+
+        .dropdown-content input[type="checkbox"] {
+            flex-shrink: 0;
+            /* ✅ กัน checkbox หด */
         }
     </style>

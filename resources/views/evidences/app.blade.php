@@ -5,26 +5,25 @@
 @section('content')
 
     <div class="evidence-container">
-      
+
 
         <!-- Controls -->
         <div class="controls">
             <!-- Search -->
             <div class="search-box" style="width:100%; max-width:420px;">
                 <div class="icon">
-                    <!-- search icon -->
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor" style="color:#9ca3af;">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
                 </div>
-                <input type="text" id="custom-search" class="search-input" placeholder="ค้นหาเอกสารและหลักฐาน">
+                <input type="text" id="custom-search" class="search-input" placeholder="ค้นหาไฟล์ / ตัวชี้วัด">
             </div>
 
             <!-- Sort -->
             <div class="dropdown" id="sort-dropdown-container">
-                <button id="sort-button" class="btn">
+                <button id="sort-button" class="btns">
                     <span>เรียงลำดับ</span>
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor">
@@ -32,29 +31,22 @@
                             d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
                     </svg>
                 </button>
-                <div id="sort-dropdown" class="dropdown-menu hidden" role="menu" aria-orientation="vertical">
-                    <button class="dropdown-item sort-option" data-column="0" data-order="asc" role="menuitem">ลำดับ
-                        (น้อยไปมาก)</button>
-                    <button class="dropdown-item sort-option" data-column="0" data-order="desc" role="menuitem">ลำดับ
-                        (มากไปน้อย)</button>
-                    <button class="dropdown-item sort-option" data-column="1" data-order="asc" role="menuitem">ชื่อไฟล์
-                        (A-Z)</button>
-                    <button class="dropdown-item sort-option" data-column="1" data-order="desc" role="menuitem">ชื่อไฟล์
-                        (Z-A)</button>
-                    <button class="dropdown-item sort-option" data-column="4" data-order="desc"
-                        role="menuitem">วันที่อัปโหลด
-                        (ใหม่ล่าสุด)</button>
-                    <button class="dropdown-item sort-option" data-column="4" data-order="asc" role="menuitem">วันที่อัปโหลด
-                        (เก่าล่าสุด)</button>
+                <div id="sort-dropdown" class="dropdown-menus hidden" role="menu">
+                    <button class="dropdown-item sort-option" data-column="8" data-order="asc">ปี (น้อย→มาก)</button>
+                    <button class="dropdown-item sort-option" data-column="8" data-order="desc">ปี (มาก→น้อย)</button>
+                    <button class="dropdown-item sort-option" data-column="1" data-order="asc">ชื่อไฟล์ (A-Z)</button>
+                    <button class="dropdown-item sort-option" data-column="1" data-order="desc">ชื่อไฟล์ (Z-A)</button>
+                    <button class="dropdown-item sort-option" data-column="3" data-order="asc">ประเภทไฟล์ (A-Z)</button>
+                    <button class="dropdown-item sort-option" data-column="3" data-order="desc">ประเภทไฟล์ (Z-A)</button>
                     <div class="dropdown-divider"></div>
                     <button id="clear-sort" type="button" class="dropdown-item"
-                        style="color:#4b5563;">ล้างตัวเรียงลำดับ</button>
+                        style="color:#4b5563;">ล้างการเรียงลำดับ</button>
                 </div>
             </div>
 
             <!-- Filter -->
             <div class="dropdown" id="filter-dropdown-container">
-                <button id="filter-button" class="btn">
+                <button id="filter-button" class="btns">
                     <span>กรองข้อมูล</span>
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor">
@@ -63,10 +55,110 @@
                     </svg>
                 </button>
 
-                <div id="filter-dropdown" class="dropdown-menu hidden">
+                <div id="filter-dropdown" class="dropdown-menus hidden">
                     <div style="padding:12px 12px;">
 
-                        {{-- Section: ประเภทไฟล์ --}}
+                        {{-- ปี --}}
+                        <h3 class="dropdown-title">ปี</h3>
+                        <div class="dropdown-multiselect" id="yearDropdown">
+                            <div class="dropdown-btn" onclick="toggleDropdown('yearDropdown')">
+                                <span id="year-label">เลือกปี</span>
+                                <i style="font-size:12px;">▼</i>
+                            </div>
+                            <div class="dropdown-content">
+                                @foreach ($years as $year)
+                                    <label>
+                                        <input type="checkbox" class="filter-option" data-column="8"
+                                            data-value="{{ $year }}">
+                                        <span style="margin-left:6px;">{{ $year }}</span>
+                                    </label>
+                                @endforeach
+                            </div>
+                        </div>
+
+                        <div class="dropdown-divider"></div>
+
+                        {{-- มาตรฐาน --}}
+                        <h3 class="dropdown-title">มาตรฐาน</h3>
+                        <div class="dropdown-multiselect" id="standardDropdown">
+                            <div class="dropdown-btn" onclick="toggleDropdown('standardDropdown')">
+                                <span id="standard-label">เลือกมาตรฐาน</span>
+                                <i style="font-size:12px;">▼</i>
+                            </div>
+                            <div class="dropdown-content">
+                                @foreach ($standards as $std)
+                                    <label>
+                                        <input type="checkbox" class="filter-option" data-column="9"
+                                            data-value="{{ $std }}">
+                                        <span style="margin-left:6px;">{{ $std }}</span>
+                                    </label>
+                                @endforeach
+                            </div>
+                        </div>
+
+                        <div class="dropdown-divider"></div>
+
+                        {{-- ด้าน --}}
+                        <h3 class="dropdown-title">ด้าน</h3>
+                        <div class="dropdown-multiselect" id="dimensionDropdown">
+                            <div class="dropdown-btn" onclick="toggleDropdown('dimensionDropdown')">
+                                <span id="dimension-label">เลือกด้าน</span>
+                                <i style="font-size:12px;">▼</i>
+                            </div>
+                            <div class="dropdown-content">
+                                @foreach ($dimensions as $dim)
+                                    <label>
+                                        <input type="checkbox" class="filter-option" data-column="10"
+                                            data-value="{{ $dim }}">
+                                        <span style="margin-left:6px;">{{ $dim }}</span>
+                                    </label>
+                                @endforeach
+                            </div>
+                        </div>
+
+                        <div class="dropdown-divider"></div>
+
+                        {{-- ผู้รับผิดชอบ --}}
+                        <h3 class="dropdown-title">ผู้รับผิดชอบ</h3>
+                        <div class="dropdown-multiselect" id="collectorDropdown">
+                            <div class="dropdown-btn" onclick="toggleDropdown('collectorDropdown')">
+                                <span id="collector-label">เลือกผู้รับผิดชอบ</span>
+                                <i style="font-size:12px;">▼</i>
+                            </div>
+                            <div class="dropdown-content">
+                                @foreach ($collectors as $collector)
+                                    <label>
+                                        <input type="checkbox" class="filter-option" data-column="5"
+                                            data-value="{{ $collector }}">
+                                        <span style="margin-left:6px;">{{ $collector }}</span>
+                                    </label>
+                                @endforeach
+                            </div>
+                        </div>
+
+                        <div class="dropdown-divider"></div>
+
+                        {{-- หน่วยงาน --}}
+                        <h3 class="dropdown-title">หน่วยงาน</h3>
+                        <div class="dropdown-multiselect" id="deptDropdown">
+                            <div class="dropdown-btn" onclick="toggleDropdown('deptDropdown')">
+                                <span id="dept-label">เลือกหน่วยงาน</span>
+                                <i style="font-size:12px;">▼</i>
+                            </div>
+                            <div class="dropdown-content">
+                                @foreach ($departments as $dept)
+                                    <label>
+                                        <input type="checkbox" class="filter-option" data-column="12"
+                                            data-value="{{ $dept }}">
+                                        <span style="margin-left:6px;">{{ $dept }}</span>
+                                    </label>
+                                @endforeach
+                            </div>
+                        </div>
+
+                        <div class="dropdown-divider"></div>
+
+                        {{-- ประเภทไฟล์ --}}
                         <h3 class="dropdown-title">ประเภทไฟล์</h3>
                         <div class="dropdown-multiselect" id="typeDropdown">
                             <div class="dropdown-btn" onclick="toggleDropdown('typeDropdown')">
@@ -75,11 +167,10 @@
                             </div>
                             <div class="dropdown-content">
                                 @foreach ($fileTypes as $type)
-                                    <label style="display:flex; align-items:center; margin-bottom:4px;">
-                                        <input type="checkbox" class="filter-option type-option" data-column="3"
+                                    <label>
+                                        <input type="checkbox" class="filter-option" data-column="3"
                                             data-value="{{ $type }}">
-                                        <span
-                                            style="margin-left:6px; font-size:14px; color:#374151;">{{ $type }}</span>
+                                        <span style="margin-left:6px;">{{ $type }}</span>
                                     </label>
                                 @endforeach
                             </div>
@@ -87,20 +178,19 @@
 
                         <div class="dropdown-divider"></div>
 
-                        {{-- Section: ผู้ใช้งาน --}}
-                        <h3 class="dropdown-title">ผู้ใช้งาน</h3>
-                        <div class="dropdown-multiselect" id="userDropdown">
-                            <div class="dropdown-btn" onclick="toggleDropdown('userDropdown')">
-                                <span id="user-label">เลือกผู้ใช้งาน</span>
+                        {{-- สถานะ --}}
+                        <h3 class="dropdown-title">สถานะ</h3>
+                        <div class="dropdown-multiselect" id="statusDropdown">
+                            <div class="dropdown-btn" onclick="toggleDropdown('statusDropdown')">
+                                <span id="status-label">เลือกสถานะ</span>
                                 <i style="font-size:12px;">▼</i>
                             </div>
                             <div class="dropdown-content">
-                                @foreach ($fileUsers as $user)
-                                    <label style="display:flex; align-items:center; margin-bottom:4px;">
-                                        <input type="checkbox" class="filter-option user-option" data-column="5"
-                                            data-value="{{ $user }}">
-                                        <span
-                                            style="margin-left:6px; font-size:14px; color:#374151;">{{ $user }}</span>
+                                @foreach ($statusList as $statusText)
+                                    <label>
+                                        <input type="checkbox" class="filter-option" data-column="11"
+                                            data-value="{{ $statusText }}">
+                                        <span style="margin-left:6px;">{{ $statusText }}</span>
                                     </label>
                                 @endforeach
                             </div>
@@ -108,37 +198,17 @@
 
                         <div class="dropdown-divider"></div>
 
-                        <h3 class="dropdown-title">ตัวชี้วัด</h3>
-                        <div class="dropdown-multiselect" id="indicatorDropdown">
-                            <div class="dropdown-btn" onclick="toggleDropdown('indicatorDropdown')">
-                                <span id="indicator-label">เลือกตัวชี้วัด</span>
-                                <i style="font-size:12px;">▼</i>
-                            </div>
-                            <div class="dropdown-content">
-                                @foreach ($indicators as $ind)
-                                    <label style="display:flex; align-items:center; margin-bottom:4px;">
-                                        <input type="checkbox" class="filter-option indicator-option" data-column="6"
-                                            data-value="{{ $ind->code }}">
-                                        <span style="margin-left:6px; font-size:14px; color:#374151;">
-                                            {{ $ind->code }}
-                                            {{-- {{ $ind->code }} - {{ $ind->name }} --}}
-                                        </span>
-                                    </label>
-                                @endforeach
-                            </div>
-                        </div>
-                        <div class="dropdown-divider"></div>
                         {{-- Buttons --}}
                         <div style="display:flex; justify-content:space-between; gap:12px;">
-                            <button id="clear-filters" class="btn" style="padding:6px 10px;">ล้างตัวกรอง</button>
-                            <button id="apply-filters" class="btn btn-primary"
-                                style="padding:6px 10px;">ใช้ตัวกรอง</button>
+                            <button id="clear-filters" class="btn">ล้างตัวกรอง</button>
+                            <button id="apply-filters" class="btn btn-primary">ใช้ตัวกรอง</button>
                         </div>
+
                     </div>
                 </div>
             </div>
-
         </div>
+
 
         <!-- ตารางเอกสารและหลักฐาน -->
         <div class="evidence-containers">
@@ -146,19 +216,28 @@
                 <table class="table" id="evidenceTable">
                     <thead>
                         <tr>
-                            <th>ลำดับ</th>
-                            <th>ชื่อไฟล์</th>
-                            <th>ขนาดไฟล์</th>
-                            <th>ประเภทไฟล์</th>
-                            <th>วันที่อัปโหลด</th>
-                            <th>ชื่อผู้อัปโหลด</th>
-                            <th>ตัวชี้วัด</th>
+                            <th>ลำดับ</th> <!-- 0 -->
+                            <th>ชื่อไฟล์</th> <!-- 1 -->
+                            <th>ขนาดไฟล์</th> <!-- 2 -->
+                            <th>ประเภทไฟล์</th> <!-- 3 -->
+                            <th>วันที่อัปโหลด</th> <!-- 4 -->
+                            <th>ชื่อผู้อัปโหลด</th> <!-- 5 -->
+                            <th>ตัวชี้วัด</th> <!-- 6 -->
+                            <th>จัดการ</th> <!-- 7 -->
 
-                            <th>จัดการ</th>
+                            <!-- ✅ hidden columns -->
+                            <th style="display:none;">ปี</th> <!-- 8 -->
+                            <th style="display:none;">มาตรฐาน</th> <!-- 9 -->
+                            <th style="display:none;">ด้าน</th> <!-- 10 -->
+                            <th style="display:none;">สถานะ</th> <!-- 11 -->
+                            <th style="display:none;">หน่วยงาน</th> <!-- 12 -->
                         </tr>
                     </thead>
                     <tbody>
                         @foreach ($evidences as $index => $evidence)
+                            @php
+                                $indicator = $evidence->criteria->indicator ?? null;
+                            @endphp
                             <tr>
                                 <td>{{ $index + 1 }}</td>
                                 <td>
@@ -166,16 +245,13 @@
                                         <div class="file-icon">
                                             @if (str_ends_with($evidence->type, 'pdf'))
                                                 <i data-lucide="file-text" style="color:#dc2626;"></i>
-                                            @elseif (str_ends_with($evidence->type, 'docx') || str_ends_with($evidence->type, '.docx'))
+                                            @elseif (str_ends_with($evidence->type, 'docx'))
                                                 <i data-lucide="file-text" style="color:#2563eb;"></i>
-                                            @elseif (str_ends_with($evidence->type, 'pptx') || str_ends_with($evidence->type, '.pptx'))
+                                            @elseif (str_ends_with($evidence->type, 'pptx'))
                                                 <i data-lucide="file-text" style="color:#eb7e25;"></i>
-                                            @elseif (str_ends_with($evidence->type, 'image') ||
-                                                    str_ends_with($evidence->type, 'jpg') ||
-                                                    str_ends_with($evidence->type, 'png') ||
-                                                    str_ends_with($evidence->type, 'jpeg'))
+                                            @elseif (str_ends_with($evidence->type, 'jpg') || str_ends_with($evidence->type, 'png'))
                                                 <i data-lucide="image" style="color:#16a34a;"></i>
-                                            @elseif (str_ends_with($evidence->type, 'excel') || str_ends_with($evidence->name, '.xls'))
+                                            @elseif (str_ends_with($evidence->type, 'xls') || str_ends_with($evidence->type, 'xlsx'))
                                                 <i data-lucide="file-spreadsheet" style="color:#059669;"></i>
                                             @elseif ($evidence->type === 'url')
                                                 <i data-lucide="link" style="color:#9333ea;"></i>
@@ -183,52 +259,55 @@
                                                 <i data-lucide="file" style="color:#6b7280;"></i>
                                             @endif
                                         </div>
-
                                         <div class="file-details">
                                             <div class="file-name">{{ $evidence->name }}</div>
                                             @if ($evidence->detail)
                                                 <div class="file-description">
-                                                    {{ Str::limit(strip_tags($evidence->detail), 50) }}</div>
+                                                    {{ Str::limit(strip_tags($evidence->detail), 50) }}
+                                                </div>
                                             @endif
                                         </div>
-
                                     </div>
                                 </td>
                                 <td>{{ $evidence->total_size_human ?? '-' }}</td>
                                 <td data-search="{{ $evidence->type }}">{{ $evidence->type }}</td>
                                 <td data-order="{{ optional($evidence->created_at)->timestamp }}">
-                                    {{ $evidence->created_at ? $evidence->created_at->format('M d, Y') : 'Dec 13, 2022' }}
+                                    {{ $evidence->created_at?->format('M d, Y') ?? '-' }}
                                 </td>
                                 <td data-search="{{ optional($evidence->user)->name ?? '' }}">
                                     {{ $evidence->user->name ?? '-' }}
                                 </td>
-                                <td data-search="{{ optional($evidence->criteria->indicator)->code ?? '' }}">
-                                    {{ optional($evidence->criteria->indicator)->name ?? '-' }}
+                                <td data-search="{{ optional($indicator)->code ?? '' }}">
+                                    {{ $indicator->name ?? '-' }}
                                 </td>
-
                                 <td>
                                     <div class="evidence-actions">
                                         @if ($evidence->type === 'url' && !empty($evidence->path['urls'][0]))
-                                            <button type="button" class="btn-link" style="width: 110px;"
-                                                onclick="window.open('{{ $evidence->path['urls'][0] }}', '_blank')"
-                                                title="เปิดลิงก์">
-                                                <i data-lucide="external-link" style="margin-right:4px;"></i> เปิดลิงก์
+                                            <button type="button" class="btn-link"
+                                                onclick="window.open('{{ $evidence->path['urls'][0] }}', '_blank')">
+                                                <i data-lucide="external-link"></i> เปิดลิงก์
                                             </button>
                                         @else
                                             <button type="button" class="btn-download"
-                                                onclick="window.location.href='{{ route('evidences.download', $evidence->id) }}'"
-                                                title="ดาวน์โหลด">
-                                                <i data-lucide="download" style="margin-right:4px;"></i> ดาวน์โหลด
+                                                onclick="window.location.href='{{ route('evidences.download', $evidence->id) }}'">
+                                                <i data-lucide="download"></i> ดาวน์โหลด
                                             </button>
                                         @endif
-
-
                                     </div>
                                 </td>
+
+                                <!-- ✅ hidden values for filtering -->
+                                <td style="display:none;">{{ $indicator->year ?? '' }}</td>
+                                <td style="display:none;">{{ $indicator->category->standard->name ?? '' }}</td>
+                                <td style="display:none;">{{ $indicator->category->name ?? '' }}</td>
+                                <td style="display:none;">{{ $statusMap[$indicator->status ?? 0] ?? 'ไม่ทราบ' }}</td>
+                                <td style="display:none;">
+                                    {{ $indicator->assignments->first()?->collectorUser?->department->name ?? '-' }}</td>
                             </tr>
                         @endforeach
                     </tbody>
                 </table>
+
             </div>
         </div>
     </div>
@@ -236,7 +315,7 @@
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <!-- DataTables CSS -->
-    
+
     <!-- DataTables JS -->
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/lucide@0.469.0/dist/umd/lucide.min.js"></script>
@@ -399,7 +478,7 @@
             }
 
             // อัปเดต label เมื่อเลือก
-            function setupDropdownLabel(dropdownId, labelId) {
+            function setupDropdownLabel(dropdownId, labelId, defaultText) {
                 const checkboxes = document.querySelectorAll(`#${dropdownId} .filter-option`);
                 const label = document.getElementById(labelId);
 
@@ -409,20 +488,20 @@
                             .filter(x => x.checked)
                             .map(x => x.getAttribute('data-value'));
 
-                        label.textContent = selected.length ?
-                            selected.join(', ') :
-                            (dropdownId === 'typeDropdown' ?
-                                'เลือกประเภทไฟล์' :
-                                (dropdownId === 'userDropdown' ?
-                                    'เลือกผู้ใช้งาน' :
-                                    'เลือกตัวชี้วัด'));
+                        label.textContent = selected.length ? selected.join(', ') : defaultText;
                     });
                 });
             }
 
-            setupDropdownLabel('typeDropdown', 'type-label');
-            setupDropdownLabel('userDropdown', 'user-label');
-            setupDropdownLabel('indicatorDropdown', 'indicator-label');
+            setupDropdownLabel('yearDropdown', 'year-label', 'เลือกปี');
+            setupDropdownLabel('standardDropdown', 'standard-label', 'เลือกมาตรฐาน');
+            setupDropdownLabel('dimensionDropdown', 'dimension-label', 'เลือกด้าน');
+            setupDropdownLabel('collectorDropdown', 'collector-label', 'เลือกผู้รับผิดชอบ');
+            setupDropdownLabel('deptDropdown', 'dept-label', 'เลือกหน่วยงาน');
+
+            setupDropdownLabel('typeDropdown', 'type-label', 'เลือกประเภท');
+            setupDropdownLabel('statusDropdown', 'status-label', 'เลือกสถานะ');
+
 
             // checkboxes.forEach(cb => {
             //     cb.addEventListener('change', () => {
@@ -451,6 +530,15 @@
         :root {
             --blue-600: #2563eb;
             --blue-700: #1d4ed8;
+            --green-100: #dcfce7;
+            --green-600: #16a34a;
+            --green-700: #15803d;
+            --yellow-100: #fef3c7;
+            --yellow-600: #d97706;
+            --yellow-700: #b45309;
+            --red-100: #fee2e2;
+            --red-600: #dc2626;
+            --red-700: #b91c1c;
             --gray-50: #f9fafb;
             --gray-100: #f3f4f6;
             --gray-200: #e5e7eb;
@@ -468,6 +556,52 @@
             --pad-4: 16px;
         }
 
+        #filter-dropdown {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px 24px;
+            max-height: 70vh;
+            overflow-y: auto;
+            padding: 16px;
+            box-sizing: border-box;
+        }
+
+        #filter-dropdown .dropdown-title {
+            grid-column: span 2;
+            /* ✅ ให้หัวข้อใหญ่กินเต็มแถว */
+            margin-top: 8px;
+        }
+
+
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+        }
+
+        .tooltip::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 125%;
+            /* tooltip อยู่ด้านบน */
+            /* left: 50%; */
+            /* transform: translateX(-50%);
+                                                                                                            background: #333; */
+            color: #fff;
+            font-size: 12px;
+            /* padding: 5px 8px; */
+            border-radius: 6px;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease-in-out;
+            z-index: 999;
+        }
+
+        .tooltip:hover::after {
+            opacity: 1;
+        }
+
         .hidden {
             display: none !important;
         }
@@ -475,7 +609,7 @@
         .evidence-container {
             max-width: 1500px;
             margin: 0 auto;
-            
+
         }
 
         .evidence-container h1 {
@@ -522,7 +656,7 @@
         }
 
         /* ปุ่ม */
-        .btn {
+        .btns {
             display: inline-flex;
             align-items: center;
             gap: 8px;
@@ -537,7 +671,7 @@
             transition: .15s background-color ease;
         }
 
-        .btn:hover {
+        .btns:hover {
             background: var(--gray-100);
         }
 
@@ -558,12 +692,14 @@
             text-align: left;
         }
 
-        .dropdown-menu {
+
+        .dropdown-menus {
             position: absolute;
             left: 0;
             top: 100%;
             margin-top: 8px;
-            width: 192px;
+            width: 100%;
+            /* ✅ ใช้ 100% ของ container (เท่าปุ่ม) */
             background: var(--white);
             border-radius: 6px;
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, .1), 0 4px 6px -2px rgba(0, 0, 0, .05);
@@ -571,9 +707,13 @@
             z-index: 9999;
             padding: 4px 0;
             display: block;
+            box-sizing: border-box;
+            /* ✅ กัน padding บวกเกิน */
+            min-width: max-content;
+            /* ✅ กัน dropdown เล็กเกินถ้ามีข้อความยาว */
         }
 
-        .dropdown-menu.hidden {
+        .dropdown-menus.hidden {
             display: none !important;
         }
 
@@ -605,6 +745,13 @@
             margin-bottom: 8px;
         }
 
+        .dropdown-multiselect .dropdown-btn span,
+        .dropdown-multiselect .dropdown-content span {
+            white-space: normal;
+            /* ✅ ข้อความยาวจะตัดบรรทัด */
+            word-break: break-word;
+        }
+
         .filter-option {
             accent-color: var(--blue-600);
         }
@@ -627,8 +774,8 @@
             border: 2px solid #C2D9EB;
             margin-top: 40px;
             margin-bottom: 40px;
-            margin-left: 60px;
-            margin-right: 60px;
+            margin-left: 40px;
+            margin-right: 40px;
         }
 
         .table {
@@ -643,56 +790,46 @@
             background: var(--gray-50);
             border-bottom: 1px solid var(--gray-200);
             padding: 12px;
+            font-size: 14px;
         }
 
         .table tbody td {
             padding: 12px;
             border-bottom: 1px solid var(--gray-200);
-        }
-
-        /* File info styling */
-        .file-info {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .file-icon {
-            flex-shrink: 0;
-        }
-
-        .file-details {
-            min-width: 0;
-        }
-
-        .file-name {
-            font-weight: 500;
-            color: #111827;
-            word-break: break-word;
-        }
-
-        .file-description {
-            font-size: 12px;
-            color: #6b7280;
-            margin-top: 2px;
+            font-size: 14px;
+            vertical-align: middle;
         }
 
         /* Status badges */
         .status-badge {
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 12px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 64px;
+            /* กำหนดความกว้างขั้นต่ำ ให้ badge กว้างเท่ากัน */
+            padding: 4px 10px;
+            border-radius: 9999px;
+            /* pill shape */
+            font-size: 13px;
             font-weight: 500;
+            line-height: 1.4;
+            text-align: center;
+            white-space: nowrap;
         }
 
-        .status-active {
-            background: #dcfce7;
-            color: #166534;
+        .status-completed {
+            background: var(--green-100);
+            color: var(--green-700);
         }
 
-        .status-inactive {
-            background: #fee2e2;
-            color: #991b1b;
+        .status-warning {
+            background: var(--yellow-100);
+            color: var(--yellow-700);
+        }
+
+        .status-error {
+            background: var(--red-100);
+            color: var(--red-700);
         }
 
         /* Action buttons */
@@ -700,6 +837,149 @@
             display: flex;
             gap: 8px;
             flex-wrap: wrap;
+        }
+
+        .btn-edit {
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 6px 12px;
+            border-radius: 6px;
+            border: 1px solid var(--blue-600);
+            background: var(--white);
+            cursor: pointer;
+            font-size: 12px;
+            white-space: nowrap;
+            color: var(--blue-600);
+        }
+
+        .btn-edit:hover {
+            background: #eff6ff;
+        }
+
+        .btn-view {
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 6px 12px;
+            border-radius: 6px;
+            border: 1px solid var(--green-600);
+            background: var(--white);
+            cursor: pointer;
+            font-size: 12px;
+            white-space: nowrap;
+            color: var(--green-600);
+        }
+
+        .btn-view :hover {
+            background: #eff6ff;
+        }
+
+        .dataTables_length,
+        .dataTables_filter {
+            display: none;
+        }
+
+        /* Responsive */
+        @media (min-width: 768px) {
+            .controls {
+                flex-wrap: nowrap;
+            }
+
+            .controls .search-box {
+                flex: 1 1 420px;
+                max-width: none;
+            }
+        }
+
+        .controls>* {
+            flex-shrink: 0;
+        }
+
+        /* Table responsive */
+        @media (max-width: 768px) {
+            .evidence-actions {
+                flex-direction: column;
+            }
+
+            .table {
+                font-size: 12px;
+            }
+
+            .evidence-list {
+                margin-left: 20px;
+                margin-right: 20px;
+                padding: 20px;
+            }
+        }
+
+        i[data-lucide] {
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        .dropdown-multiselect {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+            /* ✅ ให้กว้างเต็ม cell ของ grid */
+            min-width: 200px;
+            /* ✅ แต่ไม่ต่ำกว่า 200px */
+        }
+
+        .dropdown-multiselect .dropdown-btn {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            padding: 6px 10px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            background: #fff;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .dropdown-multiselect .dropdown-content {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: 100%;
+            max-height: 220px;
+            overflow-y: auto;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            background: #fff;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+            z-index: 20;
+            padding: 8px;
+        }
+
+        .dropdown-multiselect.open .dropdown-content {
+            display: block;
+        }
+
+        .dropdown-content label {
+            display: flex;
+            /* ✅ จัด checkbox + text เป็น flex */
+            align-items: center;
+            /* ✅ ให้ text อยู่กึ่งกลาง checkbox */
+            gap: 6px;
+            /* ✅ ระยะห่างระหว่างกล่องกับข้อความ */
+            margin-bottom: 6px;
+            /* ✅ ระยะห่างระหว่างแถว */
+            font-size: 14px;
+            color: #374151;
+            /* เทาเข้ม */
+            cursor: pointer;
+        }
+
+        .dropdown-content input[type="checkbox"] {
+            flex-shrink: 0;
+            /* ✅ กัน checkbox หด */
         }
 
         .btn-download,
