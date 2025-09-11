@@ -167,9 +167,9 @@
                         @foreach ($indicators as $index => $indicator)
                             @php
                                 $statusKey = match ((int) $indicator->status) {
-                                    2, 3 => 'complete',
+                                     3 => 'complete',
                                     4 => 'incomplete',
-                                    0 => 'pending',
+                                    0 ,2,1 => 'pending',
                                     default => 'pending',
                                 };
 
@@ -200,6 +200,8 @@
                                     {{-- status icon switch --}}
                                     @switch($indicator->status)
                                         @case(0)
+                                          @case(1)
+                                          @case(2)
                                             <span class="tip" data-tip="อยู่ระหว่างดำเนินการ">
                                                 <i data-lucide="alert-triangle" class="status-icon text-danger"></i>
                                             </span>
@@ -211,7 +213,7 @@
                                             </span>
                                         @break
 
-                                        @case(2)
+                                      
                                         @case(3)
                                             <span class="tip" data-tip="ผลการดำเนินงานครบถ้วนตามเกณฑ์มาตรการ">
                                                 <i data-lucide="check-circle" class="status-icon text-success"></i>
@@ -573,97 +575,88 @@
                 }
 
                 // 8) Chart.js (คงเดิม)
-                let donutChart = null;
-                const donutCanvas = document.getElementById('satisfactionChart');
-                let chartKeys = [],
-                    chartLabels = [],
-                    chartColors = [];
+           // 8) Chart.js (Pie Chart สำหรับ status)
+let donutChart = null;
+const donutCanvas = document.getElementById('satisfactionChart');
+let chartKeys = [],
+    chartLabels = [],
+    chartColors = [];
 
-                if (donutCanvas) {
-                    const donutCtx = donutCanvas.getContext('2d');
-                    chartLabels = @json(array_column($legendConfig, 'label'));
-                    chartColors = @json(array_column($legendConfig, 'color'));
-                    chartKeys = @json(array_column($legendConfig, 'key'));
+if (donutCanvas) {
+    const donutCtx = donutCanvas.getContext('2d');
+    chartLabels = @json(array_column($legendConfig, 'label'));
+    chartColors = @json(array_column($legendConfig, 'color'));
+    chartKeys   = @json(array_column($legendConfig, 'key')); // ['1','2','0-2'] หรือ ['3','4','0-2']
 
-                    const countsMap = @json($statusCounts);
-                    const dataValues = chartKeys.map((k) => Number(countsMap[k] ?? 0));
+    const countsMap = @json($statusCounts);
+    const dataValues = chartKeys.map((k) => Number(countsMap[k] ?? 0));
 
-                    donutChart = new Chart(donutCtx, {
-                        type: 'pie',
-                        data: {
-                            labels: chartLabels,
-                            datasets: [{
-                                data: dataValues,
-                                backgroundColor: chartColors,
-                                borderColor: '#ffffff',
-                                borderWidth: 2,
-                                hoverOffset: 6,
-                            }],
+    donutChart = new Chart(donutCtx, {
+        type: 'pie',
+        data: {
+            labels: chartLabels,
+            datasets: [{
+                data: dataValues,
+                backgroundColor: chartColors,
+                borderColor: '#ffffff',
+                borderWidth: 2,
+                hoverOffset: 6,
+            }],
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        usePointStyle: true,
+                        font: { size: 12 },
+                        padding: 15
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: (ctx) => {
+                            const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
+                            const val = ctx.parsed;
+                            const pct = total > 0 ? ((val / total) * 100).toFixed(1) : '0.0';
+                            return ` ${ctx.label}: ${val} (${pct}%)`;
                         },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            plugins: {
-                                legend: {
-                                    position: 'bottom',
-                                    labels: {
-                                        usePointStyle: true,
-                                        font: {
-                                            size: 12
-                                        },
-                                        padding: 15
-                                    }
-                                },
-                                tooltip: {
-                                    callbacks: {
-                                        label: (ctx) => {
-                                            const total = ctx.dataset.data.reduce((a, b) => a + b,
-                                                0);
-                                            const val = ctx.parsed;
-                                            const pct = total > 0 ? ((val / total) * 100).toFixed(
-                                                1) : '0.0';
-                                            return ` ${ctx.label}: ${val} (${pct}%)`;
-                                        },
-                                    },
-                                },
-                                // ✅ แสดง % ในวงกลม
-                                datalabels: {
-                                    color: '#fff',
-                                    font: {
-                                        weight: 'bold',
-                                        size: 14
-                                    },
-                                    formatter: (value, ctx) => {
-                                        const total = ctx.chart.data.datasets[0].data.reduce((a,
-                                            b) => a + b, 0);
-                                        const pct = total > 0 ? (value / total * 100).toFixed(1) :
-                                            0;
-                                        return pct + '%';
-                                    }
-                                }
-                            },
-                            // ✅ คลิก slice เพื่อ filter DataTable
-                            onClick: (evt, elements) => {
-                                if (elements.length > 0) {
-                                    const index = elements[0].index;
-                                    const key = chartKeys[
-                                        index]; // เช่น complete/incomplete/pending
-
-                                    // toggle filter: ถ้าคลิกซ้ำ → ยกเลิก
-                                    if (window.selectedStatusFilter === key) {
-                                        window.selectedStatusFilter = null;
-                                    } else {
-                                        window.selectedStatusFilter = key;
-                                    }
-
-                                    // กรอง DataTable
-                                    table.draw();
-                                }
-                            }
-                        },
-                        plugins: [ChartDataLabels] // ⭐ enable datalabels
-                    });
+                    },
+                },
+                datalabels: {
+                    color: '#fff',
+                    font: { weight: 'bold', size: 14 },
+                    formatter: (value, ctx) => {
+                        const total = ctx.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+                        const pct = total > 0 ? (value / total * 100).toFixed(1) : 0;
+                        return pct + '%';
+                    }
                 }
+            },
+            // ✅ คลิก slice เพื่อ filter DataTable
+            onClick: (evt, elements) => {
+                if (elements.length > 0) {
+                    const index = elements[0].index;
+                    const key = chartKeys[index]; // เช่น '1','2','0-2'
+
+                    // toggle filter: ถ้าคลิกซ้ำ → ยกเลิก
+                    if (window.selectedStatusFilter === key) {
+                        window.selectedStatusFilter = null;
+                    } else {
+                        window.selectedStatusFilter = key;
+                    }
+
+                    // กรอง DataTable
+                    table.draw();
+                }
+            }
+        },
+        plugins: [ChartDataLabels]
+    });
+}
+
 
                 // ====== ฟังก์ชัน Export ทั้งการ์ดเป็น PNG ======
                 // function exportCardToImage() {
