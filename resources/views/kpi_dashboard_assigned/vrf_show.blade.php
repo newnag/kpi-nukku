@@ -74,11 +74,16 @@
                                 {{ $criteria->sequence }}. {!! $criteria->name !!}
                             </div>
                             <div class="criteria-status">
-                                <select name="criterias[{{ $criteria->id }}][status]" class="criteria-status-select"
+                                <select name="criterias[{{ $criteria->id }}][status]" class="text-sm text-center"
+                                    @if ($locked) disabled @endif>
                                     form="variables-form" data-criteria-id="{{ $criteria->id }}">
                                     <option value="0" {{ ($criteria->status ?? 0) == 0 ? 'selected' : '' }}>
                                         รอดำเนินการ</option>
-                                    <option value="1" {{ ($criteria->status ?? 0) == 1 ? 'selected' : '' }}>ยืนยัน
+                                    <option value="1" {{ ($criteria->status ?? 0) == 1 ? 'selected' : '' }}>
+                                        ผ่านเกณฑ์การพิจารณา
+                                    </option>
+                                    <option value="2" {{ ($criteria->status ?? 0) == 2 ? 'selected' : '' }}>
+                                        ไม่ผ่านเกณฑ์การพิจารณา
                                     </option>
                                 </select>
                             </div>
@@ -99,7 +104,7 @@
                                     <!-- ปุ่มปิด -->
                                     <button @click="open{{ $criteria->id }} = false"
                                         class="absolute top-3 right-3 text-gray-500 hover:text-red-500">
-                                        ✕
+                                        ปิด
                                     </button>
 
                                     <form action="{{ route('evidences.store') }}" method="POST"
@@ -150,6 +155,7 @@
                                                                     class="form-input url-input locked"
                                                                     value="{{ $u }}" readonly tabindex="-1">
                                                                 <button type="button" class="remove-url-btn"
+                                                                    @if ($locked) hidden @endif
                                                                     aria-label="ลบ URL">
                                                                     <i data-lucide="x" style="width:16px;height:16px;"></i>
                                                                 </button>
@@ -260,18 +266,55 @@
                                         </span>
 
                                         <div class="space-x-3 flex items-center justify-center">
-                                            <select name="evidences[{{ $evidence->id }}][status]" {{-- ✅ เพิ่ม name --}}
+                                            <select name="evidences[{{ $evidence->id }}][status]"
+                                                @if ($locked) disabled @endif
                                                 id="evidence-{{ $evidence->id }}" data-criteria-id="{{ $criteria->id }}"
-                                                form="variables-form">
+                                                form="variables-form" class="text-center ">
                                                 <option value="false" {{ $evidence->status ? '' : 'selected' }}>
                                                     รอดำเนินการ</option>
-                                                <option value="true" {{ $evidence->status ? 'selected' : '' }}>ยืนยัน
+                                                <option value="true" {{ $evidence->status ? 'selected' : '' }}>
+                                                    รับรองหลักฐาน
                                                 </option>
                                             </select>
 
-                                            <button class="btn-delete" data-id="{{ $evidence->id }}" title="ลบหลักฐาน">
-                                                ลบ
-                                            </button>
+                                            <x-modal title="ยืนยันการลบหลักฐาน" size="sm" :context="'delete-evidence-' . $evidence->id">
+                                                <x-slot:trigger>
+                                                    <button type="button" class="btn-delete" title="ลบหลักฐาน"
+                                                        @if ($locked) hidden @endif>
+                                                        ลบ
+                                                    </button>
+                                                </x-slot:trigger>
+
+                                                <div class="space-y-2">
+                                                    <p class="text-slate-700">
+                                                        ต้องการลบหลักฐาน <span
+                                                            class="font-semibold">{{ $evidence->name }}</span> ใช่หรือไม่?
+                                                    </p>
+
+                                                    {{-- ฟอร์มลบ (DELETE) --}}
+                                                    <form x-ref="delForm" method="POST"
+                                                        action="{{ route('evidences.destroy', $evidence->id) }}">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        {{-- ถ้าต้องการกลับมาหน้าปัจจุบันหลังลบ --}}
+                                                        <input type="hidden" name="redirect"
+                                                            value="{{ url()->current() }}">
+                                                    </form>
+                                                </div>
+
+                                                <x-slot:footer>
+                                                    <div class="flex justify-end gap-2">
+                                                        <button type="button" class="btns-secondary"
+                                                            @click="$dispatch('modal:close')">
+                                                            ยกเลิก
+                                                        </button>
+                                                        <button type="button" class="btns-primary"
+                                                            @click="$refs.delForm.submit()">
+                                                            ยืนยันการลบ
+                                                        </button>
+                                                    </div>
+                                                </x-slot:footer>
+                                            </x-modal>
                                         </div>
                                     </div>
                                 @empty
@@ -313,7 +356,7 @@
                                 <input type="number" name="variables[{{ $variable->id }}]"
                                     value="{{ old('variables.' . $variable->id, $variable->value) }}"
                                     placeholder="กรุณากรอกร้อยละเป็นตัวเลข" class="variable-input"
-                                    {{ $indicator->status == 3 ? 'readonly' : '' }}>
+                                    @if ($locked) readonly @endif>
                             </div>
                         @empty
                             <p class="text-gray-500">ยังไม่มีตัวแปรที่ต้องกรอกเอง</p>
@@ -336,8 +379,7 @@
 
                     <x-modal title="เปลี่ยนสถานะตัวชี้วัด" size="sm" :context="'status'">
                         <x-slot:trigger>
-                            <button type="button" class="btn-outlines">
-                                {{-- @if ($locked) disabled @endif> --}}
+                            <button type="button" class="btn-outlines" data-allow-when-locked="true">
                                 <i class="fa-solid fa-gear"></i>เปลี่ยนสถานะตัวชี้วัด
                             </button>
                         </x-slot:trigger>
@@ -382,24 +424,22 @@
 @endsection
 
 @push('scripts')
-    @push('scripts')
-        <link
-            href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;600&family=Kanit:wght@400;600&family=Sarabun:wght@400;600&display=swap"
-            rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;600&family=Kanit:wght@400;600&family=Sarabun:wght@400;600&display=swap"
+        rel="stylesheet">
 
-        <!-- ✅ โหลด jQuery + Trumbowyg -->
-        <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Trumbowyg/2.27.3/ui/trumbowyg.min.css">
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/Trumbowyg/2.27.3/trumbowyg.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/Trumbowyg/2.27.3/langs/th.min.js"></script>
-        <link rel="stylesheet"
-            href="https://cdnjs.cloudflare.com/ajax/libs/Trumbowyg/2.27.3/plugins/colors/ui/trumbowyg.colors.min.css">
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/Trumbowyg/2.27.3/plugins/colors/trumbowyg.colors.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/Trumbowyg/2.27.3/plugins/fontsize/trumbowyg.fontsize.min.js">
-        </script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/Trumbowyg/2.27.3/plugins/fontfamily/trumbowyg.fontfamily.min.js">
-        </script>
-    @endpush
+    <!-- ✅ โหลด jQuery + Trumbowyg -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Trumbowyg/2.27.3/ui/trumbowyg.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Trumbowyg/2.27.3/trumbowyg.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Trumbowyg/2.27.3/langs/th.min.js"></script>
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/Trumbowyg/2.27.3/plugins/colors/ui/trumbowyg.colors.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Trumbowyg/2.27.3/plugins/colors/trumbowyg.colors.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Trumbowyg/2.27.3/plugins/fontsize/trumbowyg.fontsize.min.js">
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Trumbowyg/2.27.3/plugins/fontfamily/trumbowyg.fontfamily.min.js">
+    </script>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
@@ -872,78 +912,6 @@
                 });
             }
 
-            /*** ---------- Delete Evidence ---------- ***/
-            const csrfTokenMeta = document.querySelector('meta[name="csrf-token"]');
-            const csrfToken = csrfTokenMeta ? csrfTokenMeta.getAttribute("content") : "";
-
-            document.querySelectorAll(".btn-delete").forEach(btn => {
-                btn.addEventListener("click", function() {
-                    const id = this.getAttribute("data-id");
-                    Swal.fire({
-                        title: 'คุณแน่ใจหรือไม่?',
-                        text: "ต้องการลบหลักฐานนี้",
-                        icon: 'warning',
-                        showCancelButton: true,
-                        confirmButtonColor: '#d33',
-                        cancelButtonColor: '#6b7280',
-                        confirmButtonText: 'ลบ',
-                        cancelButtonText: 'ยกเลิก'
-                    }).then((result) => {
-                        if (!result.isConfirmed) return;
-                        fetch(`/evidences/${id}`, {
-                                method: "DELETE",
-                                headers: {
-                                    "X-CSRF-TOKEN": csrfToken,
-                                    "Content-Type": "application/json",
-                                    "Accept": "application/json"
-                                }
-                            })
-                            .then(async res => {
-                                const text = await res.text();
-                                try {
-                                    return JSON.parse(text);
-                                } catch {
-                                    console.error("Response is not JSON:", text);
-                                    throw new Error("Invalid JSON");
-                                }
-                            })
-                            .then(data => {
-                                if (data.success) {
-                                    document.getElementById(`evidence-${id}`)?.remove();
-                                    Swal.fire({
-                                        toast: true,
-                                        position: 'top-end',
-                                        icon: 'success',
-                                        title: 'ลบหลักฐานเรียบร้อยแล้ว',
-                                        showConfirmButton: false,
-                                        timer: 2000
-                                    });
-                                } else {
-                                    Swal.fire({
-                                        toast: true,
-                                        position: 'top-end',
-                                        icon: 'error',
-                                        title: 'เกิดข้อผิดพลาดในการลบ',
-                                        showConfirmButton: false,
-                                        timer: 2000
-                                    });
-                                }
-                            })
-                            .catch(error => {
-                                console.error("Error:", error);
-                                Swal.fire({
-                                    toast: true,
-                                    position: 'top-end',
-                                    icon: 'error',
-                                    title: 'เกิดข้อผิดพลาดในการลบ',
-                                    showConfirmButton: false,
-                                    timer: 2000
-                                });
-                            });
-                    });
-                });
-            });
-
             @foreach ($indicator->criterias as $criteria)
                 new FileUploadHandler({{ $criteria->id }});
                 new URLHandler({{ $criteria->id }});
@@ -1160,7 +1128,7 @@
 
         .criteria-status {
             /* font-weight: 600;
-                            font-size: 14px; */
+                                        font-size: 14px; */
             color: #1f2937;
         }
 
