@@ -394,14 +394,14 @@
                                 }
                             @endphp
 
-                            <td class="px-4 py-3 text-sm" data-search="{{ $docText }}"
+                            <td class="status-badge px-4 py-1 text-sm" data-search="{{ $docText }}"
                                 data-order="{{ $docOrder }}">
                                 <span
                                     class="flex justify-center text-center px-2 py-1 text-xs font-medium rounded-full {{ $badgeCls }}">
                                     {{ $docText }}
                                 </span>
                             </td>
-                            <td class="px-4 py-3 text-sm">
+                            <td class="px-4 py-3 text-sm border-b border-gray-200">
                                 <a href="{{ route('indicator.show', $indicator['id']) }}"
                                     class="btn-view flex items-center gap-1">
                                     <!-- ไอคอนตา -->
@@ -591,22 +591,35 @@
                 gap: 6px;
                 padding: 6px 14px;
                 border-radius: 6px;
-                /* ✅ มุมมนเล็กน้อย */
                 border: 1px solid #3b82f6;
-                /* ✅ น้ำเงิน (Tailwind blue-500) */
-                background: #fff;
+                background: transparent;
+                /* ✅ โปร่งใส */
                 cursor: pointer;
                 font-size: 13px;
                 font-weight: 500;
                 white-space: nowrap;
                 color: #3b82f6;
-                /* ✅ ตัวอักษรน้ำเงิน */
                 transition: all 0.2s ease-in-out;
             }
 
             .btn-view:hover {
                 background: #dbeafe;
-                /* ✅ น้ำเงินอ่อนตอน hover */
+            }
+
+            .status-badge {
+
+                align-items: center;
+                justify-content: center;
+                min-width: 64px;
+                /* กำหนดความกว้างขั้นต่ำ ให้ badge กว้างเท่ากัน */
+                padding: 4px 10px;
+
+                /* pill shape */
+                font-size: 13px;
+                font-weight: 500;
+                line-height: 1.4;
+                text-align: center;
+                white-space: nowrap;
             }
         </style>
     @endpush
