@@ -25,10 +25,12 @@
         </div>
 
         <!-- เปลี่ยนจาก canvas เป็น div สำหรับ ApexCharts -->
-          <div class="chart-card ">
-      <div id="scoreLineChart" ></div>
-        </div>
-  
+<div class="chart-card">
+ <div id="scoreLineChart"></div>
+</div>
+       
+
+
     </div>
     <div class="chart-card summary-card">
         <h2 class="card-title">คะแนนรวมมาตรฐานตามปี</h2>
@@ -278,7 +280,8 @@
                     },
                     series: [{
                             name: "คะแนนที่ได้",
-                            data: payload.scores
+                            data: (payload.scores || []).map(v => Number(v) || 0)
+
                         },
                         {
                             name: "คะแนนเต็ม",
@@ -439,137 +442,139 @@
     </script>
     <script>
         document.addEventListener("DOMContentLoaded", () => {
-            const toggle = document.getElementById("toggle-filter");
-            const panel = document.getElementById("filter-panel");
+            const chartsMain = {};
+            const originalsMain = {};
 
-            toggle.addEventListener("change", () => {
-                panel.style.display = toggle.checked ? "block" : "none";
-            });
-        });
+            // === โหลดข้อมูลจาก blade ===
+            const payload = @json($yearlyTotals);
+            originalsMain['scoreLine'] = payload;
 
-        (function() {
-            const yearlyTotals = @json($yearlyTotals);
-            // yearlyTotals = [{year:2025, score:735, max:740}, ...]
+            const options = {
+                chart: {
+                    type: 'area',
+                    height: 350,
+                    toolbar: {
+                        show: false
+                    },
+                    zoom: {
+                        enabled: false
+                    }
+                },
+                series: [{
+                        name: "คะแนนที่ได้",
+                        data: payload.map(r => Number(r.score) || 0)
+                    },
+                    {
+                        name: "คะแนนเต็ม",
+                        data: payload.map(r => Number(r.max) || 0)
+                    }
+                ],
+                xaxis: {
+                    categories: payload.map(r => r.year),
+                    title: {
+                        text: "ปีการประเมิน"
+                    }
+                },
+                yaxis: {
+                    min: 0,
+                    max: payload.length ? Math.max(...payload.map(r => r.max)) * 1.15 : 100,
+                    title: {
+                        text: "คะแนน"
+                    }
+                },
+                dataLabels: {
+                    enabled: true,
+                    background: {
+                        enabled: true,
+                        foreColor: '#fff',
+                        borderRadius: 4,
+                        padding: 4,
+                        opacity: 0.9
+                    },
+                    formatter: function(val, opts) {
+                        if (val === null || isNaN(val)) return "";
+                        if (opts.seriesIndex === 0) {
+                            const row = payload[opts.dataPointIndex];
+                            const percent = row.max ? ((row.score / row.max) * 100).toFixed(1) : 0;
+                            return `${val} (${percent}%)`;
+                        }
+                        return "";
+                    },
+                    offsetY: -10
+                },
+                colors: ['#4f46e5', '#94a3b8'],
+                stroke: {
+                    curve: 'smooth',
+                    width: 3
+                },
+                markers: {
+                    size: 5,
+                    colors: ['#fff'],
+                    strokeColors: ['#4f46e5', '#94a3b8'],
+                    strokeWidth: 2,
+                    hover: {
+                        size: 7
+                    }
+                },
+                grid: {
+                    padding: {
+                        top: 40,
+                        right: 30,
+                        bottom: 10,
+                        left: 20
+                    }
+                },
+                legend: {
+                    position: 'top',
+                    horizontalAlign: 'right'
+                }
+            };
 
-            // ✅ สร้าง options ของ chart
-            function makeOptions(data) {
-                const maxVal = data.length ? Math.max(...data.map(r => r.max)) : 0;
+            const chart = new ApexCharts(document.querySelector("#scoreLineChart"), options);
+            chart.render();
+            chartsMain['scoreLine'] = chart;
 
-                return {
+            // === filter by year ===
+            function applyYearFilter() {
+                const years = Array.from(document.querySelectorAll('.year-checkbox:checked'))
+                    .map(cb => String(cb.value));
+
+                const orig = originalsMain['scoreLine'];
+                const idxs = orig.map((r, i) => years.includes(String(r.year)) ? i : -1).filter(i => i >= 0);
+
+                const newLabels = idxs.map(i => orig[i].year);
+                const newScores = idxs.map(i => Number(orig[i].score) || 0);
+                const newMax = idxs.map(i => Number(orig[i].max) || 0);
+
+                chartsMain['scoreLine'].updateOptions({
+                    xaxis: {
+                        categories: newLabels
+                    },
                     series: [{
                             name: "คะแนนที่ได้",
-                            data: data.map(r => r.score)
+                            data: newScores
                         },
                         {
                             name: "คะแนนเต็ม",
-                            data: data.map(r => r.max)
+                            data: newMax
                         }
                     ],
-                    chart: {
-                        height: 350,
-                        type: 'area',
-                        toolbar: {
-                            show: false
-                        },
-                        zoom: {
-                            enabled: false
-                        }
-                    },
-                    colors: ['#4f46e5', '#94a3b8'],
-                    dataLabels: {
-                        enabled: true,
-                        background: {
-                            enabled: true,
-                            foreColor: '#fff',
-                            borderRadius: 4,
-                            padding: 4,
-                            opacity: 0.9
-                        },
-                        formatter: function(val, opts) {
-                            if (opts.seriesIndex === 0) {
-                                const row = data[opts.dataPointIndex];
-                                const percent = row.max ? ((row.score / row.max) * 100).toFixed(1) : 0;
-                                return `${val} (${percent}%)`;
-                            }
-                            return "";
-                        },
-                        offsetY: function(val, opts) {
-                            const isMax = val === maxVal;
-                            return isMax ? -25 : -10; // ✅ auto shift ถ้าชนขอบ
-                        }
-                    },
-                    stroke: {
-                        curve: 'smooth',
-                        width: 3
-                    },
-                    markers: {
-                        size: 5,
-                        colors: ['#fff'],
-                        strokeColors: ['#4f46e5', '#94a3b8'],
-                        strokeWidth: 2,
-                        hover: {
-                            size: 7
-                        }
-                    },
-                    xaxis: {
-                        categories: data.map(r => r.year),
-                        title: {
-                            text: 'ปีการประเมิน',
-                            style: {
-                                fontSize: '13px',
-                                fontWeight: '600',
-                                color: '#374151'
-                            }
-                        }
-                    },
                     yaxis: {
                         min: 0,
-                        max: maxVal ? maxVal * 1.15 : 100, // ✅ space เผื่อ datalabel
+                        max: newMax.length ? Math.max(...newMax) * 1.15 : 100,
                         title: {
-                            text: 'คะแนน',
-                            style: {
-                                fontSize: '13px',
-                                fontWeight: '600',
-                                color: '#374151'
-                            }
+                            text: "คะแนน"
                         }
-                    },
-                    grid: {
-                        padding: {
-                            top: 40,
-                            right: 30,
-                            bottom: 10,
-                            left: 20
-                        } // ✅ กันไม่ให้ชนขอบ
-                    },
-                    legend: {
-                        position: 'top',
-                        horizontalAlign: 'right'
                     }
-                };
+                }, true, true);
             }
 
-            // ✅ ฟังก์ชันดึงข้อมูลตามปีที่เลือก
-            function getSelectedData() {
-                const selectedYears = Array.from(document.querySelectorAll('.year-checkbox:checked'))
-                    .map(c => parseInt(c.value));
-                return yearlyTotals.filter(r => selectedYears.includes(r.year));
-            }
-
-            // ✅ Render chart ครั้งแรก
-            let initData = getSelectedData();
-            let chart = new ApexCharts(document.querySelector("#scoreLineChart"), makeOptions(initData));
-            chart.render();
-
-            // ✅ Update chart เมื่อเปลี่ยน checkbox
-            document.querySelectorAll('.year-checkbox').forEach(chk => {
-                chk.addEventListener('change', () => {
-                    const filtered = getSelectedData();
-                    chart.updateOptions(makeOptions(filtered), true, true);
-                });
+            document.querySelectorAll('.year-checkbox').forEach(cb => {
+                cb.addEventListener('change', applyYearFilter);
             });
-        })();
+        });
     </script>
+
 
 
     <!-- แล้วค่อยตามด้วยสคริปต์ของคุณ -->
@@ -988,6 +993,12 @@
             margin: 0;
         }
 
+        #scoreLineChart {
+            min-height: 365px;
+            width: 100%;
+            max-width: 100%;
+
+        }
 
 
 
