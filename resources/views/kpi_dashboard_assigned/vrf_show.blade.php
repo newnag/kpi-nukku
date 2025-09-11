@@ -90,126 +90,7 @@
                         </div>
 
                         <div class="criteria-content">
-                            <div class="criteria-evidence" x-data="{ open{{ $criteria->id }}: false }">
-                                <!-- ปุ่มเปิด popup -->
-                                <button @click="open{{ $criteria->id }} = true" class="btn-adds"
-                                    @if ($locked) hidden @endif>
-                                    เพิ่มหลักฐาน <i class="fa fa-upload"></i>
-                                </button>
-
-                                <!-- Popup -->
-                                <div x-show="open{{ $criteria->id }} && {{ $indicator->status }} != 3"
-                                    class="fixed inset-0 bg-opacity-50 flex items-center justify-center z-50" x-cloak>
-
-                                    <!-- ปุ่มปิด -->
-                                    <button @click="open{{ $criteria->id }} = false"
-                                        class="absolute top-3 right-3 text-gray-500 hover:text-red-500">
-                                        ปิด
-                                    </button>
-
-                                    <form action="{{ route('evidences.store') }}" method="POST"
-                                        enctype="multipart/form-data" id="evidence-form-{{ $criteria->id }}">
-                                        @csrf
-                                        <input type="hidden" name="criteria_id" value="{{ $criteria->id }}">
-
-
-                                        <div class="evidence-containers">
-                                            <div class="header-containers">เพิ่มหลักฐานใหม่</div>
-
-                                            <!-- ฟอร์มเพิ่มหลักฐาน -->
-                                            <div class="evidence-form">
-                                                <!-- ================= Upload Section ================= -->
-                                                <div class="upload-section">
-                                                    <div class="upload-area upload-area-{{ $criteria->id }}"
-                                                        data-criteria="{{ $criteria->id }}">
-                                                        <div class="upload-icon">
-                                                            <svg xmlns="http://www.w3.org/2000/svg" width="48"
-                                                                height="48" fill="none" viewBox="0 0 24 24"
-                                                                stroke="currentColor" style="color:#9ca3af;">
-                                                                <path stroke-linecap="round" stroke-linejoin="round"
-                                                                    stroke-width="1"
-                                                                    d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                                                            </svg>
-                                                        </div>
-                                                        <p class="upload-text">วางไฟล์ของคุณที่นี่ หรือ
-                                                            คลิกเพื่อเลือกไฟล์</p>
-                                                        <input type="file" id="fileInput-{{ $criteria->id }}"
-                                                            name="files[]" multiple accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
-                                                            class="file-input-{{ $criteria->id }}" style="display:none;">
-                                                    </div>
-                                                    <div id="filesList-{{ $criteria->id }}"
-                                                        class="files-list files-list-{{ $criteria->id }}"></div>
-                                                </div>
-
-                                                <!-- ================= URL Section ================= -->
-                                                <div class="url-section url-section-{{ $criteria->id }}"
-                                                    data-criteria="{{ $criteria->id }}">
-                                                    <div class="section-divider"></div>
-
-                                                    {{-- แสดงค่าที่เคยกรอก (old) ทั้งหมดแบบล็อคแก้ไข + ปุ่มลบ --}}
-                                                    @foreach (collect(old('additional_urls', [])) as $u)
-                                                        @if ($u !== null && $u !== '')
-                                                            <div
-                                                                class="form-group url-row url-row-{{ $criteria->id }}-{{ $loop->index }}">
-                                                                <input type="url" name="additional_urls[]"
-                                                                    class="form-input url-input locked"
-                                                                    value="{{ $u }}" readonly tabindex="-1">
-                                                                <button type="button" class="remove-url-btn"
-                                                                    @if ($locked) hidden @endif
-                                                                    aria-label="ลบ URL">
-                                                                    <i data-lucide="x" style="width:16px;height:16px;"></i>
-                                                                </button>
-                                                            </div>
-                                                        @endif
-                                                    @endforeach
-
-                                                    {{-- แถวสุดท้าย: ว่าง + ปุ่มเพิ่ม (แก้ได้เพียงช่องเดียวในหน้า) --}}
-                                                    <div class="form-group url-row url-row-new-{{ $criteria->id }}">
-                                                        <input type="text" name="url_names[]"
-                                                            class="form-input url-name url-name-{{ $criteria->id }}"
-                                                            placeholder="ชื่อหลักฐาน URL">
-                                                        <input type="url" name="additional_urls[]"
-                                                            class="form-input url-input url-input-{{ $criteria->id }}"
-                                                            placeholder="วาง URL เพิ่มเติม">
-                                                        <button type="button"
-                                                            class="add-url-btn add-url-btn-{{ $criteria->id }}"
-                                                            aria-label="เพิ่ม URL">
-                                                            <i data-lucide="plus" style="width:16px;height:16px;"></i>
-                                                        </button>
-                                                    </div>
-                                                </div>
-
-                                                <!-- ================= Details Section ================= -->
-                                                <div class="details-section">
-                                                    <div class="section-title">รายละเอียดเพิ่มเติม</div>
-
-                                                    {{-- ใช้ Trumbowyg บน textarea นี้ --}}
-                                                    <textarea id="detailEditor-{{ $criteria->id }}" name="detail" class="detail-editor-{{ $criteria->id }}"
-                                                        rows="6">
-                                                                {!! old('detail') !!}
-                                                                </textarea>
-
-                                                </div>
-
-                                                <!-- ================= Action Buttons ================= -->
-                                                <div class="action-buttons">
-                                                    <button type="button" class="btn-secondary"
-                                                        @click="open{{ $criteria->id }} = false">
-                                                        <i data-lucide="undo-2" style="margin-right:6px;"></i>
-                                                        กลับ
-                                                    </button>
-                                                    <button type="submit" class="btn-primary">
-                                                        <i data-lucide="save" style="margin-right:6px;"></i>
-                                                        บันทึก
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                    </form>
-
-                                </div>
-                            </div>
+                            <x-evidence-uploader :criteria="$criteria" :locked="$locked" :indicator-status="$indicator->status" :store-route="route('evidences.store')" />
 
                             <!-- คำอธิบายเกณฑ์ -->
                             @if ($criteria->description)
@@ -318,7 +199,7 @@
                                         </div>
                                     </div>
                                 @empty
-                                    <div class="evidence-empty">ยังไม่มีหลักฐานแนบ</div>
+                                    <div class="text-sm text-center text-gray-500 opacity-75">----- ยังไม่มีหลักฐานแนบ -----</div>
                                 @endforelse
                             </div>
                         </div>
@@ -441,7 +322,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Trumbowyg/2.27.3/plugins/fontfamily/trumbowyg.fontfamily.min.js">
     </script>
 
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    {{-- <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> --}}
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             const form = document.getElementById("variables-form");
@@ -467,64 +348,64 @@
             lucide.createIcons();
         }
         // ================= ปุ่มบันทึกตัวแปร =================
-        document.querySelectorAll('.save-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const status = this.dataset.status;
-                const form = document.getElementById('variables-form');
-                const formData = new FormData(form);
-                formData.set('status', status); // อัปเดทค่า status
+        // document.querySelectorAll('.save-btn').forEach(btn => {
+        //     btn.addEventListener('click', function() {
+        //         const status = this.dataset.status;
+        //         const form = document.getElementById('variables-form');
+        //         const formData = new FormData(form);
+        //         formData.set('status', status); // อัปเดทค่า status
 
-                fetch(form.action, {
-                        method: "POST",
-                        body: formData,
-                        headers: {
-                            "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content,
-                            "Accept": "application/json"
-                        }
-                    })
-                    .then(async res => {
-                        const text = await res.text();
-                        try {
-                            return JSON.parse(text);
-                        } catch (err) {
-                            console.error("Response is not JSON:", text);
-                            throw err;
-                        }
-                    })
-                    .then(data => {
-                        if (data.success) {
-                            Swal.fire({
-                                toast: true,
-                                position: 'top-end',
-                                icon: 'success',
-                                title: data.message || 'บันทึกสำเร็จ',
-                                showConfirmButton: false,
-                                timer: 2000
-                            });
-                        } else {
-                            Swal.fire({
-                                toast: true,
-                                position: 'top-end',
-                                icon: 'error',
-                                title: data.message || 'เกิดข้อผิดพลาด',
-                                showConfirmButton: false,
-                                timer: 2000
-                            });
-                        }
-                    })
-                    .catch(err => {
-                        console.error("Fetch error:", err);
-                        Swal.fire({
-                            toast: true,
-                            position: 'top-end',
-                            icon: 'error',
-                            title: 'ไม่สามารถบันทึกได้',
-                            showConfirmButton: false,
-                            timer: 2000
-                        });
-                    });
-            });
-        });
+        //         fetch(form.action, {
+        //                 method: "POST",
+        //                 body: formData,
+        //                 headers: {
+        //                     "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content,
+        //                     "Accept": "application/json"
+        //                 }
+        //             })
+        //             .then(async res => {
+        //                 const text = await res.text();
+        //                 try {
+        //                     return JSON.parse(text);
+        //                 } catch (err) {
+        //                     console.error("Response is not JSON:", text);
+        //                     throw err;
+        //                 }
+        //             })
+        //             .then(data => {
+        //                 if (data.success) {
+        //                     Swal.fire({
+        //                         toast: true,
+        //                         position: 'top-end',
+        //                         icon: 'success',
+        //                         title: data.message || 'บันทึกสำเร็จ',
+        //                         showConfirmButton: false,
+        //                         timer: 2000
+        //                     });
+        //                 } else {
+        //                     Swal.fire({
+        //                         toast: true,
+        //                         position: 'top-end',
+        //                         icon: 'error',
+        //                         title: data.message || 'เกิดข้อผิดพลาด',
+        //                         showConfirmButton: false,
+        //                         timer: 2000
+        //                     });
+        //                 }
+        //             })
+        //             .catch(err => {
+        //                 console.error("Fetch error:", err);
+        //                 Swal.fire({
+        //                     toast: true,
+        //                     position: 'top-end',
+        //                     icon: 'error',
+        //                     title: 'ไม่สามารถบันทึกได้',
+        //                     showConfirmButton: false,
+        //                     timer: 2000
+        //                 });
+        //             });
+        //     });
+        // });
 
 
 
@@ -570,95 +451,95 @@
             const editorInitialized = {};
             const form = document.getElementById("evidence-form-{{ $criteria->id }}");
 
-            form.addEventListener("submit", function(e) {
-                e.preventDefault();
+            // form.addEventListener("submit", function(e) {
+            //     e.preventDefault();
 
-                let formData = new FormData(form);
+            //     let formData = new FormData(form);
 
-                fetch(form.action, {
-                        method: "POST",
-                        body: formData,
-                        headers: {
-                            "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content,
-                            "Accept": "application/json" // ✅ บังคับ Laravel ส่ง JSON
-                        }
-                    })
-                    .then(async res => {
-                        const text = await res.text();
-                        try {
-                            return JSON.parse(text);
-                        } catch (err) {
-                            console.error("Response is not JSON:", text);
-                            throw err;
-                        }
-                    })
-                    .then(data => {
-                        if (data.success) {
-                            Swal.fire({
-                                toast: true,
-                                position: 'top-end',
-                                icon: 'success',
-                                title: data.message || 'บันทึกสำเร็จ',
-                                showConfirmButton: false,
-                                timer: 2000
-                            });
+            //     fetch(form.action, {
+            //             method: "POST",
+            //             body: formData,
+            //             headers: {
+            //                 "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content,
+            //                 "Accept": "application/json" // ✅ บังคับ Laravel ส่ง JSON
+            //             }
+            //         })
+            //         .then(async res => {
+            //             const text = await res.text();
+            //             try {
+            //                 return JSON.parse(text);
+            //             } catch (err) {
+            //                 console.error("Response is not JSON:", text);
+            //                 throw err;
+            //             }
+            //         })
+            //         .then(data => {
+            //             if (data.success) {
+            //                 Swal.fire({
+            //                     toast: true,
+            //                     position: 'top-end',
+            //                     icon: 'success',
+            //                     title: data.message || 'บันทึกสำเร็จ',
+            //                     showConfirmButton: false,
+            //                     timer: 2000
+            //                 });
 
-                            const list = document.querySelector(
-                                `.evidence-list-${form.querySelector('[name="criteria_id"]').value}`
-                            );
-                            if (list && data.evidences && Array.isArray(data.evidences)) {
-                                data.evidences.forEach(ev => {
-                                    list.insertAdjacentHTML("beforeend", renderEvidenceItem(
-                                        ev));
+            //                 const list = document.querySelector(
+            //                     `.evidence-list-${form.querySelector('[name="criteria_id"]').value}`
+            //                 );
+            //                 if (list && data.evidences && Array.isArray(data.evidences)) {
+            //                     data.evidences.forEach(ev => {
+            //                         list.insertAdjacentHTML("beforeend", renderEvidenceItem(
+            //                             ev));
 
-                                    // bind ปุ่มลบทันที
-                                    const deleteBtn = list.querySelector(
-                                        `#evidence-${ev.id} .btn-delete`);
-                                    deleteBtn.addEventListener("click", () => handleDelete(ev
-                                        .id));
-                                });
-                                if (window.lucide?.createIcons) lucide.createIcons();
-                            }
+            //                         // bind ปุ่มลบทันที
+            //                         const deleteBtn = list.querySelector(
+            //                             `#evidence-${ev.id} .btn-delete`);
+            //                         deleteBtn.addEventListener("click", () => handleDelete(ev
+            //                             .id));
+            //                     });
+            //                     if (window.lucide?.createIcons) lucide.createIcons();
+            //                 }
 
 
 
-                            // ✅ ปิด popup หลัง Toast
-                            setTimeout(() => {
-                                // ถ้าใช้ Alpine variable เช่น open{{ $criteria->id }}
-                                window[`open{{ $criteria->id }}`] = false;
+            //                 // ✅ ปิด popup หลัง Toast
+            //                 setTimeout(() => {
+            //                     // ถ้าใช้ Alpine variable เช่น open{{ $criteria->id }}
+            //                     window[`open{{ $criteria->id }}`] = false;
 
-                                // fallback force ปิด DOM
-                                const popup = form.closest('[x-show]');
-                                if (popup) {
-                                    popup.style.display = 'none';
-                                }
-                            }, 800);
+            //                     // fallback force ปิด DOM
+            //                     const popup = form.closest('[x-show]');
+            //                     if (popup) {
+            //                         popup.style.display = 'none';
+            //                     }
+            //                 }, 800);
 
-                            // ✅ reset form หลังบันทึกเสร็จ
-                            form.reset();
-                        } else {
-                            Swal.fire({
-                                toast: true,
-                                position: 'top-end',
-                                icon: 'error',
-                                title: data.message || 'เกิดข้อผิดพลาด ⚠️',
-                                showConfirmButton: false,
-                                timer: 2000
-                            });
-                        }
-                    })
-                    .catch(err => {
-                        console.error("Fetch error:", err);
-                        Swal.fire({
-                            toast: true,
-                            position: 'top-end',
-                            icon: 'error',
-                            title: 'ไม่สามารถบันทึกได้',
-                            showConfirmButton: false,
-                            timer: 2000
-                        });
-                    });
-            });
+            //                 // ✅ reset form หลังบันทึกเสร็จ
+            //                 form.reset();
+            //             } else {
+            //                 Swal.fire({
+            //                     toast: true,
+            //                     position: 'top-end',
+            //                     icon: 'error',
+            //                     title: data.message || 'เกิดข้อผิดพลาด ⚠️',
+            //                     showConfirmButton: false,
+            //                     timer: 2000
+            //                 });
+            //             }
+            //         })
+            //         .catch(err => {
+            //             console.error("Fetch error:", err);
+            //             Swal.fire({
+            //                 toast: true,
+            //                 position: 'top-end',
+            //                 icon: 'error',
+            //                 title: 'ไม่สามารถบันทึกได้',
+            //                 showConfirmButton: false,
+            //                 timer: 2000
+            //             });
+            //         });
+            // });
 
 
             /*** ---------- File Upload Handler Class ---------- ***/
@@ -1128,7 +1009,7 @@
 
         .criteria-status {
             /* font-weight: 600;
-                                        font-size: 14px; */
+                                                font-size: 14px; */
             color: #1f2937;
         }
 
