@@ -189,7 +189,7 @@
         </div>
     </div>
 
-    <div class="border border-gray-200 rounded-lg shadow-sm overflow-x-auto">
+    <div class="border bg-white border-gray-200 rounded-lg shadow-sm overflow-x-auto">
         <div class="dashboard-list">
             <table id="myTable" class="w-full">
                 <thead>
