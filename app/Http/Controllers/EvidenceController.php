@@ -185,16 +185,99 @@ class EvidenceController extends Controller
     //     return view('evidences.app', compact('evidences', 'fileTypes', 'fileUsers', 'indicators'));
     // }
 
+    public function index(Request $request)
+    {
+        // เริ่มต้น query + preload ความสัมพันธ์
+        $query = Evidence::with(['criteria.indicator', 'user']);
+
+        // 🟢 ถ้า role = user → แสดงเฉพาะของตัวเอง
+        if (Auth::user() && Auth::user()->hasRole('user')) {
+            $query->where('user_id', Auth::id());
+        }
+
+        // กรอง criteria_id
+        if ($request->filled('criteria_id')) {
+            $query->where('criteria_id', (int) $request->input('criteria_id'));
+        }
+
+        // กรอง user_id (แต่ user ปกติไม่ควรเลือก user_id อื่นได้อยู่แล้ว)
+        if ($request->filled('user_id')) {
+            $query->where('user_id', (int) $request->input('user_id'));
+        }
+
+        // กรอง status
+        if ($request->has('status') && $request->input('status') !== '') {
+            $status = $request->input('status');
+            if (in_array($status, ['0', '1', 0, 1, true, false], true)) {
+                $query->where('status', (int) $status);
+            }
+        }
+
+        // กรอง type
+        if ($request->filled('type')) {
+            $query->where('type', $request->input('type'));
+        }
+
+        // ✅ กรอง indicator
+        if ($request->filled('indicator_id')) {
+            $query->whereHas('criteria.indicator', function ($q) use ($request) {
+                $q->where('id', (int) $request->input('indicator_id'));
+            });
+        }
+
+        // 🔹 รายการประเภทไฟล์
+        $fileTypes = (clone $query)
+            ->select('type')
+            ->whereNotNull('type')
+            ->distinct()
+            ->orderBy('type')
+            ->pluck('type');
+
+        // 🔹 รายการผู้ใช้ (เฉพาะ role อื่น ๆ เท่านั้นถึงจะเห็น user list)
+        $fileUsers = collect();
+        if (!Auth::user()->hasRole('user')) {
+            $fileUsers = (clone $query)
+                ->join('users', 'evidence.user_id', '=', 'users.id')
+                ->select('users.name')
+                ->whereNotNull('users.name')
+                ->distinct()
+                ->orderBy('users.name')
+                ->pluck('users.name');
+        }
+
+        // 🔹 รายการตัวชี้วัด
+        $indicators = Indicator::select('code', 'name')
+            ->groupBy('code', 'name')
+            ->orderByRaw("split_part(code, '-', 1)")            // prefix ก่อน '-'
+            ->orderByRaw("(split_part(code, '-', 2))::int")     // ตัวเลขหลัง '-'
+            ->get();
+
+        // Pagination
+        $perPage   = (int) $request->input('per_page', 5000);
+        $evidences = $query->paginate($perPage)->withQueryString();
+
+        // คำนวณ total_size
+        $evidences->getCollection()->transform(function ($evidence) {
+            $totalSize = 0;
+            if (!empty($evidence->path['files'])) {
+                foreach ($evidence->path['files'] as $f) {
+                    $totalSize += $f['size'] ?? 0;
+                }
+            }
+            $evidence->total_size = $totalSize;
+            $evidence->total_size_human = $this->formatFileSize($totalSize);
+            return $evidence;
+        });
+
+        return view('evidences.app', compact('evidences', 'fileTypes', 'fileUsers', 'indicators'));
+    }
+
 
     /**
      * Store a newly created evidence in storage.
      */
     public function create(Criteria $criteria)
     {
-        // Log ตอนเข้าหน้า create
-        // Log::info('=== EvidenceController@create ===', [
-        //     'criteria_param' => $criteria->id ?? null,
-        // ]);
 
         $criterias = Criteria::orderBy('name')->get(['id', 'name']);
 
@@ -220,9 +303,6 @@ class EvidenceController extends Controller
 
     public function store(Request $request)
     {
-        Log::info('=== EvidenceController@store ===', [
-            'criteria_id' => $request->input('criteria_id'),
-        ]);
 
         $request->validate([
             'criteria_id'       => 'required|integer|exists:criterias,id',
@@ -322,7 +402,7 @@ class EvidenceController extends Controller
                     $evidence = new Evidence();
                     $evidence->path        = $payload;
                     $evidence->detail      = null;
-                    $evidence->status      = true;
+                    $evidence->status      = false;
                     $evidence->criteria_id = $criteria->id;
                     $evidence->user_id     = Auth::id();
                     $evidence->name        = $originalName;
@@ -387,8 +467,17 @@ class EvidenceController extends Controller
                 ]);
             }
 
-            return redirect()->route('dashboardKpiUser.show', $indicator->id)
-                ->with('success', 'บันทึกหลักฐานเรียบร้อยแล้ว');
+            $userId = Auth::user();
+
+            if ($userId->hasRole('user')) {
+                // ส่งข้อมูลกลับไปยังหน้าแสดงผล
+                return redirect()->route('dashboardkpi.user.show', $indicator->id)
+                    ->with('success', 'บันทึกหลักฐานเรียบร้อยแล้ว');
+            } else {
+                // สำหรับผู้ดูแลระบบหรือบทบาทอื่น ๆ
+                return redirect()->route('dashboardkpi.admin.show', $indicator->id)
+                    ->with('success', 'บันทึกหลักฐานเรียบร้อยแล้ว');
+            }
         } catch (\Throwable $e) {
             Log::error('Evidence store error', [
                 'exception' => $e->getMessage(),
@@ -549,23 +638,26 @@ class EvidenceController extends Controller
      */
     public function destroy($id)
     {
-        $evidence = Evidence::findOrFail($id);
+        try {
+            $evidence = Evidence::findOrFail($id);
 
-        // ถ้ามีไฟล์จริงใน storage → ลบด้วย
-        if (is_array($evidence->path) && isset($evidence->path['files'])) {
-            foreach ($evidence->path['files'] as $file) {
-                if (!empty($file['path'])) {
-                    Storage::disk('public')->delete($file['path']);
+            // Delete associated files if they exist
+            if (is_array($evidence->path) && isset($evidence->path['files'])) {
+                foreach ($evidence->path['files'] as $file) {
+                    if (!empty($file['path'])) {
+                        Storage::disk('public')->delete($file['path']);
+                    }
                 }
             }
+
+            $evidence->delete();
+
+            // Flash success message to session
+            return redirect()->back()->with('success', 'ลบหลักฐานเรียบร้อยแล้ว');
+        } catch (\Exception $e) {
+            // Flash error message to session
+            return redirect()->back()->with('error', 'เกิดข้อผิดพลาดในการลบหลักฐาน');
         }
-
-        $evidence->delete();
-
-        return response()->json([
-            'success' => true,
-            'message' => 'ลบหลักฐานเรียบร้อยแล้ว'
-        ]);
     }
 
 

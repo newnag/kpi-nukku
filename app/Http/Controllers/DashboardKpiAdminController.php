@@ -6,74 +6,13 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Indicator;
 use App\Models\Variable;
+use App\Models\Criteria;
+use App\Models\Evidence;
 use Illuminate\Database\Eloquent\Casts\Json;
+use Laravel\Pail\ValueObjects\Origin\Console;
 
 class DashboardKpiAdminController extends Controller
 {
-    public function index(Request $request)
-    {
-        $user   = Auth::user();
-        $userId = $user->id;
-
-        $query = Indicator::query();
-
-        // ✅ ใช้ Spatie เช็ค role
-        if ($user->hasRole('user')) {
-            $query->whereHas('assignments', fn($q) => $q->where('collector', $userId));
-        }
-
-        $indicators = $query
-            ->with([
-                'category:id,name,standard_id',
-                'category.standard:id,name',
-                'assignments' => function ($q) use ($user) {
-                    if ($user->hasRole('user')) {
-                        $q->where('collector', $user->id);
-                    }
-                    $q->with(['collectorUser:id,name,department_id', 'collectorUser.department:id,name']);
-                },
-                'criterias:id,indicator_id,status'
-            ])
-            ->orderByRaw("
-            CASE LEFT(code, 3)
-                WHEN 'NCS' THEN 1
-                WHEN 'NCO' THEN 2
-                WHEN 'NCP' THEN 3
-                ELSE 4
-            END
-        ")
-            ->orderByRaw("
-            CASE 
-                WHEN split_part(code, '-', 2) ~ '^[0-9]+$' 
-                THEN CAST(split_part(code, '-', 2) AS INTEGER)
-                ELSE 999999
-            END
-        ")
-            ->get()
-            ->map(function ($indicator) {
-                $totalCriteria = $indicator->criterias->count();
-                $completed     = $indicator->criterias->where('status', 1)->count();
-
-                if ($totalCriteria === 0) {
-                    $indicator->doc_status = 'รอดำเนินการ';
-                } elseif ($completed < $totalCriteria) {
-                    $indicator->doc_status = 'ไม่ครบ';
-                } else {
-                    $indicator->doc_status = 'ครบ';
-                }
-
-                $indicator->status_key = match ((int) $indicator->status) {
-                    2, 3 => 'complete',
-                    4    => 'incomplete',
-                    0    => 'pending',
-                    default => 'pending',
-                };
-
-                return $indicator;
-            });
-
-        return view('kpi_dashboard_assigned.app', compact('indicators'));
-    }
 
     public function show($id)
     {
@@ -100,12 +39,33 @@ class DashboardKpiAdminController extends Controller
     {
         $indicator = Indicator::findOrFail($id);
 
+        // variables
         if ($request->has('variables')) {
             foreach ($request->variables as $varId => $value) {
                 Variable::updateOrCreate(
                     ['id' => $varId, 'indicator_id' => $indicator->id],
                     ['value' => $value]
                 );
+            }
+        }
+
+        // criterias
+        if ($request->has('criterias')) {
+            foreach ($request->criterias as $criteriaId => $criteriaData) {
+                if (isset($criteriaData['status'])) {
+                    Criteria::where('id', $criteriaId)->update(['status' => $criteriaData['status']]);
+                }
+            }
+        }
+
+        // evidences
+        if ($request->has('evidences')) {
+            foreach ($request->evidences as $evidenceId => $evidenceData) {
+                if (isset($evidenceData['status'])) {
+                    Evidence::where('id', $evidenceId)->update([
+                        'status' => $evidenceData['status'] === 'true'
+                    ]);
+                }
             }
         }
 
@@ -116,8 +76,25 @@ class DashboardKpiAdminController extends Controller
         $indicator->save();
 
         // ✅ ส่ง JSON กลับไป
-        return redirect()->route('dashboardKpiUser.index')
+        return redirect()->route('dashboardkpi.admin.show', $indicator->id)
             ->with('success', 'บันทึกข้อมูลเรียบร้อยแล้ว');
+
+        // return response()->json($request->all());
     }
 
+    // public function updateStatus(Request $request, $id)
+    // {
+    //     $indicator = Indicator::findOrFail($id);
+
+    //     if ($request->has('status')) {
+    //         $indicator->status = $request->status;
+    //         $indicator->save();
+
+    //         return redirect()->route('dashboardkpi.admin.show', $indicator->id)
+    //             ->with('success', 'เปลี่ยนสถานะตัวชี้วัดเรียบร้อยแล้ว');
+    //     }
+
+    //     return redirect()->route('dashboardkpi.admin.show', $indicator->id)
+    //         ->with('error', 'ไม่พบสถานะที่ต้องการเปลี่ยนแปลง');
+    // }
 }

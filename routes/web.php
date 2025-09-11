@@ -60,16 +60,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
             ->name('export')
             ->middleware('permission:export-dashboard');
     });
-
-    // ===== DASHBOARD KPI USER ROUTES =====
-    Route::prefix('dashboardKpiUser')->name('dashboardKpiUser.')->middleware('permission:view-dashboard-kpi-user')->group(function () {
-        Route::get('/', [DashboardKpiUserController::class, 'index'])->name('index');
-        Route::get('/dashboardKpiUser/{id}', [DashboardKpiUserController::class, 'show'])
-
-            ->name('show')
-            ->middleware('permission:show-dashboard-kpi-user');
-    });
-
+    
     // ===== INDICATOR ROUTES =====
     Route::prefix('indicator')->name('indicator.')->group(function () {
         // Dashboard
@@ -243,20 +234,20 @@ Route::middleware(['auth:sanctum'])->group(function () {
             ->middleware('permission:download-evidence');
     });
 
-    Route::prefix('dashboardKpiUser')->name('dashboardKpiUser.')->group(function () {
+    // ===== DASHBOARD KPI ROUTES =====
+    Route::prefix('dashboardkpi')->name('dashboardkpi.')->group(function () {
+        
         Route::get('/', [DashboardKpiUserController::class, 'index'])->name('index');
-        Route::get('/dashboardKpiUser/{id}', [DashboardKpiUserController::class, 'show'])->name('show');
-        Route::put('/{id}/update-variables', [DashboardKpiUserController::class, 'saveVariables'])->name('saveVariables');
-    });
+        
+        Route::prefix('/user')->name('user.')->group(function () {
+            Route::get('/kpi/{id}', [DashboardKpiUserController::class, 'show'])->name('show');
+            Route::put('/{id}/update-variables', [DashboardKpiUserController::class, 'saveVariables'])->name('saveVariables');
+        });
 
-    Route::prefix('dashboardKpiUser')->name('dashboardKpiUser.')->group(function () {
-        Route::get('/', [DashboardKpiUserController::class, 'index'])->name('index');
-        Route::get('/dashboardKpiUser/{id}', [DashboardKpiUserController::class, 'show'])->name('show');
-        Route::put('/{id}/update-variables', [DashboardKpiUserController::class, 'saveVariables'])->name('saveVariables');
+        Route::prefix('/admin')->name('admin.')->group(function () {
+            Route::get('/kpi/{id}', [DashboardKpiAdminController::class, 'show'])->name('show');
+            Route::put('/{id}/update-variables', [DashboardKpiAdminController::class, 'saveVariables'])->name('saveVariables');
+            Route::put('/kpi/{id}/update-status', [DashboardKpiAdminController::class, 'updateStatus'])->name('updateStatus');
+        });
     });
-});
-
-Route::prefix('/test')->name('dashboardKpiAdmin.')->group(function () {
-    Route::get('/', [DashboardKpiAdminController::class, 'index'])->name('index');
-    Route::get('/dashboardKpiUser/{id}', [DashboardKpiAdminController::class, 'show'])->name('show');
 });

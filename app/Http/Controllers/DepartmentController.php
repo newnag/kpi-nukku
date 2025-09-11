@@ -59,7 +59,7 @@ class DepartmentController extends Controller
 
         //ตรวจสอบว่ามีผู้ใช้งานในหน่วยงานนี้หรือไม่
         if ($department->users()->count() > 0) {
-            return redirect()->route('departmrnts.index')
+            return redirect()->route('departments.index')
                 ->with('error', 'ไม่สามารถลบหน่วยงานนี้ได้ เพราะมีการใช้งานอยู่ในระบบ');
         }
         $department->delete();
