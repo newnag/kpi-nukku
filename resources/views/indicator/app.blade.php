@@ -403,17 +403,19 @@
                             </td>
                             <td class="px-4 py-3 text-sm">
                                 <a href="{{ route('indicator.show', $indicator['id']) }}"
-                                    class="inline-flex items-center justify-center px-3 py-1 bg-white border border-blue-500 text-blue-500 rounded-full text-xs font-medium hover:bg-blue-500 hover:text-white">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 mr-1" fill="none"
-                                        viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    class="btn-view flex items-center gap-1">
+                                    <!-- ไอคอนตา -->
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
                                             d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        <path stroke-linecap="round" stroke-linejoin="round"
                                             d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                     </svg>
-                                    MORE
+                                    ตรวจสอบ
                                 </a>
                             </td>
+
                         </tr>
                         @empty
                             <tr>
@@ -579,6 +581,32 @@
                 font-size: 12px;
                 white-space: nowrap;
                 z-index: 10;
+
+            }
+
+            .btn-view {
+                text-decoration: none;
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+                padding: 6px 14px;
+                border-radius: 6px;
+                /* ✅ มุมมนเล็กน้อย */
+                border: 1px solid #3b82f6;
+                /* ✅ น้ำเงิน (Tailwind blue-500) */
+                background: #fff;
+                cursor: pointer;
+                font-size: 13px;
+                font-weight: 500;
+                white-space: nowrap;
+                color: #3b82f6;
+                /* ✅ ตัวอักษรน้ำเงิน */
+                transition: all 0.2s ease-in-out;
+            }
+
+            .btn-view:hover {
+                background: #dbeafe;
+                /* ✅ น้ำเงินอ่อนตอน hover */
             }
         </style>
     @endpush

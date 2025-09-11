@@ -12,21 +12,7 @@
         z-index: 1000;
         width: 100%;
         box-sizing: border-box;
-    }
-
-    .navbar-brand {
-        display: flex;
-        align-items: center;
-        font-weight: 600;
-        color: #000;
-        text-decoration: none;
-    }
-
-    .navbar-brand img {
-        height: 40px;
-        width: 40px;
-        border-radius: 50%;
-        margin-right: 10px;
+        flex-wrap: wrap;
     }
 
     .navbar-menu {
@@ -38,14 +24,125 @@
     .navbar-menu a {
         color: #333;
         text-decoration: none;
-        padding: 6px 12px;
+        padding: 8px 14px;
         border-radius: 6px;
-        transition: background 0.2s;
+        transition: background 0.2s, color 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 6px;
     }
 
     .navbar-menu a:hover,
     .navbar-menu a.active {
-        background: #eee;
+        background: #f3f4f6;
+        color: #111;
+    }
+
+    .navbar-brand {
+        display: flex;
+        align-items: center;
+        font-weight: 600;
+        color: #000;
+        text-decoration: none;
+        white-space: nowrap;
+        /* ✅ ไม่ให้ตัดบรรทัด */
+        font-size: 15px;
+        gap: 10px;
+    }
+
+    .navbar-brand img {
+        height: 50px;
+        /* ✅ ย่อโลโก้ */
+        width: auto;
+        border-radius: 50%;
+    }
+
+    .dropdown {
+        position: relative;
+    }
+
+    .dropdown-toggle {
+        cursor: pointer;
+        padding: 8px 14px;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        transition: background 0.2s;
+    }
+
+    .dropdown-toggle:hover {
+        background: #f3f4f6;
+    }
+
+    .dropdown-menu {
+        display: none;
+        position: absolute;
+        top: 100%;
+        right: 0;
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        min-width: 220px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        flex-direction: column;
+        z-index: 1000;
+        padding: 6px 0;
+    }
+
+    .dropdown.open .dropdown-menu {
+        display: flex;
+    }
+
+    .dropdown-menu a {
+        padding: 8px 14px;
+        color: #333;
+        font-size: 14px;
+    }
+
+    .dropdown-menu a:hover {
+        background: #f9fafb;
+    }
+
+    .user-avatar {
+        height: 35px;
+        width: 35px;
+        border-radius: 50%;
+        border: 2px solid #ddd;
+    }
+
+    .navbar-toggle {
+        display: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        background: none;
+        border: none;
+        color: #333;
+    }
+
+    /* ✅ Responsive */
+    @media (max-width: 768px) {
+        .navbar {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .navbar-menu {
+            display: none;
+            flex-direction: column;
+            width: 100%;
+            padding: 0.5rem 0;
+            border-top: 1px solid #eee;
+        }
+
+        .navbar-menu.show {
+            display: flex;
+        }
+
+        .navbar-toggle {
+            display: block;
+            margin-left: auto;
+        }
     }
 
     /* Dropdown */
@@ -163,23 +260,28 @@
 
 <!-- Navbar Component -->
 <nav class="navbar">
-    <a href="{{ auth()->check() ? route('dashboard.index') : '#' }}" class="navbar-brand">
+    <a href="{{ route('dashboard.index') }}" class="navbar-brand">
         <img src="/uploads/logonuthaiS-2.png" alt="Logo">
-        <span>{{ 'ระบบบริหารจัดการข้อมูลการรับรองสถาบันจากสภาการพยาบาล' }}</span>
+        <span>ระบบบริหารจัดการข้อมูลการรับรองสถาบัน</span>
     </a>
+
+    <!-- ปุ่ม Hamburger -->
+    <button class="navbar-toggle" onclick="document.querySelector('.navbar-menu').classList.toggle('show')">
+        <i class="fa-solid fa-bars"></i>
+    </button>
 
     @auth
         <div class="navbar-menu">
-            <!-- Dashboard - Available to all authenticated users -->
             @can('view-dashboard')
                 <a href="{{ route('dashboard.index') }}" class="{{ request()->routeIs('dashboard.index') ? 'active' : '' }}">
                     <i class="fa-solid fa-gauge-high"></i> Dashboard
                 </a>
-                <!-- Graph Result - Available to users with export permission -->
-                <a href="{{ route('dashboard.getData') }}" class="{{ request()->routeIs('dashboard.getData') ? 'active' : '' }}">
+                <a href="{{ route('dashboard.getData') }}"
+                    class="{{ request()->routeIs('dashboard.getData') ? 'active' : '' }}">
                     <i class="fa-solid fa-chart-column"></i> กราฟแสดงผลลัพธ์ตัวชี้วัด
                 </a>
             @endcan
+
             @hasanyrole('user')
                 <a href="{{ route('dashboardKpiUser.index') }}"
                     class="{{ request()->is('dashboardKpiUser*') ? 'active' : '' }}">
@@ -190,87 +292,49 @@
                 </a>
             @endhasanyrole
 
-
-            <!-- Indicators - Available to users with indicator permissions -->
             @can('view-indicator-dashboard')
                 <a href="{{ route('indicator.index') }}" class="{{ request()->is('indicator*') ? 'active' : '' }}">
                     <i class="fa-solid fa-sliders"></i> จัดการตัวชี้วัด
                 </a>
             @endcan
+
             @hasanyrole('super_admin|system_admin|qa_admin')
                 <a href="{{ route('dashboardKpiUser.index') }}"
                     class="{{ request()->routeIs('dashboardKpiUser.*') ? 'active' : '' }}">
                     <i class="fa-solid fa-chart-line"></i> ตรวจสอบตัวชี้วัด
                 </a>
             @endhasanyrole
-            <!-- Settings - Only for super_admin and system_admin roles -->
+
             @hasanyrole('super_admin|system_admin')
-                <div class="dropdown" id="settingsDropdown">
+                <div class="dropdown" onclick="this.classList.toggle('open')">
                     <div class="dropdown-toggle">
                         <i class="fa-solid fa-gear"></i> ตั้งค่าระบบ <i class="fa-solid fa-caret-down ml-1"></i>
                     </div>
                     <div class="dropdown-menu">
                         @can('view-settings')
-                            <a href="{{ route('settings.index') }}">
-                                <i class="fa-solid fa-bell"></i> กำหนดวันแจ้งเตือน
-                            </a>
+                            <a href="{{ route('settings.index') }}"><i class="fa-solid fa-bell"></i> กำหนดวันแจ้งเตือน</a>
                         @endcan
                         @can('view-departments')
-                            <a href="{{ route('departments.index') }}">
-                                <i class="fa-solid fa-sitemap"></i> จัดการหน่วยงาน
-                            </a>
+                            <a href="{{ route('departments.index') }}"><i class="fa-solid fa-sitemap"></i> จัดการหน่วยงาน</a>
                         @endcan
                         @can('view-standards')
-                            <a href="{{ route('standards.index') }}">
-                                <i class="fa-solid fa-layer-group"></i> จัดการข้อมูลมาตรฐาน/ด้านต่างๆ
-                            </a>
+                            <a href="{{ route('standards.index') }}"><i class="fa-solid fa-layer-group"></i>
+                                จัดการข้อมูลมาตรฐาน/ด้านต่างๆ</a>
                         @endcan
                         @can('view-users')
-                            <a href="{{ route('users.index') }}">
-                                <i class="fa-solid fa-users"></i> จัดการผู้ใช้งาน
-                            </a>
+                            <a href="{{ route('users.index') }}"><i class="fa-solid fa-users"></i> จัดการผู้ใช้งาน</a>
                         @endcan
                         @can('view-evidence')
-                            <a href="{{ route('evidences.index') }}">
-                                <i class="fa-solid fa-folder-open"></i> จัดการหลักฐาน
-                            </a>
-                        @endcan
-
-                    </div>
-                </div>
-            @endhasanyrole
-
-            <!-- Management Menu - For qa_admin and administration_admin -->
-            @hasanyrole('qa_admin|administration_admin')
-                <div class="dropdown" id="managementDropdown">
-                    <div class="dropdown-toggle">
-                        <i class="fa-solid fa-tasks"></i> จัดการ <i class="fa-solid fa-caret-down ml-1"></i>
-                    </div>
-                    <div class="dropdown-menu">
-                        @can('view-departments')
-                            <a href="{{ route('departments.index') }}">
-                                <i class="fa-solid fa-sitemap"></i> จัดการหน่วยงาน
-                            </a>
-                        @endcan
-                        @can('view-standards')
-                            <a href="{{ route('standards.index') }}">
-                                <i class="fa-solid fa-layer-group"></i> จัดการมาตรฐาน
-                            </a>
-                        @endcan
-                        @can('view-evidence')
-                            <a href="{{ route('evidences.index') }}">
-                                <i class="fa-solid fa-file-alt"></i> จัดการหลักฐาน
-                            </a>
+                            <a href="{{ route('evidences.index') }}"><i class="fa-solid fa-folder-open"></i> จัดการหลักฐาน</a>
                         @endcan
                     </div>
                 </div>
             @endhasanyrole
 
-            <!-- User Menu - Available to all authenticated users -->
-            <div class="dropdown" id="userDropdown">
+            <div class="dropdown" onclick="this.classList.toggle('open')">
                 <div class="dropdown-toggle">
                     <img src="/uploads/avatar-type1.png" alt="User" class="user-avatar">
-                    <span class=" sm:inline">{{ auth()->user()->name ?? 'ผู้ใช้' }}</span>
+                    <span class="sm:inline">{{ auth()->user()->name ?? 'ผู้ใช้' }}</span>
                 </div>
                 <div class="dropdown-menu">
                     <div class="px-3 py-2 text-xs text-gray-500 border-b">
@@ -281,10 +345,6 @@
                             @endif
                         </div>
                     </div>
-                    {{-- @can('edit-profile')
-                        <a href="#"><i class="fa-solid fa-id-badge"></i> โปรไฟล์</a>
-                    @endcan --}}
-                    <hr>
                     <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                         <i class="fa-solid fa-right-from-bracket"></i> ออกจากระบบ
                     </a>
@@ -293,6 +353,14 @@
         </div>
     @endauth
 </nav>
+
+<!-- Logout Form -->
+@auth
+    <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display:none;">
+        @csrf
+    </form>
+@endauth
+
 
 <!-- Logout Form -->
 @auth
