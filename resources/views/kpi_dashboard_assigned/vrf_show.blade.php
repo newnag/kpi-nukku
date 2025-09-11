@@ -292,7 +292,7 @@
                 </div>
             </div>
 
-            <form id="variables-form" action="{{ route('dashboardKpiAdmin.saveVariables', $indicator->id) }}"
+            <form id="variables-form" action="{{ route('dashboardkpi.admin.saveVariables', $indicator->id) }}"
                 method="POST">
                 @csrf
                 @method('PUT')
@@ -326,7 +326,7 @@
 
                 <div class="action-bts">
                     <button type="button" class="btns-secondary"
-                        onclick="location.href='{{ route('dashboardKpiUser.index') }}'">
+                        onclick="location.href='{{ route('dashboardkpi.index') }}'">
                         <i class="fa fa-undo"></i> กลับ
                     </button>
 
@@ -336,8 +336,8 @@
 
                     <x-modal title="เปลี่ยนสถานะตัวชี้วัด" size="sm" :context="'status'">
                         <x-slot:trigger>
-                            <button type="button" class="btn-outlines"
-                                @if ($locked) disabled @endif>
+                            <button type="button" class="btn-outlines">
+                                {{-- @if ($locked) disabled @endif> --}}
                                 <i class="fa-solid fa-gear"></i>เปลี่ยนสถานะตัวชี้วัด
                             </button>
                         </x-slot:trigger>
@@ -1177,11 +1177,6 @@
         }
 
         .criteria-evidence {
-            /* display: flex; */
-            /* align-items: stretch; */
-            /* gap: 8px; */
-            /* flex-direction: column; */
-
             padding: 10px;
             display: flex;
             justify-content: center;

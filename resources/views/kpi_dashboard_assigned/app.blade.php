@@ -317,13 +317,13 @@
                                 <td>
                                     <div class="evidence-actions">
                                         @role('user')
-                                            <a href="{{ route('dashboardKpiUser.show', $indicator->id) }}"
+                                            <a href="{{ route('dashboardkpi.user.show', $indicator->id) }}"
                                                 class="btn-edit flex items-center gap-1" title="ทำการประเมิน">
                                                 <i data-lucide="edit"></i>
                                                 <span>ทำการประเมิน</span>
                                             </a>
                                             @elserole('super_admin|system_admin|qa_admin')
-                                            <a href="{{ route('dashboardKpiAdmin.show', $indicator->id) }}"
+                                            <a href="{{ route('dashboardkpi.admin.show', $indicator->id) }}"
                                                 class="btn-view flex items-center gap-1" title="ตรวจสอบ">
                                                 <i data-lucide="eye"></i>
                                                 <span>ตรวจสอบ</span>
@@ -331,10 +331,6 @@
                                         @endrole
                                     </div>
                                 </td>
-
-
-
-
                             </tr>
                         @endforeach
                     </tbody>

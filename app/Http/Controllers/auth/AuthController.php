@@ -19,10 +19,10 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-        $credentials = $request->validate([
-            'email' => ['required', 'string'],
-            'password' => ['required', 'string'],
-        ]);
+        // $credentials = $request->validate([
+        //     'email' => ['required', 'string'],
+        //     'password' => ['required', 'string'],
+        // ]);
 
         $key = Str::lower($request->input('email')) . '|' . $request->ip();
         $maxAttempts = 5;
@@ -45,9 +45,7 @@ class AuthController extends Controller
         }
 
         if ($user->status === 'inactive') {
-            return response()->json([
-                'message' => 'บัญชีของคุณถูกระงับการใช้งาน กรุณาติดต่อผู้ดูแลระบบ',
-            ], 413);
+            return response()->json(['message' => 'บัญชีของคุณถูกระงับการใช้งาน...'], 403);
         }
 
         RateLimiter::clear($key);
@@ -67,7 +65,7 @@ class AuthController extends Controller
         } elseif ($user->hasRole('administration_admin')) {
             $redirect = '/dashboard';
         } elseif ($user->hasRole('user')) {
-            $redirect = '/dashboardKpiUser';
+            $redirect = '/dashboardkpi/user';
         }
 
         return response()->json(['redirect' => $redirect]);

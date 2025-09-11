@@ -278,7 +278,7 @@
                 </div>
             </div>
 
-            <form id="variables-form" action="{{ route('dashboardKpiUser.saveVariables', $indicator->id) }}"
+            <form id="variables-form" action="{{ route('dashboardkpi.user.saveVariables', $indicator->id) }}"
                 method="POST">
                 @csrf
                 @method('PUT')

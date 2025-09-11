@@ -181,8 +181,8 @@
                 </a>
             @endcan
             @hasanyrole('user')
-                <a href="{{ route('dashboardKpiUser.index') }}"
-                    class="{{ request()->is('dashboardKpiUser*') ? 'active' : '' }}">
+                <a href="{{ route('dashboardkpi.index') }}"
+                    class="{{ request()->is('dashboardkpi*') ? 'active' : '' }}">
                     <i class="fa-solid fa-gauge-high"></i> Dashboard ผู้ใช้งาน
                 </a>
                 <a href="{{ route('evidences.index') }}" class="{{ request()->is('evidences*') ? 'active' : '' }}">
@@ -198,8 +198,8 @@
                 </a>
             @endcan
             @hasanyrole('super_admin|system_admin|qa_admin')
-                <a href="{{ route('dashboardKpiUser.index') }}"
-                    class="{{ request()->routeIs('dashboardKpiUser.*') ? 'active' : '' }}">
+                <a href="{{ route('dashboardkpi.index') }}"
+                    class="{{ request()->routeIs('dashboardkpi.*') ? 'active' : '' }}">
                     <i class="fa-solid fa-chart-line"></i> ตรวจสอบตัวชี้วัด
                 </a>
             @endhasanyrole

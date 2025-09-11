@@ -320,7 +320,7 @@ class EvidenceController extends Controller
                     $evidence = new Evidence();
                     $evidence->path        = $payload;
                     $evidence->detail      = null;
-                    $evidence->status      = true;
+                    $evidence->status      = false;
                     $evidence->criteria_id = $criteria->id;
                     $evidence->user_id     = Auth::id();
                     $evidence->name        = $originalName;
@@ -385,8 +385,17 @@ class EvidenceController extends Controller
                 ]);
             }
 
-            return redirect()->route('dashboardKpiUser.show', $indicator->id)
+            $userId = Auth::user();
+
+            if ($userId->hasRole('user')) {
+                // ส่งข้อมูลกลับไปยังหน้าแสดงผล
+                return redirect()->route('dashboardkpi.user.show', $indicator->id)
                 ->with('success', 'บันทึกหลักฐานเรียบร้อยแล้ว');
+            } else {
+                // สำหรับผู้ดูแลระบบหรือบทบาทอื่น ๆ
+                return redirect()->route('dashboardkpi.admin.show', $indicator->id)
+                    ->with('success', 'บันทึกหลักฐานเรียบร้อยแล้ว');
+            }
         } catch (\Throwable $e) {
             Log::error('Evidence store error', [
                 'exception' => $e->getMessage(),
