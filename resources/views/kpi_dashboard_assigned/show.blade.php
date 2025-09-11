@@ -483,354 +483,112 @@
     document.addEventListener('DOMContentLoaded', function() {
         const fileHandlers = {};
         const editorInitialized = {};
-        const form = document.getElementById("evidence-form-{{ $criteria->id }}");
 
-        form.addEventListener("submit", function(e) {
-            e.preventDefault();
-
-            let formData = new FormData(form);
-
-            fetch(form.action, {
-                    method: "POST",
-                    body: formData,
-                    headers: {
-                        "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content,
-                        "Accept": "application/json" // ✅ บังคับ Laravel ส่ง JSON
-                    }
-                })
-                .then(async res => {
-                    const text = await res.text();
-                    try {
-                        return JSON.parse(text);
-                    } catch (err) {
-                        console.error("Response is not JSON:", text);
-                        throw err;
-                    }
-                })
-                .then(data => {
-                    if (data.success) {
-                        Swal.fire({
-                            toast: true,
-                            position: 'top-end',
-                            icon: 'success',
-                            title: data.message || 'บันทึกสำเร็จ',
-                            showConfirmButton: false,
-                            timer: 2000
-                        });
-
-                        const list = document.querySelector(
-                            `.evidence-list-${form.querySelector('[name="criteria_id"]').value}`
-                        );
-                        if (list && data.evidences && Array.isArray(data.evidences)) {
-                            data.evidences.forEach(ev => {
-                                list.insertAdjacentHTML("beforeend", renderEvidenceItem(
-                                    ev));
-
-                                // bind ปุ่มลบทันที
-                                const deleteBtn = list.querySelector(
-                                    `#evidence-${ev.id} .btn-delete`);
-                                deleteBtn.addEventListener("click", () => handleDelete(ev
-                                    .id));
-                            });
-                            if (window.lucide?.createIcons) lucide.createIcons();
-                        }
-
-
-
-                        // ✅ ปิด popup หลัง Toast
-                        setTimeout(() => {
-                            // ถ้าใช้ Alpine variable เช่น open{{ $criteria->id }}
-                            window[`open{{ $criteria->id }}`] = false;
-
-                            // fallback force ปิด DOM
-                            const popup = form.closest('[x-show]');
-                            if (popup) {
-                                popup.style.display = 'none';
+        // --- For each criteria, setup handlers ---
+        @foreach ($indicator->criterias as $criteria)
+        (function() {
+            const form = document.getElementById("evidence-form-{{ $criteria->id }}");
+            if (form) {
+                form.addEventListener("submit", function(e) {
+                    e.preventDefault();
+                    let formData = new FormData(form);
+                    fetch(form.action, {
+                            method: "POST",
+                            body: formData,
+                            headers: {
+                                "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content,
+                                "Accept": "application/json" // ✅ บังคับ Laravel ส่ง JSON
                             }
-                        }, 800);
-
-                        // ✅ reset form หลังบันทึกเสร็จ
-                        form.reset();
-                    } else {
-                        Swal.fire({
-                            toast: true,
-                            position: 'top-end',
-                            icon: 'error',
-                            title: data.message || 'เกิดข้อผิดพลาด ⚠️',
-                            showConfirmButton: false,
-                            timer: 2000
+                        })
+                        .then(async res => {
+                            const text = await res.text();
+                            try {
+                                return JSON.parse(text);
+                            } catch (err) {
+                                console.error("Response is not JSON:", text);
+                                throw err;
+                            }
+                        })
+                        .then(data => {
+                            if (data.success) {
+                                Swal.fire({
+                                    toast: true,
+                                    position: 'top-end',
+                                    icon: 'success',
+                                    title: data.message || 'บันทึกสำเร็จ',
+                                    showConfirmButton: false,
+                                    timer: 2000
+                                });
+                                const list = document.querySelector(
+                                    `.evidence-list-${form.querySelector('[name="criteria_id"]').value}`
+                                );
+                                if (list && data.evidences && Array.isArray(data.evidences)) {
+                                    data.evidences.forEach(ev => {
+                                        list.insertAdjacentHTML("beforeend", renderEvidenceItem(ev));
+                                        // bind ปุ่มลบทันที
+                                        const deleteBtn = list.querySelector(
+                                            `#evidence-${ev.id} .btn-delete`);
+                                        deleteBtn.addEventListener("click", () => handleDelete(ev.id));
+                                    });
+                                    if (window.lucide?.createIcons) lucide.createIcons();
+                                }
+                                // ✅ ปิด popup หลัง Toast
+                                setTimeout(() => {
+                                    // ถ้าใช้ Alpine variable เช่น open{{ $criteria->id }}
+                                    window[`open{{ $criteria->id }}`] = false;
+                                    // fallback force ปิด DOM
+                                    const popup = form.closest('[x-show]');
+                                    if (popup) {
+                                        popup.style.display = 'none';
+                                    }
+                                }, 800);
+                                // ✅ reset form หลังบันทึกเสร็จ
+                                form.reset();
+                            } else {
+                                Swal.fire({
+                                    toast: true,
+                                    position: 'top-end',
+                                    icon: 'error',
+                                    title: data.message || 'เกิดข้อผิดพลาด ⚠️',
+                                    showConfirmButton: false,
+                                    timer: 2000
+                                });
+                            }
+                        })
+                        .catch(err => {
+                            console.error("Fetch error:", err);
+                            Swal.fire({
+                                toast: true,
+                                position: 'top-end',
+                                icon: 'error',
+                                title: 'ไม่สามารถบันทึกได้',
+                                showConfirmButton: false,
+                                timer: 2000
+                            });
                         });
-                    }
-                })
-                .catch(err => {
-                    console.error("Fetch error:", err);
-                    Swal.fire({
-                        toast: true,
-                        position: 'top-end',
-                        icon: 'error',
-                        title: 'ไม่สามารถบันทึกได้',
-                        showConfirmButton: false,
-                        timer: 2000
-                    });
                 });
-        });
+            }
+            new FileUploadHandler({{ $criteria->id }});
+            new URLHandler({{ $criteria->id }});
+            observePopupVisibility({{ $criteria->id }});
+        })();
+        @endforeach
 
-
-        /*** ---------- File Upload Handler Class ---------- ***/
-        class FileUploadHandler {
-            constructor(criteriaId) {
-                this.criteriaId = criteriaId;
-                this.uploadArea = document.querySelector(`.upload-area-${criteriaId}`);
-                this.fileInput = document.getElementById(`fileInput-${criteriaId}`);
-                this.filesList = document.getElementById(`filesList-${criteriaId}`);
-                this.selectedFiles = [];
-                fileHandlers[criteriaId] = this;
-                this.init();
-            }
-            init() {
-                if (!this.uploadArea || !this.fileInput || !this.filesList) return;
-                ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(evt => {
-                    this.uploadArea.addEventListener(evt, e => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                    });
-                });
-                this.uploadArea.addEventListener('click', () => this.fileInput.click());
-                this.uploadArea.addEventListener('dragover', e => {
-                    e.preventDefault();
-                    this.uploadArea.classList.add('drag-over');
-                });
-                this.uploadArea.addEventListener('dragleave', () => {
-                    this.uploadArea.classList.remove('drag-over');
-                });
-                this.uploadArea.addEventListener('drop', e => {
-                    e.preventDefault();
-                    this.uploadArea.classList.remove('drag-over');
-                    this.handleFiles(Array.from(e.dataTransfer.files || []));
-                });
-                this.fileInput.addEventListener('change', e => {
-                    this.handleFiles(Array.from(e.target.files || []));
+        // --- Setup popup triggers for Trumbowyg ---
+        @foreach ($indicator->criterias as $criteria)
+        (function() {
+            const btn = document.querySelector('[\@click="open{{ $criteria->id }} = true"]');
+            if (btn) {
+                btn.addEventListener("click", () => {
+                    setTimeout(() => initTrumbowyg({{ $criteria->id }}), 600);
                 });
             }
-            handleFiles(files) {
-                files.forEach(file => {
-                    const exists = this.selectedFiles.find(f =>
-                        f.name === file.name && f.size === file.size && f.type === file.type
-                    );
-                    if (!exists) {
-                        this.selectedFiles.push(file);
-                        this.displayFile(file);
-                    }
-                });
-                this.syncInputFiles();
-            }
-            displayFile(file) {
-                const el = document.createElement('div');
-                el.className = 'file-item';
-                el.innerHTML = `
-                    <div class="file-icon">
-                        <i data-lucide="file-text" style="width:20px;height:20px;color:#ef4444;"></i>
-                    </div>
-                    <span class="file-name" title="${file.name}">${file.name}</span>
-                    <span class="file-size">${this.formatFileSize(file.size)}</span>
-                    <button type="button" class="remove-file" aria-label="ลบไฟล์"
-                        data-name="${encodeURIComponent(file.name)}" 
-                        data-size="${file.size}"
-                        data-criteria="${this.criteriaId}">
-                        <i data-lucide="x" style="width:16px;height:16px;"></i>
-                    </button>`;
-                this.filesList.appendChild(el);
-                el.querySelector('.remove-file').addEventListener('click', e => {
-                    const btn = e.currentTarget;
-                    const name = decodeURIComponent(btn.getAttribute('data-name') || '');
-                    const size = Number(btn.getAttribute('data-size') || 0);
-                    const criteriaId = btn.getAttribute('data-criteria');
-                    const handler = fileHandlers[criteriaId];
-                    if (handler) {
-                        handler.selectedFiles = handler.selectedFiles.filter(f =>
-                            !(f.name === name && f.size === size)
-                        );
-                        handler.syncInputFiles();
-                    }
-                    el.remove();
-                });
-                if (window.lucide?.createIcons) lucide.createIcons();
-            }
-            syncInputFiles() {
-                if (!this.fileInput) return;
-                const dt = new DataTransfer();
-                this.selectedFiles.forEach(file => dt.items.add(file));
-                this.fileInput.files = dt.files;
-            }
-            formatFileSize(bytes) {
-                if (bytes === 0) return '0 Bytes';
-                const k = 1024,
-                    sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
-                const i = Math.floor(Math.log(bytes) / Math.log(k));
-                return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-            }
-        }
-
-        /*** ---------- URL Handler Class ---------- ***/
-        class URLHandler {
-            constructor(criteriaId) {
-                this.criteriaId = criteriaId;
-                this.urlSection = document.querySelector(`.url-section-${criteriaId}`);
-                this.init();
-            }
-            init() {
-                if (!this.urlSection) return;
-                if (!this.urlSection.querySelector('input[type="url"]:not([readonly])')) {
-                    this.appendNewEditableRow();
-                }
-                this.urlSection.addEventListener('click', e => this.handleClick(e));
-                this.urlSection.addEventListener('keydown', e => this.handleKeydown(e));
-            }
-            handleClick(e) {
-                const addBtn = e.target.closest(`.add-url-btn-${this.criteriaId}`);
-                if (addBtn) {
-                    const row = addBtn.closest('.url-row');
-                    this.lockRowAndSwapButton(row);
-                    this.appendNewEditableRow();
-                    return;
-                }
-                const removeBtn = e.target.closest('.remove-url-btn');
-                if (removeBtn && removeBtn.closest(`.url-section-${this.criteriaId}`)) {
-                    const row = removeBtn.closest('.url-row');
-                    row?.remove();
-                    if (!this.urlSection.querySelector('input[type="url"]:not([readonly])')) {
-                        this.appendNewEditableRow();
-                    }
-                }
-            }
-            handleKeydown(e) {
-                if (e.key === 'Enter' && e.target.matches(`.url-input-${this.criteriaId}`)) {
-                    e.preventDefault();
-                    const row = e.target.closest('.url-row');
-                    this.lockRowAndSwapButton(row);
-                    this.appendNewEditableRow();
-                }
-            }
-            appendNewEditableRow() {
-                const row = document.createElement('div');
-                row.className = `form-group url-row`;
-                row.innerHTML = `
-                    <input type="text" name="url_names[]" 
-                        class="form-input url-name url-name-${this.criteriaId}" 
-                        placeholder="ชื่อหลักฐาน URL">
-                    <input type="url" name="additional_urls[]" 
-                        class="form-input url-input url-input-${this.criteriaId}" 
-                        placeholder="วาง URL เพิ่มเติม">
-                    <button type="button" 
-                        class="add-url-btn add-url-btn-${this.criteriaId}" 
-                        aria-label="เพิ่ม URL">
-                        <i data-lucide="plus" style="width:16px;height:16px;"></i>
-                    </button>`;
-                this.urlSection.appendChild(row);
-                if (window.lucide?.createIcons) lucide.createIcons();
-                row.querySelector(`input.url-input-${this.criteriaId}`)?.focus();
-            }
-            lockRowAndSwapButton(row) {
-                if (!row) return;
-                const input = row.querySelector(`input.url-input-${this.criteriaId}`);
-                if (!input || !input.value.trim()) return;
-                input.readOnly = true;
-                input.classList.add('locked');
-                input.setAttribute('tabindex', '-1');
-                const addBtn = row.querySelector(`.add-url-btn-${this.criteriaId}`);
-                if (addBtn) {
-                    addBtn.classList.remove(`add-url-btn-${this.criteriaId}`);
-                    addBtn.classList.add('remove-url-btn');
-                    addBtn.setAttribute('aria-label', 'ลบ URL');
-                    addBtn.innerHTML = `<i data-lucide="x" style="width:16px;height:16px;"></i>`;
-                    if (window.lucide?.createIcons) lucide.createIcons();
-                }
-            }
-        }
-
-        /*** ---------- Trumbowyg Editor ---------- ***/
-        function initTrumbowyg(criteriaId) {
-            if (typeof $ === 'undefined' || typeof $.fn.trumbowyg === 'undefined') return false;
-            if (editorInitialized[criteriaId]) return true;
-            const selector = `#detailEditor-${criteriaId}`;
-            const $editor = $(selector);
-            if ($editor.length === 0) return false;
-            try {
-                if ($editor.data('trumbowyg')) $editor.trumbowyg('destroy');
-                $editor.trumbowyg({
-                    lang: 'th',
-                    btns: [
-                        ['viewHTML'],
-                        ['undo', 'redo'],
-                        ['formatting'],
-                        ['fontfamily'],
-                        ['fontsize'],
-                        ['foreColor', 'backColor'],
-                        ['strong', 'em', 'del', 'underline'],
-                        ['link'],
-                        ['justifyLeft', 'justifyCenter', 'justifyRight', 'justifyFull'],
-                        ['unorderedList', 'orderedList'],
-                        ['horizontalRule'],
-                        ['removeformat'],
-                        ['fullscreen']
-                    ],
-                    plugins: {
-                        fontfamily: {
-                            fonts: [
-                                'Prompt, sans-serif', 'Kanit, sans-serif',
-                                'Sarabun, sans-serif', 'Arial, sans-serif',
-                                'Times New Roman, serif'
-                            ]
-                        },
-                        fontsize: {
-                            allowCustomSize: true,
-                            sizeList: ['12px', '14px', '16px', '18px', '20px', '24px', '28px', '32px']
-                        }
-                    },
-                    autogrow: true
-                });
-                editorInitialized[criteriaId] = true;
-                return true;
-            } catch (error) {
-                console.error(`❌ Error initializing Trumbowyg:`, error);
-                return false;
-            }
-        }
-
-        function setupPopupTriggers() {
-            @foreach ($indicator->criterias as $criteria)
-                const btn{{ $criteria->id }} = document.querySelector(
-                    '[\\@click="open{{ $criteria->id }} = true"]');
-                if (btn{{ $criteria->id }}) {
-                    btn{{ $criteria->id }}.addEventListener("click", () => {
-                        setTimeout(() => initTrumbowyg({{ $criteria->id }}), 600);
-                    });
-                }
-            @endforeach
-        }
-        setupPopupTriggers();
-
-        function observePopupVisibility(criteriaId) {
-            const popup = document.querySelector(`[x-show="open${criteriaId}"]`);
-            if (!popup) return;
-            const observer = new MutationObserver(() => {
-                const isVisible = !popup.hasAttribute('x-cloak') &&
-                    popup.style.display !== 'none' &&
-                    popup.offsetParent !== null;
-                if (isVisible && !editorInitialized[criteriaId]) {
-                    setTimeout(() => initTrumbowyg(criteriaId), 100);
-                }
-            });
-            observer.observe(popup, {
-                attributes: true,
-                attributeFilter: ['style', 'class', 'x-cloak']
-            });
-        }
+        })();
+        @endforeach
 
         /*** ---------- Delete Evidence ---------- ***/
         const csrfTokenMeta = document.querySelector('meta[name="csrf-token"]');
         const csrfToken = csrfTokenMeta ? csrfTokenMeta.getAttribute("content") : "";
-
         document.querySelectorAll(".btn-delete").forEach(btn => {
             btn.addEventListener("click", function() {
                 const id = this.getAttribute("data-id");
@@ -898,12 +656,6 @@
                 });
             });
         });
-
-        @foreach ($indicator->criterias as $criteria)
-            new FileUploadHandler({{ $criteria->id }});
-            new URLHandler({{ $criteria->id }});
-            observePopupVisibility({{ $criteria->id }});
-        @endforeach
     });
 </script>
 
