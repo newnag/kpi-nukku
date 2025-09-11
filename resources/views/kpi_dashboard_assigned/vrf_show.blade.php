@@ -90,7 +90,7 @@
                         </div>
 
                         <div class="criteria-content">
-                            <x-evidence-uploader :criteria="$criteria" :locked="$locked" :indicator-status="$indicator->status" :store-route="route('evidences.store')" />
+                            <x-evidence-uploader :criteria="$criteria" :store-route="route('evidences.store')" :locked-statuses="$locked" />
 
                             <!-- คำอธิบายเกณฑ์ -->
                             @if ($criteria->description)
@@ -108,43 +108,45 @@
                                     @endphp
 
                                     <div class="evidence-item" id="evidence-{{ $evidence->id }}">
-                                        <span class="evidence-icon">
-                                            @if (Str::endsWith($type, 'pdf'))
-                                                <i data-lucide="file-text" style="color:#dc2626;"></i>
-                                            @elseif (Str::endsWith($type, 'doc') || Str::endsWith($type, 'docx') || Str::endsWith($name, '.docx'))
-                                                <i data-lucide="file-text" style="color:#2563eb;"></i>
-                                            @elseif (Str::endsWith($type, 'ppt') || Str::endsWith($type, 'pptx') || Str::endsWith($name, '.pptx'))
-                                                <i data-lucide="presentation" style="color:#eb7e25;"></i>
-                                            @elseif (in_array($type, ['jpg', 'jpeg', 'png', 'gif', 'image']))
-                                                <i data-lucide="image" style="color:#16a34a;"></i>
-                                            @elseif (Str::endsWith($type, 'xls') || Str::endsWith($type, 'xlsx') || Str::contains($name, '.xls'))
-                                                <i data-lucide="file-spreadsheet" style="color:#059669;"></i>
-                                            @elseif ($type === 'url')
-                                                <i data-lucide="link" style="color:#9333ea;"></i>
-                                            @elseif ($type === 'note')
-                                                <i data-lucide="sticky-note" style="color:#f59e0b;"></i>
-                                            @else
-                                                <i data-lucide="file" style="color:#6b7280;"></i>
-                                            @endif
-                                        </span>
+                                        <div class="flex items-center space-x-2">
+                                            <span class="evidence-icon">
+                                                @if (Str::endsWith($type, 'pdf'))
+                                                    <i data-lucide="file-text" style="color:#dc2626;"></i>
+                                                @elseif (Str::endsWith($type, 'doc') || Str::endsWith($type, 'docx') || Str::endsWith($name, '.docx'))
+                                                    <i data-lucide="file-text" style="color:#2563eb;"></i>
+                                                @elseif (Str::endsWith($type, 'ppt') || Str::endsWith($type, 'pptx') || Str::endsWith($name, '.pptx'))
+                                                    <i data-lucide="presentation" style="color:#eb7e25;"></i>
+                                                @elseif (in_array($type, ['jpg', 'jpeg', 'png', 'gif', 'image']))
+                                                    <i data-lucide="image" style="color:#16a34a;"></i>
+                                                @elseif (Str::endsWith($type, 'xls') || Str::endsWith($type, 'xlsx') || Str::contains($name, '.xls'))
+                                                    <i data-lucide="file-spreadsheet" style="color:#059669;"></i>
+                                                @elseif ($type === 'url')
+                                                    <i data-lucide="link" style="color:#9333ea;"></i>
+                                                @elseif ($type === 'note')
+                                                    <i data-lucide="sticky-note" style="color:#f59e0b;"></i>
+                                                @else
+                                                    <i data-lucide="file" style="color:#6b7280;"></i>
+                                                @endif
+                                            </span>
 
-                                        <span class="evidence-name">
-                                            @if ($evidence->type === 'url')
-                                                @php
-                                                    // ถ้า path เก็บเป็น JSON หรือ array
-                                                    $urls = is_array($evidence->path)
-                                                        ? $evidence->path
-                                                        : json_decode($evidence->path, true);
-                                                    $firstUrl = $urls['urls'][0] ?? '#';
-                                                @endphp
-                                                <a href="{{ $firstUrl }}" target="_blank"
-                                                    class="text-blue-600 underline hover:text-blue-800">
+                                            <span class="evidence-name">
+                                                @if ($evidence->type === 'url')
+                                                    @php
+                                                        // ถ้า path เก็บเป็น JSON หรือ array
+                                                        $urls = is_array($evidence->path)
+                                                            ? $evidence->path
+                                                            : json_decode($evidence->path, true);
+                                                        $firstUrl = $urls['urls'][0] ?? '#';
+                                                    @endphp
+                                                    <a href="{{ $firstUrl }}" target="_blank"
+                                                        class="text-blue-600 underline hover:text-blue-800">
+                                                        {{ $evidence->name }}
+                                                    </a>
+                                                @else
                                                     {{ $evidence->name }}
-                                                </a>
-                                            @else
-                                                {{ $evidence->name }}
-                                            @endif
-                                        </span>
+                                                @endif
+                                            </span>
+                                        </div>
 
                                         <div class="space-x-3 flex items-center justify-center">
                                             <select name="evidences[{{ $evidence->id }}][status]"
@@ -199,7 +201,8 @@
                                         </div>
                                     </div>
                                 @empty
-                                    <div class="text-sm text-center text-gray-500 opacity-75">----- ยังไม่มีหลักฐานแนบ -----</div>
+                                    <div class="text-sm text-center text-gray-500 opacity-75">----- ยังไม่มีหลักฐานแนบ -----
+                                    </div>
                                 @endforelse
                             </div>
                         </div>
@@ -269,12 +272,12 @@
                             <button type="button"
                                 class="status-choice w-full text-left px-4 py-2 rounded hover:bg-slate-50"
                                 data-status="1">
-                                1 — บันทึกร่าง
+                                1 — บันทึกเป็นฉบับร่าง
                             </button>
                             <button type="button"
                                 class="status-choice w-full text-left px-4 py-2 rounded hover:bg-slate-50"
                                 data-status="2">
-                                2 — บันทึกจริง
+                                2 — บันทึกเป็นฉบับจริง
                             </button>
                             <hr class="my-1 border-slate-200">
                             <button type="button"
@@ -1009,7 +1012,7 @@
 
         .criteria-status {
             /* font-weight: 600;
-                                                font-size: 14px; */
+                                                        font-size: 14px; */
             color: #1f2937;
         }
 
@@ -1093,6 +1096,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
+            column-gap: 10px;
             font-size: 13px;
             color: #374151;
         }

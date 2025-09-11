@@ -82,19 +82,19 @@ class DashboardKpiAdminController extends Controller
         // return response()->json($request->all());
     }
 
-    public function updateStatus(Request $request, $id)
-    {
-        $indicator = Indicator::findOrFail($id);
+    // public function updateStatus(Request $request, $id)
+    // {
+    //     $indicator = Indicator::findOrFail($id);
 
-        if ($request->has('status')) {
-            $indicator->status = $request->status;
-            $indicator->save();
+    //     if ($request->has('status')) {
+    //         $indicator->status = $request->status;
+    //         $indicator->save();
 
-            return redirect()->route('dashboardkpi.admin.show', $indicator->id)
-                ->with('success', 'เปลี่ยนสถานะตัวชี้วัดเรียบร้อยแล้ว');
-        }
+    //         return redirect()->route('dashboardkpi.admin.show', $indicator->id)
+    //             ->with('success', 'เปลี่ยนสถานะตัวชี้วัดเรียบร้อยแล้ว');
+    //     }
 
-        return redirect()->route('dashboardkpi.admin.show', $indicator->id)
-            ->with('error', 'ไม่พบสถานะที่ต้องการเปลี่ยนแปลง');
-    }
+    //     return redirect()->route('dashboardkpi.admin.show', $indicator->id)
+    //         ->with('error', 'ไม่พบสถานะที่ต้องการเปลี่ยนแปลง');
+    // }
 }

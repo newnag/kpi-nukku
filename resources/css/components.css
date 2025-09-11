@@ -596,22 +596,50 @@
     transform: translateX(-50%) translateY(-4px);
 }
 
-.switch {
+/* ===== Modal responsiveness & scroll lock ===== */
+.modal-open,
+.modal-open body {
+    overflow: hidden;
+}
+
+/* Ensure the panel looks great on mobile fullscreen */
+.modal-panel {
+    /* Already using rounded-none on mobile via classes; keep panel strong */
+}
+
+/* Modal body harmonization so nested forms don't double-pad */
+.modal-body .evidence-form {
+    padding: 0;
+    margin: 0;
+    background: transparent;
+    border: 0;
+    box-shadow: none;
+}
+
+/* Optional: nicer touch targets on small screens */
+@media (max-width: 640px) {
+    .btn-ghost-close {
+        padding: 0.25rem 0.5rem;
+        border-radius: 8px;
+    }
+}
+
+/* .switch {
     position: relative;
     display: inline-block;
     width: 44px;
     height: 24px;
-}
+} */
 
 /* Hide default HTML checkbox */
-.switch input {
+/* .switch input {
     opacity: 0;
     width: 0;
     height: 0;
-}
+} */
 
 /* The slider */
-.slider {
+/* .slider {
     position: absolute;
     cursor: pointer;
     top: 0;
@@ -621,9 +649,9 @@
     background-color: #ccc;
     -webkit-transition: 0.4s;
     transition: 0.4s;
-}
+} */
 
-.slider:before {
+/* .slider:before {
     position: absolute;
     content: "";
     height: 18px;
@@ -647,13 +675,13 @@ input:checked + .slider:before {
     -webkit-transform: translateX(20px);
     -ms-transform: translateX(20px);
     transform: translateX(20px);
-}
+} */
 
 /* Rounded sliders */
-.slider.round {
+/* .slider.round {
     border-radius: 24px;
 }
 
 .slider.round:before {
     border-radius: 50%;
-}
+} */

@@ -102,8 +102,8 @@ class EvidenceController extends Controller
         $query = Evidence::with(['criteria.indicator', 'user']);
 
         // 🟢 ถ้า role = user → แสดงเฉพาะของตัวเอง
-        if (auth()->user()->hasRole('user')) {
-            $query->where('user_id', auth()->id());
+        if (Auth::user() && Auth::user()->hasRole('user')) {
+            $query->where('user_id', Auth::id());
         }
 
         // กรอง criteria_id
@@ -146,7 +146,7 @@ class EvidenceController extends Controller
 
         // 🔹 รายการผู้ใช้ (เฉพาะ role อื่น ๆ เท่านั้นถึงจะเห็น user list)
         $fileUsers = collect();
-        if (!auth()->user()->hasRole('user')) {
+        if (!Auth::user()->hasRole('user')) {
             $fileUsers = (clone $query)
                 ->join('users', 'evidence.user_id', '=', 'users.id')
                 ->select('users.name')
@@ -189,10 +189,6 @@ class EvidenceController extends Controller
      */
     public function create(Criteria $criteria)
     {
-        // Log ตอนเข้าหน้า create
-        // Log::info('=== EvidenceController@create ===', [
-        //     'criteria_param' => $criteria->id ?? null,
-        // ]);
 
         $criterias = Criteria::orderBy('name')->get(['id', 'name']);
 
@@ -218,9 +214,6 @@ class EvidenceController extends Controller
 
     public function store(Request $request)
     {
-        Log::info('=== EvidenceController@store ===', [
-            'criteria_id' => $request->input('criteria_id'),
-        ]);
 
         $request->validate([
             'criteria_id'       => 'required|integer|exists:criterias,id',
@@ -390,7 +383,7 @@ class EvidenceController extends Controller
             if ($userId->hasRole('user')) {
                 // ส่งข้อมูลกลับไปยังหน้าแสดงผล
                 return redirect()->route('dashboardkpi.user.show', $indicator->id)
-                ->with('success', 'บันทึกหลักฐานเรียบร้อยแล้ว');
+                    ->with('success', 'บันทึกหลักฐานเรียบร้อยแล้ว');
             } else {
                 // สำหรับผู้ดูแลระบบหรือบทบาทอื่น ๆ
                 return redirect()->route('dashboardkpi.admin.show', $indicator->id)
@@ -556,23 +549,26 @@ class EvidenceController extends Controller
      */
     public function destroy($id)
     {
-        $evidence = Evidence::findOrFail($id);
+        try {
+            $evidence = Evidence::findOrFail($id);
 
-        // ถ้ามีไฟล์จริงใน storage → ลบด้วย
-        if (is_array($evidence->path) && isset($evidence->path['files'])) {
-            foreach ($evidence->path['files'] as $file) {
-                if (!empty($file['path'])) {
-                    Storage::disk('public')->delete($file['path']);
+            // Delete associated files if they exist
+            if (is_array($evidence->path) && isset($evidence->path['files'])) {
+                foreach ($evidence->path['files'] as $file) {
+                    if (!empty($file['path'])) {
+                        Storage::disk('public')->delete($file['path']);
+                    }
                 }
             }
+
+            $evidence->delete();
+
+            // Flash success message to session
+            return redirect()->back()->with('success', 'ลบหลักฐานเรียบร้อยแล้ว');
+        } catch (\Exception $e) {
+            // Flash error message to session
+            return redirect()->back()->with('error', 'เกิดข้อผิดพลาดในการลบหลักฐาน');
         }
-
-        $evidence->delete();
-
-        return response()->json([
-            'success' => true,
-            'message' => 'ลบหลักฐานเรียบร้อยแล้ว'
-        ]);
     }
 
 

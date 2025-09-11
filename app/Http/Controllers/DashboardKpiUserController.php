@@ -111,17 +111,20 @@ class DashboardKpiUserController extends Controller
 
         $indicator->save();
 
-        $userId = Auth::user();
+        // $userId = Auth::user();
 
-        if ($userId->hasRole('user')) {
-            // ส่งข้อมูลกลับไปยังหน้าแสดงผล
-            return redirect()->route('dashboardkpi.user.show', $indicator->id)
+        return redirect()->route('dashboardkpi.user.show', $indicator->id)
                 ->with('success', 'บันทึกข้อมูลเรียบร้อยแล้ว');
-        } else {
-            // สำหรับผู้ดูแลระบบหรือบทบาทอื่น ๆ
-            return redirect()->route('dashboardkpi.admin.show', $indicator->id)
-                ->with('success', 'บันทึกข้อมูลเรียบร้อยแล้ว');
-        }
+
+        // if ($userId->hasRole('user')) {
+        //     // ส่งข้อมูลกลับไปยังหน้าแสดงผล
+        //     return redirect()->route('dashboardkpi.user.show', $indicator->id)
+        //         ->with('success', 'บันทึกข้อมูลเรียบร้อยแล้ว');
+        // } else {
+        //     // สำหรับผู้ดูแลระบบหรือบทบาทอื่น ๆ
+        //     return redirect()->route('dashboardkpi.admin.show', $indicator->id)
+        //         ->with('success', 'บันทึกข้อมูลเรียบร้อยแล้ว');
+        // }
     }
 
 

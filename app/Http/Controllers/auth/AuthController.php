@@ -65,7 +65,7 @@ class AuthController extends Controller
         } elseif ($user->hasRole('administration_admin')) {
             $redirect = '/dashboard';
         } elseif ($user->hasRole('user')) {
-            $redirect = '/dashboardkpi/user';
+            $redirect = '/dashboardkpi';
         }
 
         return response()->json(['redirect' => $redirect]);

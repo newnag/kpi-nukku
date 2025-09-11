@@ -36,10 +36,10 @@
 
     {{-- Teleport to body to avoid parent overflow clipping --}}
     <template x-teleport="body">
-        <div x-show="open" x-cloak class="fixed inset-0 z-[1000] flex items-center justify-center p-3 sm:p-6"
+        <div x-show="open" x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6"
             @keydown.escape.window="open = false" role="dialog" aria-modal="true" aria-label="{{ $title ?? 'Modal' }}">
             {{-- Backdrop --}}
-            <div class="absolute inset-0 bg-black/40" @if ($closeOnBg) @click="open = false" @endif>
+            <div class="absolute inset-0 bg-white/10 backdrop-blur" @if ($closeOnBg) @click="open = false" @endif>
             </div>
 
             {{-- Panel wrapper (centering + width) --}}
