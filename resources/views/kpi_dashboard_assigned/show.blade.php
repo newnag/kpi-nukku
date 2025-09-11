@@ -413,7 +413,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             const fileHandlers = {};
             const editorInitialized = {};
-            const form = document.getElementById("evidence-form-{{ $criteria->id }}");
+            // const form = document.getElementById("evidence-form-{{ $criteria->id }}");
 
             // form.addEventListener("submit", function(e) {
             //     e.preventDefault();

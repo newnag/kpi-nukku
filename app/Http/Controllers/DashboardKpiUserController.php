@@ -64,9 +64,9 @@ class DashboardKpiUserController extends Controller
                 }
 
                 $indicator->status_key = match ((int) $indicator->status) {
-                    2, 3 => 'complete',
+                    3 => 'complete',
                     4    => 'incomplete',
-                    0    => 'pending',
+                    0 ,1,2   => 'pending',
                     default => 'pending',
                 };
 
@@ -92,6 +92,7 @@ class DashboardKpiUserController extends Controller
 
         return view('kpi_dashboard_assigned.show', compact('indicator', 'criteria_id'));
     }
+    
     public function saveVariables(Request $request, $id)
     {
         $indicator = Indicator::findOrFail($id);
