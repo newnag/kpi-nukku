@@ -2,9 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
 use App\Models\Criteria;
+use App\Models\Department;
 use App\Models\Evidence;
 use App\Models\Indicator;
+use App\Models\Standard;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Storage;
@@ -55,10 +59,10 @@ class EvidenceController extends Controller
 
         // ✅ Dropdown data
         $years = Indicator::whereNotNull('year')->distinct()->orderByDesc('year')->pluck('year');
-        $standards = \App\Models\Standard::select('name')->distinct()->orderBy('name')->pluck('name');
-        $dimensions = \App\Models\Category::select('name')->distinct()->orderBy('name')->pluck('name');
-        $departments = \App\Models\Department::select('name')->distinct()->orderBy('name')->pluck('name');
-        $collectors = \App\Models\User::whereHas('assignments')
+        $standards = Standard::select('name')->distinct()->orderBy('name')->pluck('name');
+        $dimensions = Category::select('name')->distinct()->orderBy('name')->pluck('name');
+        $departments =Department::select('name')->distinct()->orderBy('name')->pluck('name');
+        $collectors = User::whereHas('assignments')
             ->select('name')->distinct()->orderBy('name')->pluck('name');
         $fileTypes = Evidence::whereNotNull('type')->distinct()->orderBy('type')->pluck('type');
         $statusMap = [
@@ -98,13 +102,6 @@ class EvidenceController extends Controller
         ));
     }
 
-  
-  
-
-
-    /**
-     * Store a newly created evidence in storage.
-     */
     public function create(Criteria $criteria)
     {
 

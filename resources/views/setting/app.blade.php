@@ -17,7 +17,7 @@
 
                     <!-- Title -->
                     <div class="form-group">
-                        <label class="form-label">ชื่อเว็บไซต์ <span class="required">*</span></label>
+                        <label class="form-label">หัวข้อการแจ้งเตือน <span class="required">*</span></label>
                         <input type="text" name="title" class="form-input" required
                             value="{{ old('title', $setting->title ?? '') }}">
                     </div>
