@@ -15,7 +15,7 @@
         <h2 class="card-title">คะแนนรวมตามปี</h2>
 
         <!-- ✅ Checkbox เลือกปี -->
-        <div id="year-filters" style="margin-bottom:10px;">
+        <div id="year-filters" style="margin-bottom:10px;margin-left: 20px;">
             @foreach ($filters['years'] as $y)
                 <label style="margin-right:10px;">
                     <input type="checkbox" class="year-checkbox" value="{{ $y }}" checked>
@@ -36,7 +36,7 @@
         <h2 class="card-title">คะแนนรวมมาตรฐานตามปี</h2>
 
         <!-- ✅ Checkbox ปี -->
-        <div id="year-filters-standard" style="margin-bottom:10px;">
+        <div id="year-filters-standard" style="margin-bottom:10px;margin-left: 20px;">
             @foreach ($filters['years'] as $y)
                 <label style="margin-right:10px;">
                     <input type="checkbox" class="year-checkbox-std" value="{{ $y }}" checked>
@@ -69,7 +69,7 @@
         <h2 class="card-title">คะแนนรวมตามด้าน</h2>
 
         <!-- ✅ Checkbox ปี -->
-        <div id="year-filters-dim" style="margin-bottom:10px;">
+        <div id="year-filters-dim" style="margin-bottom:10px;margin-left: 20px;">
             @foreach ($filters['years'] as $y)
                 <label style="margin-right:10px;">
                     <input type="checkbox" class="year-checkbox-dim" value="{{ $y }}" checked>
@@ -780,8 +780,7 @@
                     vDim = $dim.value,
                     vType = $type.value;
 
-                document.querySelectorAll('.chart-card').forEach(card => {
-                    if (card.classList.contains('summary-card')) return;
+                document.querySelectorAll('.enhanced-chart-card').forEach(card => {
                     let show = true;
                     if (vStd && card.dataset.standard !== vStd) show = false;
                     if (vDim && (card.dataset.dimension || '') !== vDim) show = false;
@@ -1089,6 +1088,47 @@
                 font-size: 36px;
             }
         }
+               .switch {
+            position: relative;
+            display: inline-block;
+            width: 46px;
+            height: 24px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            inset: 0;
+            background-color: #ccc;
+            transition: .3s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .3s;
+            border-radius: 50%;
+        }
+
+        input:checked+.slider {
+            background-color: #2196F3;
+        }
+
+        input:checked+.slider:before {
+            transform: translateX(22px);
+        }
     </style>
 
     <style>
@@ -1290,4 +1330,15 @@
     </style>
 
 
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+    const toggle = document.getElementById('toggle-filter');
+    const panel = document.getElementById('filter-panel');
+    if (toggle && panel) {
+        toggle.addEventListener('change', function() {
+            panel.style.display = this.checked ? '' : 'none';
+        });
+    }
+});
+    </script>
 @endsection
