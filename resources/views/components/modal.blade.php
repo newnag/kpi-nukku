@@ -27,6 +27,7 @@
 <div x-data="{ open: false }" x-init="$watch('open', v => {
     // lock page scroll while open
     document.documentElement.classList.toggle('modal-open', v);
+    document.body.style.overflow = v ? 'hidden' : ''; // Prevent background scroll
     if (v) { $dispatch('modal:opened', { context: @js($context) }); }
 })" @modal:close.window="open = false" class="inline">
     {{-- Trigger --}}
@@ -36,11 +37,10 @@
 
     {{-- Teleport to body to avoid parent overflow clipping --}}
     <template x-teleport="body">
-        <div x-show="open" x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6"
+        <div x-show="open" x-cloak class="fixed inset-0 flex items-center justify-center p-3 sm:p-6"
             @keydown.escape.window="open = false" role="dialog" aria-modal="true" aria-label="{{ $title ?? 'Modal' }}">
             {{-- Backdrop --}}
-            <div class="absolute inset-0 bg-white/10 backdrop-blur" @if ($closeOnBg) @click="open = false" @endif>
-            </div>
+            <div class="absolute inset-0 bg-black/10 opacity-50" @if ($closeOnBg) @click="open = false" @endif></div>
 
             {{-- Panel wrapper (centering + width) --}}
             <div class="relative mx-auto w-full {{ $panelWidth }} {{ $mobileShell }}">
@@ -72,3 +72,33 @@
         </div>
     </template>
 </div>
+
+<style>
+    .modal-open,
+    .modal-open body {
+        /* overflow: hidden; */
+
+        
+    }
+
+    .modal-backdrop {
+        /* Ensure backdrop covers entire viewport */
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        /* z-index: 1040; */
+    }
+
+    /* .modal { */
+        /* position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%; */
+        /* z-index: 1050; */
+        
+    /* } */
+</style>
