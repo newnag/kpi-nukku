@@ -75,15 +75,15 @@
                             </div>
                             <div class="criteria-status">
                                 <select name="criterias[{{ $criteria->id }}][status]" class="text-sm text-center"
-                                    @if ($locked) disabled @endif>
-                                    form="variables-form" data-criteria-id="{{ $criteria->id }}">
+                                    @if ($locked) disabled @endif form="variables-form"
+                                    data-criteria-id="{{ $criteria->id }}">
                                     <option value="0" {{ ($criteria->status ?? 0) == 0 ? 'selected' : '' }}>
                                         รอดำเนินการ</option>
                                     <option value="1" {{ ($criteria->status ?? 0) == 1 ? 'selected' : '' }}>
-                                        ผ่านเกณฑ์การพิจารณา
+                                        เอกสารครบถ้วน
                                     </option>
                                     <option value="2" {{ ($criteria->status ?? 0) == 2 ? 'selected' : '' }}>
-                                        ไม่ผ่านเกณฑ์การพิจารณา
+                                        เอกสารไม่ครบถ้วน
                                     </option>
                                 </select>
                             </div>
@@ -149,7 +149,7 @@
                                         </div>
 
                                         <div class="space-x-3 flex items-center justify-center">
-                                            <select name="evidences[{{ $evidence->id }}][status]"
+                                            {{-- <select name="evidences[{{ $evidence->id }}][status]"
                                                 @if ($locked) disabled @endif
                                                 id="evidence-{{ $evidence->id }}" data-criteria-id="{{ $criteria->id }}"
                                                 form="variables-form" class="text-center ">
@@ -158,7 +158,7 @@
                                                 <option value="true" {{ $evidence->status ? 'selected' : '' }}>
                                                     รับรองหลักฐาน
                                                 </option>
-                                            </select>
+                                            </select> --}}
 
                                             <x-modal title="ยืนยันการลบหลักฐาน" size="sm" :context="'delete-evidence-' . $evidence->id">
                                                 <x-slot:trigger>
@@ -213,6 +213,10 @@
             </div>
 
             <div class="card">
+                <h2 class="card-title">เกณฑ์การให้คะแนน</h2>
+                <div class="criteria-box">
+                    {!! $indicator->comment ?? '-' !!}
+                </div>
                 <h2 class="card-title">วิธีการคำนวน</h2>
                 <div class="criteria-box">
                     {!! $indicator->condition ?? '-' !!}
@@ -227,11 +231,9 @@
                 @if ($indicator->variables->where('type', 'input')->isNotEmpty())
                     <div class="card">
                         <h2 class="card-title">กรอกค่าตัวแปร</h2>
-
                         @php
                             $inputVariables = $indicator->variables->filter(fn($v) => trim($v->type) === 'input');
                         @endphp
-
                         @forelse($inputVariables as $variable)
                             <div class="variable-row">
                                 <label class="variable-label">
@@ -243,65 +245,92 @@
                                     @if ($locked) readonly @endif>
                             </div>
                         @empty
-                            <p class="text-gray-500">ยังไม่มีตัวแปรที่ต้องกรอกเอง</p>
+                            <p class="text-gray-500">ยังไม่มีตัวแปรที่ต้องกรอก</p>
                         @endforelse
                     </div>
                 @endif
-
                 <!-- ✅ hidden status -->
                 <input type="hidden" name="status" id="status-input" value="{{ $indicator->status ?? 2 }}">
+            </form>
 
-                <div class="action-bts">
-                    <button type="button" class="btns-secondary"
-                        onclick="location.href='{{ route('dashboardkpi.index') }}'">
-                        <i class="fa fa-undo"></i> กลับ
-                    </button>
+            <div class="card">
+                <h2 class="card-title">คะแนนที่ได้</h2>
+                <div class="score-display-container">
+                    <div class="score-item">
+                        <div class="score-label">คะแนนที่ได้</div>
+                        <div class="score-value-display current-score">
+                            {{ $indicator->score_acc ?? '0' }}
+                        </div>
+                    </div>
+                    <div class="score-separator">/</div>
+                    <div class="score-item">
+                        <div class="score-label">คะแนนเต็ม</div>
+                        <div class="score-value-display max-score">
+                            {{ $indicator->max_score ?? '0' }}
+                        </div>
+                    </div>
+                </div>
+                {{-- <div class="score-percentage">
+                    @php
+                        $percentage = 0;
+                        if (($indicator->max_score ?? 0) > 0) {
+                            $percentage = (($indicator->score_acc ?? 0) / $indicator->max_score) * 100;
+                        }
+                    @endphp
+                    <div class="percentage-bar">
+                        <div class="percentage-fill" style="width: {{ min($percentage, 100) }}%"></div>
+                    </div>
+                    <div class="percentage-text">{{ number_format($percentage, 1) }}%</div>
+                </div> --}}
+            </div>
 
-                    <button type="submit" class="btns-primary" id="save-results-btn">
-                        <i class="fa fa-save"></i> บันทึกผลลัพ
-                    </button>
+            <div class="action-bts">
+                <button type="button" class="btns-secondary"
+                    onclick="location.href='{{ route('dashboardkpi.index') }}'">
+                    <i class="fa fa-undo"></i> กลับ
+                </button>
 
-                    <x-modal title="เปลี่ยนสถานะตัวชี้วัด" size="sm" :context="'status'">
-                        <x-slot:trigger>
-                            <button type="button" class="btn-outlines" data-allow-when-locked="true">
-                                <i class="fa-solid fa-gear"></i>เปลี่ยนสถานะตัวชี้วัด
-                            </button>
-                        </x-slot:trigger>
+                <button type="button" class="save-btn btns-primary" id="save-results-btn"
+                    @if ($locked) hidden @endif>
+                    <i class="fa fa-save"></i> บันทึกผลลัพธ์
+                </button>
 
-                        <div class="space-y-2">
-                            <button type="button"
-                                class="status-choice w-full text-left px-4 py-2 rounded hover:bg-slate-50"
-                                data-status="1">
-                                1 — บันทึกเป็นฉบับร่าง
-                            </button>
-                            <button type="button"
-                                class="status-choice w-full text-left px-4 py-2 rounded hover:bg-slate-50"
-                                data-status="2">
-                                2 — บันทึกเป็นฉบับจริง
-                            </button>
-                            <hr class="my-1 border-slate-200">
-                            <button type="button"
-                                class="status-choice w-full text-left px-4 py-2 rounded hover:bg-slate-50"
-                                data-status="3">
-                                3 — ผลการดำเนินงานครบถ้วนตามเกณฑ์มาตรฐาน
-                            </button>
-                            <button type="button"
-                                class="status-choice w-full text-left px-4 py-2 rounded hover:bg-slate-50"
-                                data-status="4">
-                                4 — ผลการดำเนินงานไม่ครบถ้วนตามเกณฑ์มาตรฐาน
+                <x-modal title="เปลี่ยนสถานะตัวชี้วัด" size="sm" :context="'status'">
+                    <x-slot:trigger>
+                        <button type="button" class=" btn-outlines" data-allow-when-locked="true">
+                            <i class="fa-solid fa-gear"></i>เปลี่ยนสถานะตัวชี้วัด
+                        </button>
+                    </x-slot:trigger>
+
+                    <div class="space-y-2">
+                        <button type="button" class="status-choice w-full text-left px-4 py-2 rounded hover:bg-slate-50"
+                            data-status="1">
+                            1 — บันทึกเป็นฉบับร่าง
+                        </button>
+                        <button type="button" class="status-choice w-full text-left px-4 py-2 rounded hover:bg-slate-50"
+                            data-status="2">
+                            2 — บันทึกเป็นฉบับจริง
+                        </button>
+                        <hr class="my-1 border-slate-200">
+                        <button type="button" class="status-choice w-full text-left px-4 py-2 rounded hover:bg-slate-50"
+                            data-status="3">
+                            3 — ผลการดำเนินงานครบถ้วนตามเกณฑ์มาตรฐาน
+                        </button>
+                        <button type="button" class="status-choice w-full text-left px-4 py-2 rounded hover:bg-slate-50"
+                            data-status="4">
+                            4 — ผลการดำเนินงานไม่ครบถ้วนตามเกณฑ์มาตรฐาน
+                        </button>
+                    </div>
+
+                    <x-slot:footer>
+                        <div class="flex justify-end gap-2">
+                            <button type="button" class="btns-secondary" @click="$dispatch('modal:close')">
+                                ปิด
                             </button>
                         </div>
-
-                        <x-slot:footer>
-                            <div class="flex justify-end gap-2">
-                                <button type="button" class="btns-secondary" @click="$dispatch('modal:close')">
-                                    ปิด
-                                </button>
-                            </div>
-                        </x-slot:footer>
-                    </x-modal>
-                </div>
-            </form>
+                    </x-slot:footer>
+                </x-modal>
+            </div>
         </div>
 
     </div>
@@ -331,15 +360,29 @@
             const form = document.getElementById("variables-form");
             const statusInput = document.getElementById("status-input");
 
-            // ดักทุกปุ่มที่มี class .save-btn
+            // Add event listeners to all buttons with the class .save-btn
             document.querySelectorAll(".save-btn").forEach(btn => {
                 btn.addEventListener("click", function() {
-                    const status = this.getAttribute("data-status");
+                    // Get the status from the button's data-status attribute
+                    const status = this.getAttribute("data-status") || statusInput.value;
 
-                    // ใส่ค่า status ลง hidden input
+                    // Set the hidden input value to the status
                     statusInput.value = status;
 
-                    // ส่ง form
+                    // Submit the form
+                    form.submit();
+                });
+            });
+
+            // Add click event listeners to all buttons with the class "status-choice"
+            document.querySelectorAll('.status-choice').forEach(button => {
+                button.addEventListener('click', function() {
+                    const status = this.getAttribute('data-status'); // Get the data-status value
+
+                    // Set the status value in the hidden input field
+                    statusInput.value = status;
+
+                    // Submit the form
                     form.submit();
                 });
             });
@@ -803,25 +846,6 @@
             @endforeach
         });
     </script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const form = document.getElementById('variables-form');
-            const statusInput = document.getElementById('status-input');
-
-            // Add click event listeners to all buttons with the class "status-choice"
-            document.querySelectorAll('.status-choice').forEach(button => {
-                button.addEventListener('click', function() {
-                    const status = this.getAttribute('data-status'); // Get the data-status value
-
-                    // Set the status value in the hidden input field
-                    statusInput.value = status;
-
-                    // Submit the form
-                    form.submit();
-                });
-            });
-        });
-    </script>
 @endpush
 
 @push('styles')
@@ -1012,7 +1036,7 @@
 
         .criteria-status {
             /* font-weight: 600;
-                                                        font-size: 14px; */
+                                                                                font-size: 14px; */
             color: #1f2937;
         }
 
@@ -1378,7 +1402,134 @@
             border-color: #3b82f6;
         }
 
+        /* Score Display Styles */
+        .score-display-container {
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            gap: 20px;
+            padding: 24px;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border-radius: 16px;
+            border: 1px solid #e2e8f0;
+            margin-bottom: 20px;
+        }
 
+        .score-item {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .score-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .score-value-display {
+            font-size: 36px;
+            font-weight: 700;
+            line-height: 1;
+            padding: 12px 20px;
+            border-radius: 12px;
+            min-width: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .score-value-display.current-score {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: white;
+        }
+
+        .score-value-display.max-score {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+
+        .score-separator {
+            font-size: 42px;
+            font-weight: 300;
+            color: #94a3b8;
+            margin: 0 10px;
+        }
+
+        /* .score-percentage {
+                margin-top: 16px;
+                text-align: center;
+            }
+
+            .percentage-bar {
+                width: 100%;
+                height: 12px;
+                background: #e2e8f0;
+                border-radius: 6px;
+                overflow: hidden;
+                margin-bottom: 8px;
+                position: relative;
+            }
+
+            .percentage-fill {
+                height: 100%;
+                background: linear-gradient(90deg, #3b82f6 0%, #10b981 50%, #22c55e 100%);
+                border-radius: 6px;
+                transition: width 0.3s ease;
+                position: relative;
+            }
+
+            .percentage-fill::after {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.3) 50%, transparent 100%);
+                animation: shimmer 2s infinite;
+            } */
+
+        @keyframes shimmer {
+            0% {
+                transform: translateX(-100%);
+            }
+
+            100% {
+                transform: translateX(100%);
+            }
+        }
+
+        .percentage-text {
+            font-size: 18px;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .score-display-container {
+                flex-direction: column;
+                gap: 16px;
+                padding: 20px;
+            }
+
+            .score-separator {
+                transform: rotate(90deg);
+                margin: 0;
+            }
+
+            .score-value-display {
+                font-size: 28px;
+                padding: 10px 16px;
+                min-width: 60px;
+            }
+        }
 
         .evidence-containers {
             width: 85%;

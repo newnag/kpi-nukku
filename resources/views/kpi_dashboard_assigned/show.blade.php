@@ -148,13 +148,13 @@
                                         </div>
 
                                         <div class="space-x-3 flex items-center justify-center">
-                                            @php
+                                            {{-- @php
                                                 $statusClass =
                                                     $evidence->status === 'true' ? 'รับรองหลักฐาน' : 'รอดำเนินการ';
                                             @endphp
                                             <label class="text-nowrap text-gray-700">
                                                 {{ $statusClass }}
-                                            </label>
+                                            </label> --}}
 
                                             <x-modal title="ยืนยันการลบหลักฐาน" size="sm" :context="'delete-evidence-' . $evidence->id">
                                                 <x-slot:trigger>
@@ -248,7 +248,7 @@
                 <input type="hidden" name="status" id="status-input">
 
                 <div class="action-bts">
-                    <button type="button" class="btns-secondary" onclick="history.back()">
+                    <button type="button" class="btns-secondary" onclick="location.href='{{ route('dashboardkpi.index') }}'">
                         <i class="fa fa-undo"></i> กลับ
                     </button>
 
