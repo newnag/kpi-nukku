@@ -217,7 +217,7 @@
                 <div class="criteria-box">
                     {!! $indicator->comment ?? '-' !!}
                 </div>
-                <h2 class="card-title">วิธีการคำนวน</h2>
+                <div class="ml-4 mb-1 text-sm font-bold">วิธีการคำนวน</div>
                 <div class="criteria-box">
                     {!! $indicator->condition ?? '-' !!}
                 </div>
