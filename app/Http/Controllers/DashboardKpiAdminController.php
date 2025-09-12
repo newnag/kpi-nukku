@@ -109,6 +109,53 @@ class DashboardKpiAdminController extends Controller
         return $scoreAcc;
     }
 
+    private function calculateChecklistScore($indicator)
+    {
+        // Get all criteria with status = 1 (passed criteria)
+        $passedCriteria = $indicator->criterias->where('status', 1);
+
+        // Create array of passed criteria sequences (sorted and normalized to int for comparison)
+        $passedCriteriaSequences = $passedCriteria
+            ->pluck('sequence')
+            ->map(fn($v) => (int) $v)
+            ->sort()
+            ->values()
+            ->toArray();
+
+        Log::info("Passed criteria sequences for indicator {$indicator->id}: " . json_encode($passedCriteriaSequences));
+
+        // Check each checklist item for exact match
+        foreach ($indicator->checklistItems as $checklistItem) {
+            $requiredItems = $checklistItem->required_items ?? [];
+
+            // Normalize and sort required items for comparison
+            $sortedRequiredItems = collect($requiredItems)
+                ->map(fn($v) => (int) $v)
+                ->sort()
+                ->values()
+                ->toArray();
+
+            Log::info("Checking checklist item {$checklistItem->id}, required sequences: " . json_encode($sortedRequiredItems));
+            Log::info("Comparing with passed sequences: " . json_encode($passedCriteriaSequences));
+
+            // Check if the passed criteria sequences exactly match the required items
+            if ($passedCriteriaSequences === $sortedRequiredItems) {
+                $itemScore = $checklistItem->score ?? 0;
+
+                Log::info("Exact match found! Using score {$itemScore} from checklist item {$checklistItem->id}");
+
+                return $itemScore; // Return immediately when exact match is found
+            } else {
+                Log::info("No exact match for checklist item {$checklistItem->id}");
+            }
+        }
+
+        // If no exact match found, return 0
+        Log::info("No checklist item matched the passed criteria sequences for indicator {$indicator->id}");
+
+        return 0;
+    }
+
     private function calculateFormulaScore($indicator)
     {
         // Refresh to ensure latest values
@@ -176,53 +223,6 @@ class DashboardKpiAdminController extends Controller
         // Fallback: no output variables exist; use last outcome (or 0 if none)
         Log::info("No output variables found; using last outcome for indicator {$indicator->id}: {$lastOutcome}");
         return $lastOutcome;
-    }
-
-    private function calculateChecklistScore($indicator)
-    {
-        // Get all criteria with status = 1 (passed criteria)
-        $passedCriteria = $indicator->criterias->where('status', 1);
-
-        // Create array of passed criteria sequences (sorted and normalized to int for comparison)
-        $passedCriteriaSequences = $passedCriteria
-            ->pluck('sequence')
-            ->map(fn($v) => (int) $v)
-            ->sort()
-            ->values()
-            ->toArray();
-
-        Log::info("Passed criteria sequences for indicator {$indicator->id}: " . json_encode($passedCriteriaSequences));
-
-        // Check each checklist item for exact match
-        foreach ($indicator->checklistItems as $checklistItem) {
-            $requiredItems = $checklistItem->required_items ?? [];
-
-            // Normalize and sort required items for comparison
-            $sortedRequiredItems = collect($requiredItems)
-                ->map(fn($v) => (int) $v)
-                ->sort()
-                ->values()
-                ->toArray();
-
-            Log::info("Checking checklist item {$checklistItem->id}, required sequences: " . json_encode($sortedRequiredItems));
-            Log::info("Comparing with passed sequences: " . json_encode($passedCriteriaSequences));
-
-            // Check if the passed criteria sequences exactly match the required items
-            if ($passedCriteriaSequences === $sortedRequiredItems) {
-                $itemScore = $checklistItem->score ?? 0;
-
-                Log::info("Exact match found! Using score {$itemScore} from checklist item {$checklistItem->id}");
-
-                return $itemScore; // Return immediately when exact match is found
-            } else {
-                Log::info("No exact match for checklist item {$checklistItem->id}");
-            }
-        }
-
-        // If no exact match found, return 0
-        Log::info("No checklist item matched the passed criteria sequences for indicator {$indicator->id}");
-
-        return 0;
     }
 
     private function evaluateFormula($expression)
