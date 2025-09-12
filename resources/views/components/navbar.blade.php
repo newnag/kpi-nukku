@@ -333,7 +333,7 @@
 
             <div class="dropdown" onclick="this.classList.toggle('open')">
                 <div class="dropdown-toggle">
-                    <img src="/uploads/avatar-type1.png" alt="User" class="user-avatar">
+                    {{-- <img src="/uploads/avatar-type1.png" alt="User" class="user-avatar"> --}}
                     <span class="sm:inline">{{ auth()->user()->name ?? 'ผู้ใช้' }}</span>
                 </div>
                 <div class="dropdown-menu">

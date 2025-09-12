@@ -22,31 +22,66 @@
 
     <!-- Sort -->
     <div class="dropdown" id="sort-dropdown-container">
-        <button id="sort-button" class="btn">
+        <button id="sort-button" class="btns">
             <span>เรียงลำดับ</span>
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24"
                 stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
             </svg>
         </button>
-        <div id="sort-dropdown" class="dropdown-menu hidden" role="menu" aria-orientation="vertical">
-            <button class="dropdown-item sort-option" data-column="0" data-order="asc" role="menuitem">ลำดับ
-                (น้อยไปมาก)</button>
-            <button class="dropdown-item sort-option" data-column="0" data-order="desc" role="menuitem">ลำดับ
-                (มากไปน้อย)</button>
-            <button class="dropdown-item sort-option" data-column="1" data-order="asc" role="menuitem">ชื่อผู้ใช้งาน
-                (A-Z)</button>
-            <button class="dropdown-item sort-option" data-column="1" data-order="desc" role="menuitem">ชื่อผู้ใช้งาน
-                (Z-A)</button>
+
+        <div id="sort-dropdown" class="dropdown-menus hidden" role="menu" aria-orientation="vertical">
+            <!-- ลำดับ -->
+            <button class="dropdown-item sort-option" data-column="0" data-order="asc" role="menuitem">
+                ลำดับ (น้อยไปมาก)
+            </button>
+            <button class="dropdown-item sort-option" data-column="0" data-order="desc" role="menuitem">
+                ลำดับ (มากไปน้อย)
+            </button>
+
+            <!-- ชื่อผู้ใช้งาน -->
+            <button class="dropdown-item sort-option" data-column="1" data-order="asc" role="menuitem">
+                ชื่อผู้ใช้งาน (A-Z)
+            </button>
+            <button class="dropdown-item sort-option" data-column="1" data-order="desc" role="menuitem">
+                ชื่อผู้ใช้งาน (Z-A)
+            </button>
+
+            <!-- อีเมล -->
+            <button class="dropdown-item sort-option" data-column="2" data-order="asc" role="menuitem">
+                อีเมล (A-Z)
+            </button>
+            <button class="dropdown-item sort-option" data-column="2" data-order="desc" role="menuitem">
+                อีเมล (Z-A)
+            </button>
+
+            <!-- หน่วยงาน -->
+            <button class="dropdown-item sort-option" data-column="3" data-order="asc" role="menuitem">
+                หน่วยงาน (A-Z)
+            </button>
+            <button class="dropdown-item sort-option" data-column="3" data-order="desc" role="menuitem">
+                หน่วยงาน (Z-A)
+            </button>
+
+            <!-- บทบาท -->
+            <button class="dropdown-item sort-option" data-column="5" data-order="asc" role="menuitem">
+                บทบาท (A-Z)
+            </button>
+            <button class="dropdown-item sort-option" data-column="5" data-order="desc" role="menuitem">
+                บทบาท (Z-A)
+            </button>
+
             <div class="dropdown-divider"></div>
-            <button id="clear-sort" type="button" class="dropdown-item"
-                style="color:#4b5563;">ล้างตัวเรียงลำดับ</button>
+
+            <button id="clear-sort" type="button" class="dropdown-item" style="color:#4b5563;">
+                ล้างการเรียงลำดับ
+            </button>
         </div>
     </div>
 
     <!-- Filter -->
     <div class="dropdown" id="filter-dropdown-container">
-        <button id="filter-button" class="btn">
+        <button id="filter-button" class="btns">
             <span>กรองข้อมูล</span>
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24"
                 stroke="currentColor">
@@ -55,7 +90,7 @@
             </svg>
         </button>
 
-        <div id="filter-dropdown" class="dropdown-menu hidden">
+        <div id="filter-dropdown" class="dropdown-menus hidden">
             <div style="padding:12px 12px;">
                 <h3 class="dropdown-title">หน่วยงาน</h3>
                 <div id="department-options" style="display:grid; gap:8px;">
@@ -314,9 +349,7 @@
     });
 </script>
 <!-- Lucide Icons -->
-<scrixpt>
-    lucide.createIcons();
-</scrixpt>
+
 <!-- ========== CSS (แทน Tailwind) ========== -->
 <style>
     :root {
@@ -410,7 +443,7 @@
     }
 
     /* ปุ่ม */
-    .btn {
+    .btns {
         display: inline-flex;
         align-items: center;
         gap: 8px;
@@ -425,7 +458,7 @@
         transition: .15s background-color ease;
     }
 
-    .btn:hover {
+    .btns:hover {
         background: var(--gray-100);
     }
 
@@ -446,12 +479,12 @@
         text-align: left;
     }
 
-    .dropdown-menu {
+    .dropdown-menus {
         position: absolute;
         left: 0;
         top: 100%;
         margin-top: 8px;
-        width: 192px;
+        width: 300px;
         background: var(--white);
         border-radius: 6px;
         box-shadow: 0 10px 15px -3px rgba(0, 0, 0, .1), 0 4px 6px -2px rgba(0, 0, 0, .05);
@@ -462,7 +495,7 @@
         display: block;
     }
 
-    .dropdown-menu.hidden {
+    .dropdown-menus.hidden {
         display: none !important;
     }
 
@@ -973,6 +1006,16 @@
     /* กันองค์ประกอบโดนบีบจน wrap โดยไม่ตั้งใจ */
     .controls>* {
         flex-shrink: 0;
+    }
+
+    #filter-dropdown {
+        max-height: 400px;
+        /* ปรับความสูงตามที่ต้องการ */
+        overflow-y: auto;
+        /* เลื่อนลงได้ */
+        overflow-x: hidden;
+        /* ซ่อน scroll bar แนวนอน */
+        max-width: 300px;
     }
 </style>
 
