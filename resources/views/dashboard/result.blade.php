@@ -25,10 +25,10 @@
         </div>
 
         <!-- เปลี่ยนจาก canvas เป็น div สำหรับ ApexCharts -->
-<div class="chart-card">
- <div id="scoreLineChart"></div>
-</div>
-       
+        <div class="chart-card">
+            <div id="scoreLineChart"></div>
+        </div>
+
 
 
     </div>
@@ -780,22 +780,47 @@
                     vDim = $dim.value,
                     vType = $type.value;
 
-                document.querySelectorAll('.enhanced-chart-card').forEach(card => {
-                    let show = true;
-                    if (vStd && card.dataset.standard !== vStd) show = false;
-                    if (vDim && (card.dataset.dimension || '') !== vDim) show = false;
-                    if (vType && (card.dataset.type || '') !== vType) show = false;
-                    if (vCode && (card.dataset.code || '') !== vCode) show = false;
-                    if (vYear) {
-                        try {
-                            const raw = JSON.parse(card.getAttribute('data-years') || '[]');
-                            const years = (raw || []).map(y => String(y));
-                            if (!years.includes(vYear)) show = false;
-                        } catch {}
+                document.querySelectorAll('.charts-of-standard').forEach(container => {
+                    const cards = container.querySelectorAll('.chart-card[data-index]');
+                    let visibleCount = 0;
+
+                    cards.forEach(card => {
+                        let show = true;
+                        if (vStd && card.dataset.standard !== vStd) show = false;
+                        if (vDim && (card.dataset.dimension || '') !== vDim) show = false;
+                        if (vType && (card.dataset.type || '') !== vType) show = false;
+                        if (vCode && (card.dataset.code || '') !== vCode) show = false;
+                        if (vYear) {
+                            try {
+                                const raw = JSON.parse(card.getAttribute('data-years') || '[]');
+                                const years = (raw || []).map(y => String(y));
+                                if (!years.includes(vYear)) show = false;
+                            } catch {}
+                        }
+
+                        if (show) {
+                            // ✅ limit แค่ 5 ตัวแรก
+                            if (visibleCount < 5) {
+                                card.style.display = '';
+                            } else {
+                                card.style.display = 'none';
+                            }
+                            visibleCount++;
+                        } else {
+                            card.style.display = 'none';
+                        }
+                    });
+
+                    // ✅ reset ปุ่ม show more
+                    const btn = container.parentElement.querySelector('.btn-show-more');
+                    if (btn) {
+                        btn.classList.remove('expanded');
+                        btn.textContent = 'แสดงเพิ่มเติม ▼';
+                        btn.style.display = visibleCount > 5 ? '' : 'none';
                     }
-                    card.style.display = show ? '' : 'none';
                 });
 
+                // === update charts ตาม year filter ===
                 Object.entries(chartInstances).forEach(([id, chart]) => {
                     const orig = chartOriginals[id];
                     if (!orig) return;
@@ -805,9 +830,11 @@
                     let newMax = orig.maxValues.slice();
                     if (vYear) {
                         const idxs = orig.years.map((y, i) => ({
-                            y,
-                            i
-                        })).filter(o => o.y === vYear).map(o => o.i);
+                                y,
+                                i
+                            }))
+                            .filter(o => o.y === vYear)
+                            .map(o => o.i);
                         newYears = idxs.map(i => orig.years[i]);
                         newValues = idxs.map(i => orig.values[i]);
                         newMax = idxs.map(i => orig.maxValues[i]);
@@ -840,7 +867,17 @@
                 [$year, $code, $std, $dim, $type].forEach(sel => {
                     if (sel) sel.selectedIndex = 0;
                 });
-                document.querySelectorAll('.chart-card').forEach(c => c.style.display = '');
+
+                // รีเซ็ตการ์ดของทุก standard
+                document.querySelectorAll('.charts-of-standard').forEach(container => {
+                    const cards = container.querySelectorAll('.chart-card[data-index]');
+                    cards.forEach(c => {
+                        const idx = parseInt(c.dataset.index, 10);
+                        c.style.display = idx < 5 ? '' : 'none'; // ✅ โชว์เฉพาะ 5 การ์ดแรก
+                    });
+                });
+
+                // รีเซ็ต chart กลับเป็นข้อมูลต้นฉบับ
                 Object.entries(chartInstances).forEach(([id, chart]) => {
                     const orig = chartOriginals[id];
                     chart.updateOptions({
@@ -864,9 +901,11 @@
                         ]
                     }, false, true);
                 });
-                document.querySelectorAll('.btn-show-more.expanded').forEach(btn => {
+
+                // รีเซ็ตปุ่ม show more ทุกตัว
+                document.querySelectorAll('.btn-show-more').forEach(btn => {
                     btn.classList.remove('expanded');
-                    btn.textContent = 'แสดงเพิ่มเติม';
+                    btn.textContent = 'แสดงเพิ่มเติม ▼';
                 });
             }
 
@@ -1088,7 +1127,8 @@
                 font-size: 36px;
             }
         }
-               .switch {
+
+        .switch {
             position: relative;
             display: inline-block;
             width: 46px;
@@ -1332,13 +1372,13 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-    const toggle = document.getElementById('toggle-filter');
-    const panel = document.getElementById('filter-panel');
-    if (toggle && panel) {
-        toggle.addEventListener('change', function() {
-            panel.style.display = this.checked ? '' : 'none';
+            const toggle = document.getElementById('toggle-filter');
+            const panel = document.getElementById('filter-panel');
+            if (toggle && panel) {
+                toggle.addEventListener('change', function() {
+                    panel.style.display = this.checked ? '' : 'none';
+                });
+            }
         });
-    }
-});
     </script>
 @endsection
