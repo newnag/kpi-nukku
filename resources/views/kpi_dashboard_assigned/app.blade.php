@@ -900,14 +900,14 @@
         }
 
         .evidence-list {
-            background: white;
+            /* background: white;
             border-radius: 10px;
             padding: 30px;
             border: 2px solid #C2D9EB;
             margin-top: 40px;
             margin-bottom: 40px;
             margin-left: 40px;
-            margin-right: 40px;
+            margin-right: 40px; */
         }
 
         .table {
@@ -1041,9 +1041,9 @@
             }
 
             .evidence-list {
-                margin-left: 20px;
+                /* margin-left: 20px;
                 margin-right: 20px;
-                padding: 20px;
+                padding: 20px; */
             }
         }
 

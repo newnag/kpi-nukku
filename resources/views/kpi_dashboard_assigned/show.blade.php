@@ -239,7 +239,7 @@
                                     {{ $indicator->status == 2 ? 'readonly' : '' }}>
                             </div>
                         @empty
-                            <p class="text-gray-500">ยังไม่มีตัวแปรที่ต้องกรอกเอง</p>
+                            <p class="text-gray-500">ยังไม่มีตัวแปรที่ต้องกรอก</p>
                         @endforelse
                     </div>
                 @endif
