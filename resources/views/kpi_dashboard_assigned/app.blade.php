@@ -293,21 +293,21 @@
                                     @switch($indicator->status)
                                         @case(0)
                                             <span class="tooltip" data-tooltip="รอดำเนินการ">
-                                               <i data-lucide="alert-triangle" class="w-5 h-5 text-red-500"></i>
+                                                <i data-lucide="alert-triangle" class="w-5 h-5 text-red-500"></i>
                                                 <span class="sr-only">รอดำเนินการ</span>
                                             </span>
                                         @break
 
                                         @case(1)
                                             <span class="tooltip" data-tooltip="รอดำเนินการ / บันทึกร่าง">
-                                               <i data-lucide="alert-triangle" class="w-5 h-5 text-red-500"></i>
+                                                <i data-lucide="alert-triangle" class="w-5 h-5 text-red-500"></i>
                                                 <span class="sr-only">รอดำเนินการ / บันทึกร่าง</span>
                                             </span>
                                         @break
 
                                         @case(2)
                                             <span class="tooltip" data-tooltip="รอดำเนินการ / บันทึกจริง">
-                                               <i data-lucide="alert-triangle" class="w-5 h-5 text-red-500"></i>
+                                                <i data-lucide="alert-triangle" class="w-5 h-5 text-red-500"></i>
                                                 <span class="sr-only">รอดำเนินการ / บันทึกจริง</span>
                                             </span>
                                         @break
@@ -718,7 +718,7 @@
             /* tooltip อยู่ด้านบน */
             /* left: 50%; */
             /* transform: translateX(-50%);
-                                                                            background: #333; */
+                                                                                background: #333; */
             color: #fff;
             font-size: 12px;
             /* padding: 5px 8px; */

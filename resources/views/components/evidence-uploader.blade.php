@@ -16,7 +16,7 @@
     <!-- Backdrop + Modal -->
     <div class="eu-modal-backdrop" x-cloak x-show="open" x-transition.opacity
         @keydown.escape.window.prevent.stop="closeModal()">
-        <div class="eu-backdrop-click" @click="closeModal()"></div>
+        <div class="eu-backdrop-click bg-black/10 opacity-50 " @click="closeModal()"></div>
 
         <section class="eu-modal" role="dialog" aria-modal="true" aria-labelledby="eu-title-{{ $cid }}"
             x-trap.inert.noscroll="open">
@@ -183,7 +183,7 @@
 
         .eu-btn.outline {
             background: #fff;
-            color: #111827;
+            color: #398ECA;
             border-color: #d1d5db
         }
 
@@ -233,12 +233,13 @@
         .eu-backdrop-click {
             position: absolute;
             inset: 0;
-            background: rgba(0, 0, 0, .45)
         }
 
         .eu-modal {
-            position: relative;
-            margin: auto;
+            position: fixed; /* Change to fixed to center on screen */
+            top: 50%; /* Center vertically */
+            left: 50%; /* Center horizontally */
+            transform: translate(-50%, -50%); /* Adjust for element's own size */
             z-index: 61;
             background: #fff;
             border-radius: 16px;
@@ -459,6 +460,12 @@
     </script>
 
     <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Alpine Plugins -->
+    <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/focus@3.x.x/dist/cdn.min.js"></script>
+
+    <!-- Alpine Core -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
     <script>
         function eUploader{{ $cid }}() {

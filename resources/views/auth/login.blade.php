@@ -4,7 +4,7 @@
 
 @section('content')
     <div class="flex items-center justify-center">
-        <div class="max-w-md w-full mt-12">
+        <div class="max-w-md w-full ">
             <!-- Main Card -->
             <div class="bg-white/80 backdrop-blur-sm shadow-2xl rounded-3xl p-8 border border-white/20 ">
                 <!-- Logo Section -->

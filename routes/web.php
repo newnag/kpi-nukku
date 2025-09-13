@@ -241,13 +241,13 @@ Route::middleware(['auth:sanctum'])->group(function () {
         
         Route::prefix('/user')->name('user.')->group(function () {
             Route::get('/kpi/{id}', [DashboardKpiUserController::class, 'show'])->name('show');
-            Route::put('/{id}/update-variables', [DashboardKpiUserController::class, 'saveVariables'])->name('saveVariables');
+            Route::put('/kpi/{id}/save-variables', [DashboardKpiUserController::class, 'saveVariables'])->name('saveVariables');
         });
 
         Route::prefix('/admin')->name('admin.')->group(function () {
             Route::get('/kpi/{id}', [DashboardKpiAdminController::class, 'show'])->name('show');
-            Route::put('/{id}/update-variables', [DashboardKpiAdminController::class, 'saveVariables'])->name('saveVariables');
-            Route::put('/kpi/{id}/update-status', [DashboardKpiAdminController::class, 'updateStatus'])->name('updateStatus');
+            Route::put('/kpi/{id}/save-variables', [DashboardKpiAdminController::class, 'saveVariables'])->name('saveVariables');
+            // Route::put('/kpi/{id}/update-status', [DashboardKpiAdminController::class, 'updateStatus'])->name('updateStatus');
         });
     });
 });

@@ -20,19 +20,21 @@ body {
 
 /* ===== LAYOUT COMPONENTS ===== */
 
-/* Main Content */
 .main-content {
     flex: 1;
     width: 100%;
     background-color: rgb(248, 250, 252);
     position: relative;
+    display: flex; /* Ensure the container can stretch */
+    flex-direction: column; /* Align children vertically */
 }
 
-/* Container for main content */
 .container {
     max-width: 1200px;
     margin: 0 auto;
     padding: 2rem;
+    height: 100%;
+    flex: 1;
 }
 
 /* ===== FOOTER ===== */
@@ -97,7 +99,6 @@ body {
     position: relative;
     /* Remove flex property to allow natural content flow */
 }
-
 
 /* ===== FORM CONTAINERS ===== */
 .form-container {
@@ -718,7 +719,6 @@ body {
 
 /* ===== PRINT STYLES ===== */
 @media print {
-
     .page-header {
         background: none;
         border: none;

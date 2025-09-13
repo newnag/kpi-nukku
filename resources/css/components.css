@@ -596,25 +596,6 @@
     transform: translateX(-50%) translateY(-4px);
 }
 
-/* ===== Modal responsiveness & scroll lock ===== */
-.modal-open,
-.modal-open body {
-    overflow: hidden;
-}
-
-/* Ensure the panel looks great on mobile fullscreen */
-.modal-panel {
-    /* Already using rounded-none on mobile via classes; keep panel strong */
-}
-
-/* Modal body harmonization so nested forms don't double-pad */
-.modal-body .evidence-form {
-    padding: 0;
-    margin: 0;
-    background: transparent;
-    border: 0;
-    box-shadow: none;
-}
 
 /* Optional: nicer touch targets on small screens */
 @media (max-width: 640px) {
