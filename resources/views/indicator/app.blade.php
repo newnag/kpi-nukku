@@ -305,9 +305,29 @@
 
                                     // Get all unique department names
                                     $departmentNames = $departments->values();
+                                    // Get all unique department names
+                                    $departmentNames = $departments->values();
 
                                 @endphp
+                                @endphp
 
+                                @if ($departmentNames->count() === 1)
+                                    {{ $departmentNames->first() }}
+                                @elseif ($departmentNames->count() > 1)
+                                    {{ $departmentNames->implode(', ') }}
+                                @else
+                                    <span class="text-gray-400">ไม่มีการมอบหมาย</span>
+                                @endif
+                            </td>
+                            <td class="px-4 py-3 text-sm text-gray-900 text-center">
+                                {{ number_format($indicator['score_acc'], 2) ?? '0.00' }}
+                            </td>
+                            <td class="px-4 py-3 text-sm text-gray-900 text-center">
+                                {{ number_format($indicator['max_score'], 2) ?? '0.00' }}
+                            </td>
+                            @php
+                                $statusCode = (int) ($indicator['status'] ?? -1);
+                            @endphp
                                 @if ($departmentNames->count() === 1)
                                     {{ $departmentNames->first() }}
                                 @elseif ($departmentNames->count() > 1)
@@ -557,6 +577,45 @@
                 font-size: 12px;
                 white-space: nowrap;
                 z-index: 10;
+
+            }
+
+            .btn-view {
+                text-decoration: none;
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+                padding: 6px 14px;
+                border-radius: 6px;
+                border: 1px solid #3b82f6;
+                background: transparent;
+                /* ✅ โปร่งใส */
+                cursor: pointer;
+                font-size: 13px;
+                font-weight: 500;
+                white-space: nowrap;
+                color: #3b82f6;
+                transition: all 0.2s ease-in-out;
+            }
+
+            .btn-view:hover {
+                background: #dbeafe;
+            }
+
+            .status-badge {
+
+                align-items: center;
+                justify-content: center;
+                min-width: 64px;
+                /* กำหนดความกว้างขั้นต่ำ ให้ badge กว้างเท่ากัน */
+                padding: 4px 10px;
+
+                /* pill shape */
+                font-size: 13px;
+                font-weight: 500;
+                line-height: 1.4;
+                text-align: center;
+                white-space: nowrap;
             }
         </style>
     @endpush
@@ -746,4 +805,51 @@
 
             });
         </script>
+        <style>
+            .dashboard-list {
+                background: white;
+                border-radius: 10px;
+                padding: 30px;
+                border: 2px solid #C2D9EB;
+                margin-top: 40px;
+                margin-bottom: 40px;
+                margin-left: 60px;
+                margin-right: 60px;
+
+            }
+
+            .dashboard-list {
+                margin-left: 20px;
+                margin-right: 20px;
+                padding: 20px;
+            }
+
+            .status-icon {
+                width: 20px;
+                height: 20px;
+                display: block;
+                /* block จะทำให้จัดตรงกลางได้ง่าย */
+            }
+
+
+            .tip {
+                position: relative;
+                display: inline-block;
+                cursor: pointer;
+            }
+
+            .tip[data-tip]:hover::after {
+                content: attr(data-tip);
+                position: absolute;
+                bottom: 125%;
+                left: 50%;
+                transform: translateX(-50%);
+                background: rgba(0, 0, 0, .75);
+                color: #fff;
+                padding: 4px 8px;
+                border-radius: 4px;
+                font-size: 12px;
+                white-space: nowrap;
+            }
+        </style>
     @endpush

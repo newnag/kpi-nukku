@@ -17,7 +17,7 @@
             <div class="field">
                 <label>ปีการประเมิน</label>
                 <select id="filter-year" name="year">
-                    <option value="">ทั้งหมด</option>
+                    {{-- <option value="">ทั้งหมด</option> --}}
                     @foreach ($years as $y)
                         <option value="{{ $y }}" {{ (string) $selectedYear === (string) $y ? 'selected' : '' }}>
                             {{ $y }}

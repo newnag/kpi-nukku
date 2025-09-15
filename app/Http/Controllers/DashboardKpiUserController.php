@@ -63,9 +63,9 @@ class DashboardKpiUserController extends Controller
                 }
 
                 $indicator->status_key = match ((int) $indicator->status) {
-                    2, 3 => 'complete',
+                    3 => 'complete',
                     4    => 'incomplete',
-                    0    => 'pending',
+                    0, 1, 2   => 'pending',
                     default => 'pending',
                 };
 
@@ -87,9 +87,10 @@ class DashboardKpiUserController extends Controller
             'checklistItems',
         ])->findOrFail($id);
 
-        $criteria_id = optional($indicator->criterias->first())->id;
+        $criteria   = $indicator->criterias->first(); // อาจเป็น null ได้
+        $criteria_id = optional($criteria)->id;
 
-        return view('kpi_dashboard_assigned.show', compact('indicator', 'criteria_id'));
+        return view('kpi_dashboard_assigned.show', compact('indicator', 'criteria', 'criteria_id'));
     }
 
     public function saveVariables(Request $request, $id)
@@ -112,7 +113,7 @@ class DashboardKpiUserController extends Controller
         $indicator->save();
 
         return redirect()->route('dashboardkpi.user.show', $indicator->id)
-                ->with('success', 'บันทึกข้อมูลเรียบร้อยแล้ว');
+            ->with('success', 'บันทึกข้อมูลเรียบร้อยแล้ว');
 
     }
 }

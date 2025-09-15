@@ -29,9 +29,12 @@
                     </svg>
                 </button>
                 <div id="sort-dropdown" class="dropdown-menus hidden" role="menu" aria-orientation="vertical">
-                    <button class="dropdown-item sort-option" data-column="0" data-order="asc" role="menuitem">ปี(น้อยไปมาก)</button>
-                    <button class="dropdown-item sort-option" data-column="0" data-order="desc" role="menuitem">ปี(มากไปน้อย)</button>
-                    <button class="dropdown-item sort-option" data-column="1" data-order="asc" role="menuitem">ชื่อตัวบ่งชี้(A-Z)</button>
+                    <button class="dropdown-item sort-option" data-column="0" data-order="asc"
+                        role="menuitem">ปี(น้อยไปมาก)</button>
+                    <button class="dropdown-item sort-option" data-column="0" data-order="desc"
+                        role="menuitem">ปี(มากไปน้อย)</button>
+                    <button class="dropdown-item sort-option" data-column="1" data-order="asc"
+                        role="menuitem">ชื่อตัวบ่งชี้(A-Z)</button>
                     <button class="dropdown-item sort-option" data-column="1" data-order="desc"
                         role="menuitem">ชื่อตัวบ่งชี้(Z-A)</button>
                     <button class="sort-option text-left block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
@@ -709,7 +712,7 @@
             /* tooltip อยู่ด้านบน */
             /* left: 50%; */
             /* transform: translateX(-50%);
-                                                                                                background: #333; */
+                                                                                                    background: #333; */
             color: #fff;
             font-size: 12px;
             /* padding: 5px 8px; */
@@ -730,11 +733,11 @@
         }
 
         /*
-                    .evidence-container {
-                        max-width: 1500px;
-                        margin: 0 auto;
+                        .evidence-container {
+                            max-width: 1500px;
+                            margin: 0 auto;
 
-                    } */
+                        } */
 
         .evidence-container h1 {
             margin: 0 0 8px;
@@ -893,13 +896,13 @@
 
         .evidence-list {
             /* background: white;
-                            border-radius: 10px;
-                            padding: 30px;
-                            border: 2px solid #C2D9EB;
-                            margin-top: 40px;
-                            margin-bottom: 40px;
-                            margin-left: 40px;
-                            margin-right: 40px; */
+                                border-radius: 10px;
+                                padding: 30px;
+                                border: 2px solid #C2D9EB;
+                                margin-top: 40px;
+                                margin-bottom: 40px;
+                                margin-left: 40px;
+                                margin-right: 40px; */
         }
 
         .table {
@@ -1034,8 +1037,8 @@
 
             .evidence-list {
                 /* margin-left: 20px;
-                                margin-right: 20px;
-                                padding: 20px; */
+                                    margin-right: 20px;
+                                    padding: 20px; */
             }
         }
 
