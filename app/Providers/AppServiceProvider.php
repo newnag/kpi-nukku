@@ -15,7 +15,9 @@ class AppServiceProvider extends ServiceProvider
     {
         //
     }
-
+protected $policies = [
+    \App\Models\Indicator::class => \App\Policies\IndicatorPolicy::class,
+];
     /**
      * Bootstrap any application services.
      */
@@ -25,4 +27,5 @@ class AppServiceProvider extends ServiceProvider
             $view->with('global_setting', Setting::first());
         });
     }
+    
 }
