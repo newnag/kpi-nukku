@@ -265,22 +265,22 @@
                 <tbody class="bg-white ">
                     @forelse($indicators as $indicator)
                         <tr class="hover:bg-gray-50 divide-y divide-gray-200 ">
-                            <td class="max-w-6 text-sm text-gray-800 text-center align-top">
-                                <div>{{ $indicator['year'] }}</div>
-                            </td>
-                            <td class="max-w-15 text-sm text-gray-800 truncate align-top">โครงสร้าง</td>
-                            <td class="max-w-15 text-sm text-gray-800 truncate align-top">ด้านตัวชี้วัด</td>
-                            <td class="max-w-60 text-sm text-gray-800 truncate align-top">
-                                <span class="block truncate" title="{{ $indicator['name'] }}">
+                            <td class="max-w-6 text-sm text-gray-700 text-center align-top">{{ $indicator['year'] }}</td>
+                            <td class="max-w-15 text-sm text-balance text-gray-700 align-top">
+                                {{ $indicator['category']['name'] }}</td>
+                            <td class="max-w-15 text-sm text-balance text-gray-700 align-top">
+                                {{ $indicator['standard']['name'] }}</td>
+                            <td class="max-w-60 text-sm text-gray-700 text-balance align-top">
+                                {{-- <span class="block truncate" title="{{ $indicator['name'] }}"> --}}
                                     {{ $indicator['name'] }}
-                                </span>
+                                {{-- </span> --}}
                             </td>
-                            <td class="max-w-9 text-center text-sm text-gray-800 truncate align-top">
+                            <td class="max-w-9 text-center text-sm text-gray-700 truncate  align-top">
                                 {{ $indicator['code'] }}</td>
-                            <td class="max-w-11 text-sm text-gray-800 align-top">
+                            <td class="max-w-11 text-sm text-gray-700 text-center align-top">
                                 {{ $indicator['type'] ?? 'ไม่ระบุ' }}
                             </td>
-                            <td class="text-sm text-gray-800 align-top">
+                            <td class="text-sm text-gray-700 align-top">
                                 @php
                                     // Unique, non-empty department names
                                     $departments = collect($indicator['assignments'] ?? [])
@@ -314,10 +314,10 @@
                                 @endif
                             </td>
 
-                            <td class=" text-sm text-gray-800 text-center align-top">
+                            <td class=" text-sm text-gray-700 text-center align-top">
                                 {{ number_format($indicator['score_acc'], 2) ?? '0.00' }}
                             </td>
-                            <td class=" text-sm text-gray-800 text-center align-top">
+                            <td class=" text-sm text-gray-700 text-center align-top">
                                 {{ number_format($indicator['max_score'], 2) ?? '0.00' }}
                             </td>
                             @php
