@@ -8,6 +8,11 @@ This document summarizes the automated tests in the repository, how to run them,
 - Total: 43 tests, 138 assertions (at time of writing)
 - Scope: Authentication, authorization, indicators (API + controller), evidence (upload/download/toggle), users/departments/categories/standards CRUD, exports, resources, and helper services.
 
+Roles/Permissions Matrix
+- See Roles Matrix: docs/ROLES_MATRIX.md
+- UI visibility tests: tests/Feature/NavbarVisibilityByRoleTest.php
+
+
 ## Running Tests
 
 - Run all: `php artisan test`
@@ -69,6 +74,10 @@ Notes
 - Framework: Laravel 12, PHPUnit 11
 - รวม: 43 tests, 138 assertions (ณ เวลาจัดทำ)
 - ขอบเขต: ระบบล็อกอิน/สิทธิ์ (Auth/Permissions), Indicators (API + Controller), Evidence (อัปโหลด/ดาวน์โหลด/สลับสถานะ), CRUD สำหรับ Users/Departments/Categories/Standards, Export, Resource mapping และ Service/Helper ที่เกี่ยวข้อง
+
+## สรุปสิทธิ์ 
+- ตารางบทบาทและสิทธิ์: docs/ROLES_MATRIX.md
+- เทสเมนูตามบทบาท: tests/Feature/NavbarVisibilityByRoleTest.php
 
 ## วิธีรันเทสต์
 
