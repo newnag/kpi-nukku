@@ -6,11 +6,10 @@
 @section('subheader', 'ระบบบริหารจัดการข้อมูลการรับรองสถาบันจากสภาการพยาบาล')
 
 @section('content')
-    <div class="ml-3 mr-3 md:ml-9 md:mr-9 mb-9 space-y-5">
-        <div class=" flex flex-col md:flex-row md:justify-between gap-4 md:gap-2">
-            <!-- Search & Filter Controls Group -->
+    <div class="space-y-5">
+        <div class="flex justify-between">
             <div class="flex flex-wrap gap-2 ">
-                <div class="relative w-full sm:w-auto bg-white rounded-lg shadow-sm ">
+                <div class="relative w-screen sm:w-auto bg-white rounded-lg shadow-sm ">
                     <div class="absolute inset-y-0 left-3 flex items-center pointer-events-none">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24"
                             stroke="currentColor">
@@ -18,9 +17,8 @@
                                 d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                         </svg>
                     </div>
-                    <input type="text" id="custom-search"
-                        class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none w-full"
-                        placeholder="ค้นหารายการตัวบ่งชี้">
+                    <input type="text" id="custom-search" placeholder="ค้นหารายการตัวบ่งชี้"
+                        class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/40" />
                 </div>
 
                 <!-- Sort Button with Dropdown -->
@@ -187,239 +185,225 @@
                 </button>
             </div>
         </div>
-    </div>
-    <div class="border border-gray-200 rounded-lg shadow-sm overflow-x-auto">
-        <table id="myTable" class="w-full">
-            <thead>
-                <tr>
-                    <th class="w-16 px-4 py-3 text-sm font-medium text-gray-900 cursor-pointer select-none">
-                        <div class="flex items-center justify-between">
-                            <span>ปี</span>
-                            <svg class="sort-icon w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
-                            </svg>
-                        </div>
-                    </th>
-                    <th class="w-fit px-4 py-3 text-sm font-medium text-gray-900 text-left cursor-pointer select-none">
-                        <div class="flex items-center justify-between">
-                            <span>ชื่อตัวบ่งชี้</span>
-                            <svg class="sort-icon w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
-                            </svg>
-                        </div>
-                    </th>
-                    <th class="w-fit px-4 py-3 text-sm font-medium text-gray-900 cursor-pointer select-none">
-                        <div class="flex items-center justify-between">
-                            <span>รหัส</span>
-                            <svg class="sort-icon w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
-                            </svg>
-                        </div>
-                    </th>
-                    <th
-                        class="w-fit px-4 py-3 text-sm font-medium text-gray-900 cursor-pointer select-none hidden md:table-cell">
-                        <div class="flex items-center justify-between">
-                            <span>ประเภทตัวชี้วัด</span>
-                            <svg class="sort-icon w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
-                            </svg>
-                        </div>
-                    </th>
-                    <th
-                        class="w-fit px-4 py-3 text-sm font-medium text-gray-900 cursor-pointer select-none hidden md:table-cell">
-                        <div class="flex items-center justify-between">
-                            <span>หน่วยที่ติดตาม</span>
-                            <svg class="sort-icon w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
-                            </svg>
-                        </div>
-                    </th>
-                    <th class="w-fit px-4 py-3 text-sm font-medium text-gray-900 cursor-pointer select-none">
-                        <div class="flex items-center justify-between">
-                            <span>ผลลัพธ์</span>
-                            <svg class="sort-icon w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
-                            </svg>
-                        </div>
-                    </th>
-                    <th
-                        class="w-fit px-4 py-3 text-sm font-medium text-gray-900 cursor-pointer select-none hidden sm:table-cell">
-                        <div class="flex items-center justify-between">
-                            <span>คะแนนรวม</span>
-                            <svg class="sort-icon w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
-                            </svg>
-                        </div>
-                    </th>
-                    <th class="w-fit px-4 py-3 text-sm font-medium text-gray-900 cursor-pointer select-none">
-                        <div class="flex items-center justify-between">
-                            <span>สถานะตัวชี้วัด</span>
-                            <svg class="sort-icon w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
-                            </svg>
-                        </div>
-                    </th>
-                    <th
-                        class="w-fit px-4 py-3 text-sm font-medium text-gray-900 cursor-pointer select-none hidden sm:table-cell">
-                        <div class="flex items-center justify-between">
-                            <span>สถานะเอกสาร</span>
-                            <svg class="sort-icon w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
-                            </svg>
-                        </div>
-                    </th>
-                    <th class="w-fit px-4 py-3 text-sm font-medium text-gray-900">จัดการ</th>
-                </tr>
-            </thead>
-            <tbody class="bg-white ">
-                @forelse($indicators as $indicator)
-                    <tr class="hover:bg-gray-50 divide-y  divide-gray-200 ">
-                        <td class="px-4 py-3 text-sm text-gray-900">{{ $indicator['year'] }}</td>
-                        <td class="px-4 py-3 text-sm text-gray-900 text-clip overflow-hidde">{{ $indicator['name'] }}
-                        </td>
-                        <td class="px-4 py-3 text-sm text-gray-900">{{ $indicator['code'] }}</td>
-                        <td class="px-4 py-3 text-sm text-gray-900">
-                            {{ $indicator['type'] ?? 'ไม่ระบุ' }}
-                        </td>
-                        <td class="px-4 py-3 text-sm text-gray-900">
+        <div class="border border-gray-200 rounded-lg shadow-sm overflow-x-auto">
+            <table id="myTable" class="w-full">
+                <thead>
+                    <tr>
+                        <th class="w-16 px-4 py-3 text-sm font-medium text-gray-900 cursor-pointer select-none">
+                            <div class="flex items-center justify-between">
+                                <span>ปี</span>
+                                {{-- <svg class="sort-icon w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
+                                </svg> --}}
+                            </div>
+                        </th>
+                        <th class="w-fit px-4 py-3 text-sm font-medium text-gray-900 text-left cursor-pointer select-none">
+                            <div class="flex items-center justify-between">
+                                <span>ชื่อตัวบ่งชี้</span>
+                                {{-- <svg class="sort-icon w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
+                                </svg> --}}
+                            </div>
+                        </th>
+                        <th class="w-fit px-4 py-3 text-sm font-medium text-gray-900 cursor-pointer select-none">
+                            <div class="flex items-center justify-between">
+                                <span>รหัส</span>
+                                {{-- <svg class="sort-icon w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
+                                </svg> --}}
+                            </div>
+                        </th>
+                        <th
+                            class="w-fit px-4 py-3 text-sm font-medium text-gray-900 cursor-pointer select-none hidden md:table-cell">
+                            <div class="flex items-center justify-between">
+                                <span>ประเภทตัวชี้วัด</span>
+                                {{-- <svg class="sort-icon w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
+                                </svg> --}}
+                            </div>
+                        </th>
+                        <th
+                            class="w-fit px-4 py-3 text-sm font-medium text-gray-900 cursor-pointer select-none hidden md:table-cell">
+                            <div class="flex items-center justify-between">
+                                <span>หน่วยที่ติดตาม</span>
+                                {{-- <svg class="sort-icon w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
+                                </svg> --}}
+                            </div>
+                        </th>
+                        <th class="w-fit px-4 py-3 text-sm font-medium text-gray-900 cursor-pointer select-none">
+                            <div class="flex items-center justify-between">
+                                <span>ผลลัพธ์</span>
+                                {{-- <svg class="sort-icon w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
+                                </svg> --}}
+                            </div>
+                        </th>
+                        <th
+                            class="w-fit px-4 py-3 text-sm font-medium text-gray-900 cursor-pointer select-none hidden sm:table-cell">
+                            <div class="flex items-center justify-between">
+                                <span>คะแนนรวม</span>
+                                {{-- <svg class="sort-icon w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
+                                </svg> --}}
+                            </div>
+                        </th>
+                        <th class="w-fit px-4 py-3 text-sm font-medium text-gray-900 cursor-pointer select-none">
+                            <div class="flex items-center justify-between">
+                                <span>สถานะตัวชี้วัด</span>
+                                {{-- <svg class="sort-icon w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
+                                </svg> --}}
+                            </div>
+                        </th>
+                        <th
+                            class="w-fit px-4 py-3 text-sm font-medium text-gray-900 cursor-pointer select-none hidden sm:table-cell">
+                            <div class="flex items-center justify-between">
+                                <span>สถานะเอกสาร</span>
+                                {{-- <svg class="sort-icon w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
+                                </svg> --}}
+                            </div>
+                        </th>
+                        <th class="w-fit px-4 py-3 text-sm font-medium text-gray-900">จัดการ</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white ">
+                    @forelse($indicators as $indicator)
+                        <tr class="hover:bg-gray-50 divide-y  divide-gray-200 ">
+                            <td class="px-4 py-3 text-sm text-gray-900">{{ $indicator['year'] }}</td>
+                            <td class="px-4 py-3 text-sm text-gray-900 text-clip overflow-hidde">{{ $indicator['name'] }}
+                            </td>
+                            <td class="px-4 py-3 text-sm text-gray-900">{{ $indicator['code'] }}</td>
+                            <td class="px-4 py-3 text-sm text-gray-900">
+                                {{ $indicator['type'] ?? 'ไม่ระบุ' }}
+                            </td>
+                            <td class="px-4 py-3 text-sm text-gray-900">
+                                @php
+                                    // Collect all department names from assignments
+                                    $departments = collect($indicator['assignments'])
+                                        ->pluck('user.department_name', 'user.department_id')
+                                        ->unique();
+
+                                    // Get all unique department names
+                                    $departmentNames = $departments->values();
+
+                                @endphp
+
+                                @if ($departmentNames->count() === 1)
+                                    {{ $departmentNames->first() }}
+                                @elseif ($departmentNames->count() > 1)
+                                    {{ $departmentNames->implode(', ') }}
+                                @else
+                                    <span class="text-gray-400">ไม่มีการมอบหมาย</span>
+                                @endif
+                            </td>
+                            <td class="px-4 py-3 text-sm text-gray-900 text-center">
+                                {{ number_format($indicator['score_acc'], 2) ?? '0.00' }}
+                            </td>
+                            <td class="px-4 py-3 text-sm text-gray-900 text-center">
+                                {{ number_format($indicator['max_score'], 2) ?? '0.00' }}
+                            </td>
                             @php
-                                // Collect all department names from assignments
-                                $departments = collect($indicator['assignments'])
-                                    ->pluck('user.department_name', 'user.department_id')
-                                    ->unique();
-
-                                // Get all unique department names
-                                $departmentNames = $departments->values();
-
+                                $statusCode = (int) ($indicator['status'] ?? -1);
                             @endphp
 
-                            @if ($departmentNames->count() === 1)
-                                {{ $departmentNames->first() }}
-                            @elseif ($departmentNames->count() > 1)
-                                {{ $departmentNames->implode(', ') }}
-                            @else
-                                <span class="text-gray-400">ไม่มีการมอบหมาย</span>
-                            @endif
-                        </td>
-                        <td class="px-4 py-3 text-sm text-gray-900 text-center">
-                            {{ number_format($indicator['score_acc'], 2) ?? '0.00' }}
-                        </td>
-                        <td class="px-4 py-3 text-sm text-gray-900 text-center">
-                            {{ number_format($indicator['max_score'], 2) ?? '0.00' }}
-                        </td>
-                        @php
-                            $statusCode = (int) ($indicator['status'] ?? -1);
-                        @endphp
+                            <td class="px-4 py-3 text-sm" data-search="{{ $statusCode }}"
+                                data-order="{{ $statusCode }}">
+                                @switch($statusCode)
+                                    @case(0)
+                                        <span class="tooltip" data-tooltip="รอดำเนินการ">
+                                            <i data-lucide="alert-triangle" class="w-5 h-5 text-red-500"></i>
+                                            <span class="sr-only">รอดำเนินการ</span>
+                                        </span>
+                                    @break
 
-                        <td class="px-4 py-3 text-sm" data-search="{{ $statusCode }}" data-order="{{ $statusCode }}">
-                            @switch($statusCode)
-                                @case(3)
-                                    <div
-                                        class="flex justify-center items-center w-6 h-6 mx-auto rounded-full bg-green-100 text-green-600">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
-                                            viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M5 13l4 4L19 7" />
-                                        </svg>
-                                    </div>
-                                @break
+                                    @case(1)
+                                        <span class="tooltip" data-tooltip="รอดำเนินการ / บันทึกร่าง">
+                                            <i data-lucide="alert-triangle" class="w-5 h-5 text-red-500"></i>
+                                            <span class="sr-only">รอดำเนินการ / บันทึกร่าง</span>
+                                        </span>
+                                    @break
 
-                                @case(4)
-                                    <div
-                                        class="flex justify-center items-center w-6 h-6 mx-auto rounded-full bg-red-100 text-red-600">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
-                                            viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M6 18L18 6M6 6l12 12" />
-                                        </svg>
-                                    </div>
-                                @break
+                                    @case(2)
+                                        <span class="tooltip" data-tooltip="รอดำเนินการ / บันทึกจริง">
+                                            <i data-lucide="alert-triangle" class="w-5 h-5 text-red-500"></i>
+                                            <span class="sr-only">รอดำเนินการ / บันทึกจริง</span>
+                                        </span>
+                                    @break
 
-                                @default
-                                    <div
-                                        class="flex justify-center items-center w-6 h-6 mx-auto rounded-full bg-yellow-100 text-yellow-600">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
-                                            viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                                        </svg>
-                                    </div>
-                            @endswitch
-                        </td>
+                                    @case(3)
+                                        <span class="tooltip" data-tooltip="ผลการดำเนินงานครบถ้วนตามเกณฑ์มาตรการ">
+                                            <i data-lucide="check-circle" class="w-5 h-5 text-green-500"></i>
+                                            <span class="sr-only">ผลการดำเนินงานครบถ้วนตามเกณฑ์มาตรการ</span>
+                                        </span>
+                                    @break
 
-                        @php
-                            // Derive document status from criteria statuses (0/1/2)
-                            $criteria = collect($indicator['criteria'] ?? []);
+                                    @case(4)
+                                        <span class="tooltip" data-tooltip="ผลการดำเนินงานยังไม่ครบถ้วนตามเกณฑ์">
+                                            <i data-lucide="alert-triangle" class="w-5 h-5 text-red-500"></i>
+                                            <span class="sr-only">ผลการดำเนินงานยังไม่ครบถ้วนตามเกณฑ์</span>
+                                        </span>
+                                    @break
 
-                            // Normalize to string to handle 0 vs "0"
-                            $has0 = $criteria->contains(fn($c) => (string) ($c['status'] ?? '') === '0');
-                            $has2 = $criteria->contains(fn($c) => (string) ($c['status'] ?? '') === '2');
+                                    @default
+                                        <span class="tooltip" data-tooltip="สถานะไม่ระบุ">
+                                            <i data-lucide="help-circle" class="w-5 h-5 text-gray-400"></i>
+                                            <span class="sr-only">สถานะไม่ระบุ</span>
+                                        </span>
+                                @endswitch
+                            </td>
 
-                            if ($criteria->isEmpty() || $has0) {
-                                $docText = 'รอดำเนินการ';
-                                $docOrder = 0;
-                                $badgeCls = 'bg-gray-100 text-gray-800';
-                            } elseif ($has2) {
-                                $docText = 'ครบถ้วน';
-                                $docOrder = 1;
-                                $badgeCls = 'bg-green-100 text-green-800';
-                            } else {
-                                $docText = 'ไม่ครบถ้วน';
-                                $docOrder = 2;
-                                $badgeCls = 'bg-red-100 text-red-800';
-                            }
-                        @endphp
-
-                        <td class="px-4 py-3 text-sm" data-search="{{ $docText }}"
-                            data-order="{{ $docOrder }}">
-                            <span
-                                class="flex justify-center text-center px-2 py-1 text-xs font-medium rounded-full {{ $badgeCls }}">
-                                {{ $docText }}
-                            </span>
-                        </td>
-                        <td class="px-4 py-3 text-sm">
-                            <a href="{{ route('indicator.show', $indicator['id']) }}"
-                                class="inline-flex items-center justify-center px-3 py-1 bg-white border border-blue-500 text-blue-500 rounded-full text-xs font-medium hover:bg-blue-500 hover:text-white">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 mr-1" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                </svg>
-                                MORE
-                            </a>
-                        </td>
-                    </tr>
-                    @empty
-                        <tr>
-                            <td colspan="10" class=" px-4 py-8 text-center text-gray-500">
-                                ไม่พบข้อมูลตัวบ่งชี้
+                            <td class="px-4 py-3 text-sm">
+                                {{-- data-search="{{ $docText }} --}}
+                                {{-- data-order="{{ $docOrder }}" --}}
+                                datadoc
+                            </td>
+                            <td class="px-4 py-3 text-sm">
+                                <a href="{{ route('indicator.show', $indicator['id']) }}"
+                                    class="inline-flex items-center justify-center px-3 py-1 bg-white border border-blue-500 text-blue-500 rounded-full text-xs font-medium hover:bg-blue-500 hover:text-white">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 mr-1" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d=" M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                    </svg>
+                                    MORE
+                                </a>
                             </td>
                         </tr>
-                    @endforelse
-                </tbody>
-            </table>
+                        @empty
+                            <tr>
+                                <td colspan="10" class=" px-4 py-8 text-center text-gray-500">
+                                    ไม่พบข้อมูลตัวบ่งชี้
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
         </div>
         </div>
+
     @endsection
 
     @push('styles')

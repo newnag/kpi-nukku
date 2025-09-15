@@ -6,24 +6,19 @@
 @section('subheader', 'ระบบบริหารจัดการข้อมูลการรับรองสถาบันจากสภาการพยาบาล')
 
 @section('content')
-    <div class="evidence-container">
-
-        <!-- Controls -->
-        <div class="controls">
-            <!-- Search -->
-            <div class="search-box" style="width:100%; max-width:420px;">
-                <div class="icon">
-                    <!-- search icon -->
+    <div class="space-y-5">
+        <div class="flex gap-2 flex-wrap">
+            <div class="relative w-full sm:w-auto bg-white rounded-lg shadow-sm">
+                <div class="absolute inset-y-0 left-3 flex items-center pointer-events-none">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor" style="color:#9ca3af;">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
                 </div>
-                <input type="text" id="custom-search" class="search-input" placeholder="ค้นหารายการตัวบ่งชี้">
+                <input type="text" id="custom-search" placeholder="ค้นหารายการตัวบ่งชี้"
+                    class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/40" />
             </div>
-
-            <!-- Sort -->
             <div class="dropdown" id="sort-dropdown-container">
                 <button id="sort-button" class="btns">
                     <span>เรียงลำดับ</span>
@@ -34,19 +29,15 @@
                     </svg>
                 </button>
                 <div id="sort-dropdown" class="dropdown-menus hidden" role="menu" aria-orientation="vertical">
-                    <button class="dropdown-item sort-option" data-column="0" data-order="asc" role="menuitem">ปี
-                        (น้อยไปมาก)</button>
-                    <button class="dropdown-item sort-option" data-column="0" data-order="desc" role="menuitem">ปี
-                        (มากไปน้อย)</button>
-                    <button class="dropdown-item sort-option" data-column="1" data-order="asc" role="menuitem">ชื่อตัวบ่งชี้
-                        (A-Z)</button>
+                    <button class="dropdown-item sort-option" data-column="0" data-order="asc" role="menuitem">ปี(น้อยไปมาก)</button>
+                    <button class="dropdown-item sort-option" data-column="0" data-order="desc" role="menuitem">ปี(มากไปน้อย)</button>
+                    <button class="dropdown-item sort-option" data-column="1" data-order="asc" role="menuitem">ชื่อตัวบ่งชี้(A-Z)</button>
                     <button class="dropdown-item sort-option" data-column="1" data-order="desc"
-                        role="menuitem">ชื่อตัวบ่งชี้
-                        (Z-A)</button>
-                    <button class="dropdown-item sort-option" data-column="4" data-order="desc" role="menuitem">คะแนนเต็ม
-                        (มากไปน้อย)</button>
-                    <button class="dropdown-item sort-option" data-column="4" data-order="asc" role="menuitem">คะแนนเต็ม
-                        (น้อยไปมาก)</button>
+                        role="menuitem">ชื่อตัวบ่งชี้(Z-A)</button>
+                    <button class="sort-option text-left block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        data-column="7" data-order="asc" role="menuitem">ผลลัพธ์ (น้อยไปมาก)</button>
+                    <button class="sort-option text-left block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        data-column="7" data-order="desc" role="menuitem">ผลลัพธ์ (มากไปน้อย)</button>
                     <div class="dropdown-divider"></div>
                     <button id="clear-sort" type="button" class="dropdown-item"
                         style="color:#4b5563;">ล้างการเรียงลำดับ</button>
@@ -718,7 +709,7 @@
             /* tooltip อยู่ด้านบน */
             /* left: 50%; */
             /* transform: translateX(-50%);
-                                                                                background: #333; */
+                                                                                                background: #333; */
             color: #fff;
             font-size: 12px;
             /* padding: 5px 8px; */
@@ -738,11 +729,12 @@
             display: none !important;
         }
 
-        .evidence-container {
-            max-width: 1500px;
-            margin: 0 auto;
+        /*
+                    .evidence-container {
+                        max-width: 1500px;
+                        margin: 0 auto;
 
-        }
+                    } */
 
         .evidence-container h1 {
             margin: 0 0 8px;
@@ -901,13 +893,13 @@
 
         .evidence-list {
             /* background: white;
-            border-radius: 10px;
-            padding: 30px;
-            border: 2px solid #C2D9EB;
-            margin-top: 40px;
-            margin-bottom: 40px;
-            margin-left: 40px;
-            margin-right: 40px; */
+                            border-radius: 10px;
+                            padding: 30px;
+                            border: 2px solid #C2D9EB;
+                            margin-top: 40px;
+                            margin-bottom: 40px;
+                            margin-left: 40px;
+                            margin-right: 40px; */
         }
 
         .table {
@@ -1042,8 +1034,8 @@
 
             .evidence-list {
                 /* margin-left: 20px;
-                margin-right: 20px;
-                padding: 20px; */
+                                margin-right: 20px;
+                                padding: 20px; */
             }
         }
 

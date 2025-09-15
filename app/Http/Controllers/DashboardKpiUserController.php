@@ -18,7 +18,6 @@ class DashboardKpiUserController extends Controller
 
         $query = Indicator::query();
 
-        // ✅ ใช้ Spatie เช็ค role
         if ($user->hasRole('user')) {
             $query->whereHas('assignments', fn($q) => $q->where('collector', $userId));
         }
@@ -92,6 +91,7 @@ class DashboardKpiUserController extends Controller
 
         return view('kpi_dashboard_assigned.show', compact('indicator', 'criteria_id'));
     }
+
     public function saveVariables(Request $request, $id)
     {
         $indicator = Indicator::findOrFail($id);
@@ -111,53 +111,8 @@ class DashboardKpiUserController extends Controller
 
         $indicator->save();
 
-        // $userId = Auth::user();
-
         return redirect()->route('dashboardkpi.user.show', $indicator->id)
                 ->with('success', 'บันทึกข้อมูลเรียบร้อยแล้ว');
 
-        // if ($userId->hasRole('user')) {
-        //     // ส่งข้อมูลกลับไปยังหน้าแสดงผล
-        //     return redirect()->route('dashboardkpi.user.show', $indicator->id)
-        //         ->with('success', 'บันทึกข้อมูลเรียบร้อยแล้ว');
-        // } else {
-        //     // สำหรับผู้ดูแลระบบหรือบทบาทอื่น ๆ
-        //     return redirect()->route('dashboardkpi.admin.show', $indicator->id)
-        //         ->with('success', 'บันทึกข้อมูลเรียบร้อยแล้ว');
-        // }
     }
-
-
-    // public function saveVariables(Request $request, $id)
-    // {
-    //     $indicator = Indicator::findOrFail($id);
-
-    //     if ($request->has('variables')) {
-    //         foreach ($request->variables as $varId => $value) {
-    //             Variable::updateOrCreate(
-    //                 ['id' => $varId, 'indicator_id' => $indicator->id],
-    //                 ['value' => $value]
-    //             );
-    //         }
-    //     }
-
-    //     // ✅ update status
-    //     if ($request->has('status')) {
-    //         $indicator->status = $request->status;
-    //     }
-
-    //     $indicator->save();
-    //     // return response()->json([
-    //     //     'success' => true,
-    //     //     'message' => $request->status == 1
-    //     //         ? 'บันทึกฉบับร่างเรียบร้อย ✅'
-    //     //         : 'บันทึกจริงสำเร็จ 🚀',
-    //     // ]);
-
-    //     return redirect()
-    //         ->route('dashboardKpiUser.index')
-    //         ->with('success', $request->status == 1
-    //             ? 'บันทึกฉบับร่างเรียบร้อย '
-    //             : 'บันทึกจริงสำเร็จ ');
-    // }
 }
