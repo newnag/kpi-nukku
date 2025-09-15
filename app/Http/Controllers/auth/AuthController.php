@@ -24,7 +24,19 @@ class AuthController extends Controller
         }
         Auth::login($user);
         $request->session()->regenerate();
-        return redirect('/home');
+        // Decide redirect path by role
+        $redirect = $user->hasRole('user') ? '/dashboardkpi' : '/dashboard';
+
+        // If the frontend expects JSON (AJAX login), return the target
+        if ($request->expectsJson()) {
+            return response()->json(['redirect' => $redirect]);
+        }
+
+        // For normal form posts: users go directly, others respect intended
+        if ($user->hasRole('user')) {
+            return redirect($redirect);
+        }
+        return redirect()->intended($redirect);
     }
 
     public function logout(Request $request)
@@ -40,4 +52,3 @@ class AuthController extends Controller
         return response()->json($request->user());
     }
 }
-

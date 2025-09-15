@@ -203,13 +203,13 @@
                                           @case(1)
                                           @case(2)
                                             <span class="tip" data-tip="อยู่ระหว่างดำเนินการ">
-                                                <i data-lucide="alert-triangle" class="status-icon text-danger"></i>
+                                                <i data-lucide="clock" class="status-icon text-danger"></i>
                                             </span>
                                         @break
 
                                         @case(4)
                                             <span class="tip" data-tip="ผลการดำเนินงานยังไม่ครบถ้วนตามเกณฑ์">
-                                                <i data-lucide="clock" class="status-icon text-warn"></i>
+                                                <i data-lucide="alert-triangle" class="status-icon text-warn"></i>
                                             </span>
                                         @break
 

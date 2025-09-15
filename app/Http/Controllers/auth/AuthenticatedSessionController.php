@@ -3,49 +3,88 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Auth\LoginRequest;
-use Illuminate\Http\RedirectResponse;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
-use Inertia\Response;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Str;
 
-class AuthenticatedSessionController extends Controller
+class AuthController extends Controller
 {
-    /**
-     * Show the login page.
-     */
-    public function create(Request $request): Response
+    public function showLoginForm()
     {
-        return Inertia::render('auth/Login', [
-            'canResetPassword' => Route::has('password.request'),
-            'status' => $request->session()->get('status'),
-        ]);
+        return view('auth.login');
     }
 
-    /**
-     * Handle an incoming authentication request.
-     */
-    public function store(LoginRequest $request): RedirectResponse
+    public function login(Request $request)
     {
-        $request->authenticate();
+        // $credentials = $request->validate([
+        //     'email' => ['required', 'string'],
+        //     'password' => ['required', 'string'],
+        // ]);
 
-        $request->session()->regenerate();
+        $key = Str::lower($request->input('email')) . '|' . $request->ip();
+        $maxAttempts = 5;
+        $decaySeconds = 60;
 
-        return redirect()->intended(route('dashboard', absolute: false));
+        if (RateLimiter::tooManyAttempts($key, $maxAttempts)) {
+            return response()->json([
+                'message' => 'คุณพยายามเข้าสู่ระบบมากเกินไป กรุณารอ 1 นาทีแล้วลองใหม่อีกครั้ง.',
+            ], 429);
+        }
+
+        $user = User::where('email', $request->email)->first();
+
+        if (! $user || ! Hash::check($request->password, $user->password)) {
+            RateLimiter::hit($key, $decaySeconds);
+
+            return response()->json([
+                'message' => 'กรุณากรอกอีเมลและรหัสผ่านให้ถูกต้อง',
+            ], 401);
+        }
+
+        if ($user->status === 'inactive') {
+            return response()->json(['message' => 'บัญชีของคุณถูกระงับการใช้งาน...'], 403);
+        }
+
+        RateLimiter::clear($key);
+
+        Auth::login($user);
+        $request->session()->regenerate(); // prevent session fixation
+
+        // ✅ เช็ก role ของ $user
+        // $redirect = '/dashboard'; // default
+
+        if ($user->hasRole('super_admin')) {
+            $redirect = '/dashboard';
+        } elseif ($user->hasRole('system_admin')) {
+            $redirect = '/dashboard';
+        } elseif ($user->hasRole('qa_admin')) {
+            $redirect = '/dashboard';
+        } elseif ($user->hasRole('administration_admin')) {
+            $redirect = '/dashboard';
+        } elseif ($user->hasRole('user')) {
+            $redirect = '/dashboardkpi';
+        }
+
+        return response()->json(['redirect' => $redirect]);
     }
 
-    /**
-     * Destroy an authenticated session.
-     */
-    public function destroy(Request $request): RedirectResponse
+
+    public function logout(Request $request)
     {
-        Auth::guard('web')->logout();
+        Auth::logout();
 
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect('/');
+        return redirect('/login')->with('success', 'ออกจากระบบสำเร็จ');
+    }
+
+    public function user(Request $request)
+    {
+        // return view('auth.profile', ['user' => $request->user()]);
+        return response()->json($request->user());
     }
 }

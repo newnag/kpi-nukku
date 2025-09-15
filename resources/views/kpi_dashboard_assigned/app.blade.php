@@ -254,8 +254,12 @@
                             <th>รหัส</th>
                             <th>ประเภทตัวชี้วัด</th>
                             <th>หน่วยงานที่รับผิดชอบ</th>
+
+
+                            <th>คะแนนที่ได้</th>
+
+
                             <th>คะแนนเต็ม</th>
-                            <th>คะแนนรวม</th>
                             <th>สถานะตัวบ่งชี้</th>
                             <th>สถานะเอกสาร</th>
                             <th>จัดการ</th>
@@ -275,6 +279,7 @@
                                     }
                                 }
                             @endphp
+
                             <tr data-max="{{ (float) $indicator->max_score }}" data-standard="{{ $standardName }}"
                                 data-dimension="{{ $dimensionName }}" data-collector="{{ $collectorName }}"
                                 data-dept="{{ $deptName }}" data-status="{{ $indicator->status_key }}">
@@ -286,28 +291,37 @@
                                 <td class="status-cell">{{ $indicator->code }}</td>
                                 <td class="status-cell">{{ $indicator->type }}</td>
                                 <td class="status-cell">{{ $deptName ?: '-' }}</td>
-                                <td class="status-cell">{{ $indicator->score_acc }}</td>
+
+                                <td class="status-cell">
+                                    @if (auth()->user()->hasRole('user') && !in_array($indicator->status, [3, 4]))
+                                        {{-- user + status ไม่ใช่ 3/4 → ไม่ต้องแสดงคะแนน --}}
+                                        -
+                                    @else
+                                        {{ $indicator->score_acc ?? '-' }}
+                                    @endif
+                                </td>
+
                                 <td class="status-cell">{{ $indicator->max_score }}</td>
 
                                 <td class="status-cell">
                                     @switch($indicator->status)
                                         @case(0)
                                             <span class="tooltip" data-tooltip="รอดำเนินการ">
-                                                <i data-lucide="alert-triangle" class="w-5 h-5 text-red-500"></i>
+                                                <i data-lucide="clock" class="w-5 h-5 text-red-500"></i>
                                                 <span class="sr-only">รอดำเนินการ</span>
                                             </span>
                                         @break
 
                                         @case(1)
                                             <span class="tooltip" data-tooltip="รอดำเนินการ / บันทึกร่าง">
-                                                <i data-lucide="alert-triangle" class="w-5 h-5 text-red-500"></i>
+                                                <i data-lucide="clock" class="w-5 h-5 text-red-500"></i>
                                                 <span class="sr-only">รอดำเนินการ / บันทึกร่าง</span>
                                             </span>
                                         @break
 
                                         @case(2)
                                             <span class="tooltip" data-tooltip="รอดำเนินการ / บันทึกจริง">
-                                                <i data-lucide="alert-triangle" class="w-5 h-5 text-red-500"></i>
+                                                <i data-lucide="clock" class="w-5 h-5 text-red-500"></i>
                                                 <span class="sr-only">รอดำเนินการ / บันทึกจริง</span>
                                             </span>
                                         @break
@@ -321,7 +335,7 @@
 
                                         @case(4)
                                             <span class="tooltip" data-tooltip="ผลการดำเนินงานยังไม่ครบถ้วนตามเกณฑ์">
-                                                <i data-lucide="alert-triangle" class="w-5 h-5 text-red-500"></i>
+                                                <i data-lucide="alert-triangle" class="w-5 h-5 text-yellow-500"></i>
                                                 <span class="sr-only">ผลการดำเนินงานยังไม่ครบถ้วนตามเกณฑ์</span>
                                             </span>
                                         @break
@@ -338,7 +352,7 @@
                                     @switch($indicator->doc_status)
                                         @case('ไม่ครบ')
                                             <span
-                                                class=" status-badge px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-700">
+                                                class="status-badge px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-700">
                                                 ไม่ครบ
                                             </span>
                                         @break
@@ -381,6 +395,7 @@
                 </table>
             </div>
         </div>
+
     </div>
 
 
@@ -718,7 +733,7 @@
             /* tooltip อยู่ด้านบน */
             /* left: 50%; */
             /* transform: translateX(-50%);
-                                                                                background: #333; */
+                                                                                                    background: #333; */
             color: #fff;
             font-size: 12px;
             /* padding: 5px 8px; */

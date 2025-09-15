@@ -340,7 +340,7 @@
                                     @case(2)
                                         <div class="flex justify-center items-center">
                                             <span class="tip" data-tip="อยู่ระหว่างดำเนินการ">
-                                                <i data-lucide="alert-triangle" class="status-icon text-red-500"></i>
+                                                <i data-lucide="clock" class="status-icon text-red-500"></i>
                                             </span>
                                         </div>
                                     @break
@@ -348,7 +348,7 @@
                                     @case(4)
                                         <div class="flex justify-center items-center">
                                             <span class="tip" data-tip="ผลการดำเนินงานยังไม่ครบถ้วนตามเกณฑ์">
-                                                <i data-lucide="clock" class="status-icon text-yellow-500"></i>
+                                                <i data-lucide="alert-triangle" class="status-icon text-yellow-500"></i>
                                             </span>
                                         </div>
                                     @break
