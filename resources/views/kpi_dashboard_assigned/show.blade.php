@@ -235,12 +235,34 @@
                         @endforelse
                     </div>
                 @endif
+                @if (in_array($indicator->status, [3, 4]))
+                    <div class="card">
+                        <h2 class="card-title">คะแนนที่ได้</h2>
+                        <div class="score-display-container">
+                            <div class="score-item">
+                                <div class="score-label">คะแนนที่ได้</div>
+                                <div class="score-value-display current-score">
+                                    {{ $indicator->score_acc ?? '0' }}
+                                </div>
+                            </div>
+                            <div class="score-separator">/</div>
+                            <div class="score-item">
+                                <div class="score-label">คะแนนเต็ม</div>
+                                <div class="score-value-display max-score">
+                                    {{ $indicator->max_score ?? '0' }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @endif
+
 
                 <!-- ✅ hidden status -->
                 <input type="hidden" name="status" id="status-input">
 
                 <div class="action-bts">
-                    <button type="button" class="btns-secondary" onclick="location.href='{{ route('dashboardkpi.index') }}'">
+                    <button type="button" class="btns-secondary"
+                        onclick="location.href='{{ route('dashboardkpi.index') }}'">
                         <i class="fa fa-undo"></i> กลับ
                     </button>
 
@@ -298,94 +320,99 @@
             });
         });
     </script>
-  <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // ✅ กัน error lucide
-    if (window.lucide && typeof lucide.createIcons === 'function') {
-        lucide.createIcons();
-    }
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // ✅ กัน error lucide
+            if (window.lucide && typeof lucide.createIcons === 'function') {
+                lucide.createIcons();
+            }
 
-    const fileHandlers = {};
-    const editorInitialized = {};
-    const csrfTokenMeta = document.querySelector('meta[name="csrf-token"]');
-    const csrfToken = csrfTokenMeta ? csrfTokenMeta.getAttribute("content") : "";
+            const fileHandlers = {};
+            const editorInitialized = {};
+            const csrfTokenMeta = document.querySelector('meta[name="csrf-token"]');
+            const csrfToken = csrfTokenMeta ? csrfTokenMeta.getAttribute("content") : "";
 
-    // ✅ Template render หลักฐานใหม่
-    function renderEvidenceItem(ev) {
-        let icon = '<i data-lucide="file" style="color:#6b7280;"></i>';
-        if (ev.type === 'pdf') icon = '<i data-lucide="file-text" style="color:#dc2626;"></i>';
-        else if (['doc','docx'].includes(ev.type)) icon = '<i data-lucide="file-text" style="color:#2563eb;"></i>';
-        else if (['ppt','pptx'].includes(ev.type)) icon = '<i data-lucide="presentation" style="color:#eb7e25;"></i>';
-        else if (['jpg','jpeg','png','gif','image'].includes(ev.type)) icon = '<i data-lucide="image" style="color:#16a34a;"></i>';
-        else if (['xls','xlsx'].includes(ev.type)) icon = '<i data-lucide="file-spreadsheet" style="color:#059669;"></i>';
-        else if (ev.type === 'url') icon = '<i data-lucide="link" style="color:#9333ea;"></i>';
-        else if (ev.type === 'note') icon = '<i data-lucide="sticky-note" style="color:#f59e0b;"></i>';
+            // ✅ Template render หลักฐานใหม่
+            function renderEvidenceItem(ev) {
+                let icon = '<i data-lucide="file" style="color:#6b7280;"></i>';
+                if (ev.type === 'pdf') icon = '<i data-lucide="file-text" style="color:#dc2626;"></i>';
+                else if (['doc', 'docx'].includes(ev.type)) icon =
+                    '<i data-lucide="file-text" style="color:#2563eb;"></i>';
+                else if (['ppt', 'pptx'].includes(ev.type)) icon =
+                    '<i data-lucide="presentation" style="color:#eb7e25;"></i>';
+                else if (['jpg', 'jpeg', 'png', 'gif', 'image'].includes(ev.type)) icon =
+                    '<i data-lucide="image" style="color:#16a34a;"></i>';
+                else if (['xls', 'xlsx'].includes(ev.type)) icon =
+                    '<i data-lucide="file-spreadsheet" style="color:#059669;"></i>';
+                else if (ev.type === 'url') icon = '<i data-lucide="link" style="color:#9333ea;"></i>';
+                else if (ev.type === 'note') icon = '<i data-lucide="sticky-note" style="color:#f59e0b;"></i>';
 
-        let nameHtml = ev.name;
-        if (ev.type === 'url' && ev.path?.urls?.[0]) {
-            nameHtml = `<a href="${ev.path.urls[0]}" target="_blank"
+                let nameHtml = ev.name;
+                if (ev.type === 'url' && ev.path?.urls?.[0]) {
+                    nameHtml = `<a href="${ev.path.urls[0]}" target="_blank"
                            class="text-blue-600 underline hover:text-blue-800">${ev.name}</a>`;
-        }
+                }
 
-        return `
+                return `
             <div class="evidence-item" id="evidence-${ev.id}">
                 <span class="evidence-icon">${icon}</span>
                 <span class="evidence-name">${nameHtml}</span>
                 <button class="btn-delete" data-id="${ev.id}" title="ลบหลักฐาน">x</button>
             </div>`;
-    }
+            }
 
-    /*** ---------- File Upload Handler ---------- ***/
-    class FileUploadHandler {
-        constructor(criteriaId) {
-            this.criteriaId = criteriaId;
-            this.uploadArea = document.querySelector(`.upload-area-${criteriaId}`);
-            this.fileInput = document.getElementById(`fileInput-${criteriaId}`);
-            this.filesList = document.getElementById(`filesList-${criteriaId}`);
-            this.selectedFiles = [];
-            fileHandlers[criteriaId] = this;
-            this.init();
-        }
-        init() {
-            if (!this.uploadArea || !this.fileInput || !this.filesList) return;
-            ['dragenter','dragover','dragleave','drop'].forEach(evt => {
-                this.uploadArea.addEventListener(evt, e => {
-                    e.preventDefault(); e.stopPropagation();
-                });
-            });
-            this.uploadArea.addEventListener('click', () => this.fileInput.click());
-            this.uploadArea.addEventListener('dragover', e => {
-                e.preventDefault();
-                this.uploadArea.classList.add('drag-over');
-            });
-            this.uploadArea.addEventListener('dragleave', () => {
-                this.uploadArea.classList.remove('drag-over');
-            });
-            this.uploadArea.addEventListener('drop', e => {
-                e.preventDefault();
-                this.uploadArea.classList.remove('drag-over');
-                this.handleFiles(Array.from(e.dataTransfer.files || []));
-            });
-            this.fileInput.addEventListener('change', e => {
-                this.handleFiles(Array.from(e.target.files || []));
-            });
-        }
-        handleFiles(files) {
-            files.forEach(file => {
-                const exists = this.selectedFiles.find(f =>
-                    f.name === file.name && f.size === file.size && f.type === file.type
-                );
-                if (!exists) {
-                    this.selectedFiles.push(file);
-                    this.displayFile(file);
+            /*** ---------- File Upload Handler ---------- ***/
+            class FileUploadHandler {
+                constructor(criteriaId) {
+                    this.criteriaId = criteriaId;
+                    this.uploadArea = document.querySelector(`.upload-area-${criteriaId}`);
+                    this.fileInput = document.getElementById(`fileInput-${criteriaId}`);
+                    this.filesList = document.getElementById(`filesList-${criteriaId}`);
+                    this.selectedFiles = [];
+                    fileHandlers[criteriaId] = this;
+                    this.init();
                 }
-            });
-            this.syncInputFiles();
-        }
-        displayFile(file) {
-            const el = document.createElement('div');
-            el.className = 'file-item';
-            el.innerHTML = `
+                init() {
+                    if (!this.uploadArea || !this.fileInput || !this.filesList) return;
+                    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(evt => {
+                        this.uploadArea.addEventListener(evt, e => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                        });
+                    });
+                    this.uploadArea.addEventListener('click', () => this.fileInput.click());
+                    this.uploadArea.addEventListener('dragover', e => {
+                        e.preventDefault();
+                        this.uploadArea.classList.add('drag-over');
+                    });
+                    this.uploadArea.addEventListener('dragleave', () => {
+                        this.uploadArea.classList.remove('drag-over');
+                    });
+                    this.uploadArea.addEventListener('drop', e => {
+                        e.preventDefault();
+                        this.uploadArea.classList.remove('drag-over');
+                        this.handleFiles(Array.from(e.dataTransfer.files || []));
+                    });
+                    this.fileInput.addEventListener('change', e => {
+                        this.handleFiles(Array.from(e.target.files || []));
+                    });
+                }
+                handleFiles(files) {
+                    files.forEach(file => {
+                        const exists = this.selectedFiles.find(f =>
+                            f.name === file.name && f.size === file.size && f.type === file.type
+                        );
+                        if (!exists) {
+                            this.selectedFiles.push(file);
+                            this.displayFile(file);
+                        }
+                    });
+                    this.syncInputFiles();
+                }
+                displayFile(file) {
+                    const el = document.createElement('div');
+                    el.className = 'file-item';
+                    el.innerHTML = `
                 <div class="file-icon"><i data-lucide="file-text"></i></div>
                 <span class="file-name" title="${file.name}">${file.name}</span>
                 <span class="file-size">${this.formatFileSize(file.size)}</span>
@@ -395,97 +422,122 @@ document.addEventListener('DOMContentLoaded', function() {
                     data-criteria="${this.criteriaId}">
                     <i data-lucide="x"></i>
                 </button>`;
-            this.filesList.appendChild(el);
-            el.querySelector('.remove-file').addEventListener('click', e => {
-                const btn = e.currentTarget;
-                const name = decodeURIComponent(btn.getAttribute('data-name') || '');
-                const size = Number(btn.getAttribute('data-size') || 0);
-                this.selectedFiles = this.selectedFiles.filter(f => !(f.name === name && f.size === size));
-                this.syncInputFiles();
-                el.remove();
-            });
-            if (window.lucide?.createIcons) lucide.createIcons();
-        }
-        syncInputFiles() {
-            if (!this.fileInput) return;
-            const dt = new DataTransfer();
-            this.selectedFiles.forEach(file => dt.items.add(file));
-            this.fileInput.files = dt.files;
-        }
-        formatFileSize(bytes) {
-            if (bytes === 0) return '0 Bytes';
-            const k = 1024, sizes = ['Bytes','KB','MB','GB','TB'];
-            const i = Math.floor(Math.log(bytes) / Math.log(k));
-            return parseFloat((bytes / Math.pow(k,i)).toFixed(2)) + ' ' + sizes[i];
-        }
-    }
+                    this.filesList.appendChild(el);
+                    el.querySelector('.remove-file').addEventListener('click', e => {
+                        const btn = e.currentTarget;
+                        const name = decodeURIComponent(btn.getAttribute('data-name') || '');
+                        const size = Number(btn.getAttribute('data-size') || 0);
+                        this.selectedFiles = this.selectedFiles.filter(f => !(f.name === name && f
+                            .size === size));
+                        this.syncInputFiles();
+                        el.remove();
+                    });
+                    if (window.lucide?.createIcons) lucide.createIcons();
+                }
+                syncInputFiles() {
+                    if (!this.fileInput) return;
+                    const dt = new DataTransfer();
+                    this.selectedFiles.forEach(file => dt.items.add(file));
+                    this.fileInput.files = dt.files;
+                }
+                formatFileSize(bytes) {
+                    if (bytes === 0) return '0 Bytes';
+                    const k = 1024,
+                        sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+                    const i = Math.floor(Math.log(bytes) / Math.log(k));
+                    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+                }
+            }
 
-    /*** ---------- Trumbowyg Editor ---------- ***/
-    function initTrumbowyg(criteriaId) {
-        if (typeof $ === 'undefined' || typeof $.fn.trumbowyg === 'undefined') return false;
-        if (editorInitialized[criteriaId]) return true;
-        const $editor = $(`#detailEditor-${criteriaId}`);
-        if ($editor.length === 0) return false;
-        try {
-            if ($editor.data('trumbowyg')) $editor.trumbowyg('destroy');
-            $editor.trumbowyg({ lang: 'th', autogrow: true });
-            editorInitialized[criteriaId] = true;
-            return true;
-        } catch (error) {
-            console.error("❌ Error init Trumbowyg:", error);
-            return false;
-        }
-    }
+            /*** ---------- Trumbowyg Editor ---------- ***/
+            function initTrumbowyg(criteriaId) {
+                if (typeof $ === 'undefined' || typeof $.fn.trumbowyg === 'undefined') return false;
+                if (editorInitialized[criteriaId]) return true;
+                const $editor = $(`#detailEditor-${criteriaId}`);
+                if ($editor.length === 0) return false;
+                try {
+                    if ($editor.data('trumbowyg')) $editor.trumbowyg('destroy');
+                    $editor.trumbowyg({
+                        lang: 'th',
+                        autogrow: true
+                    });
+                    editorInitialized[criteriaId] = true;
+                    return true;
+                } catch (error) {
+                    console.error("❌ Error init Trumbowyg:", error);
+                    return false;
+                }
+            }
 
-    /*** ---------- Delete Evidence ---------- ***/
-    document.querySelectorAll(".btn-delete").forEach(btn => {
-        btn.addEventListener("click", function() {
-            const id = this.getAttribute("data-id");
-            Swal.fire({
-                title: 'คุณแน่ใจหรือไม่?',
-                text: "ต้องการลบหลักฐานนี้",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#6b7280',
-                confirmButtonText: 'ลบ',
-                cancelButtonText: 'ยกเลิก'
-            }).then((result) => {
-                if (!result.isConfirmed) return;
-                fetch(`/evidences/${id}`, {
-                    method: "DELETE",
-                    headers: {
-                        "X-CSRF-TOKEN": csrfToken,
-                        "Content-Type": "application/json",
-                        "Accept": "application/json"
-                    }
-                })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success) {
-                        document.getElementById(`evidence-${id}`)?.remove();
-                        Swal.fire({ toast:true, position:'top-end', icon:'success', title:'ลบหลักฐานเรียบร้อยแล้ว', showConfirmButton:false, timer:2000 });
-                    } else {
-                        Swal.fire({ toast:true, position:'top-end', icon:'error', title:'เกิดข้อผิดพลาดในการลบ', showConfirmButton:false, timer:2000 });
-                    }
-                })
-                .catch(err => {
-                    console.error("Error:", err);
-                    Swal.fire({ toast:true, position:'top-end', icon:'error', title:'เกิดข้อผิดพลาดในการลบ', showConfirmButton:false, timer:2000 });
+            /*** ---------- Delete Evidence ---------- ***/
+            document.querySelectorAll(".btn-delete").forEach(btn => {
+                btn.addEventListener("click", function() {
+                    const id = this.getAttribute("data-id");
+                    Swal.fire({
+                        title: 'คุณแน่ใจหรือไม่?',
+                        text: "ต้องการลบหลักฐานนี้",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#d33',
+                        cancelButtonColor: '#6b7280',
+                        confirmButtonText: 'ลบ',
+                        cancelButtonText: 'ยกเลิก'
+                    }).then((result) => {
+                        if (!result.isConfirmed) return;
+                        fetch(`/evidences/${id}`, {
+                                method: "DELETE",
+                                headers: {
+                                    "X-CSRF-TOKEN": csrfToken,
+                                    "Content-Type": "application/json",
+                                    "Accept": "application/json"
+                                }
+                            })
+                            .then(res => res.json())
+                            .then(data => {
+                                if (data.success) {
+                                    document.getElementById(`evidence-${id}`)?.remove();
+                                    Swal.fire({
+                                        toast: true,
+                                        position: 'top-end',
+                                        icon: 'success',
+                                        title: 'ลบหลักฐานเรียบร้อยแล้ว',
+                                        showConfirmButton: false,
+                                        timer: 2000
+                                    });
+                                } else {
+                                    Swal.fire({
+                                        toast: true,
+                                        position: 'top-end',
+                                        icon: 'error',
+                                        title: 'เกิดข้อผิดพลาดในการลบ',
+                                        showConfirmButton: false,
+                                        timer: 2000
+                                    });
+                                }
+                            })
+                            .catch(err => {
+                                console.error("Error:", err);
+                                Swal.fire({
+                                    toast: true,
+                                    position: 'top-end',
+                                    icon: 'error',
+                                    title: 'เกิดข้อผิดพลาดในการลบ',
+                                    showConfirmButton: false,
+                                    timer: 2000
+                                });
+                            });
+                    });
                 });
             });
+
+            /*** ---------- Init per-criteria ---------- ***/
+            @foreach ($indicator->criterias as $criteria)
+                new FileUploadHandler({{ $criteria->id }});
+                setTimeout(() => initTrumbowyg({{ $criteria->id }}), 600);
+            @endforeach
+
         });
-    });
-
-    /*** ---------- Init per-criteria ---------- ***/
-    @foreach($indicator->criterias as $criteria)
-        new FileUploadHandler({{ $criteria->id }});
-        setTimeout(() => initTrumbowyg({{ $criteria->id }}), 600);
-    @endforeach
-
-});
-</script>
-
+    </script>
 @endpush
 
 
@@ -677,7 +729,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         .criteria-status {
             /* font-weight: 600;
-                                                                                                font-size: 14px; */
+                                                                                                            font-size: 14px; */
             color: #1f2937;
         }
 
@@ -1072,6 +1124,134 @@ document.addEventListener('DOMContentLoaded', function() {
 
             background: linear-gradient(90deg, #a9c6ff 0%, #fff3d4 100%);
             color: #222;
+        }
+
+        .score-display-container {
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            gap: 20px;
+            padding: 24px;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border-radius: 16px;
+            border: 1px solid #e2e8f0;
+            margin-bottom: 20px;
+        }
+
+        .score-item {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .score-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .score-value-display {
+            font-size: 36px;
+            font-weight: 700;
+            line-height: 1;
+            padding: 12px 20px;
+            border-radius: 12px;
+            min-width: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .score-value-display.current-score {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: white;
+        }
+
+        .score-value-display.max-score {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+
+        .score-separator {
+            font-size: 42px;
+            font-weight: 300;
+            color: #94a3b8;
+            margin: 0 10px;
+        }
+
+        /* .score-percentage {
+                        margin-top: 16px;
+                        text-align: center;
+                    }
+
+                    .percentage-bar {
+                        width: 100%;
+                        height: 12px;
+                        background: #e2e8f0;
+                        border-radius: 6px;
+                        overflow: hidden;
+                        margin-bottom: 8px;
+                        position: relative;
+                    }
+
+                    .percentage-fill {
+                        height: 100%;
+                        background: linear-gradient(90deg, #3b82f6 0%, #10b981 50%, #22c55e 100%);
+                        border-radius: 6px;
+                        transition: width 0.3s ease;
+                        position: relative;
+                    }
+
+                    .percentage-fill::after {
+                        content: '';
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        right: 0;
+                        bottom: 0;
+                        background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.3) 50%, transparent 100%);
+                        animation: shimmer 2s infinite;
+                    } */
+
+        @keyframes shimmer {
+            0% {
+                transform: translateX(-100%);
+            }
+
+            100% {
+                transform: translateX(100%);
+            }
+        }
+
+        .percentage-text {
+            font-size: 18px;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .score-display-container {
+                flex-direction: column;
+                gap: 16px;
+                padding: 20px;
+            }
+
+            .score-separator {
+                transform: rotate(90deg);
+                margin: 0;
+            }
+
+            .score-value-display {
+                font-size: 28px;
+                padding: 10px 16px;
+                min-width: 60px;
+            }
         }
 
         .evidence-form {
