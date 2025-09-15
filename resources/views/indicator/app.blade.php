@@ -264,7 +264,9 @@
                 </thead>
                 <tbody class="bg-white ">
                     @forelse($indicators as $indicator)
-                        <tr class="hover:bg-gray-50 divide-y divide-gray-200 ">
+                        <tr class="hover:bg-gray-50 active:bg-gray-100 divide-y divide-gray-200 cursor-pointer"
+                            data-href="{{ route('indicator.show', $indicator['id']) }}" tabindex="0" role="link"
+                            aria-label="เปิด {{ $indicator['name'] }}" title="คลิกเพื่อดูรายละเอียด">
                             <td class="max-w-6 text-sm text-gray-700 text-center align-top">{{ $indicator['year'] }}</td>
                             <td class="max-w-15 text-sm text-balance text-gray-700 align-top">
                                 {{ $indicator['category']['name'] }}</td>
@@ -272,7 +274,7 @@
                                 {{ $indicator['standard']['name'] }}</td>
                             <td class="max-w-60 text-sm text-gray-700 text-balance align-top">
                                 {{-- <span class="block truncate" title="{{ $indicator['name'] }}"> --}}
-                                    {{ $indicator['name'] }}
+                                {{ $indicator['name'] }}
                                 {{-- </span> --}}
                             </td>
                             <td class="max-w-9 text-center text-sm text-gray-700 truncate  align-top">
@@ -280,7 +282,7 @@
                             <td class="max-w-11 text-sm text-gray-700 text-center align-top">
                                 {{ $indicator['type'] ?? 'ไม่ระบุ' }}
                             </td>
-                            <td class="text-sm text-gray-700 align-top">
+                            <td class="text-sm text-gray-700 align-top" data-rowlink-ignore>
                                 @php
                                     // Unique, non-empty department names
                                     $departments = collect($indicator['assignments'] ?? [])
@@ -634,6 +636,28 @@
     @push('scripts')
         <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
         <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+        <script>
+            // ไปหน้ารายละเอียดเมื่อคลิกแถว (ยกเว้นคลิก element ที่ควรคลิกเองอยู่แล้ว)
+            $(document).on('click', '#myTable tbody tr[data-href]', function(e) {
+                if ($(e.target).closest('a, button, input, select, textarea, label, [data-rowlink-ignore]').length) {
+                    return; // อย่าพาไป link ถ้าคลิกสิ่งที่ interactive อยู่แล้ว
+                }
+                const url = this.dataset.href;
+                if (url) window.location.href = url;
+            });
+
+            // รองรับ Enter/Space เพื่อเข้าหน้าใหม่ (accessibility)
+            $(document).on('keydown', '#myTable tbody tr[data-href]', function(e) {
+                const isEnter = e.key === 'Enter' || e.keyCode === 13;
+                const isSpace = e.key === ' ' || e.keyCode === 32;
+                if (isEnter || isSpace) {
+                    e.preventDefault();
+                    const url = this.dataset.href;
+                    if (url) window.location.href = url;
+                }
+            });
+        </script>
+
         <script>
             $(document).ready(function() {
                 // Initialize DataTable
