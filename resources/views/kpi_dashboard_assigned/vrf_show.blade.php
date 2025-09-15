@@ -129,7 +129,7 @@
                                                 @endif
                                             </span>
 
-                                            <span class="evidence-name">
+                                            {{-- <span class="evidence-name">
                                                 @if ($evidence->type === 'url')
                                                     @php
                                                         // ถ้า path เก็บเป็น JSON หรือ array
@@ -145,7 +145,34 @@
                                                 @else
                                                     {{ $evidence->name }}
                                                 @endif
+                                            </span> --}}
+                                            <span class="evidence-name">
+                                                @php
+                                                    $ext = strtolower(pathinfo($evidence->name, PATHINFO_EXTENSION));
+                                                    $openInNewTab = in_array($ext, [
+                                                        'pdf',
+                                                        'jpg',
+                                                        'jpeg',
+                                                        'png',
+                                                        'gif',
+                                                    ]);
+                                                @endphp
+
+                                                @if ($openInNewTab)
+                                                    {{-- PDF & Image → เปิดในแท็บใหม่ --}}
+                                                    <a href="{{ route('evidences.download', $evidence->id) }}"
+                                                        target="_blank" class="text-blue-600 underline hover:text-blue-800">
+                                                        {{ $evidence->name }}
+                                                    </a>
+                                                @else
+                                                    {{-- Word, Excel, PPT → ดาวน์โหลด --}}
+                                                    <a href="{{ route('evidences.download', $evidence->id) }}" download
+                                                        class="text-blue-600 underline hover:text-blue-800">
+                                                        {{ $evidence->name }}
+                                                    </a>
+                                                @endif
                                             </span>
+
                                         </div>
 
                                         <div class="space-x-3 flex items-center justify-center">
@@ -1036,7 +1063,7 @@
 
         .criteria-status {
             /* font-weight: 600;
-                                                                                font-size: 14px; */
+                                                                                    font-size: 14px; */
             color: #1f2937;
         }
 
@@ -1462,38 +1489,38 @@
         }
 
         /* .score-percentage {
-                margin-top: 16px;
-                text-align: center;
-            }
+                    margin-top: 16px;
+                    text-align: center;
+                }
 
-            .percentage-bar {
-                width: 100%;
-                height: 12px;
-                background: #e2e8f0;
-                border-radius: 6px;
-                overflow: hidden;
-                margin-bottom: 8px;
-                position: relative;
-            }
+                .percentage-bar {
+                    width: 100%;
+                    height: 12px;
+                    background: #e2e8f0;
+                    border-radius: 6px;
+                    overflow: hidden;
+                    margin-bottom: 8px;
+                    position: relative;
+                }
 
-            .percentage-fill {
-                height: 100%;
-                background: linear-gradient(90deg, #3b82f6 0%, #10b981 50%, #22c55e 100%);
-                border-radius: 6px;
-                transition: width 0.3s ease;
-                position: relative;
-            }
+                .percentage-fill {
+                    height: 100%;
+                    background: linear-gradient(90deg, #3b82f6 0%, #10b981 50%, #22c55e 100%);
+                    border-radius: 6px;
+                    transition: width 0.3s ease;
+                    position: relative;
+                }
 
-            .percentage-fill::after {
-                content: '';
-                position: absolute;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.3) 50%, transparent 100%);
-                animation: shimmer 2s infinite;
-            } */
+                .percentage-fill::after {
+                    content: '';
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.3) 50%, transparent 100%);
+                    animation: shimmer 2s infinite;
+                } */
 
         @keyframes shimmer {
             0% {
