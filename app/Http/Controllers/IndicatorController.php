@@ -2,27 +2,21 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Carbon;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
-
-use App\Models\Indicator;
-use App\Models\User;
-use App\Models\Standard;
-use App\Models\Department;
+use App\Http\Resources\IndicatorResource;
 use App\Models\Category;
 use App\Models\Criteria;
-use App\Models\Variable;
+use App\Models\Department;
 use App\Models\Formula;
-use App\Models\Checklist_item;
-use App\Http\Resources\IndicatorResource;
-
-
+use App\Models\Indicator;
+use App\Models\Standard;
+use App\Models\User;
+use App\Models\Variable;
+use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class IndicatorController extends Controller
 {
-
     public function index()
     {
         $indicators = Indicator::with([
@@ -31,8 +25,11 @@ class IndicatorController extends Controller
             'criterias',
             // 'evidences',
         ])
+            ->orderBy('code', 'desc')
             ->get()
-            ->map(fn($i) => $this->serializeIndicatorForList($i));
+            ->map(fn ($i) => $this->serializeIndicatorForList($i));
+
+        // dd($indicators);
 
         return view('indicator.app', compact('indicators'));
 
@@ -48,7 +45,7 @@ class IndicatorController extends Controller
         $data['usersForAssign'] = User::select('id', 'name', 'department_id')
             ->orderBy('name')
             ->get()
-            ->map(fn($u) => [
+            ->map(fn ($u) => [
                 'id' => $u->id,
                 'name' => $u->name,
                 'department_id' => $u->department_id,
@@ -77,84 +74,82 @@ class IndicatorController extends Controller
         // return response()->json($data);
     }
 
-
-
     public function store(Request $request)
     {
         $validated = $request->validate([
             // Basic
-            'year'         => 'required|integer|digits:4',
-            'name'         => 'required|string|max:255',
-            'code'         => 'required|string|max:100',
-            'max_score'    => 'required|numeric|min:0',
-            'standard_id'  => 'required|exists:standards,id',
-            'category_id'  => 'required|exists:categories,id',
-            'type'         => 'nullable|string',
-            'deadline'     => 'required|date',
+            'year' => 'required|integer|digits:4',
+            'name' => 'required|string|max:255',
+            'code' => 'required|string|max:100',
+            'max_score' => 'required|numeric|min:0',
+            'standard_id' => 'required|exists:standards,id',
+            'category_id' => 'required|exists:categories,id',
+            'type' => 'nullable|string',
+            'deadline' => 'required|date',
 
             // Responsible
-            'department_ids'   => 'nullable|array',
+            'department_ids' => 'nullable|array',
             'department_ids.*' => 'exists:departments,id',
 
-            'user_ids'         => 'required|array|min:1',
-            'user_ids.*'       => 'exists:users,id',
+            'user_ids' => 'required|array|min:1',
+            'user_ids.*' => 'exists:users,id',
 
             // Rich text
-            'description'  => 'nullable|string',
-            'condition'    => 'nullable|string',
-            'comment'      => 'nullable|string',
-            'annotation'   => 'nullable|string',
+            'description' => 'nullable|string',
+            'condition' => 'nullable|string',
+            'comment' => 'nullable|string',
+            'annotation' => 'nullable|string',
 
             // Criteria
-            'criteria'                   => 'nullable|array',
-            'criteria.*.id'              => 'nullable|integer|exists:criterias,id',
-            'criteria.*.sequence'        => 'required|integer',
-            'criteria.*.name'            => 'required|string|max:255',
-            'criteria.*.description'     => 'nullable|string',
+            'criteria' => 'nullable|array',
+            'criteria.*.id' => 'nullable|integer|exists:criterias,id',
+            'criteria.*.sequence' => 'required|integer',
+            'criteria.*.name' => 'required|string|max:255',
+            'criteria.*.description' => 'nullable|string',
 
             // Multi-choice (count-based)
-            'multiCounts'                => 'nullable|array',
-            'multiCounts.*.count'        => 'required|integer|min:0',
-            'multiCounts.*.score'        => 'required|numeric',
+            'multiCounts' => 'nullable|array',
+            'multiCounts.*.count' => 'required|integer|min:0',
+            'multiCounts.*.score' => 'required|numeric',
 
             // Multi-choice (selected-based)
-            'multiSelected'                    => 'nullable|array',
-            'multiSelected.*.sequence'         => 'required|integer',
-            'multiSelected.*.required_items'   => 'nullable|array',
+            'multiSelected' => 'nullable|array',
+            'multiSelected.*.sequence' => 'required|integer',
+            'multiSelected.*.required_items' => 'nullable|array',
             'multiSelected.*.required_items.*' => 'integer',
-            'multiSelected.*.score'            => 'required|numeric',
+            'multiSelected.*.score' => 'required|numeric',
 
             // Custom scoring
-            'scoring.variables'                       => 'nullable|array',
-            'scoring.variables.*.variable_name'      => 'required|string|max:100',
-            'scoring.variables.*.label_name'         => 'required|string|max:100',
-            'scoring.variables.*.type'               => 'required|in:defined,input,output',
-            'scoring.variables.*.value'              => 'nullable|numeric',
-            'scoring.condition'                      => 'nullable|string',
+            'scoring.variables' => 'nullable|array',
+            'scoring.variables.*.variable_name' => 'required|string|max:100',
+            'scoring.variables.*.label_name' => 'required|string|max:100',
+            'scoring.variables.*.type' => 'required|in:defined,input,output',
+            'scoring.variables.*.value' => 'nullable|numeric',
+            'scoring.condition' => 'nullable|string',
         ]);
 
         try {
             DB::beginTransaction();
 
             $indicator = Indicator::create([
-                'year'         => $validated['year'],
-                'name'         => $validated['name'],
-                'code'         => $validated['code'],
-                'max_score'    => $validated['max_score'],
-                'score_acc'    => 0,
+                'year' => $validated['year'],
+                'name' => $validated['name'],
+                'code' => $validated['code'],
+                'max_score' => $validated['max_score'],
+                'score_acc' => 0,
                 'categorie_id' => $validated['category_id'], // คอลัมน์สะกดตามนี้
-                'type'         => $validated['type'] ?? null,
-                'deadline'     => $validated['deadline'],
-                'status'       => 0,
-                'description'  => $validated['description'] ?? null,
-                'condition'    => $validated['condition'] ?? null,
-                'comment'      => $validated['comment'] ?? null,
-                'annotation'   => $validated['annotation'] ?? null,
+                'type' => $validated['type'] ?? null,
+                'deadline' => $validated['deadline'],
+                'status' => 0,
+                'description' => $validated['description'] ?? null,
+                'condition' => $validated['condition'] ?? null,
+                'comment' => $validated['comment'] ?? null,
+                'annotation' => $validated['annotation'] ?? null,
             ]);
 
             // สร้าง assignments หลายรายการ
             $indicator->assignments()->createMany(
-                collect($validated['user_ids'])->unique()->values()->map(fn($uid) => ['collector' => $uid])->all()
+                collect($validated['user_ids'])->unique()->values()->map(fn ($uid) => ['collector' => $uid])->all()
             );
 
             $criteriaCount = $this->syncCriterias($indicator, $validated['criteria'] ?? []);
@@ -169,8 +164,9 @@ class IndicatorController extends Controller
                 ->with('success', 'ตัวชี้วัดถูกสร้างเรียบร้อยแล้ว');
         } catch (\Throwable $e) {
             DB::rollBack();
+
             return back()
-                ->withErrors(['error' => 'เกิดข้อผิดพลาดในการบันทึก: ' . $e->getMessage()])
+                ->withErrors(['error' => 'เกิดข้อผิดพลาดในการบันทึก: '.$e->getMessage()])
                 ->withInput();
         }
     }
@@ -184,12 +180,11 @@ class IndicatorController extends Controller
         $data['usersForAssign'] = User::select('id', 'name', 'department_id')
             ->orderBy('name')
             ->get()
-            ->map(fn($u) => [
+            ->map(fn ($u) => [
                 'id' => $u->id,
                 'name' => $u->name,
                 'department_id' => $u->department_id,
             ]);
-
 
         $indicator = Indicator::with([
             'category.standard',
@@ -206,7 +201,7 @@ class IndicatorController extends Controller
 
         return view('indicator.edit', [
             'data_indicator' => $data_indicator,
-            'information' => $data
+            'information' => $data,
         ]);
         // return response()->json(['information' => [$data], 'data_indicator' => $data_indicator]);
     }
@@ -215,55 +210,55 @@ class IndicatorController extends Controller
     {
         $validated = $request->validate([
             // Basic
-            'year'         => 'required|integer|digits:4',
-            'name'         => 'required|string|max:255',
-            'code'         => 'required|string|max:100',
-            'max_score'    => 'required|numeric|min:0',
-            'standard_id'  => 'required|exists:standards,id',
-            'category_id'  => 'required|exists:categories,id',
-            'type'         => 'nullable|string',
-            'deadline'     => 'required|date',
+            'year' => 'required|integer|digits:4',
+            'name' => 'required|string|max:255',
+            'code' => 'required|string|max:100',
+            'max_score' => 'required|numeric|min:0',
+            'standard_id' => 'required|exists:standards,id',
+            'category_id' => 'required|exists:categories,id',
+            'type' => 'nullable|string',
+            'deadline' => 'required|date',
 
             // Responsible
-            'department_ids'   => 'nullable|array',
+            'department_ids' => 'nullable|array',
             'department_ids.*' => 'exists:departments,id',
 
-            'user_ids'         => 'required|array|min:1',
-            'user_ids.*'       => 'exists:users,id',
+            'user_ids' => 'required|array|min:1',
+            'user_ids.*' => 'exists:users,id',
 
             // Rich text
-            'description'  => 'nullable|string',
-            'condition'    => 'nullable|string',
-            'comment'      => 'nullable|string',
-            'annotation'   => 'nullable|string',
+            'description' => 'nullable|string',
+            'condition' => 'nullable|string',
+            'comment' => 'nullable|string',
+            'annotation' => 'nullable|string',
 
             // Criteria
-            'criteria'                   => 'nullable|array',
-            'criteria.*.id'              => 'nullable|integer|exists:criterias,id',
-            'criteria.*.sequence'        => 'required|integer',
-            'criteria.*.name'            => 'required|string|max:255',
-            'criteria.*.description'     => 'nullable|string',
+            'criteria' => 'nullable|array',
+            'criteria.*.id' => 'nullable|integer|exists:criterias,id',
+            'criteria.*.sequence' => 'required|integer',
+            'criteria.*.name' => 'required|string|max:255',
+            'criteria.*.description' => 'nullable|string',
 
             // Multi-choice
-            'multiCounts'                => 'nullable|array',
-            'multiCounts.*.count'        => 'required|integer|min:0',
-            'multiCounts.*.score'        => 'required|numeric',
+            'multiCounts' => 'nullable|array',
+            'multiCounts.*.count' => 'required|integer|min:0',
+            'multiCounts.*.score' => 'required|numeric',
 
-            'multiSelected'                     => 'nullable|array',
-            'multiSelected.*.sequence'          => 'required|integer',
-            'multiSelected.*.required_items'    => 'nullable|array',
-            'multiSelected.*.required_items.*'  => 'integer',
-            'multiSelected.*.score'             => 'required|numeric',
+            'multiSelected' => 'nullable|array',
+            'multiSelected.*.sequence' => 'required|integer',
+            'multiSelected.*.required_items' => 'nullable|array',
+            'multiSelected.*.required_items.*' => 'integer',
+            'multiSelected.*.score' => 'required|numeric',
 
             // Scoring (variable/formula)
-            'scoring.variables'                       => 'nullable|array',
-            'scoring.variables.*.id'                  => 'nullable|integer|exists:variables,id',
-            'scoring.variables.*.variable_name'       => 'required|string|max:100',
-            'scoring.variables.*.label_name'          => 'required|string|max:100',
-            'scoring.variables.*.type'                => 'required|in:defined,input,output',
-            'scoring.variables.*.value'               => 'nullable|numeric',
-            'scoring.condition'                       => 'nullable|string',
-            'scoring.formula_id'                      => 'nullable|integer|exists:formulas,id',
+            'scoring.variables' => 'nullable|array',
+            'scoring.variables.*.id' => 'nullable|integer|exists:variables,id',
+            'scoring.variables.*.variable_name' => 'required|string|max:100',
+            'scoring.variables.*.label_name' => 'required|string|max:100',
+            'scoring.variables.*.type' => 'required|in:defined,input,output',
+            'scoring.variables.*.value' => 'nullable|numeric',
+            'scoring.condition' => 'nullable|string',
+            'scoring.formula_id' => 'nullable|integer|exists:formulas,id',
         ]);
 
         try {
@@ -272,17 +267,17 @@ class IndicatorController extends Controller
 
                 // --- Update base fields ---
                 $indicator->update([
-                    'year'         => $validated['year'],
-                    'name'         => $validated['name'],
-                    'code'         => $validated['code'],
-                    'max_score'    => $validated['max_score'],
+                    'year' => $validated['year'],
+                    'name' => $validated['name'],
+                    'code' => $validated['code'],
+                    'max_score' => $validated['max_score'],
                     'categorie_id' => $validated['category_id'],     // Database column is categorie_id
-                    'type'         => $validated['type'] ?? null,
-                    'deadline'     => $validated['deadline'],
-                    'description'  => $validated['description'] ?? null,
-                    'condition'    => $validated['condition'] ?? null,
-                    'comment'      => $validated['comment'] ?? null,
-                    'annotation'   => $validated['annotation'] ?? null,
+                    'type' => $validated['type'] ?? null,
+                    'deadline' => $validated['deadline'],
+                    'description' => $validated['description'] ?? null,
+                    'condition' => $validated['condition'] ?? null,
+                    'comment' => $validated['comment'] ?? null,
+                    'annotation' => $validated['annotation'] ?? null,
                 ]);
 
                 // --- Departments (you validated them, so sync them) ---
@@ -318,11 +313,10 @@ class IndicatorController extends Controller
                 ->with('success', 'ตัวชี้วัดถูกอัปเดตเรียบร้อยแล้ว');
         } catch (\Throwable $e) {
             return back()
-                ->withErrors(['error' => 'เกิดข้อผิดพลาดในการอัปเดต: ' . $e->getMessage()])
+                ->withErrors(['error' => 'เกิดข้อผิดพลาดในการอัปเดต: '.$e->getMessage()])
                 ->withInput();
         }
     }
-
 
     public function delete($id)
     {
@@ -333,13 +327,15 @@ class IndicatorController extends Controller
             $indicator->delete();
 
             DB::commit();
+
             return redirect()
                 ->route('indicator.index')
                 ->with('success', 'ตัวชี้วัดถูกลบเรียบร้อยแล้ว');
         } catch (\Throwable $e) {
             DB::rollBack();
+
             return back()
-                ->withErrors(['error' => 'เกิดข้อผิดพลาดในการลบ: ' . $e->getMessage()]);
+                ->withErrors(['error' => 'เกิดข้อผิดพลาดในการลบ: '.$e->getMessage()]);
         }
     }
 
@@ -347,6 +343,7 @@ class IndicatorController extends Controller
     {
         // หมายเหตุ: คอลัมน์คือ categorie_id
         $indicators = Indicator::where('categorie_id', $categoryId)->get();
+
         return response()->json(['indicators' => $indicators]);
     }
 
@@ -366,8 +363,8 @@ class IndicatorController extends Controller
     private function formSelections(): array
     {
         return [
-            'standards'   => Standard::query()->pluck('name', 'id')->toArray(),
-            'categories'  => Category::query()->pluck('name', 'id')->toArray(),
+            'standards' => Standard::query()->pluck('name', 'id')->toArray(),
+            'categories' => Category::query()->pluck('name', 'id')->toArray(),
             'departments' => Department::query()->pluck('name', 'id')->toArray(),
         ];
     }
@@ -378,7 +375,7 @@ class IndicatorController extends Controller
         $deadline = null;
         if ($i->deadline instanceof Carbon) {
             $deadline = $i->deadline->format('Y-m-d');
-        } elseif (!empty($i->deadline)) {
+        } elseif (! empty($i->deadline)) {
             try {
                 $deadline = Carbon::parse($i->deadline)->format('Y-m-d');
             } catch (\Throwable $e) {
@@ -386,22 +383,32 @@ class IndicatorController extends Controller
             }
         }
 
+        // Aggregate criteria status:
+        // - If any criteria has status 0 => overall 0 (รอดำเนินการ)
+        // - Else if any criteria has status 2 => overall 2 (เอกสารไม่ครบถ้วน)
+        // - Else => 1 (เอกสารครบถ้วน)
+        $hasPending = $i->criterias->contains(fn ($c) => (int) ($c->status ?? -1) === 0);
+        $hasIncomplete = $i->criterias->contains(fn ($c) => (int) ($c->status ?? -1) === 2);
+        $criteriaStatus = $hasPending ? 0 : ($hasIncomplete ? 2 : 1);
+
         return [
-            'id'        => $i->id,
-            'name'      => $i->name,
-            'year'      => $i->year,
-            'code'      => $i->code,
-            'deadline'  => $deadline,
-            'status'    => $i->status,
+            'id' => $i->id,
+            'name' => $i->name,
+            'year' => $i->year,
+            'code' => $i->code,
+            'deadline' => $deadline,
+            'status' => $i->status,
+            // Aggregated status from criterias
+            'criteria_status' => $criteriaStatus,
             'score_acc' => $i->score_acc,
             'max_score' => $i->max_score,
-            'type'      => $i->type,
-            'category'  => $i->category ? [
-                'id'   => $i->category->id,
+            'type' => $i->type,
+            'category' => $i->category ? [
+                'id' => $i->category->id,
                 'name' => $i->category->name,
             ] : null,
-            'standard'  => ($i->category && $i->category->standard) ? [
-                'id'   => $i->category->standard->id,
+            'standard' => ($i->category && $i->category->standard) ? [
+                'id' => $i->category->standard->id,
                 'name' => $i->category->standard->name,
             ] : null,
 
@@ -409,11 +416,12 @@ class IndicatorController extends Controller
             'assignments' => $i->assignments->map(function ($a) {
                 // ถ้าในความสัมพันธ์ Assignment มี ->user ก็ใช้เลย ไม่งั้น fallback หาเอง
                 $user = $a->user ?? \App\Models\User::find($a->collector);
+
                 return [
                     'user' => $user ? [
-                        'id'              => $user->id,
-                        'name'            => $user->name,
-                        'department_id'   => $user->department_id,
+                        'id' => $user->id,
+                        'name' => $user->name,
+                        'department_id' => $user->department_id,
                         'department_name' => optional($user->department)->name,
                     ] : null,
                 ];
@@ -421,11 +429,11 @@ class IndicatorController extends Controller
 
             'criteria' => $i->criterias->map(function ($c) {
                 return [
-                    'id'          => $c->id,
-                    'name'        => $c->name,
-                    // 'description' => $c->description,
-                    // 'sequence'    => $c->sequence,
-                    'status'      => $c->status,
+                    'id' => $c->id,
+                    'name' => $c->name,
+                    'description' => $c->description,
+                    'sequence' => $c->sequence,
+                    'status' => $c->status,
                 ];
             }),
 
@@ -450,16 +458,17 @@ class IndicatorController extends Controller
         $rows = [];
         foreach ($criteria as $c) {
             $rows[] = [
-                'name'         => (string) ($c['name'] ?? ''),
-                'description'  => $c['description'] ?? null,
-                'sequence'     => (int) ($c['sequence'] ?? 0),
+                'name' => (string) ($c['name'] ?? ''),
+                'description' => $c['description'] ?? null,
+                'sequence' => (int) ($c['sequence'] ?? 0),
                 'indicator_id' => $indicator->id,
             ];
         }
-        if (!empty($rows)) {
+        if (! empty($rows)) {
             // ถ้าต้องการ timestamps ให้เพิ่ม created_at/updated_at เอง หรือใช้ createMany ผ่าน relation
             Criteria::insert($rows);
         }
+
         return count($rows);
     }
 
@@ -471,15 +480,15 @@ class IndicatorController extends Controller
         $indicator->variables()->delete();
         $indicator->formulas()->delete();
 
-        $vars        = (array) ($scoring['variables'] ?? []);
+        $vars = (array) ($scoring['variables'] ?? []);
         $formulaText = trim((string) ($scoring['condition'] ?? ''));
 
         $createdVars = [];
         foreach ($vars as $v) {
-            $name      = trim((string) ($v['variable_name'] ?? ''));
-            $label     = trim((string) ($v['label_name'] ?? ''));
-            $type      = (string) ($v['type'] ?? 'defined'); // defined|input|output
-            $value     = array_key_exists('value', $v) ? $v['value'] : null;
+            $name = trim((string) ($v['variable_name'] ?? ''));
+            $label = trim((string) ($v['label_name'] ?? ''));
+            $type = (string) ($v['type'] ?? 'defined'); // defined|input|output
+            $value = array_key_exists('value', $v) ? $v['value'] : null;
 
             if ($name === '' || $label === '') {
                 continue; // Skip if either name or label is empty
@@ -487,9 +496,9 @@ class IndicatorController extends Controller
 
             $createdVars[] = $indicator->variables()->create([
                 'variable_name' => $name,
-                'label_name'    => $label,
-                'type'          => $type,
-                'value'         => $type === 'defined' ? $value : null,
+                'label_name' => $label,
+                'type' => $type,
+                'value' => $type === 'defined' ? $value : null,
             ]);
         }
 
@@ -510,18 +519,20 @@ class IndicatorController extends Controller
     private function syncChecklistFromSelected(Indicator $indicator, array $multiSelected): void
     {
         foreach ($multiSelected as $row) {
-            $req      = array_values(array_filter((array) ($row['required_items'] ?? []), 'is_numeric'));
-            $score    = (float) ($row['score'] ?? 0);
+            $req = array_values(array_filter((array) ($row['required_items'] ?? []), 'is_numeric'));
+            $score = (float) ($row['score'] ?? 0);
             $sequence = (int) ($row['sequence'] ?? 1);
 
-            if (!$req) continue;
+            if (! $req) {
+                continue;
+            }
 
             sort($req);
 
             $indicator->checklistItems()->create([
                 'required_items' => $req,
-                'score'          => $score,
-                'sequence'       => $sequence,
+                'score' => $score,
+                'sequence' => $sequence,
             ]);
         }
     }
@@ -542,25 +553,30 @@ class IndicatorController extends Controller
             ->map(function ($arr) {
                 $a = array_map('intval', (array) $arr);
                 sort($a);
+
                 return implode(',', $a);
             })->flip();
 
         $universe = range(1, $criteriaCount);
 
         foreach ($multiCounts as $rule) {
-            $k     = (int) ($rule['count'] ?? 0);
+            $k = (int) ($rule['count'] ?? 0);
             $score = (float) ($rule['score'] ?? 0);
 
-            if ($k <= 0 || $k > $criteriaCount) continue;
+            if ($k <= 0 || $k > $criteriaCount) {
+                continue;
+            }
 
             foreach ($this->kCombinations($universe, $k) as $combo) {
                 $key = implode(',', $combo);
-                if (isset($existingKeys[$key])) continue;
+                if (isset($existingKeys[$key])) {
+                    continue;
+                }
 
                 $indicator->checklistItems()->create([
                     'required_items' => $combo,
-                    'score'          => $score,
-                    'sequence'       => 1,
+                    'score' => $score,
+                    'sequence' => 1,
                 ]);
                 $existingKeys[$key] = true;
             }
@@ -571,11 +587,16 @@ class IndicatorController extends Controller
     private function kCombinations(array $arr, int $k): array
     {
         $n = count($arr);
-        if ($k < 0 || $k > $n) return [];
-        if ($k === 0) return [[]];
+        if ($k < 0 || $k > $n) {
+            return [];
+        }
+        if ($k === 0) {
+            return [[]];
+        }
 
         $out = [];
         $this->kCombDfs($arr, $k, 0, [], $out);
+
         return $out;
     }
 
@@ -585,6 +606,7 @@ class IndicatorController extends Controller
             $tmp = $curr;
             sort($tmp);
             $out[] = $tmp;
+
             return;
         }
         for ($i = $start; $i < count($arr); $i++) {
@@ -605,18 +627,18 @@ class IndicatorController extends Controller
 
         foreach ($criteria as $c) {
             $criteriaData = [
-                'name'         => (string) ($c['name'] ?? ''),
-                'description'  => $c['description'] ?? null,
-                'sequence'     => (int) ($c['sequence'] ?? 0),
+                'name' => (string) ($c['name'] ?? ''),
+                'description' => $c['description'] ?? null,
+                'sequence' => (int) ($c['sequence'] ?? 0),
                 'indicator_id' => $indicator->id,
             ];
 
-            if (!empty($c['id'])) {
+            if (! empty($c['id'])) {
                 // Update existing criteria
                 $existingCriteria = Criteria::where('id', $c['id'])
                     ->where('indicator_id', $indicator->id)
                     ->first();
-                
+
                 if ($existingCriteria) {
                     $existingCriteria->update($criteriaData);
                     $existingIds[] = $c['id'];
