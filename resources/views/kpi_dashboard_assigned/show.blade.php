@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', '')
+@section('title', $indicator->code." : ".$indicator->name)
 
 @section('content')
 
@@ -240,7 +240,8 @@
                 <input type="hidden" name="status" id="status-input">
 
                 <div class="action-bts">
-                    <button type="button" class="btns-secondary" onclick="location.href='{{ route('dashboardkpi.index') }}'">
+                    <button type="button" class="btns-secondary"
+                        onclick="location.href='{{ route('dashboardkpi.index') }}'">
                         <i class="fa fa-undo"></i> กลับ
                     </button>
 
@@ -250,10 +251,33 @@
                             <i class="fa fa-save"></i> บันทึกเป็นฉบับร่าง
                         </button>
 
-                        <!-- บันทึกเป็นฉบับจริง -->
-                        <button type="submit" class="btns-primary save-btn" data-status="2">
-                            <i class="fa fa-save"></i> บันทึกเป็นฉบับจริง
-                        </button>
+                        <!-- บันทึกเป็นฉบับจริง (ยืนยันด้วย Modal) -->
+                        <x-modal title="ยืนยันการบันทึกเป็นฉบับจริง" size="sm" :context="'confirm-final-save'">
+                            <x-slot:trigger>
+                                <button type="button" class="btns-primary">
+                                    <i class="fa fa-save"></i> บันทึกเป็นฉบับจริง
+                                </button>
+                            </x-slot:trigger>
+
+                            <div class="space-y-2">
+                                <p class="text-slate-700">
+                                    ต้องการบันทึกเป็นฉบับจริง ใช่หรือไม่?
+                                </p>
+                                <p class="text-sm text-slate-500">
+                                    หลังจากยืนยัน ระบบจะบันทึกข้อมูลเป็นฉบับจริงตามสถานะที่กำหนด
+                                </p>
+                            </div>
+
+                            <x-slot:footer>
+                                <div class="flex justify-end gap-2">
+                                    <button type="button" class="btns-secondary" @click="$dispatch('modal:close')">ยกเลิก</button>
+                                    <button type="button" class="btns-primary"
+                                        onclick="(function(){var form=document.getElementById('variables-form');var statusInput=document.getElementById('status-input');if(statusInput){statusInput.value='2';}if(form){form.submit();}})()">
+                                        ยืนยันการบันทึก
+                                    </button>
+                                </div>
+                            </x-slot:footer>
+                        </x-modal>
                     @endif
                 </div>
             </form>
@@ -298,94 +322,99 @@
             });
         });
     </script>
-  <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // ✅ กัน error lucide
-    if (window.lucide && typeof lucide.createIcons === 'function') {
-        lucide.createIcons();
-    }
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // ✅ กัน error lucide
+            if (window.lucide && typeof lucide.createIcons === 'function') {
+                lucide.createIcons();
+            }
 
-    const fileHandlers = {};
-    const editorInitialized = {};
-    const csrfTokenMeta = document.querySelector('meta[name="csrf-token"]');
-    const csrfToken = csrfTokenMeta ? csrfTokenMeta.getAttribute("content") : "";
+            const fileHandlers = {};
+            const editorInitialized = {};
+            const csrfTokenMeta = document.querySelector('meta[name="csrf-token"]');
+            const csrfToken = csrfTokenMeta ? csrfTokenMeta.getAttribute("content") : "";
 
-    // ✅ Template render หลักฐานใหม่
-    function renderEvidenceItem(ev) {
-        let icon = '<i data-lucide="file" style="color:#6b7280;"></i>';
-        if (ev.type === 'pdf') icon = '<i data-lucide="file-text" style="color:#dc2626;"></i>';
-        else if (['doc','docx'].includes(ev.type)) icon = '<i data-lucide="file-text" style="color:#2563eb;"></i>';
-        else if (['ppt','pptx'].includes(ev.type)) icon = '<i data-lucide="presentation" style="color:#eb7e25;"></i>';
-        else if (['jpg','jpeg','png','gif','image'].includes(ev.type)) icon = '<i data-lucide="image" style="color:#16a34a;"></i>';
-        else if (['xls','xlsx'].includes(ev.type)) icon = '<i data-lucide="file-spreadsheet" style="color:#059669;"></i>';
-        else if (ev.type === 'url') icon = '<i data-lucide="link" style="color:#9333ea;"></i>';
-        else if (ev.type === 'note') icon = '<i data-lucide="sticky-note" style="color:#f59e0b;"></i>';
+            // ✅ Template render หลักฐานใหม่
+            function renderEvidenceItem(ev) {
+                let icon = '<i data-lucide="file" style="color:#6b7280;"></i>';
+                if (ev.type === 'pdf') icon = '<i data-lucide="file-text" style="color:#dc2626;"></i>';
+                else if (['doc', 'docx'].includes(ev.type)) icon =
+                    '<i data-lucide="file-text" style="color:#2563eb;"></i>';
+                else if (['ppt', 'pptx'].includes(ev.type)) icon =
+                    '<i data-lucide="presentation" style="color:#eb7e25;"></i>';
+                else if (['jpg', 'jpeg', 'png', 'gif', 'image'].includes(ev.type)) icon =
+                    '<i data-lucide="image" style="color:#16a34a;"></i>';
+                else if (['xls', 'xlsx'].includes(ev.type)) icon =
+                    '<i data-lucide="file-spreadsheet" style="color:#059669;"></i>';
+                else if (ev.type === 'url') icon = '<i data-lucide="link" style="color:#9333ea;"></i>';
+                else if (ev.type === 'note') icon = '<i data-lucide="sticky-note" style="color:#f59e0b;"></i>';
 
-        let nameHtml = ev.name;
-        if (ev.type === 'url' && ev.path?.urls?.[0]) {
-            nameHtml = `<a href="${ev.path.urls[0]}" target="_blank"
+                let nameHtml = ev.name;
+                if (ev.type === 'url' && ev.path?.urls?.[0]) {
+                    nameHtml = `<a href="${ev.path.urls[0]}" target="_blank"
                            class="text-blue-600 underline hover:text-blue-800">${ev.name}</a>`;
-        }
+                }
 
-        return `
+                return `
             <div class="evidence-item" id="evidence-${ev.id}">
                 <span class="evidence-icon">${icon}</span>
                 <span class="evidence-name">${nameHtml}</span>
                 <button class="btn-delete" data-id="${ev.id}" title="ลบหลักฐาน">x</button>
             </div>`;
-    }
+            }
 
-    /*** ---------- File Upload Handler ---------- ***/
-    class FileUploadHandler {
-        constructor(criteriaId) {
-            this.criteriaId = criteriaId;
-            this.uploadArea = document.querySelector(`.upload-area-${criteriaId}`);
-            this.fileInput = document.getElementById(`fileInput-${criteriaId}`);
-            this.filesList = document.getElementById(`filesList-${criteriaId}`);
-            this.selectedFiles = [];
-            fileHandlers[criteriaId] = this;
-            this.init();
-        }
-        init() {
-            if (!this.uploadArea || !this.fileInput || !this.filesList) return;
-            ['dragenter','dragover','dragleave','drop'].forEach(evt => {
-                this.uploadArea.addEventListener(evt, e => {
-                    e.preventDefault(); e.stopPropagation();
-                });
-            });
-            this.uploadArea.addEventListener('click', () => this.fileInput.click());
-            this.uploadArea.addEventListener('dragover', e => {
-                e.preventDefault();
-                this.uploadArea.classList.add('drag-over');
-            });
-            this.uploadArea.addEventListener('dragleave', () => {
-                this.uploadArea.classList.remove('drag-over');
-            });
-            this.uploadArea.addEventListener('drop', e => {
-                e.preventDefault();
-                this.uploadArea.classList.remove('drag-over');
-                this.handleFiles(Array.from(e.dataTransfer.files || []));
-            });
-            this.fileInput.addEventListener('change', e => {
-                this.handleFiles(Array.from(e.target.files || []));
-            });
-        }
-        handleFiles(files) {
-            files.forEach(file => {
-                const exists = this.selectedFiles.find(f =>
-                    f.name === file.name && f.size === file.size && f.type === file.type
-                );
-                if (!exists) {
-                    this.selectedFiles.push(file);
-                    this.displayFile(file);
+            /*** ---------- File Upload Handler ---------- ***/
+            class FileUploadHandler {
+                constructor(criteriaId) {
+                    this.criteriaId = criteriaId;
+                    this.uploadArea = document.querySelector(`.upload-area-${criteriaId}`);
+                    this.fileInput = document.getElementById(`fileInput-${criteriaId}`);
+                    this.filesList = document.getElementById(`filesList-${criteriaId}`);
+                    this.selectedFiles = [];
+                    fileHandlers[criteriaId] = this;
+                    this.init();
                 }
-            });
-            this.syncInputFiles();
-        }
-        displayFile(file) {
-            const el = document.createElement('div');
-            el.className = 'file-item';
-            el.innerHTML = `
+                init() {
+                    if (!this.uploadArea || !this.fileInput || !this.filesList) return;
+                    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(evt => {
+                        this.uploadArea.addEventListener(evt, e => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                        });
+                    });
+                    this.uploadArea.addEventListener('click', () => this.fileInput.click());
+                    this.uploadArea.addEventListener('dragover', e => {
+                        e.preventDefault();
+                        this.uploadArea.classList.add('drag-over');
+                    });
+                    this.uploadArea.addEventListener('dragleave', () => {
+                        this.uploadArea.classList.remove('drag-over');
+                    });
+                    this.uploadArea.addEventListener('drop', e => {
+                        e.preventDefault();
+                        this.uploadArea.classList.remove('drag-over');
+                        this.handleFiles(Array.from(e.dataTransfer.files || []));
+                    });
+                    this.fileInput.addEventListener('change', e => {
+                        this.handleFiles(Array.from(e.target.files || []));
+                    });
+                }
+                handleFiles(files) {
+                    files.forEach(file => {
+                        const exists = this.selectedFiles.find(f =>
+                            f.name === file.name && f.size === file.size && f.type === file.type
+                        );
+                        if (!exists) {
+                            this.selectedFiles.push(file);
+                            this.displayFile(file);
+                        }
+                    });
+                    this.syncInputFiles();
+                }
+                displayFile(file) {
+                    const el = document.createElement('div');
+                    el.className = 'file-item';
+                    el.innerHTML = `
                 <div class="file-icon"><i data-lucide="file-text"></i></div>
                 <span class="file-name" title="${file.name}">${file.name}</span>
                 <span class="file-size">${this.formatFileSize(file.size)}</span>
@@ -395,97 +424,122 @@ document.addEventListener('DOMContentLoaded', function() {
                     data-criteria="${this.criteriaId}">
                     <i data-lucide="x"></i>
                 </button>`;
-            this.filesList.appendChild(el);
-            el.querySelector('.remove-file').addEventListener('click', e => {
-                const btn = e.currentTarget;
-                const name = decodeURIComponent(btn.getAttribute('data-name') || '');
-                const size = Number(btn.getAttribute('data-size') || 0);
-                this.selectedFiles = this.selectedFiles.filter(f => !(f.name === name && f.size === size));
-                this.syncInputFiles();
-                el.remove();
-            });
-            if (window.lucide?.createIcons) lucide.createIcons();
-        }
-        syncInputFiles() {
-            if (!this.fileInput) return;
-            const dt = new DataTransfer();
-            this.selectedFiles.forEach(file => dt.items.add(file));
-            this.fileInput.files = dt.files;
-        }
-        formatFileSize(bytes) {
-            if (bytes === 0) return '0 Bytes';
-            const k = 1024, sizes = ['Bytes','KB','MB','GB','TB'];
-            const i = Math.floor(Math.log(bytes) / Math.log(k));
-            return parseFloat((bytes / Math.pow(k,i)).toFixed(2)) + ' ' + sizes[i];
-        }
-    }
+                    this.filesList.appendChild(el);
+                    el.querySelector('.remove-file').addEventListener('click', e => {
+                        const btn = e.currentTarget;
+                        const name = decodeURIComponent(btn.getAttribute('data-name') || '');
+                        const size = Number(btn.getAttribute('data-size') || 0);
+                        this.selectedFiles = this.selectedFiles.filter(f => !(f.name === name && f
+                            .size === size));
+                        this.syncInputFiles();
+                        el.remove();
+                    });
+                    if (window.lucide?.createIcons) lucide.createIcons();
+                }
+                syncInputFiles() {
+                    if (!this.fileInput) return;
+                    const dt = new DataTransfer();
+                    this.selectedFiles.forEach(file => dt.items.add(file));
+                    this.fileInput.files = dt.files;
+                }
+                formatFileSize(bytes) {
+                    if (bytes === 0) return '0 Bytes';
+                    const k = 1024,
+                        sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+                    const i = Math.floor(Math.log(bytes) / Math.log(k));
+                    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+                }
+            }
 
-    /*** ---------- Trumbowyg Editor ---------- ***/
-    function initTrumbowyg(criteriaId) {
-        if (typeof $ === 'undefined' || typeof $.fn.trumbowyg === 'undefined') return false;
-        if (editorInitialized[criteriaId]) return true;
-        const $editor = $(`#detailEditor-${criteriaId}`);
-        if ($editor.length === 0) return false;
-        try {
-            if ($editor.data('trumbowyg')) $editor.trumbowyg('destroy');
-            $editor.trumbowyg({ lang: 'th', autogrow: true });
-            editorInitialized[criteriaId] = true;
-            return true;
-        } catch (error) {
-            console.error("❌ Error init Trumbowyg:", error);
-            return false;
-        }
-    }
+            /*** ---------- Trumbowyg Editor ---------- ***/
+            function initTrumbowyg(criteriaId) {
+                if (typeof $ === 'undefined' || typeof $.fn.trumbowyg === 'undefined') return false;
+                if (editorInitialized[criteriaId]) return true;
+                const $editor = $(`#detailEditor-${criteriaId}`);
+                if ($editor.length === 0) return false;
+                try {
+                    if ($editor.data('trumbowyg')) $editor.trumbowyg('destroy');
+                    $editor.trumbowyg({
+                        lang: 'th',
+                        autogrow: true
+                    });
+                    editorInitialized[criteriaId] = true;
+                    return true;
+                } catch (error) {
+                    console.error("❌ Error init Trumbowyg:", error);
+                    return false;
+                }
+            }
 
-    /*** ---------- Delete Evidence ---------- ***/
-    document.querySelectorAll(".btn-delete").forEach(btn => {
-        btn.addEventListener("click", function() {
-            const id = this.getAttribute("data-id");
-            Swal.fire({
-                title: 'คุณแน่ใจหรือไม่?',
-                text: "ต้องการลบหลักฐานนี้",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#6b7280',
-                confirmButtonText: 'ลบ',
-                cancelButtonText: 'ยกเลิก'
-            }).then((result) => {
-                if (!result.isConfirmed) return;
-                fetch(`/evidences/${id}`, {
-                    method: "DELETE",
-                    headers: {
-                        "X-CSRF-TOKEN": csrfToken,
-                        "Content-Type": "application/json",
-                        "Accept": "application/json"
-                    }
-                })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success) {
-                        document.getElementById(`evidence-${id}`)?.remove();
-                        Swal.fire({ toast:true, position:'top-end', icon:'success', title:'ลบหลักฐานเรียบร้อยแล้ว', showConfirmButton:false, timer:2000 });
-                    } else {
-                        Swal.fire({ toast:true, position:'top-end', icon:'error', title:'เกิดข้อผิดพลาดในการลบ', showConfirmButton:false, timer:2000 });
-                    }
-                })
-                .catch(err => {
-                    console.error("Error:", err);
-                    Swal.fire({ toast:true, position:'top-end', icon:'error', title:'เกิดข้อผิดพลาดในการลบ', showConfirmButton:false, timer:2000 });
+            /*** ---------- Delete Evidence ---------- ***/
+            document.querySelectorAll(".btn-delete").forEach(btn => {
+                btn.addEventListener("click", function() {
+                    const id = this.getAttribute("data-id");
+                    Swal.fire({
+                        title: 'คุณแน่ใจหรือไม่?',
+                        text: "ต้องการลบหลักฐานนี้",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#d33',
+                        cancelButtonColor: '#6b7280',
+                        confirmButtonText: 'ลบ',
+                        cancelButtonText: 'ยกเลิก'
+                    }).then((result) => {
+                        if (!result.isConfirmed) return;
+                        fetch(`/evidences/${id}`, {
+                                method: "DELETE",
+                                headers: {
+                                    "X-CSRF-TOKEN": csrfToken,
+                                    "Content-Type": "application/json",
+                                    "Accept": "application/json"
+                                }
+                            })
+                            .then(res => res.json())
+                            .then(data => {
+                                if (data.success) {
+                                    document.getElementById(`evidence-${id}`)?.remove();
+                                    Swal.fire({
+                                        toast: true,
+                                        position: 'top-end',
+                                        icon: 'success',
+                                        title: 'ลบหลักฐานเรียบร้อยแล้ว',
+                                        showConfirmButton: false,
+                                        timer: 2000
+                                    });
+                                } else {
+                                    Swal.fire({
+                                        toast: true,
+                                        position: 'top-end',
+                                        icon: 'error',
+                                        title: 'เกิดข้อผิดพลาดในการลบ',
+                                        showConfirmButton: false,
+                                        timer: 2000
+                                    });
+                                }
+                            })
+                            .catch(err => {
+                                console.error("Error:", err);
+                                Swal.fire({
+                                    toast: true,
+                                    position: 'top-end',
+                                    icon: 'error',
+                                    title: 'เกิดข้อผิดพลาดในการลบ',
+                                    showConfirmButton: false,
+                                    timer: 2000
+                                });
+                            });
+                    });
                 });
             });
+
+            /*** ---------- Init per-criteria ---------- ***/
+            @foreach ($indicator->criterias as $criteria)
+                new FileUploadHandler({{ $criteria->id }});
+                setTimeout(() => initTrumbowyg({{ $criteria->id }}), 600);
+            @endforeach
+
         });
-    });
-
-    /*** ---------- Init per-criteria ---------- ***/
-    @foreach($indicator->criterias as $criteria)
-        new FileUploadHandler({{ $criteria->id }});
-        setTimeout(() => initTrumbowyg({{ $criteria->id }}), 600);
-    @endforeach
-
-});
-</script>
-
+    </script>
 @endpush
 
 
@@ -677,7 +731,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         .criteria-status {
             /* font-weight: 600;
-                                                                                                font-size: 14px; */
+                                                                                                    font-size: 14px; */
             color: #1f2937;
         }
 
