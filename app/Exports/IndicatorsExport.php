@@ -83,7 +83,7 @@ class IndicatorsExport implements FromCollection, WithEvents
                     'ด้านการวิจัยและนวัตกรรมและผลผลิตทางวิชาการ',
                     'ด้านการบริการวิชาการ/วิชาชีพแก่สังคม',
                     'ด้านการทำนุบำรุงศิลปะและวัฒนธรรม',
-                    'ด้านนิสิต/นักศึกษา',
+                    'ด้านนิสิตและนักศึกษา',
                 ];
 
                 $row = 1;
@@ -122,9 +122,15 @@ class IndicatorsExport implements FromCollection, WithEvents
                             // preload criterias (ordered) and evidences (approved only)
                             $ids = $inds->pluck('id')->unique()->values();
                             $relations = \App\Models\Indicator::with([
-                                'criterias' => function ($q) { $q->orderBy('sequence')->orderBy('name'); },
-                                'criterias.evidences' => function ($q) { $q->where('evidence.status', true); },
+                                'criterias' => function ($q) {
+                                    $q->orderBy('sequence')->orderBy('name');
+                                },
+                                'criterias.evidences', // ดึงมาหมด
                             ])->whereIn('id', $ids)->get()->keyBy('id');
+
+                            // แล้วค่อย filter ตอนใช้งาน
+
+
 
                             foreach ($inds as $ind) {
                                 // ===== หัวตัวชี้วัด =====
@@ -152,44 +158,40 @@ class IndicatorsExport implements FromCollection, WithEvents
                                     $s->mergeCells("B{$row}:F{$row}")->setCellValue("B{$row}", 'ไม่มีข้อมูล');
                                     $row++;
                                 }
+                            
                                 foreach ($criterias as $c) {
+                                    // --- เก็บค่าหลัก ๆ ของ criteria ---
                                     $s->setCellValue("A{$row}", $ci);
-                                    $s->setCellValue("B{$row}",  ($c->name ?? ''));
+                                    $s->setCellValue("B{$row}", $c->name ?? '');
+
                                     $has = (bool) ($c->status ?? false);
                                     $s->setCellValue("C{$row}", $has ? '✓' : '');
                                     $s->setCellValue("D{$row}", $has ? '' : '✓');
                                     $s->setCellValue("E{$row}", '');
 
-                                    $first = true;
-                                    if ($c->relationLoaded('evidences')) {
+                                    // --- ถ้ามี evidences ---
+                                    if ($has && $c->evidences->isNotEmpty()) {
+                                        $first = true;
                                         foreach ($c->evidences as $ev) {
-                                            if ($first) {
-                                                $s->setCellValue("F{$row}", $ev->name ?: 'Evidence');
-                                                try {
-                                                    $url = route('evidences.download', ['id' => $ev->id]);
-                                                    $s->getCell("F{$row}")->getHyperlink()->setUrl($url);
-                                                    $s->getStyle("F{$row}")->getFont()->getColor()->setARGB('FF0000FF');
-                                                    $s->getStyle("F{$row}")->getFont()->setUnderline(true);
-                                                } catch (\Throwable $ex) {}
-                                                $first = false;
-                                            } else {
+                                            if (!$first) {
                                                 $row++;
-                                                $s->setCellValue("A{$row}", '');
-                                                $s->setCellValue("B{$row}", '');
-                                                $s->setCellValue("C{$row}", '');
-                                                $s->setCellValue("D{$row}", '');
-                                                $s->setCellValue("E{$row}", '');
-                                                $s->setCellValue("F{$row}", $ev->name ?: 'Evidence');
-                                                try {
-                                                    $url = route('evidences.download', ['id' => $ev->id]);
-                                                    $s->getCell("F{$row}")->getHyperlink()->setUrl($url);
-                                                    $s->getStyle("F{$row}")->getFont()->getColor()->setARGB('FF0000FF');
-                                                    $s->getStyle("F{$row}")->getFont()->setUnderline(true);
-                                                } catch (\Throwable $ex) {}
+                                                // ✅ merge A–E ให้ต่อเนื่องเหมือน criteria เดิม
+                                                $s->mergeCells("A{$row}:E{$row}");
                                             }
+
+                                            $s->setCellValue("F{$row}", $ev->name ?: 'Evidence');
+                                            try {
+                                                $url = route('evidences.download', ['id' => $ev->id]);
+                                                $s->getCell("F{$row}")->getHyperlink()->setUrl($url);
+                                                $s->getStyle("F{$row}")->getFont()->getColor()->setARGB('FF0000FF');
+                                                $s->getStyle("F{$row}")->getFont()->setUnderline(true);
+                                            } catch (\Throwable $ex) {
+                                            }
+
+                                            $first = false;
                                         }
-                                    }
-                                    if ($first) {
+                                    } else {
+                                        // --- ถ้าไม่มี evidences หรือยังไม่อนุมัติ ---
                                         $s->setCellValue("F{$row}", '-');
                                     }
 
@@ -231,7 +233,8 @@ class IndicatorsExport implements FromCollection, WithEvents
                                     try {
                                         $s->setCellValue("D{$r1}", ($scoreText === '' ? '0' : $scoreText) . ' คะแนน');
                                         $s->mergeCells("E{$r1}:F{$r1}")->setCellValue("E{$r1}", '✓');
-                                    } catch (\Throwable $ex) {}
+                                    } catch (\Throwable $ex) {
+                                    }
                                 }
                                 $liItems = [];
                                 if (is_string($rawComment) && stripos($rawComment, '<li') !== false) {
@@ -240,7 +243,9 @@ class IndicatorsExport implements FromCollection, WithEvents
                                             $txt = html_entity_decode(strip_tags($it));
                                             $txt = preg_replace('/[\x{00A0}\s]+/u', ' ', $txt ?? '');
                                             $txt = trim((string) $txt);
-                                            if ($txt !== '') { $liItems[] = $txt; }
+                                            if ($txt !== '') {
+                                                $liItems[] = $txt;
+                                            }
                                         }
                                     }
                                 }
@@ -321,7 +326,8 @@ class IndicatorsExport implements FromCollection, WithEvents
                                         $s->getCell("F{$row}")->getHyperlink()->setUrl($url);
                                         $s->getStyle("F{$row}")->getFont()->getColor()->setARGB('FF0000FF');
                                         $s->getStyle("F{$row}")->getFont()->setUnderline(true);
-                                    } catch (\Throwable $ex) {}
+                                    } catch (\Throwable $ex) {
+                                    }
 
                                     foreach ($approved->slice(1) as $ev) {
                                         $row++;
@@ -336,7 +342,8 @@ class IndicatorsExport implements FromCollection, WithEvents
                                             $s->getCell("F{$row}")->getHyperlink()->setUrl($url);
                                             $s->getStyle("F{$row}")->getFont()->getColor()->setARGB('FF0000FF');
                                             $s->getStyle("F{$row}")->getFont()->setUnderline(true);
-                                        } catch (\Throwable $ex) {}
+                                        } catch (\Throwable $ex) {
+                                        }
                                     }
                                 }
 
@@ -354,7 +361,9 @@ class IndicatorsExport implements FromCollection, WithEvents
                                         $criteriaTexts[] = ($seq !== '' ? "{$seq}. " : '') . $label;
                                     }
                                 }
-                                if (empty($criteriaTexts)) { $criteriaTexts = ['............................']; }
+                                if (empty($criteriaTexts)) {
+                                    $criteriaTexts = ['............................'];
+                                }
 
                                 foreach ($criteriaTexts as $txt) {
                                     $row++;
@@ -414,7 +423,9 @@ class IndicatorsExport implements FromCollection, WithEvents
                                 }
                             }
                         }
-                        if (empty($criteriaTexts)) { $criteriaTexts = ['............................']; }
+                        if (empty($criteriaTexts)) {
+                            $criteriaTexts = ['............................'];
+                        }
                         foreach ($criteriaTexts as $txt) {
                             $row++;
                             $s->mergeCells("A{$row}:C{$row}")->setCellValue("A{$row}", $txt);
