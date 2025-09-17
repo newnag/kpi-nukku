@@ -155,13 +155,18 @@
                                                         'jpeg',
                                                         'png',
                                                         'gif',
+                                                        'svg',
+                                                        'txt',
+                                                        'csv',
+                                                        'htm',
+                                                        'html',
                                                     ]);
                                                 @endphp
 
                                                 @if ($openInNewTab)
                                                     {{-- PDF & Image → เปิดในแท็บใหม่ --}}
                                                     <a href="{{ route('evidences.download', $evidence->id) }}"
-                                                        target="_blank" class="text-blue-600 underline hover:text-blue-800">
+                                                        target="_blank" rel="noopener noreferrer" class="text-blue-600 underline hover:text-blue-800">
                                                         {{ $evidence->name }}
                                                     </a>
                                                 @else
