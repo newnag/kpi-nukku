@@ -3,13 +3,18 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
-use App\Models\User;
+use Spatie\Permission\Models\Role;
 
-class RolesAndPermissionsSeeder extends Seeder
+class PermissionsTableSeeder extends Seeder
 {
-    public function run()
+
+    /**
+     * Auto generated seed file
+     *
+     * @return void
+     */
+   public function run()
     {
         // Clear cached roles and permissions
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
@@ -73,7 +78,7 @@ class RolesAndPermissionsSeeder extends Seeder
 
 
         foreach ($permissions as $permission) {
-            Permission::firstOrCreate(['name' => $permission]);
+            Permission::findOrCreate($permission, 'web');
         }
 
         // Create roles and assign permissions

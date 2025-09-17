@@ -45,9 +45,9 @@
         </div>
 
         <div>
-            <label class="block text-sm font-medium text-slate-700 mb-1">หลักฐานอ้างอิง</label>
+            <label class="block text-sm font-medium text-slate-700 mb-1">รายละเอียด</label>
             <textarea rows="3" :name="(prefix || '{{ $prefix }}') + '[description]'"
-                placeholder="กรุณากรอกรายละเอียดหลักฐานอ้างอิง เช่น เอกสารแสดงรายชื่ออาจารย์"
+                placeholder="กรุณากรอกรายละเอียด เช่น แสดงรายชื่ออาจารย์"
                 class="p-2 mt-1 w-full rounded-xl border border-slate-300 
         placeholder-slate-400 text-sm md:text-base 
         hover:shadow-md hover:border-blue-400 transition

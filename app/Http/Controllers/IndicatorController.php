@@ -109,7 +109,7 @@ class IndicatorController extends Controller
             'criteria'                   => 'nullable|array',
             'criteria.*.id'              => 'nullable|integer|exists:criterias,id',
             'criteria.*.sequence'        => 'required|integer',
-            'criteria.*.name'            => 'required|string|max:255',
+            'criteria.*.name'            => 'required|string',
             'criteria.*.description'     => 'nullable|string',
 
             // Multi-choice (count-based)
@@ -243,7 +243,7 @@ class IndicatorController extends Controller
             'criteria'                   => 'nullable|array',
             'criteria.*.id'              => 'nullable|integer|exists:criterias,id',
             'criteria.*.sequence'        => 'required|integer',
-            'criteria.*.name'            => 'required|string|max:255',
+            'criteria.*.name'            => 'required|string',
             'criteria.*.description'     => 'nullable|string',
 
             // Multi-choice
