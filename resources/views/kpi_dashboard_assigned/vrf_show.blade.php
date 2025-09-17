@@ -165,16 +165,36 @@
 
                                                 @if ($openInNewTab)
                                                     {{-- PDF & Image → เปิดในแท็บใหม่ --}}
-                                                    <a href="{{ route('evidences.download', $evidence->id) }}"
-                                                        target="_blank" rel="noopener noreferrer" class="text-blue-600 underline hover:text-blue-800">
-                                                        {{ $evidence->name }}
-                                                    </a>
+                                                    <span id="evidence-link-{{ $evidence->id }}">
+                                                        <a href="{{ route('evidences.download', $evidence->id) }}"
+                                                            target="_blank" rel="noopener noreferrer" class="text-blue-600 underline hover:text-blue-800">
+                                                            <span id="evidence-name-text-{{ $evidence->id }}">{{ $evidence->name }}</span>
+                                                        </a>
+                                                    </span>
                                                 @else
                                                     {{-- Word, Excel, PPT → ดาวน์โหลด --}}
-                                                    <a href="{{ route('evidences.download', $evidence->id) }}" download
-                                                        class="text-blue-600 underline hover:text-blue-800">
-                                                        {{ $evidence->name }}
-                                                    </a>
+                                                    <span id="evidence-link-{{ $evidence->id }}">
+                                                        <a href="{{ route('evidences.download', $evidence->id) }}" download
+                                                            class="text-blue-600 underline hover:text-blue-800">
+                                                            <span id="evidence-name-text-{{ $evidence->id }}">{{ $evidence->name }}</span>
+                                                        </a>
+                                                    </span>
+                                                @endif
+
+                                                @if (!$locked)
+                                                    <button type="button" class="ml-2 text-slate-500 hover:text-slate-700"
+                                                        title="แก้ไขชื่อไฟล์" onclick="startEditEvidenceName({{ $evidence->id }})">
+                                                        ✏️
+                                                    </button>
+                                                    <span id="evidence-edit-{{ $evidence->id }}" class="inline-flex items-center gap-1 hidden" style="display:none"
+                                                        data-update-url="{{ route('evidences.update', $evidence->id) }}">
+                                                        <input type="text" id="evidence-input-{{ $evidence->id }}" value="{{ $evidence->name }}"
+                                                            class="border rounded px-2 py-0.5 text-sm" />
+                                                        <button type="button" class="text-green-600 hover:text-green-700"
+                                                            onclick="saveEvidenceName({{ $evidence->id }})">บันทึก</button>
+                                                        <button type="button" class="text-slate-600 hover:text-slate-800"
+                                                            onclick="cancelEditEvidenceName({{ $evidence->id }})">ยกเลิก</button>
+                                                    </span>
                                                 @endif
                                             </span>
 
@@ -878,6 +898,76 @@
             @endforeach
         });
     </script>
+@endpush
+@push('scripts')
+<script>
+    function getCsrfToken() {
+        const meta = document.querySelector('meta[name="csrf-token"]');
+        return meta && meta.content ? meta.content : '';
+    }
+
+    function startEditEvidenceName(id) {
+        const linkSpan = document.getElementById('evidence-link-' + id);
+        const editSpan = document.getElementById('evidence-edit-' + id);
+        if (linkSpan && editSpan) {
+            // Hide link, show input row
+            linkSpan.style.display = 'none';
+            editSpan.style.display = 'inline-flex';
+            const input = document.getElementById('evidence-input-' + id);
+            if (input) { input.focus(); input.select(); }
+        }
+    }
+
+    function cancelEditEvidenceName(id) {
+        const linkSpan = document.getElementById('evidence-link-' + id);
+        const editSpan = document.getElementById('evidence-edit-' + id);
+        if (linkSpan && editSpan) {
+            editSpan.style.display = 'none';
+            linkSpan.style.display = '';
+        }
+    }
+
+    async function saveEvidenceName(id) {
+        const editSpan = document.getElementById('evidence-edit-' + id);
+        const input = document.getElementById('evidence-input-' + id);
+        const linkSpan = document.getElementById('evidence-link-' + id);
+        const textSpan = document.getElementById('evidence-name-text-' + id);
+        if (!editSpan || !input || !linkSpan || !textSpan) return;
+
+        const url = editSpan.dataset.updateUrl;
+        const name = input.value.trim();
+        if (!name) {
+            alert('กรุณากรอกชื่อไฟล์');
+            input.focus();
+            return;
+        }
+
+        try {
+            const res = await fetch(url, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': getCsrfToken(),
+                },
+                body: JSON.stringify({ name })
+            });
+
+            if (!res.ok) {
+                let msg = 'บันทึกไม่สำเร็จ';
+                try { const data = await res.json(); if (data && data.message) msg = data.message; } catch (_) {}
+                alert(msg);
+                return;
+            }
+
+            textSpan.textContent = name;
+            editSpan.style.display = 'none';
+            linkSpan.style.display = '';
+        } catch (e) {
+            alert('เกิดข้อผิดพลาดในการเชื่อมต่อ');
+        }
+    }
+</script>
 @endpush
 
 @push('styles')

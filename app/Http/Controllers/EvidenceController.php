@@ -61,7 +61,7 @@ class EvidenceController extends Controller
         $years = Indicator::whereNotNull('year')->distinct()->orderByDesc('year')->pluck('year');
         $standards = Standard::select('name')->distinct()->orderBy('name')->pluck('name');
         $dimensions = Category::select('name')->distinct()->orderBy('name')->pluck('name');
-        $departments =Department::select('name')->distinct()->orderBy('name')->pluck('name');
+        $departments = Department::select('name')->distinct()->orderBy('name')->pluck('name');
         $collectors = User::whereHas('assignments')
             ->select('name')->distinct()->orderBy('name')->pluck('name');
         $fileTypes = Evidence::whereNotNull('type')->distinct()->orderBy('type')->pluck('type');
@@ -133,12 +133,15 @@ class EvidenceController extends Controller
         $request->validate([
             'criteria_id'       => 'required|integer|exists:criterias,id',
             'files.*'           => 'nullable|file|mimes:pdf,jpg,jpeg,png,doc,docx|max:10240',
+            'file_names'        => 'nullable|array',
+            'file_names.*'      => 'nullable|string|max:255',
             'additional_urls'   => 'nullable|array',
             'additional_urls.*' => 'nullable|url|max:2048',
             'url_names'         => 'nullable|array',
             'url_names.*'       => 'nullable|string|max:255',
             'detail'            => 'nullable|string|max:65535',
         ]);
+
 
         $uploadedFiles = [];
         $savedEvidences = []; // ✅ เก็บ evidences หลายรายการ
@@ -206,16 +209,23 @@ class EvidenceController extends Controller
 
             // ========== 1) ถ้ามีไฟล์ → loop แล้วบันทึก ==========
             if ($hasFiles) {
-                foreach ($request->file('files') as $file) {
+                $customNames = $request->input('file_names', []);
+
+                foreach ($request->file('files') as $i => $file) {
                     $originalName = $file->getClientOriginalName();
                     $extension    = strtolower($file->getClientOriginalExtension());
-                    $filename     = uniqid() . '_' . Str::random(10) . '.' . $extension;
+
+                    // 🔹 ใช้ชื่อจาก input ถ้ามี ไม่งั้น fallback เป็นชื่อไฟล์เดิม
+                    $customName   = $customNames[$i] ?? pathinfo($originalName, PATHINFO_FILENAME);
+                    $safeName     = Str::slug(pathinfo($customName, PATHINFO_FILENAME), '_');
+                    $filename     = $safeName . '_' . uniqid() . '.' . $extension;
 
                     $path = $file->storeAs($folder, $filename, 'public');
 
                     $payload = [
                         'files' => [[
                             'original_name' => $originalName,
+                            'custom_name'   => $customName,
                             'stored_name'   => $filename,
                             'path'          => $path,
                             'size'          => $file->getSize(),
@@ -231,17 +241,11 @@ class EvidenceController extends Controller
                     $evidence->status      = false;
                     $evidence->criteria_id = $criteria->id;
                     $evidence->user_id     = Auth::id();
-                    $evidence->name        = $originalName;
+                    $evidence->name        = $customName ?: $originalName; // 🔹 บันทึกชื่อใหม่
                     $evidence->type        = $extension;
                     $evidence->save();
 
                     $uploadedFiles[] = ['path' => $path];
-
-                    // Log::info('Evidence saved (file)', [
-                    //     'evidence_id' => $evidence->id,
-                    //     'name'        => $evidence->name,
-                    //     'type'        => $evidence->type,
-                    // ]);
                 }
             }
 
@@ -641,7 +645,11 @@ class EvidenceController extends Controller
 
         $detected = null;
         if (function_exists('mime_content_type')) {
-            try { $detected = @mime_content_type($path) ?: null; } catch (\Throwable $__) { $detected = null; }
+            try {
+                $detected = @mime_content_type($path) ?: null;
+            } catch (\Throwable $__) {
+                $detected = null;
+            }
         }
         if ($detected) return strtolower($detected);
 
@@ -649,16 +657,16 @@ class EvidenceController extends Controller
         $map = [
             'pdf' => 'application/pdf',
             'jpg' => 'image/jpeg',
-            'jpeg'=> 'image/jpeg',
+            'jpeg' => 'image/jpeg',
             'png' => 'image/png',
             'gif' => 'image/gif',
-            'webp'=> 'image/webp',
+            'webp' => 'image/webp',
             'bmp' => 'image/bmp',
             'svg' => 'image/svg+xml',
             'txt' => 'text/plain',
             'csv' => 'text/csv',
             'htm' => 'text/html',
-            'html'=> 'text/html',
+            'html' => 'text/html',
         ];
         return $map[$ext] ?? null;
     }
