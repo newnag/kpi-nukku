@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', $indicator->code." : ".$indicator->name)
+@section('title', $indicator->code . ' : ' . $indicator->name)
 
 @section('content')
 
@@ -270,7 +270,8 @@
 
                             <x-slot:footer>
                                 <div class="flex justify-end gap-2">
-                                    <button type="button" class="btns-secondary" @click="$dispatch('modal:close')">ยกเลิก</button>
+                                    <button type="button" class="btns-secondary"
+                                        @click="$dispatch('modal:close')">ยกเลิก</button>
                                     <button type="button" class="btns-primary"
                                         onclick="(function(){var form=document.getElementById('variables-form');var statusInput=document.getElementById('status-input');if(statusInput){statusInput.value='2';}if(form){form.submit();}})()">
                                         ยืนยันการบันทึก
@@ -634,7 +635,6 @@
             border-radius: var(--radius);
             box-shadow: var(--shadow);
             padding: 24px;
-            /* max-width: 920px; */
             /* ปรับตามหน้า */
             margin: 16px;
             border: 1px solid #f3f4f6;
@@ -645,7 +645,6 @@
             border-radius: var(--radius);
             box-shadow: var(--shadow);
             padding: 24px;
-            /* max-width: 920px; */
             /* ปรับตามหน้า */
             margin: 16px;
             border: 1px solid #f3f4f6;
@@ -653,7 +652,6 @@
 
         .card-title {
             font-size: 18px;
-            /* font-weight: 700; */
             color: var(--blue);
             margin: 0 0 16px;
             display: flex;
@@ -679,24 +677,19 @@
             position: relative;
             left: -29px;
             width: calc(100% + 57px);
-            /* right: 30px; */
             border: none;
             border-bottom: 3px solid #C3D8E8;
-            /* เทาอ่อน */
             margin: 24px 0;
         }
 
         .description-box {
             background: #f9fafb;
-            /* gray-50 */
             border: 1px solid #e5e7eb;
-            /* gray-200 */
             border-radius: 12px;
             padding: 16px 20px;
             font-size: 14px;
             line-height: 1.7;
             color: #374151;
-            /* gray-800 */
         }
 
         .description-box p {
@@ -731,7 +724,7 @@
 
         .criteria-status {
             /* font-weight: 600;
-                                                                                                    font-size: 14px; */
+                font-size: 14px; */
             color: #1f2937;
         }
 
@@ -937,7 +930,7 @@
         .dashboard-container {
             max-width: 960px;
             margin: 0 auto;
-            padding: 24px;
+            /* padding: 24px; */
         }
 
         /* Card */
@@ -945,7 +938,7 @@
             background: #fff;
             border-radius: var(--radius);
             box-shadow: var(--shadow);
-            padding: 28px;
+            /* padding: 28px; */
             border: 1px solid var(--gray-100);
         }
 

@@ -606,7 +606,7 @@
         .dashboard-container {
             max-width: 960px;
             margin: 0 auto;
-            padding: 24px;
+            /* padding: 24px; */
         }
 
         /* Card */
@@ -614,7 +614,7 @@
             background: #fff;
             border-radius: var(--radius);
             box-shadow: var(--shadow);
-            padding: 28px;
+            /* padding: 28px; */
             border: 1px solid var(--gray-100);
         }
 
