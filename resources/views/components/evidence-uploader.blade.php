@@ -42,7 +42,7 @@
                             @dragleave.prevent="dragging = false" @drop.prevent="handleDrop($event)"
                             @click="pickFiles()">
                             <div class="eu-dropzone-icon">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="42" height="42" fill="none"
+                                <svg xmlns="http://www.w3.org/2000/svg" width="52" height="52" fill="none"
                                     viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1"
                                         d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
@@ -102,7 +102,7 @@
 
                     <!-- URLs -->
                     <div class="eu-block">
-                        <div class="eu-section-title">แนบลิงก์หลักฐาน</div>
+                        <div class="eu-section-title ">แนบลิงก์หลักฐาน</div>
 
                         @foreach (collect(old('additional_urls', [])) as $u)
                             @if ($u !== null && $u !== '')
@@ -178,8 +178,9 @@
             border: 1px solid transparent;
             cursor: pointer;
             background: #111827;
-            color: #fff;
+            color: white;
             transition: box-shadow .15s ease, transform .06s ease, background .2s ease, color .2s ease;
+            font-size: 14px;
         }
 
         .eu-btn:hover {
@@ -316,9 +317,12 @@
         }
 
         .eu-section-title {
-            font-weight: 700;
-            color: #111827;
-            margin: 0 0 .6rem
+            /* font-weight: 700; */
+            color: black;
+            margin: 0 0 .6rem;
+            font-size: 14px;
+            font-weight: 600;
+
         }
 
         /* Dropzone */
@@ -345,7 +349,8 @@
         }
 
         .eu-dropzone-text {
-            color: #374151
+            color: #374151;
+            font-size: 14px;
         }
 
         .eu-link {
@@ -366,7 +371,7 @@
 
         .eu-file {
             display: flex;
-            align-items: flex-start;
+            align-items: center;
             gap: .7rem;
             border: 1px solid #e5e7eb;
             border-radius: 10px;
@@ -445,6 +450,7 @@
             color: #111827;
             background: #fff;
             transition: border-color .2s ease, box-shadow .2s ease;
+            font-size: 14px;
         }
 
         .eu-input:focus {
@@ -468,6 +474,7 @@
             gap: .5rem;
             padding: .6rem .25rem .8rem;
             margin-top: .25rem;
+            z-index: 12;
         }
 
         .btn-adds.eu-btn {

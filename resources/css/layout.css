@@ -30,11 +30,12 @@ body {
 }
 
 .container {
-    max-width: 1600px;
+    width: 100%;
+    max-width: 1140px; /* sensible default for desktop */
     margin: 0 auto;
-    padding: 2rem;
-    height: 100%;
-    flex: 1;
+    padding: 1rem; /* tighter on small screens, expand via media queries */
+    flex: 1 1 auto;
+    min-width: 0; /* prevent flex overflow for nested flex/grid */
 }
 
 /* ===== FOOTER ===== */
@@ -323,6 +324,44 @@ body {
 .breadcrumb li:last-child {
     color: #64748b;
     font-weight: 500;
+}
+
+/* ===== RESPONSIVE CONTAINER & TYPOGRAPHY ===== */
+@media (max-width: 639.98px) {
+    .page-title {
+        font-size: 1.5rem;
+    }
+}
+
+/* Small devices (>=640px) */
+@media (min-width: 640px) {
+    .container {
+        padding: 1.25rem;
+        max-width: 720px;
+    }
+}
+
+/* Medium devices (>=768px) */
+@media (min-width: 768px) {
+    .container {
+        padding: 1.5rem;
+        max-width: 960px;
+    }
+}
+
+/* Large devices (>=1024px) */
+@media (min-width: 1024px) {
+    .container {
+        padding: 2rem;
+        max-width: 1140px;
+    }
+}
+
+/* Extra Large devices (>=1280px) */
+@media (min-width: 1280px) {
+    .container {
+        max-width: 1280px;
+    }
 }
 
 /* ===== ALERT SYSTEM ===== */

@@ -15,7 +15,7 @@ use Laravel\Pail\ValueObjects\Origin\Console;
 class DashboardKpiAdminController extends Controller
 {
 
-    public function show($id)
+    public function show(Request $request,$id)
     {
         $indicator = Indicator::with([
             'category.standard',
@@ -27,6 +27,8 @@ class DashboardKpiAdminController extends Controller
         ])->findOrFail($id);
 
         $criteria_id = optional($indicator->criterias->first())->id;
+
+        // dd($request->all(), $id);
 
         return view('kpi_dashboard_assigned.vrf_show', compact('indicator', 'criteria_id'));
 

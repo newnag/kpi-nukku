@@ -3,37 +3,36 @@
 namespace App\Http\Controllers;
 
 use App\Models\Assignment;
-
 use App\Models\Indicator;
 use App\Models\Variable;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class DashboardKpiUserController extends Controller
 {
-    public function index(Request $request)
+    public function index()
     {
-        $user   = Auth::user();
+        $user = Auth::user();
         $userId = $user->id;
+        $deptId = $user->department_id;
 
-        $query = Indicator::query();
+        $query = Indicator::with([
+            'category.standard',
+            'assignments.user.department',
+            'criterias',
+        ]);
 
+        // ✅ ผู้ใช้ทั่วไป (role: user) เห็นเฉพาะที่ถูกมอบหมายให้ตนเอง หรืออยู่ในแผนกเดียวกัน
+        // ✅ บทบาทอื่นๆ (admin/super_admin/ฯลฯ) เห็นทั้งหมด (ไม่กรอง)
         if ($user->hasRole('user')) {
-            $query->whereHas('assignments', fn($q) => $q->where('collector', $userId));
+            $query->where(function ($q) use ($userId, $deptId) {
+                $q->whereHas('assignments', fn ($qa) => $qa->where('collector', $userId))
+                    ->orWhereHas('assignments.user', fn ($qu) => $qu->where('department_id', $deptId));
+            });
         }
 
         $indicators = $query
-            ->with([
-                'category:id,name,standard_id',
-                'category.standard:id,name',
-                'assignments' => function ($q) use ($user) {
-                    if ($user->hasRole('user')) {
-                        $q->where('collector', $user->id);
-                    }
-                    $q->with(['collectorUser:id,name,department_id', 'collectorUser.department:id,name']);
-                },
-                'criterias:id,indicator_id,status'
-            ])
             ->orderByRaw("
             CASE LEFT(code, 3)
                 WHEN 'NCS' THEN 1
@@ -50,33 +49,20 @@ class DashboardKpiUserController extends Controller
             END
         ")
             ->get()
-            ->map(function ($indicator) {
-                $totalCriteria = $indicator->criterias->count();
-                $completed     = $indicator->criterias->where('status', 1)->count();
+            ->map(function ($i) use ($userId) {
+                $data = $this->serializeIndicatorForList($i);
 
-                if ($totalCriteria === 0) {
-                    $indicator->doc_status = 'รอดำเนินการ';
-                } elseif ($completed < $totalCriteria) {
-                    $indicator->doc_status = 'ไม่ครบ';
-                } else {
-                    $indicator->doc_status = 'ครบ';
-                }
+                // ✅ Check if current user is directly assigned
+                $data['is_assigned'] = $i->assignments->contains(fn ($a) => $a->collector == $userId);
 
-                $indicator->status_key = match ((int) $indicator->status) {
-                    3 => 'complete',
-                    4    => 'incomplete',
-                    0, 1, 2   => 'pending',
-                    default => 'pending',
-                };
-
-                return $indicator;
+                return $data;
             });
 
+        // dd($indicators);
         return view('kpi_dashboard_assigned.app', compact('indicators'));
     }
 
-
-    public function show($id)
+    public function show(Request $request, $id)
     {
         $indicator = Indicator::with([
             'category.standard',
@@ -87,10 +73,28 @@ class DashboardKpiUserController extends Controller
             'checklistItems',
         ])->findOrFail($id);
 
-        $criteria   = $indicator->criterias->first(); // อาจเป็น null ได้
+        $criteria = $indicator->criterias->first(); // อาจเป็น null ได้
         $criteria_id = optional($criteria)->id;
 
-        return view('kpi_dashboard_assigned.show', compact('indicator', 'criteria', 'criteria_id'));
+        $user = Auth::user();
+
+        // Optional UI hint from query string (may be 'assigned' or 'is_assigned')
+        // Do NOT use this for authorization/branching
+        $assignedHint = $request->has('is_assigned')
+            ? $request->boolean('is_assigned')
+            : $request->boolean('assigned');
+
+        // ตรวจสอบว่าผู้ใช้ถูกมอบหมายโดยตรงหรือไม่ (authoritative)
+        $isAssigned = $indicator->assignments->contains(function ($a) use ($user) {
+            return (int) ($a->collector ?? 0) === (int) $user->id;
+        });
+
+        // Branch view ตามสถานะการมอบหมายจริง
+        if ($isAssigned) {
+            return view('kpi_dashboard_assigned.show', compact('indicator', 'criteria_id'));
+        }
+
+        return view('kpi_dashboard_assigned.show_readOnly', compact('indicator', 'criteria_id'));
     }
 
     public function saveVariables(Request $request, $id)
@@ -115,5 +119,86 @@ class DashboardKpiUserController extends Controller
         return redirect()->route('dashboardkpi.user.show', $indicator->id)
             ->with('success', 'บันทึกข้อมูลเรียบร้อยแล้ว');
 
+    }
+
+    private function serializeIndicatorForList(Indicator $i): array
+    {
+        // รองรับทั้ง cast ที่เป็น Carbon และสตริงธรรมดา
+        $deadline = null;
+        if ($i->deadline instanceof Carbon) {
+            $deadline = $i->deadline->format('Y-m-d');
+        } elseif (! empty($i->deadline)) {
+            try {
+                $deadline = Carbon::parse($i->deadline)->format('Y-m-d');
+            } catch (\Throwable $e) {
+                $deadline = (string) $i->deadline;
+            }
+        }
+
+        // Aggregate criteria status:
+        // - If any criteria has status 0 => overall 0 (รอดำเนินการ)
+        // - Else if any criteria has status 2 => overall 2 (เอกสารไม่ครบถ้วน)
+        // - Else => 1 (เอกสารครบถ้วน)
+        $hasPending = $i->criterias->contains(fn ($c) => (int) ($c->status ?? -1) === 0);
+        $hasIncomplete = $i->criterias->contains(fn ($c) => (int) ($c->status ?? -1) === 2);
+        $criteriaStatus = $hasPending ? 0 : ($hasIncomplete ? 2 : 1);
+
+        return [
+            'id' => $i->id,
+            'name' => $i->name,
+            'year' => $i->year,
+            'code' => $i->code,
+            'deadline' => $deadline,
+            'status' => $i->status,
+            // Aggregated status from criterias
+            'criteria_status' => $criteriaStatus,
+            'score_acc' => $i->score_acc,
+            'max_score' => $i->max_score,
+            'type' => $i->type,
+            'category' => $i->category ? [
+                'id' => $i->category->id,
+                'name' => $i->category->name,
+            ] : null,
+            'standard' => ($i->category && $i->category->standard) ? [
+                'id' => $i->category->standard->id,
+                'name' => $i->category->standard->name,
+            ] : null,
+
+            // ทำให้ dashboard.blade เอาไป map หา department ได้
+            'assignments' => $i->assignments->map(function ($a) {
+                // ถ้าในความสัมพันธ์ Assignment มี ->user ก็ใช้เลย ไม่งั้น fallback หาเอง
+                $user = $a->user ?? \App\Models\User::find($a->collector);
+
+                return [
+                    'user' => $user ? [
+                        'id' => $user->id,
+                        'name' => $user->name,
+                        'department_id' => $user->department_id,
+                        'department_name' => optional($user->department)->name,
+                    ] : null,
+                ];
+            }),
+
+            'criteria' => $i->criterias->map(function ($c) {
+                return [
+                    'id' => $c->id,
+                    'name' => $c->name,
+                    'description' => $c->description,
+                    'sequence' => $c->sequence,
+                    'status' => $c->status,
+                ];
+            }),
+
+            // 'evidences' => $i->evidences->map(function ($e) {
+            //     return [
+            //         'id'         => $e->id,
+            //         'name'       => $e->name,
+            //         'path'       => $e->path,
+            //         'created_at' => $e->created_at instanceof Carbon
+            //             ? $e->created_at->format('Y-m-d H:i:s')
+            //             : (string) $e->created_at,
+            //     ];
+            // }),
+        ];
     }
 }

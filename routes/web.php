@@ -47,7 +47,9 @@ Route::middleware('guest')->group(function () {
 */
 
 Route::middleware('auth')->controller(AuthController::class)->group(function () {
+    // Allow both POST (recommended) and GET (convenience) for logout
     Route::post('/logout', 'logout')->name('logout');
+    Route::get('/logout', 'logout')->name('logout.get');
 });
 
 // Minimal home route for post-login redirect used in tests
@@ -61,7 +63,7 @@ Route::middleware('auth')->get('/home', function () {
 |--------------------------------------------------------------------------
 */
 
-Route::middleware(['auth:sanctum'])->group(function () {
+Route::middleware(['auth'])->group(function () {
 
     // ===== DASHBOARD ROUTES =====
     Route::prefix('dashboard')->name('dashboard.')->middleware('permission:view-dashboard')->group(function () {
