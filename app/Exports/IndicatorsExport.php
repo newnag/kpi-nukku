@@ -46,27 +46,71 @@ class IndicatorsExport implements FromCollection, WithEvents
             ->leftJoin('standards', 'standards.id', '=', 'categories.standard_id');
 
         // ===== ฟิลเตอร์ =====
-        if ($y = $this->filters['year'] ?? null) {
-            $q->where('indicators.year', $y);
-        }
-        if ($std = $this->filters['standard_id'] ?? null) {
-            $q->where('categories.standard_id', $std);
-        }
-        if ($cat = $this->filters['category_id'] ?? null) {
-            $q->where('indicators.categorie_id', $cat);
-        }
-        if ($st = $this->filters['status'] ?? null) {
-            $q->where('indicators.status', $st);
-        }
-        if ($dep = $this->filters['dept_id'] ?? null) {
-            $q->where('collector_users.department_id', $dep);
-        }
-        if ($code = $this->filters['code'] ?? null) {
-            $q->where('indicators.code', 'ILIKE', "%{$code}%");
+        if (!empty($this->filters['year'])) {
+            $years = (array) $this->filters['year'];
+            $q->whereIn('indicators.year', $years);
         }
 
+        if (!empty($this->filters['standard_id'])) {
+            $std = $this->filters['standard_id'];
+            if (is_numeric($std) && (int)$std > 0) {
+                $q->where('categories.standard_id', (int)$std);
+            } else {
+                // Fallback: allow passing standard name (string)
+                $q->where('standards.name', (string) $std);
+            }
+        }
+
+        // Category filter: support NAME grouping across standards and legacy ID
+        $categoryName = $this->filters['category'] ?? $this->filters['category_name'] ?? null;
+        if (!empty($categoryName)) {
+            $names = (array) $categoryName;
+            $names = array_values(array_filter(array_map(fn($v) => trim((string)$v), $names)));
+            if (!empty($names)) {
+                $q->whereIn('categories.name', $names);
+            }
+        } elseif (array_key_exists('category_id', $this->filters) && $this->filters['category_id'] !== null && $this->filters['category_id'] !== '') {
+            $cat = $this->filters['category_id'];
+            if (is_array($cat)) {
+                $ids = [];
+                $names = [];
+                foreach ($cat as $c) {
+                    if (is_numeric($c)) $ids[] = (int) $c; else $names[] = trim((string)$c);
+                }
+                $q->where(function($qq) use ($ids, $names) {
+                    if (!empty($ids)) {
+                        $qq->orWhereIn('indicators.categorie_id', $ids);
+                    }
+                    if (!empty($names)) {
+                        $qq->orWhereIn('categories.name', $names);
+                    }
+                });
+            } else {
+                if (is_numeric($cat) && (int)$cat > 0) {
+                    $q->where('indicators.categorie_id', (int)$cat);
+                } else {
+                    $q->where('categories.name', trim((string)$cat));
+                }
+            }
+        }
+
+        if (isset($this->filters['status']) && $this->filters['status'] !== '' && (int)$this->filters['status'] >= 0) {
+            $q->where('indicators.status', (int)$this->filters['status']);
+        }
+
+        if (!empty($this->filters['code'])) {
+            $code = trim(strtolower($this->filters['code']));
+            if (str_contains($code, '%')) {
+                $q->where('indicators.code', 'ILIKE', $code);
+            } else {
+                $q->whereRaw('LOWER(indicators.code) = ?', [$code]);
+            }
+        }
+        // dd($this->filters, $q->toSql(), $q->getBindings());
         return $q->get()->groupBy('standard_name');
     }
+
+
 
     public function registerEvents(): array
     {
@@ -158,7 +202,7 @@ class IndicatorsExport implements FromCollection, WithEvents
                                     $s->mergeCells("B{$row}:F{$row}")->setCellValue("B{$row}", 'ไม่มีข้อมูล');
                                     $row++;
                                 }
-                            
+
                                 foreach ($criterias as $c) {
                                     // --- เก็บค่าหลัก ๆ ของ criteria ---
                                     $s->setCellValue("A{$row}", $ci);

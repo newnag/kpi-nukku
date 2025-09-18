@@ -181,11 +181,8 @@
                                     }
                                 }
                             @endphp
-                            {{-- <tr data-max="{{ (float) $indicator->max_score }}" data-standard="{{ $standardName }}"
-                                data-dimension="{{ $dimensionName }}" data-collector="{{ $collectorName }}"
-                                data-dept="{{ $deptName }}" data-status="{{ $statusKey }}"> --}}
                             <tr data-max="{{ (float) $indicator->max_score }}" data-standard="{{ $standardName }}"
-                                data-dimension="{{ $indicator->category->id ?? '' }}" data-collector="{{ $collectorName }}"
+                                data-dimension="{{ $dimensionName }}" data-collector="{{ $collectorName }}"
                                 data-dept="{{ $deptName }}" data-status="{{ $statusKey }}">
                                 <td class="status-cell">{{ $indicator->year }}</td>
                                 <td class="status-cell">{{ $standardName ?: '-' }}</td> <!-- ✅ ใช้ค่าจาก relation -->
@@ -403,11 +400,8 @@
                     label: it.name ?? String(it)
                 }));
 
+                // Fill dimensions with unique NAMES (no IDs)
                 fillSelect($('#filter-dimension'), window.ALL_DIMENSIONS);
-                fillSelect($('#filter-dimension'), window.ALL_DIMENSIONS, (it) => ({
-                    value: String(it.id),
-                    label: it.name
-                }));
                 populateFromData($collector, 'collector');
 
                 populateFromData($collector, 'collector');

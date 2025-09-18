@@ -114,11 +114,16 @@ class DashboardController extends Controller
             })
             ->orderBy('name')
             ->pluck('name');
+        // Unique dimension/aspect names for dropdown (6–7 choices, no duplicates)
         $dimensionNames = Category::query()
-            ->select('id', 'name')
-            ->distinct()
-            ->orderBy('name')
-            ->get();
+            ->whereNotNull('name')
+            ->pluck('name')
+            ->map(fn($n) => trim($n))
+            ->filter()
+            ->unique()
+            ->sort()
+            ->values()
+            ->toArray();
 
 
         $dimensionStats = Category::select('id', 'name', 'standard_id')
