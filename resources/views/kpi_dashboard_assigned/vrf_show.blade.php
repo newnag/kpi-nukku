@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'testtttttt')
+@section('title', $indicator->code." : ".$indicator->name)
 
 @section('content')
 

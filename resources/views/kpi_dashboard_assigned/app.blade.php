@@ -326,7 +326,7 @@
         </div>
 
         <!-- ตารางรายการตัวบ่งชี้ -->
-        <div class="border border-gray-200 rounded-lg shadow-sm overflow-x-auto">
+        <div class="border border-gray-200 rounded-lg shadow-sm xl:overflow-auto 2xl:overflow-visible">
             <table id="myTable" class="w-full">
                 <thead>
                     <tr>
@@ -578,22 +578,12 @@
     @push('styles')
         <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.dataTables.min.css">
         <style>
-            .container {
-                max-width: 1400px !important;
-            }
-
             /* DataTables + Tailwind polish (minimal) */
             table.dataTable thead th {
                 position: relative;
                 background-color: #f9fafb;
                 border-bottom: 1px solid #e5e7eb;
                 font-weight: 600;
-            }
-
-            table.dataTable thead .sorting:after,
-            table.dataTable thead .sorting_asc:after,
-            table.dataTable thead .sorting_desc:after {
-                display: none;
             }
 
             table.dataTable thead th:hover {
@@ -648,32 +638,24 @@
                 box-sizing: border-box;
             }
         </style>
-    @endpush
 
-    @push('styles')
         <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.dataTables.min.css">
         <style>
-            /* Make this page container fluid so the table can span full width */
-            /* .main-content > .container { } */
             .container {
                 max-width: 1400px !important;
-                /* padding-left: 0.75rem; */
-                /* padding-right: 0.75rem; */
             }
-
-            /* Ensure DataTable consumes full available width */
             #myTable,
             table.dataTable {
                 width: 100% !important;
             }
 
-            .dataTables_wrapper {
+            /* .dataTables_wrapper {
                 background-color: ;
-            }
+            } */
 
             /* Length and Filter Controls */
-            .dataTables_wrapper .dataTables_length,
-            .dataTables_wrapper .dataTables_filter {}
+            /* .dataTables_wrapper .dataTables_length,
+            .dataTables_wrapper .dataTables_filter {} */
 
             /* Dropdown Select Styling */
             .dataTables_wrapper .dataTables_length select {
@@ -684,13 +666,12 @@
             }
 
             .dataTables_wrapper .dataTables_info {
-                /* padding-top: 1rem; */
                 color: #4b5563;
             }
 
-            .dataTables_wrapper .dataTables_paginate {
-                /* padding-top: 1rem; */
-            }
+            /* .dataTables_wrapper .dataTables_paginate {
+                padding-top: 1rem;
+            } */
 
             .dataTables_wrapper .dataTables_paginate .paginate_button {
                 padding: 0.5rem 1rem;
@@ -781,6 +762,7 @@
 
             /* Row hover/focus highlight */
             #myTable tbody tr {
+                transition: background-color 0.15s ease, transform 0.05s ease;
                 cursor: pointer;
                 /* reinforce clickable rows */
             }
