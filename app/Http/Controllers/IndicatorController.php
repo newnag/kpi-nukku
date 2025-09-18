@@ -25,22 +25,31 @@ class IndicatorController extends Controller
             'criterias',
             // 'evidences',
         ])
-            ->orderByRaw("
-            CASE LEFT(code, 3)
-                WHEN 'NCS' THEN 1
-                WHEN 'NCO' THEN 2
-                WHEN 'NCP' THEN 3
-                ELSE 4
-            END
-        ")
-            ->orderByRaw("
-            CASE 
-                WHEN split_part(code, '-', 2) ~ '^[0-9]+$' 
-                THEN CAST(split_part(code, '-', 2) AS INTEGER)
-                ELSE 999999
-            END
-        ")
             ->get()
+            // Database-agnostic ordering (SQLite-friendly):
+            // 1) prefix rank by first 3 chars (NCS,NCO,NCP => 1,2,3 else 4)
+            // 2) numeric part after first '-' if numeric; else 999999
+            ->sortBy(function ($i) {
+                $code = (string) ($i->code ?? '');
+                $prefix = substr($code, 0, 3);
+                $rank = match ($prefix) {
+                    'NCS' => 1,
+                    'NCO' => 2,
+                    'NCP' => 3,
+                    default => 4,
+                };
+                $num = 999999;
+                $dashPos = strpos($code, '-');
+                if ($dashPos !== false) {
+                    $after = substr($code, $dashPos + 1);
+                    if (preg_match('/^\d+$/', $after)) {
+                        $num = (int) $after;
+                    }
+                }
+                // Compose sortable key
+                return sprintf('%02d-%06d-%s', $rank, $num, $code);
+            })
+            ->values()
             ->map(fn ($i) => $this->serializeIndicatorForList($i));
 
         // dd($indicators);

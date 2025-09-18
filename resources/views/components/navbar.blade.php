@@ -262,7 +262,7 @@
 <nav class="navbar">
     <a href="{{ route('dashboard.index') }}" class="navbar-brand">
         <img src="/uploads/logonuthaiS-2.png" alt="Logo">
-        <span>ระบบบริหารจัดการตัวชี้วัดเพื่อการรับรองสถาบันจากสภาการพยาบาล</span>
+        <span>ระบบบริหาร KPI เพื่อการรับรองสถาบันจากสภาการพยาบาล</span>
     </a>
 
     <!-- ปุ่ม Hamburger -->
