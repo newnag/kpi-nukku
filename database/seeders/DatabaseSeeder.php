@@ -57,6 +57,5 @@ class DatabaseSeeder extends Seeder
         VariableFormulasTableSeeder::class,
         SettingsTableSeeder::class,
     ]);
-
     }
 }
