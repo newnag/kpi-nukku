@@ -25,7 +25,21 @@ class IndicatorController extends Controller
             'criterias',
             // 'evidences',
         ])
-            ->orderBy('code', 'desc')
+            ->orderByRaw("
+            CASE LEFT(code, 3)
+                WHEN 'NCS' THEN 1
+                WHEN 'NCO' THEN 2
+                WHEN 'NCP' THEN 3
+                ELSE 4
+            END
+        ")
+            ->orderByRaw("
+            CASE 
+                WHEN split_part(code, '-', 2) ~ '^[0-9]+$' 
+                THEN CAST(split_part(code, '-', 2) AS INTEGER)
+                ELSE 999999
+            END
+        ")
             ->get()
             ->map(fn ($i) => $this->serializeIndicatorForList($i));
 

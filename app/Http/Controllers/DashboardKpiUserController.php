@@ -28,12 +28,26 @@ class DashboardKpiUserController extends Controller
         if ($user->hasRole('user')) {
             $query->where(function ($q) use ($userId, $deptId) {
                 $q->whereHas('assignments', fn ($qa) => $qa->where('collector', $userId))
-                  ->orWhereHas('assignments.user', fn ($qu) => $qu->where('department_id', $deptId));
+                    ->orWhereHas('assignments.user', fn ($qu) => $qu->where('department_id', $deptId));
             });
         }
 
         $indicators = $query
-            ->orderBy('code', 'desc')
+            ->orderByRaw("
+            CASE LEFT(code, 3)
+                WHEN 'NCS' THEN 1
+                WHEN 'NCO' THEN 2
+                WHEN 'NCP' THEN 3
+                ELSE 4
+            END
+        ")
+            ->orderByRaw("
+            CASE 
+                WHEN split_part(code, '-', 2) ~ '^[0-9]+$' 
+                THEN CAST(split_part(code, '-', 2) AS INTEGER)
+                ELSE 999999
+            END
+        ")
             ->get()
             ->map(function ($i) use ($userId) {
                 $data = $this->serializeIndicatorForList($i);
