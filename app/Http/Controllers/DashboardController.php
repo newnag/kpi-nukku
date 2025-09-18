@@ -93,7 +93,7 @@ class DashboardController extends Controller
         $statusCounts = [
             'complete'   => $indicatorsForStatus->where('status', 3)->count(),
             'incomplete' => $indicatorsForStatus->where('status', 4)->count(),
-           'pending' => $indicatorsForStatus->whereIn('status', [0, 1, 2])->count(),
+            'pending' => $indicatorsForStatus->whereIn('status', [0, 1, 2])->count(),
 
         ];
 
@@ -105,7 +105,8 @@ class DashboardController extends Controller
         ];
 
         // 7) Dropdown filters
-        $allStandards   = Standard::orderBy('name')->get(['id', 'name']);
+        $allStandards = Standard::orderBy('name')->get(['id', 'name']);
+        
         $departments    = Department::orderBy('name')->pluck('name');
         $collectors     = User::query()
             ->whereIn('id', function ($q) {
@@ -114,7 +115,11 @@ class DashboardController extends Controller
             ->orderBy('name')
             ->pluck('name');
         $dimensionNames = Category::query()
-            ->select('name')->distinct()->orderBy('name')->pluck('name');
+            ->select('id', 'name')
+            ->distinct()
+            ->orderBy('name')
+            ->get();
+
 
         $dimensionStats = Category::select('id', 'name', 'standard_id')
             ->with('standard:id,name')
