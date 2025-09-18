@@ -435,7 +435,7 @@
                             <td class="max-w-11 text-sm text-gray-700 text-center align-top">
                                 {{ $indicator['type'] ?? 'ไม่ระบุ' }}
                             </td>
-                            <td class="text-sm text-gray-700 align-top max-w-full" data-rowlink-ignore>
+                            <td class="text-sm text-gray-700 align-top max-w-full cursor-auto" data-rowlink-ignore>
                                 @php
                                     // Unique, non-empty department names
                                     $departments = collect($indicator['assignments'] ?? [])
@@ -461,7 +461,7 @@
 
                                         @if ($total > 3)
                                             <button type="button"
-                                                class=" inline-flex items-center rounded-full bg-slate-300 text-slate-700 ring-1 ring-inset ring-slate-200 px-2 py-0.5 text-xs md:text-xs hover:bg-slate-200"
+                                                class="cursor-pointer inline-flex items-center rounded-full bg-slate-300 text-slate-700 ring-1 ring-inset ring-slate-200 px-2 py-0.5 text-xs md:text-xs hover:bg-slate-200"
                                                 @click="open = !open" :aria-expanded="open.toString()"
                                                 x-text="open ? 'แสดงน้อยลง' : '+{{ $total - 3 }}'"></button>
                                         @endif
