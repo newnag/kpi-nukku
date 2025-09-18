@@ -76,9 +76,7 @@
 <style>
     .modal-open,
     .modal-open body {
-        /* overflow: hidden; */
-
-        
+        overflow: visible;
     }
 
     .modal-backdrop {

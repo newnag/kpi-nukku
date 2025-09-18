@@ -15,13 +15,18 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
         integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
-  <script src="//unpkg.com/alpinejs" defer></script>
+    <script src="//unpkg.com/alpinejs" defer></script>
     @stack('styles')
+
 </head>
 
 <body>
+
     <!-- Navbar -->
-    <x-navbar />
+    {{-- <header> --}}
+        <x-navbar />
+    {{-- </header> --}}
+
 
     <!-- Main Content Area -->
     <main class="main-content">
@@ -58,7 +63,7 @@
                         <button onclick="this.parentElement.remove()">×</button>
                     </div>
                 @endif --}}
-                
+
             @if (View::hasSection('header') || View::hasSection('subheader'))
                 <div class="page-header">
                     <div class="page-header-content">
@@ -73,11 +78,11 @@
                     </div>
                 </div>
             @endif
-            
+
             <div class="page-content">
                 @yield('content')
             </div>
-            
+
             <x-toasts />
         </div>
     </main>
