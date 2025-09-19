@@ -19,7 +19,8 @@
                 <select id="filter-year" name="year">
                     {{-- <option value="">ทั้งหมด</option> --}}
                     @foreach ($years as $y)
-                        <option value="{{ $y }}" {{ (string) $selectedYear === (string) $y ? 'selected' : '' }}>
+                        <option value="{{ $y }}"
+                            {{ (string) $selectedYear === (string) $y ? 'selected' : '' }}>
                             {{ $y }}
                         </option>
                     @endforeach
@@ -35,23 +36,29 @@
             </div>
 
             <!-- มาตรฐาน -->
+            <!-- มาตรฐาน -->
             <div class="field">
                 <label>มาตรฐานตัวชี้วัด</label>
-                <select id="filter-standard" name="standard">
+                <select id="filter-standard" name="standard_id">
                     <option value="">ทั้งหมด</option>
                     @foreach ($standards as $std)
-                        <option value="{{ $std }}">{{ $std }}</option>
+                        <option value="{{ $std->id }}">
+                            {{ $std->name }}
+                        </option>
                     @endforeach
                 </select>
+
             </div>
 
             <!-- ด้าน -->
             <div class="field">
                 <label>ด้านตัวชี้วัด</label>
-                <select id="filter-dimension" name="dimension">
+                <select id="filter-dimension" name="category_id"> <!-- ✅ ใช้ category_id -->
                     <option value="">ทั้งหมด</option>
                     @foreach ($dimensions as $dim)
-                        <option value="{{ $dim }}">{{ $dim }}</option>
+                        <option value="{{ $dim->id ?? $dim }}">
+                            {{ $dim->name ?? $dim }}
+                        </option>
                     @endforeach
                 </select>
             </div>
@@ -59,10 +66,12 @@
             <!-- หน่วยงาน -->
             <div class="field">
                 <label>หน่วยงานที่รับผิดชอบ</label>
-                <select id="filter-dept" name="dept">
+                <select id="filter-dept" name="dept_id"> <!-- ✅ ใช้ dept_id -->
                     <option value="">ทั้งหมด</option>
                     @foreach ($departments as $dept)
-                        <option value="{{ $dept }}">{{ $dept }}</option>
+                        <option value="{{ $dept->id ?? $dept }}">
+                            {{ $dept->name ?? $dept }}
+                        </option>
                     @endforeach
                 </select>
             </div>

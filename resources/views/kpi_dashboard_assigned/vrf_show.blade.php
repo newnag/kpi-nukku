@@ -129,7 +129,7 @@
                                                 @endif
                                             </span>
 
-                                            <span class="evidence-name">
+                                            {{-- <span class="evidence-name">
                                                 @if ($evidence->type === 'url')
                                                     @php
                                                         // ถ้า path เก็บเป็น JSON หรือ array
@@ -145,7 +145,59 @@
                                                 @else
                                                     {{ $evidence->name }}
                                                 @endif
+                                            </span> --}}
+                                            <span class="evidence-name">
+                                                @php
+                                                    $ext = strtolower(pathinfo($evidence->name, PATHINFO_EXTENSION));
+                                                    $openInNewTab = in_array($ext, [
+                                                        'pdf',
+                                                        'jpg',
+                                                        'jpeg',
+                                                        'png',
+                                                        'gif',
+                                                        'svg',
+                                                        'txt',
+                                                        'csv',
+                                                        'htm',
+                                                        'html',
+                                                    ]);
+                                                @endphp
+
+                                                @if ($openInNewTab)
+                                                    {{-- PDF & Image → เปิดในแท็บใหม่ --}}
+                                                    <span id="evidence-link-{{ $evidence->id }}">
+                                                        <a href="{{ route('evidences.download', $evidence->id) }}"
+                                                            target="_blank" rel="noopener noreferrer" class="text-blue-600 underline hover:text-blue-800">
+                                                            <span id="evidence-name-text-{{ $evidence->id }}">{{ $evidence->name }}</span>
+                                                        </a>
+                                                    </span>
+                                                @else
+                                                    {{-- Word, Excel, PPT → ดาวน์โหลด --}}
+                                                    <span id="evidence-link-{{ $evidence->id }}">
+                                                        <a href="{{ route('evidences.download', $evidence->id) }}" download
+                                                            class="text-blue-600 underline hover:text-blue-800">
+                                                            <span id="evidence-name-text-{{ $evidence->id }}">{{ $evidence->name }}</span>
+                                                        </a>
+                                                    </span>
+                                                @endif
+
+                                                @if (!$locked)
+                                                    <button type="button" class="ml-2 text-slate-500 hover:text-slate-700"
+                                                        title="แก้ไขชื่อไฟล์" onclick="startEditEvidenceName({{ $evidence->id }})">
+                                                        ✏️
+                                                    </button>
+                                                    <span id="evidence-edit-{{ $evidence->id }}" class="inline-flex items-center gap-1 hidden" style="display:none"
+                                                        data-update-url="{{ route('evidences.update', $evidence->id) }}">
+                                                        <input type="text" id="evidence-input-{{ $evidence->id }}" value="{{ $evidence->name }}"
+                                                            class="border rounded px-2 py-0.5 text-sm" />
+                                                        <button type="button" class="text-green-600 hover:text-green-700"
+                                                            onclick="saveEvidenceName({{ $evidence->id }})">บันทึก</button>
+                                                        <button type="button" class="text-slate-600 hover:text-slate-800"
+                                                            onclick="cancelEditEvidenceName({{ $evidence->id }})">ยกเลิก</button>
+                                                    </span>
+                                                @endif
                                             </span>
+
                                         </div>
 
                                         <div class="space-x-3 flex items-center justify-center">
@@ -211,10 +263,9 @@
                     <p class="text-gray-500">ยังไม่มีเกณฑ์การพิจารณา</p>
                 @endforelse
             </div>
-
             <div class="card">
                 <h2 class="card-title">เกณฑ์การให้คะแนน</h2>
-                <div class="criteria-box">
+                <div class="criteria-box list-disc list-inside">
                     {!! $indicator->comment ?? '-' !!}
                 </div>
                 <div class="ml-4 mb-1 text-sm font-bold">วิธีการคำนวน</div>
@@ -222,6 +273,7 @@
                     {!! $indicator->condition ?? '-' !!}
                 </div>
             </div>
+
 
             <form id="variables-form" action="{{ route('dashboardkpi.admin.saveVariables', $indicator->id) }}"
                 method="POST">
@@ -847,6 +899,76 @@
         });
     </script>
 @endpush
+@push('scripts')
+<script>
+    function getCsrfToken() {
+        const meta = document.querySelector('meta[name="csrf-token"]');
+        return meta && meta.content ? meta.content : '';
+    }
+
+    function startEditEvidenceName(id) {
+        const linkSpan = document.getElementById('evidence-link-' + id);
+        const editSpan = document.getElementById('evidence-edit-' + id);
+        if (linkSpan && editSpan) {
+            // Hide link, show input row
+            linkSpan.style.display = 'none';
+            editSpan.style.display = 'inline-flex';
+            const input = document.getElementById('evidence-input-' + id);
+            if (input) { input.focus(); input.select(); }
+        }
+    }
+
+    function cancelEditEvidenceName(id) {
+        const linkSpan = document.getElementById('evidence-link-' + id);
+        const editSpan = document.getElementById('evidence-edit-' + id);
+        if (linkSpan && editSpan) {
+            editSpan.style.display = 'none';
+            linkSpan.style.display = '';
+        }
+    }
+
+    async function saveEvidenceName(id) {
+        const editSpan = document.getElementById('evidence-edit-' + id);
+        const input = document.getElementById('evidence-input-' + id);
+        const linkSpan = document.getElementById('evidence-link-' + id);
+        const textSpan = document.getElementById('evidence-name-text-' + id);
+        if (!editSpan || !input || !linkSpan || !textSpan) return;
+
+        const url = editSpan.dataset.updateUrl;
+        const name = input.value.trim();
+        if (!name) {
+            alert('กรุณากรอกชื่อไฟล์');
+            input.focus();
+            return;
+        }
+
+        try {
+            const res = await fetch(url, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': getCsrfToken(),
+                },
+                body: JSON.stringify({ name })
+            });
+
+            if (!res.ok) {
+                let msg = 'บันทึกไม่สำเร็จ';
+                try { const data = await res.json(); if (data && data.message) msg = data.message; } catch (_) {}
+                alert(msg);
+                return;
+            }
+
+            textSpan.textContent = name;
+            editSpan.style.display = 'none';
+            linkSpan.style.display = '';
+        } catch (e) {
+            alert('เกิดข้อผิดพลาดในการเชื่อมต่อ');
+        }
+    }
+</script>
+@endpush
 
 @push('styles')
     <style>
@@ -1036,7 +1158,7 @@
 
         .criteria-status {
             /* font-weight: 600;
-                                                                                font-size: 14px; */
+                                                                                                    font-size: 14px; */
             color: #1f2937;
         }
 
@@ -1111,6 +1233,23 @@
             display: flex;
             flex-direction: column;
             gap: 6px;
+        }
+
+        .criteria-box ul {
+            list-style-type: disc;
+            /* แสดง bullet วงกลม */
+            list-style-position: outside;
+            
+            /* ขยับเข้า */
+            padding-left: 1.5rem;
+            /* เผื่อกรณี framework reset */
+        }
+
+        .criteria-box ol {
+            list-style-type: decimal;
+            /* ถ้ามี ordered list */
+            margin-left: 1.5rem;
+            padding-left: 1.5rem;
         }
 
         .evidence-item {
@@ -1462,38 +1601,38 @@
         }
 
         /* .score-percentage {
-                margin-top: 16px;
-                text-align: center;
-            }
+                                    margin-top: 16px;
+                                    text-align: center;
+                                }
 
-            .percentage-bar {
-                width: 100%;
-                height: 12px;
-                background: #e2e8f0;
-                border-radius: 6px;
-                overflow: hidden;
-                margin-bottom: 8px;
-                position: relative;
-            }
+                                .percentage-bar {
+                                    width: 100%;
+                                    height: 12px;
+                                    background: #e2e8f0;
+                                    border-radius: 6px;
+                                    overflow: hidden;
+                                    margin-bottom: 8px;
+                                    position: relative;
+                                }
 
-            .percentage-fill {
-                height: 100%;
-                background: linear-gradient(90deg, #3b82f6 0%, #10b981 50%, #22c55e 100%);
-                border-radius: 6px;
-                transition: width 0.3s ease;
-                position: relative;
-            }
+                                .percentage-fill {
+                                    height: 100%;
+                                    background: linear-gradient(90deg, #3b82f6 0%, #10b981 50%, #22c55e 100%);
+                                    border-radius: 6px;
+                                    transition: width 0.3s ease;
+                                    position: relative;
+                                }
 
-            .percentage-fill::after {
-                content: '';
-                position: absolute;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.3) 50%, transparent 100%);
-                animation: shimmer 2s infinite;
-            } */
+                                .percentage-fill::after {
+                                    content: '';
+                                    position: absolute;
+                                    top: 0;
+                                    left: 0;
+                                    right: 0;
+                                    bottom: 0;
+                                    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.3) 50%, transparent 100%);
+                                    animation: shimmer 2s infinite;
+                                } */
 
         @keyframes shimmer {
             0% {

@@ -16,11 +16,8 @@
     </div>
     <!-- Filter Card -->
     <!-- ✅ เรียก Component filter-form -->
-    <x-filter :years="$yearsForFilter" :standards="$allStandards->pluck('name')" :departments="$departments" :collectors="$collectors" :dimensions="$dimensionNames" :action="route('dashboard.index')"
+    <x-filter :years="$yearsForFilter" :standards="$allStandards" :departments="$departments" :collectors="$collectors" :dimensions="$dimensionStats" :action="route('dashboard.index')"
         :selectedYear="$displayYear" />
-
-  
-
 
     <!-- Stats Cards -->
     <div class="stat-title">
@@ -31,7 +28,7 @@
 
         <!-- Card  ความพึงพอใจ -->
         <div class="stat-card">
-            
+
 
             <div class="stat-body">
                 <div class="chart-wrap">
@@ -167,9 +164,9 @@
                         @foreach ($indicators as $index => $indicator)
                             @php
                                 $statusKey = match ((int) $indicator->status) {
-                                     3 => 'complete',
+                                    3 => 'complete',
                                     4 => 'incomplete',
-                                    0 ,2,1 => 'pending',
+                                    0, 2, 1 => 'pending',
                                     default => 'pending',
                                 };
 
@@ -187,7 +184,6 @@
                             <tr data-max="{{ (float) $indicator->max_score }}" data-standard="{{ $standardName }}"
                                 data-dimension="{{ $dimensionName }}" data-collector="{{ $collectorName }}"
                                 data-dept="{{ $deptName }}" data-status="{{ $statusKey }}">
-
                                 <td class="status-cell">{{ $indicator->year }}</td>
                                 <td class="status-cell">{{ $standardName ?: '-' }}</td> <!-- ✅ ใช้ค่าจาก relation -->
                                 <td>{{ $indicator->name }}</td>
@@ -200,20 +196,20 @@
                                     {{-- status icon switch --}}
                                     @switch($indicator->status)
                                         @case(0)
-                                          @case(1)
-                                          @case(2)
+                                        @case(1)
+
+                                        @case(2)
                                             <span class="tip" data-tip="อยู่ระหว่างดำเนินการ">
-                                                <i data-lucide="alert-triangle" class="status-icon text-danger"></i>
+                                                <i data-lucide="clock" class="status-icon text-danger"></i>
                                             </span>
                                         @break
 
                                         @case(4)
                                             <span class="tip" data-tip="ผลการดำเนินงานยังไม่ครบถ้วนตามเกณฑ์">
-                                                <i data-lucide="clock" class="status-icon text-warn"></i>
+                                                <i data-lucide="alert-triangle" class="status-icon text-warn"></i>
                                             </span>
                                         @break
 
-                                      
                                         @case(3)
                                             <span class="tip" data-tip="ผลการดำเนินงานครบถ้วนตามเกณฑ์มาตรการ">
                                                 <i data-lucide="check-circle" class="status-icon text-success"></i>
@@ -235,7 +231,7 @@
         </div>
     </div>
 
- 
+
     <!-- ตารางเอกสารและหลักฐาน -->
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -259,10 +255,10 @@
             if (year) params.set('year', year);
 
             const standard = document.getElementById('filter-standard')?.value || '';
-            if (standard) params.set('standard', standard);
+            if (standard) params.set('standard_id', standard); // ✅ ใช้ standard_id ให้ตรงกับ Controller
 
             const dimension = document.getElementById('filter-dimension')?.value || '';
-            if (dimension) params.set('dimension', dimension);
+            if (dimension) params.set('category_id', dimension); // ✅ ถ้า filter-dimension = category
 
             const status = document.getElementById('filter-status')?.value || '';
             if (status !== '') params.set('status', status);
@@ -276,13 +272,14 @@
             const url = "{{ route('dashboard.export') }}" + (params.toString() ? `?${params}` : '');
             window.location.href = url;
         });
+
         document.getElementById('toggle-filter').addEventListener('change', function() {
             const card = document.getElementById('filter-card');
             card.style.display = this.checked ? 'block' : 'none';
         });
     </script>
 
-   
+
     <script>
         (function($) {
             let table, donutChart;
@@ -383,15 +380,29 @@
                     uniq.forEach((v) => $sel.append(`<option value="${v}">${v}</option>`));
                 };
 
-                function fillSelect($sel, items) {
+                function fillSelect($sel, items, mapper) {
                     $sel.find('option:not([value=""])').remove();
-                    (items || []).forEach((v) => $sel.append(`<option value="${v}">${v}</option>`));
+                    (items || []).forEach((item) => {
+                        const opt = typeof mapper === 'function' ?
+                            mapper(item) : {
+                                value: String(item),
+                                label: String(item)
+                            };
+                        $sel.append(`<option value="${opt.value}">${opt.label}</option>`);
+                    });
                 }
                 fillSelect($('#filter-year'), window.ALL_YEARS);
                 fillSelect($('#filter-dept'), window.ALL_DEPARTMENTS);
                 fillSelect($('#filter-collector'), window.ALL_COLLECTORS);
                 fillSelect($('#filter-standard'), window.ALL_STANDARDS);
+                fillSelect($('#filter-standard'), window.ALL_STANDARDS, (it) => ({
+                    value: String(it.name ?? it),
+                    label: it.name ?? String(it)
+                }));
+
+                // Fill dimensions with unique NAMES (no IDs)
                 fillSelect($('#filter-dimension'), window.ALL_DIMENSIONS);
+                populateFromData($collector, 'collector');
 
                 populateFromData($collector, 'collector');
 
@@ -530,7 +541,7 @@
                     // กรองทั้งหมดแบบ client-side
                     table.draw();
                 }
-             
+
                 // ✅ Custom Filter ของ DataTables (รวมปี, code, dept, standard, dimension, collector + pie chart)
                 $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
                     if (settings.nTable !== document.getElementById('dashboardTable')) return true;
@@ -575,87 +586,96 @@
                 }
 
                 // 8) Chart.js (คงเดิม)
-           // 8) Chart.js (Pie Chart สำหรับ status)
-let donutChart = null;
-const donutCanvas = document.getElementById('satisfactionChart');
-let chartKeys = [],
-    chartLabels = [],
-    chartColors = [];
+                // 8) Chart.js (Pie Chart สำหรับ status)
+                let donutChart = null;
+                const donutCanvas = document.getElementById('satisfactionChart');
+                let chartKeys = [],
+                    chartLabels = [],
+                    chartColors = [];
 
-if (donutCanvas) {
-    const donutCtx = donutCanvas.getContext('2d');
-    chartLabels = @json(array_column($legendConfig, 'label'));
-    chartColors = @json(array_column($legendConfig, 'color'));
-    chartKeys   = @json(array_column($legendConfig, 'key')); // ['1','2','0-2'] หรือ ['3','4','0-2']
+                if (donutCanvas) {
+                    const donutCtx = donutCanvas.getContext('2d');
+                    chartLabels = @json(array_column($legendConfig, 'label'));
+                    chartColors = @json(array_column($legendConfig, 'color'));
+                    chartKeys = @json(array_column($legendConfig, 'key')); // ['1','2','0-2'] หรือ ['3','4','0-2']
 
-    const countsMap = @json($statusCounts);
-    const dataValues = chartKeys.map((k) => Number(countsMap[k] ?? 0));
+                    const countsMap = @json($statusCounts);
+                    const dataValues = chartKeys.map((k) => Number(countsMap[k] ?? 0));
 
-    donutChart = new Chart(donutCtx, {
-        type: 'pie',
-        data: {
-            labels: chartLabels,
-            datasets: [{
-                data: dataValues,
-                backgroundColor: chartColors,
-                borderColor: '#ffffff',
-                borderWidth: 2,
-                hoverOffset: 6,
-            }],
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: 'bottom',
-                    labels: {
-                        usePointStyle: true,
-                        font: { size: 12 },
-                        padding: 15
-                    }
-                },
-                tooltip: {
-                    callbacks: {
-                        label: (ctx) => {
-                            const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
-                            const val = ctx.parsed;
-                            const pct = total > 0 ? ((val / total) * 100).toFixed(1) : '0.0';
-                            return ` ${ctx.label}: ${val} (${pct}%)`;
+                    donutChart = new Chart(donutCtx, {
+                        type: 'pie',
+                        data: {
+                            labels: chartLabels,
+                            datasets: [{
+                                data: dataValues,
+                                backgroundColor: chartColors,
+                                borderColor: '#ffffff',
+                                borderWidth: 2,
+                                hoverOffset: 6,
+                            }],
                         },
-                    },
-                },
-                datalabels: {
-                    color: '#fff',
-                    font: { weight: 'bold', size: 14 },
-                    formatter: (value, ctx) => {
-                        const total = ctx.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
-                        const pct = total > 0 ? (value / total * 100).toFixed(1) : 0;
-                        return pct + '%';
-                    }
-                }
-            },
-            // ✅ คลิก slice เพื่อ filter DataTable
-            onClick: (evt, elements) => {
-                if (elements.length > 0) {
-                    const index = elements[0].index;
-                    const key = chartKeys[index]; // เช่น '1','2','0-2'
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    position: 'bottom',
+                                    labels: {
+                                        usePointStyle: true,
+                                        font: {
+                                            size: 12
+                                        },
+                                        padding: 15
+                                    }
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: (ctx) => {
+                                            const total = ctx.dataset.data.reduce((a, b) => a + b,
+                                                0);
+                                            const val = ctx.parsed;
+                                            const pct = total > 0 ? ((val / total) * 100).toFixed(
+                                                1) : '0.0';
+                                            return ` ${ctx.label}: ${val} (${pct}%)`;
+                                        },
+                                    },
+                                },
+                                datalabels: {
+                                    color: '#fff',
+                                    font: {
+                                        weight: 'bold',
+                                        size: 14
+                                    },
+                                    formatter: (value, ctx) => {
+                                        const total = ctx.chart.data.datasets[0].data.reduce((a,
+                                            b) => a + b, 0);
+                                        const pct = total > 0 ? (value / total * 100).toFixed(1) :
+                                            0;
+                                        return pct + '%';
+                                    }
+                                }
+                            },
+                            // ✅ คลิก slice เพื่อ filter DataTable
+                            onClick: (evt, elements) => {
+                                if (elements.length > 0) {
+                                    const index = elements[0].index;
+                                    const key = chartKeys[index]; // เช่น '1','2','0-2'
 
-                    // toggle filter: ถ้าคลิกซ้ำ → ยกเลิก
-                    if (window.selectedStatusFilter === key) {
-                        window.selectedStatusFilter = null;
-                    } else {
-                        window.selectedStatusFilter = key;
-                    }
+                                    // toggle filter: ถ้าคลิกซ้ำ → ยกเลิก
+                                    if (window.selectedStatusFilter === key) {
+                                        window.selectedStatusFilter = null;
+                                    } else {
+                                        window.selectedStatusFilter = key;
+                                    }
 
-                    // กรอง DataTable
-                    table.draw();
+                                    // กรอง DataTable
+                                    table.draw();
+                                }
+                            }
+                        },
+                        plugins: [ChartDataLabels]
+                    });
                 }
-            }
-        },
-        plugins: [ChartDataLabels]
-    });
-}
 
 
                 // ====== ฟังก์ชัน Export ทั้งการ์ดเป็น PNG ======
@@ -772,7 +792,7 @@ if (donutCanvas) {
                 //         'page'); // จะเรียก updateSummary()/updateDonutAndLegend() ต่อเอง
                 // });
                 $(document).off('click.reset', '#reset-filters').on('click.reset', '#reset-filters', function(
-                e) {
+                    e) {
                     e.preventDefault();
                     e.stopPropagation();
 
@@ -1405,7 +1425,7 @@ if (donutCanvas) {
         }
 
         /* ตัวเลือก: วาง tooltip ด้านล่าง (ถ้าพื้นที่ด้านบนไม่พอ)
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               <span class="tip" data-tip="..." data-pos="bottom"> */
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   <span class="tip" data-tip="..." data-pos="bottom"> */
         .tip[data-pos="bottom"]::after {
             top: calc(100% + 10px);
             bottom: auto;

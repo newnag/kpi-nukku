@@ -262,7 +262,7 @@
 <nav class="navbar">
     <a href="{{ auth()->check() ? (auth()->user()->hasRole('user') ? route('dashboardkpi.index') : route('dashboard.index')) : route('dashboard.index') }}" class="navbar-brand">
         <img src="/uploads/logonuthaiS-2.png" alt="Logo">
-        <span>ระบบบริหารจัดการข้อมูลการรับรองสถาบัน</span>
+        <span>ระบบบริหารจัดการตัวชี้วัดเพื่อการรับรองสถาบันจากสภาการพยาบาล</span>
     </a>
 
     <!-- ปุ่ม Hamburger -->
@@ -333,7 +333,7 @@
 
             <div class="dropdown" onclick="this.classList.toggle('open')">
                 <div class="dropdown-toggle">
-                    <img src="/uploads/avatar-type1.png" alt="User" class="user-avatar">
+                    {{-- <img src="/uploads/avatar-type1.png" alt="User" class="user-avatar"> --}}
                     <span class="sm:inline">{{ auth()->user()->name ?? 'ผู้ใช้' }}</span>
                 </div>
                 <div class="dropdown-menu">

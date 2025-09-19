@@ -56,7 +56,7 @@
                                     d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
                             </svg>
                         </button>
-                        <div id="sort-dropdown" class="dropdown-menu hidden" role="menu" aria-orientation="vertical">
+                        <div id="sort-dropdown" class="dropdown-menus hidden" role="menu" aria-orientation="vertical">
                             <button class="dropdown-item sort-option" data-column="0" data-order="asc" role="menuitem">ลำดับ
                                 (น้อยไปมาก)</button>
                             <button class="dropdown-item sort-option" data-column="0" data-order="desc"
@@ -824,7 +824,7 @@
             text-align: left;
         }
 
-        .dropdown-menu {
+        .dropdown-menus {
             position: absolute;
             left: 0;
             top: 100%;
@@ -840,7 +840,7 @@
             display: block;
         }
 
-        .dropdown-menu.hidden {
+        .dropdown-menus.hidden {
             display: none !important;
         }
 

@@ -61,7 +61,7 @@ class EvidenceController extends Controller
         $years = Indicator::whereNotNull('year')->distinct()->orderByDesc('year')->pluck('year');
         $standards = Standard::select('name')->distinct()->orderBy('name')->pluck('name');
         $dimensions = Category::select('name')->distinct()->orderBy('name')->pluck('name');
-        $departments =Department::select('name')->distinct()->orderBy('name')->pluck('name');
+        $departments = Department::select('name')->distinct()->orderBy('name')->pluck('name');
         $collectors = User::whereHas('assignments')
             ->select('name')->distinct()->orderBy('name')->pluck('name');
         $fileTypes = Evidence::whereNotNull('type')->distinct()->orderBy('type')->pluck('type');
@@ -133,12 +133,15 @@ class EvidenceController extends Controller
         $request->validate([
             'criteria_id'       => 'required|integer|exists:criterias,id',
             'files.*'           => 'nullable|file|mimes:pdf,jpg,jpeg,png,doc,docx|max:10240',
+            'file_names'        => 'nullable|array',
+            'file_names.*'      => 'nullable|string|max:255',
             'additional_urls'   => 'nullable|array',
             'additional_urls.*' => 'nullable|url|max:2048',
             'url_names'         => 'nullable|array',
             'url_names.*'       => 'nullable|string|max:255',
             'detail'            => 'nullable|string|max:65535',
         ]);
+
 
         $uploadedFiles = [];
         $savedEvidences = []; // ✅ เก็บ evidences หลายรายการ
@@ -206,16 +209,23 @@ class EvidenceController extends Controller
 
             // ========== 1) ถ้ามีไฟล์ → loop แล้วบันทึก ==========
             if ($hasFiles) {
-                foreach ($request->file('files') as $file) {
+                $customNames = $request->input('file_names', []);
+
+                foreach ($request->file('files') as $i => $file) {
                     $originalName = $file->getClientOriginalName();
                     $extension    = strtolower($file->getClientOriginalExtension());
-                    $filename     = uniqid() . '_' . Str::random(10) . '.' . $extension;
+
+                    // 🔹 ใช้ชื่อจาก input ถ้ามี ไม่งั้น fallback เป็นชื่อไฟล์เดิม
+                    $customName   = $customNames[$i] ?? pathinfo($originalName, PATHINFO_FILENAME);
+                    $safeName     = Str::slug(pathinfo($customName, PATHINFO_FILENAME), '_');
+                    $filename     = $safeName . '_' . uniqid() . '.' . $extension;
 
                     $path = $file->storeAs($folder, $filename, 'public');
 
                     $payload = [
                         'files' => [[
                             'original_name' => $originalName,
+                            'custom_name'   => $customName,
                             'stored_name'   => $filename,
                             'path'          => $path,
                             'size'          => $file->getSize(),
@@ -231,17 +241,11 @@ class EvidenceController extends Controller
                     $evidence->status      = false;
                     $evidence->criteria_id = $criteria->id;
                     $evidence->user_id     = Auth::id();
-                    $evidence->name        = $originalName;
+                    $evidence->name        = $customName ?: $originalName; // 🔹 บันทึกชื่อใหม่
                     $evidence->type        = $extension;
                     $evidence->save();
 
                     $uploadedFiles[] = ['path' => $path];
-
-                    // Log::info('Evidence saved (file)', [
-                    //     'evidence_id' => $evidence->id,
-                    //     'name'        => $evidence->name,
-                    //     'type'        => $evidence->type,
-                    // ]);
                 }
             }
 
@@ -509,8 +513,15 @@ class EvidenceController extends Controller
                 $rel  = $this->normalizePath($file['path'] ?? null);
 
                 if ($rel && Storage::disk('public')->exists($rel)) {
+                    $absolutePath = Storage::disk('public')->path($rel);
                     $downloadName = $file['original_name'] ?? basename($rel);
-                    return response()->download(Storage::disk('public')->path($rel), $downloadName);
+                    $mime = $this->determineMime($absolutePath, $file['mime_type'] ?? null, $e->type ?? null);
+
+                    if ($this->shouldOpenInline($mime, $e->type ?? null)) {
+                        return response()->file($absolutePath, $this->inlineHeaders($downloadName, $mime));
+                    }
+
+                    return response()->download($absolutePath, $downloadName);
                 }
                 return $this->fileNotFound();
             }
@@ -556,12 +567,26 @@ class EvidenceController extends Controller
             if (!str_contains($name, '.') && !empty($e->type)) {
                 $name .= '.' . ltrim($e->type, '.');
             }
+
+            $mime = $this->determineMime($full, null, $e->type ?? null);
+
+            if ($this->shouldOpenInline($mime, $e->type ?? null)) {
+                return response()->file($full, $this->inlineHeaders($name, $mime));
+            }
+
             return response()->download($full, $name);
         }
 
         // ====== absolute path ======
         if ($raw && file_exists($raw)) {
-            return response()->download($raw, $e->name ?: basename($raw));
+            $downloadName = $e->name ?: basename($raw);
+            $mime = $this->determineMime($raw, null, $e->type ?? null);
+
+            if ($this->shouldOpenInline($mime, $e->type ?? null)) {
+                return response()->file($raw, $this->inlineHeaders($downloadName, $mime));
+            }
+
+            return response()->download($raw, $downloadName);
         }
 
         return $this->fileNotFound();
@@ -584,6 +609,86 @@ class EvidenceController extends Controller
     private function fileNotFound()
     {
         return response()->json(['success' => false, 'message' => 'File not found'], 404);
+    }
+
+    /**
+     * Decide whether to display file inline (new tab) instead of download.
+     * Inline for PDF and images only, per requirement.
+     */
+    private function shouldOpenInline(?string $mime, ?string $ext): bool
+    {
+        $mime = strtolower((string) ($mime ?? ''));
+        $ext  = strtolower((string) ($ext ?? ''));
+
+        if ($mime !== '') {
+            if ($mime === 'application/pdf') return true;
+            if (str_starts_with($mime, 'image/')) return true;
+            if ($mime === 'image/svg+xml') return true;
+            if ($mime === 'text/plain') return true;
+            if ($mime === 'text/csv' || $mime === 'application/csv') return true;
+            if ($mime === 'text/html') return true;
+        }
+
+        // Fallback by extension when MIME not available
+        return in_array($ext, ['pdf', 'jpg', 'jpeg', 'png', 'gif', 'svg', 'txt', 'csv', 'htm', 'html'], true);
+    }
+
+    /**
+     * Resolve MIME type with fallbacks based on file and extension.
+     */
+    private function determineMime(string $path, ?string $providedMime, ?string $ext): ?string
+    {
+        $providedMime = $providedMime ? strtolower($providedMime) : null;
+        if ($providedMime) {
+            return $providedMime;
+        }
+
+        $detected = null;
+        if (function_exists('mime_content_type')) {
+            try {
+                $detected = @mime_content_type($path) ?: null;
+            } catch (\Throwable $__) {
+                $detected = null;
+            }
+        }
+        if ($detected) return strtolower($detected);
+
+        $ext = strtolower((string) ($ext ?? pathinfo($path, PATHINFO_EXTENSION)));
+        $map = [
+            'pdf' => 'application/pdf',
+            'jpg' => 'image/jpeg',
+            'jpeg' => 'image/jpeg',
+            'png' => 'image/png',
+            'gif' => 'image/gif',
+            'webp' => 'image/webp',
+            'bmp' => 'image/bmp',
+            'svg' => 'image/svg+xml',
+            'txt' => 'text/plain',
+            'csv' => 'text/csv',
+            'htm' => 'text/html',
+            'html' => 'text/html',
+        ];
+        return $map[$ext] ?? null;
+    }
+
+    /**
+     * Build headers for inline display with safe filename and proper encoding.
+     */
+    private function inlineHeaders(string $filename, ?string $mime): array
+    {
+        $headers = [];
+        if ($mime) $headers['Content-Type'] = $mime;
+        $headers['X-Content-Type-Options'] = 'nosniff';
+        $ascii = $this->asciiFilename($filename);
+        $utf = rawurlencode($filename);
+        $headers['Content-Disposition'] = "inline; filename=\"{$ascii}\"; filename*=UTF-8''{$utf}";
+        return $headers;
+    }
+
+    private function asciiFilename(string $name): string
+    {
+        $safe = preg_replace('/[^A-Za-z0-9._-]/', '_', $name);
+        return $safe !== null && $safe !== '' ? $safe : 'file';
     }
     public function getByCriteria($criteriaId): JsonResponse
     {

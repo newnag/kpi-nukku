@@ -458,24 +458,22 @@
                                 data-order="{{ $statusCode }}">
                                 @switch($statusCode)
                                     @case(0)
-                                        <span class="tooltip" data-tooltip="รอดำเนินการ">
-                                            <i data-lucide="alert-triangle" class="w-5 h-5 text-red-500"></i>
-                                            <span class="sr-only">รอดำเนินการ</span>
-                                        </span>
-                                    @break
-
                                     @case(1)
-                                        <span class="tooltip" data-tooltip="รอดำเนินการ / บันทึกร่าง">
-                                            <i data-lucide="alert-triangle" class="w-5 h-5 text-red-500"></i>
-                                            <span class="sr-only">รอดำเนินการ / บันทึกร่าง</span>
-                                        </span>
-                                    @break
 
                                     @case(2)
-                                        <span class="tooltip" data-tooltip="รอดำเนินการ / บันทึกจริง">
-                                            <i data-lucide="alert-triangle" class="w-5 h-5 text-red-500"></i>
-                                            <span class="sr-only">รอดำเนินการ / บันทึกจริง</span>
-                                        </span>
+                                        <div class="flex justify-center items-center">
+                                            <span class="tip" data-tip="อยู่ระหว่างดำเนินการ">
+                                                <i data-lucide="clock" class="status-icon text-red-500"></i>
+                                            </span>
+                                        </div>
+                                    @break
+
+                                    @case(4)
+                                        <div class="flex justify-center items-center">
+                                            <span class="tip" data-tip="ผลการดำเนินงานยังไม่ครบถ้วนตามเกณฑ์">
+                                                <i data-lucide="alert-triangle" class="status-icon text-yellow-500"></i>
+                                            </span>
+                                        </div>
                                     @break
 
                                     @case(3)

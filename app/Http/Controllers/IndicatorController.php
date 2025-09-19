@@ -169,7 +169,9 @@ class IndicatorController extends Controller
             $criteriaCount = $this->syncCriterias($indicator, $validated['criteria'] ?? []);
             $this->syncVariablesAndFormula($indicator, $validated['scoring'] ?? []);
             $this->syncChecklistFromSelected($indicator, $validated['multiSelected'] ?? []);
-            $this->syncChecklistFromCounts($indicator, $validated['multiCounts'] ?? [], $criteriaCount);
+            // Generate checklist items from multiCounts via service
+            app(\App\Services\ChecklistGenerator::class)
+                ->syncFromCounts($indicator, $validated['multiCounts'] ?? [], $criteriaCount);
 
             DB::commit();
 
@@ -319,7 +321,8 @@ class IndicatorController extends Controller
                 // --- Checklist (delete all existing and create new) ---
                 $indicator->checklistItems()->delete();
                 $this->syncChecklistFromSelected($indicator, $validated['multiSelected'] ?? []);
-                $this->syncChecklistFromCounts($indicator, $validated['multiCounts'] ?? [], $criteriaCount);
+                app(\App\Services\ChecklistGenerator::class)
+                    ->syncFromCounts($indicator, $validated['multiCounts'] ?? [], $criteriaCount);
             });
 
             return redirect()

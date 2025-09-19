@@ -235,6 +235,27 @@
                         @endforelse
                     </div>
                 @endif
+                @if (in_array($indicator->status, [3, 4]))
+                    <div class="card">
+                        <h2 class="card-title">คะแนนที่ได้</h2>
+                        <div class="score-display-container">
+                            <div class="score-item">
+                                <div class="score-label">คะแนนที่ได้</div>
+                                <div class="score-value-display current-score">
+                                    {{ $indicator->score_acc ?? '0' }}
+                                </div>
+                            </div>
+                            <div class="score-separator">/</div>
+                            <div class="score-item">
+                                <div class="score-label">คะแนนเต็ม</div>
+                                <div class="score-value-display max-score">
+                                    {{ $indicator->max_score ?? '0' }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @endif
+
 
                 <!-- ✅ hidden status -->
                 <input type="hidden" name="status" id="status-input">
@@ -1119,6 +1140,134 @@
 
             background: linear-gradient(90deg, #a9c6ff 0%, #fff3d4 100%);
             color: #222;
+        }
+
+        .score-display-container {
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            gap: 20px;
+            padding: 24px;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border-radius: 16px;
+            border: 1px solid #e2e8f0;
+            margin-bottom: 20px;
+        }
+
+        .score-item {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .score-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .score-value-display {
+            font-size: 36px;
+            font-weight: 700;
+            line-height: 1;
+            padding: 12px 20px;
+            border-radius: 12px;
+            min-width: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .score-value-display.current-score {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: white;
+        }
+
+        .score-value-display.max-score {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+
+        .score-separator {
+            font-size: 42px;
+            font-weight: 300;
+            color: #94a3b8;
+            margin: 0 10px;
+        }
+
+        /* .score-percentage {
+                        margin-top: 16px;
+                        text-align: center;
+                    }
+
+                    .percentage-bar {
+                        width: 100%;
+                        height: 12px;
+                        background: #e2e8f0;
+                        border-radius: 6px;
+                        overflow: hidden;
+                        margin-bottom: 8px;
+                        position: relative;
+                    }
+
+                    .percentage-fill {
+                        height: 100%;
+                        background: linear-gradient(90deg, #3b82f6 0%, #10b981 50%, #22c55e 100%);
+                        border-radius: 6px;
+                        transition: width 0.3s ease;
+                        position: relative;
+                    }
+
+                    .percentage-fill::after {
+                        content: '';
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        right: 0;
+                        bottom: 0;
+                        background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.3) 50%, transparent 100%);
+                        animation: shimmer 2s infinite;
+                    } */
+
+        @keyframes shimmer {
+            0% {
+                transform: translateX(-100%);
+            }
+
+            100% {
+                transform: translateX(100%);
+            }
+        }
+
+        .percentage-text {
+            font-size: 18px;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .score-display-container {
+                flex-direction: column;
+                gap: 16px;
+                padding: 20px;
+            }
+
+            .score-separator {
+                transform: rotate(90deg);
+                margin: 0;
+            }
+
+            .score-value-display {
+                font-size: 28px;
+                padding: 10px 16px;
+                min-width: 60px;
+            }
         }
 
         .evidence-form {

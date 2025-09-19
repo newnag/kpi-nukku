@@ -55,7 +55,30 @@
                                 accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" class="eu-file-input"
                                 @change="handleFileInput($event)">
                         </div>
+                        <div class="eu-files" x-show="files.length">
+                            <template x-for="(f, idx) in files" :key="f._id">
+                                <div class="eu-file">
+                                    <div class="eu-file-preview" x-show="f._isImage">
+                                        <img :src="f._objectURL" :alt="f.name">
+                                    </div>
+                                    <div class="eu-file-info">
+                                        <!-- input สำหรับแก้ชื่อไฟล์ -->
+                                        <input type="text" class="eu-input eu-file-rename" :name="`file_names[]`"
+                                            x-model="f._customName" :placeholder="f.name">
 
+                                        <div class="eu-file-meta">
+                                            <span x-text="humanSize(f.size)"></span>
+                                        </div>
+                                    </div>
+                                    <button type="button" class="eu-icon-btn danger" @click="removeFile(idx)"
+                                        aria-label="ลบไฟล์">
+                                        <i data-lucide="trash-2"></i>
+                                    </button>
+                                </div>
+                            </template>
+                        </div>
+
+                        {{-- 
                         <div class="eu-files" x-show="files.length">
                             <template x-for="(f, idx) in files" :key="f._id">
                                 <div class="eu-file">
@@ -74,7 +97,7 @@
                                     </button>
                                 </div>
                             </template>
-                        </div>
+                        </div> --}}
                     </div>
 
                     <!-- URLs -->
@@ -237,10 +260,14 @@
         }
 
         .eu-modal {
-            position: fixed; /* Change to fixed to center on screen */
-            top: 50%; /* Center vertically */
-            left: 50%; /* Center horizontally */
-            transform: translate(-50%, -50%); /* Adjust for element's own size */
+            position: fixed;
+            /* Change to fixed to center on screen */
+            top: 50%;
+            /* Center vertically */
+            left: 50%;
+            /* Center horizontally */
+            transform: translate(-50%, -50%);
+            /* Adjust for element's own size */
             z-index: 61;
             background: #fff;
             border-radius: 16px;
@@ -545,11 +572,15 @@
                         f._isImage = ['jpg', 'jpeg', 'png'].includes(ext);
                         if (f._isImage) f._objectURL = URL.createObjectURL(f);
 
+                        // 🔹 ตั้งค่า default name = original
+                        f._customName = f.name;
+
                         this.files.push(f);
                     }
                     this.syncNativeInput();
                     this.$nextTick(() => this.refreshIcons());
                 },
+
                 removeFile(idx) {
                     const f = this.files[idx];
                     if (f && f._objectURL) URL.revokeObjectURL(f._objectURL);

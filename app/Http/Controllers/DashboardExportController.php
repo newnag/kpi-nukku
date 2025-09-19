@@ -11,10 +11,13 @@ class DashboardExportController extends Controller
 {
     public function export(Request $request)
     {
+        //   dd($request->all());
         $filters = $request->only([
             'year',
             'standard_id',
             'category_id',
+            'category',       // support category name grouping
+            'category_name',  // alias
             'status',
             'dept_id',
             'code'

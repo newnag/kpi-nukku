@@ -280,7 +280,7 @@ initializeVariableNames();" class="space-y-5">
                 <template x-for="(v, i) in vars" :key="'chip' + v.id">
                     <button type="button" @click="insert(v.variable_name)"
                         class="px-3 py-1 rounded-full bg-slate-300 hover:bg-slate-200 text-slate-800 text-sm shrink-0">
-                        <span x-text="v.variable_name || ('var' + (i+1))"></span>
+                        <span x-text="v.label_name || ('var' + (i+1))"></span>
                     </button>
                 </template>
             </div>

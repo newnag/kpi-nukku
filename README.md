@@ -59,3 +59,15 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+
+## Testing
+
+- Run all tests: `php artisan test`
+- Test coverage guide (EN/TH): `docs/TESTS.md`
+- Roles & permissions matrix (EN/TH): `docs/ROLES_MATRIX.md`
+
+ทดสอบ (TH)
+- รันเทสต์ทั้งหมด: `php artisan test`
+- สรุปการทดสอบ (EN/TH): `docs/TESTS.md`
+- ตารางบทบาทและสิทธิ์ (EN/TH): `docs/ROLES_MATRIX.md`
