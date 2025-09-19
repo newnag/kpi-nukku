@@ -260,7 +260,7 @@
 
 <!-- Navbar Component -->
 <nav class="navbar">
-    <a href="{{ route('dashboard.index') }}" class="navbar-brand">
+    <a href="{{ auth()->check() ? (auth()->user()->hasRole('user') ? route('dashboardkpi.index') : route('dashboard.index')) : route('dashboard.index') }}" class="navbar-brand">
         <img src="/uploads/logonuthaiS-2.png" alt="Logo">
         <span>ระบบบริหารจัดการข้อมูลการรับรองสถาบัน</span>
     </a>
