@@ -36,6 +36,7 @@ class DatabaseSeeder extends Seeder
         assignments,
         criterias,
         evidence,
+        checklist_items,
         variables,
         variable_formulas,
         settings
@@ -52,6 +53,7 @@ class DatabaseSeeder extends Seeder
         AssignmentsTableSeeder::class,
         CriteriasTableSeeder::class,
         EvidenceTableSeeder::class,
+        ChecklistItemsTableSeeder::class,
         FormulasTableSeeder::class,
         VariablesTableSeeder::class,
         VariableFormulasTableSeeder::class,

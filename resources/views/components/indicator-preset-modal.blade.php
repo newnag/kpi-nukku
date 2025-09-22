@@ -1,7 +1,7 @@
 @props(['indicators', 'standards' => [], 'modalId' => 'preset-modal'])
 
-<div id="{{ $modalId }}" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center">
-    <div class="bg-white rounded-lg shadow-lg w-full max-w-lg p-6 relative">
+<div id="{{ $modalId }}" class="fixed inset-0 bg-black/50 hidden z-[9999] flex items-center justify-center">
+    <div class="bg-white rounded-lg shadow-lg   w-full max-w-4xl p-6 relative mb-3">
 
         <!-- ปุ่มปิด -->
         <button type="button"
@@ -10,7 +10,7 @@
             ✕
         </button>
 
-        <h2 class="text-lg font-bold mb-4">จัดการ Preset Indicators</h2>
+        <h2 class="text-lg font-bold mb-4">จัดการ Preset ตัวชี้วัด</h2>
 
         <!-- ✅ Filter มาตรฐาน -->
         @php
@@ -34,9 +34,28 @@
                 ->values();
         @endphp
 
-        <div class="mb-3">
+     <div x-data="{ showFilters: false }" class="mb-4">
+    <!-- ✅ Toggle Switch -->
+    <div class="flex items-center justify-end mb-3">
+        <span class="mr-3 text-sm font-medium text-gray-700">แสดงตัวกรอง</span>
+        <label class="relative inline-flex items-center cursor-pointer">
+            <input type="checkbox" x-model="showFilters" class="sr-only peer">
+            <div
+                class="w-11 h-6 bg-gray-300 peer-focus:outline-none rounded-full peer dark:bg-gray-600
+                       peer-checked:bg-green-500 transition-colors duration-300">
+            </div>
+            <div
+                class="absolute left-0.5 top-0.5 w-5 h-5 bg-white rounded-full border border-gray-300
+                       transition-transform duration-300 peer-checked:translate-x-5">
+            </div>
+        </label>
+    </div>
+
+    <!-- ✅ ฟิลเตอร์ -->
+    <div x-show="showFilters" x-transition class="space-y-3 bg-gray-50 p-4 rounded-lg shadow">
+        <div>
             <label class="block text-sm font-medium text-gray-700">กรองตามปี</label>
-            <select id="year-filter-{{ $modalId }}" class="w-full border rounded px-2 py-1 text-sm">
+            <select id="year-filter-{{ $modalId }}" class="w-full border rounded px-2 py-1 text-sm focus:ring focus:ring-green-200">
                 <option value="">-- แสดงทั้งหมด --</option>
                 @foreach ($years as $y)
                     <option value="{{ $y }}">{{ $y }}</option>
@@ -44,15 +63,18 @@
             </select>
         </div>
 
-        <div class="mb-3">
+        <div>
             <label class="block text-sm font-medium text-gray-700">กรองตามมาตรฐาน</label>
-            <select id="standard-filter-{{ $modalId }}" class="w-full border rounded px-2 py-1 text-sm">
+            <select id="standard-filter-{{ $modalId }}" class="w-full border rounded px-2 py-1 text-sm focus:ring focus:ring-green-200">
                 <option value="">-- แสดงทั้งหมด --</option>
                 @foreach ($standards as $std)
                     <option value="{{ data_get($std, 'id') }}">{{ data_get($std, 'name') }}</option>
                 @endforeach
             </select>
         </div>
+    </div>
+</div>
+
 
         <!-- ✅ Search Box -->
         <div class="mb-3">
@@ -68,41 +90,50 @@
         </div>
 
         <!-- ✅ Check list Indicators -->
-        <form id="preset-export-form" method="GET" action="{{ route('indicator.export.bulk') }}">
-            <div class="max-h-64 overflow-y-auto border rounded p-2 mb-4" id="indicator-list-{{ $modalId }}">
-                @foreach ($indicators as $ind)
-                    <label class="flex items-center space-x-2 py-1 indicator-item"
-                           data-standard="{{ data_get($ind, 'category.standard.id') ?? data_get($ind, 'standard.id') }}"
-                           data-year="{{ data_get($ind, 'year') }}">
-                        <input type="checkbox" name="ids[]" value="{{ data_get($ind, 'id') }}" class="rounded border-gray-300">
-                        <span>{{ data_get($ind, 'code') }} - {{ data_get($ind, 'name') }}</span>
-                    </label>
-                @endforeach
-            </div>
-            <input type="hidden" name="year" id="hidden-year-{{ $modalId }}" value="">
-            <button type="submit"
-                class="block w-full text-center bg-blue-500 text-white py-2 rounded hover:bg-blue-600 mb-4">
-                Export Preset (หลายตัว)
-            </button>
-        </form>
+      <!-- ✅ Export + Import เป็น 2 คอลัมน์ -->
+<div class="flex flex-col md:flex-row gap-4">
+    <!-- Export Preset -->
+    <form id="preset-export-form" method="GET" action="{{ route('indicator.export.bulk') }}"
+          class="flex-1 flex flex-col border rounded-lg p-4">
+        <div class="max-h-64 overflow-y-auto border rounded p-2 mb-4"
+             id="indicator-list-{{ $modalId }}">
+            @foreach ($indicators as $ind)
+                <label class="flex items-center space-x-2 py-1 indicator-item"
+                       data-standard="{{ data_get($ind, 'category.standard.id') ?? data_get($ind, 'standard.id') }}"
+                       data-year="{{ data_get($ind, 'year') }}">
+                    <input type="checkbox" name="ids[]" value="{{ data_get($ind, 'id') }}"
+                           class="rounded border-gray-300">
+                    <span>{{ data_get($ind, 'code') }} - {{ data_get($ind, 'name') }}</span>
+                </label>
+            @endforeach
+        </div>
+        <input type="hidden" name="year" id="hidden-year-{{ $modalId }}" value="">
+        <button type="submit"
+            class="mt-auto block w-full text-center bg-blue-500 text-white py-2 rounded hover:bg-blue-600">
+            Export Preset
+        </button>
+    </form>
 
-        <!-- ฟอร์ม Import -->
-        <form action="{{ route('indicator.import') }}" method="POST" enctype="multipart/form-data" class="space-y-3">
-            @csrf
-            <!-- เลือกไฟล์ -->
-            <input type="file" name="preset_file" accept=".json" required
-                class="block w-full border rounded px-2 py-1 text-sm">
+    <!-- Import Preset -->
+    <form action="{{ route('indicator.import') }}" method="POST" enctype="multipart/form-data"
+          class="flex-1 flex flex-col border rounded-lg p-4 space-y-3">
+        @csrf
+        <!-- เลือกไฟล์ -->
+        <input type="file" name="preset_file" accept=".json" required
+            class="block w-full border rounded px-2 py-1 text-sm">
 
-            <!-- เลือกปี -->
-            <label class="block text-sm font-medium text-gray-700">ปีที่ต้องการนำเข้า</label>
-            <input type="number" name="year" value="{{ now()->year }}" min="2000" max="2100"
-                class="block w-full border rounded px-2 py-1 text-sm" required>
+        <!-- เลือกปี -->
+        <label class="block text-sm font-medium text-gray-700">ปีที่ต้องการนำเข้า</label>
+        <input type="number" name="year" value="{{ now()->year }}" min="2000" max="2100"
+            class="block w-full border rounded px-2 py-1 text-sm" required>
 
-            <button type="submit"
-                class="w-full bg-green-500 text-white py-2 rounded hover:bg-green-600">
-                Import Preset
-            </button>
-        </form>
+        <button type="submit"
+            class="mt-auto w-full bg-green-500 text-white py-2 rounded hover:bg-green-600">
+            Import Preset
+        </button>
+    </form>
+</div>
+
     </div>
 </div>
 
