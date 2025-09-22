@@ -283,8 +283,13 @@
     }
 
     @media (max-width: 820px) {
-        .dropdown .dropdown-toggle span {
-            display: inline;
+        .app-navbar .dropdown {
+            /* position: relative; */
+            width: 100%;
+        }
+
+        .app-navbar .dropdown .dropdown-toggle span {
+            display: initial;
         }
 
         .app-navbar.navbar {
