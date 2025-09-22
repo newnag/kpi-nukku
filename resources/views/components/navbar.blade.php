@@ -1,351 +1,470 @@
 <style>
-    /* Navbar */
-    .navbar {
+    /* Navbar (scoped) */
+    /* เพิ่ม class root .app-navbar เพื่อกัน style ภายนอก (เช่น .card, a, button global) มากระทบ */
+    .app-navbar.navbar {
         display: flex;
+        flex-direction: row;
         justify-content: space-between;
         align-items: center;
         background: #fff;
-        padding: 0.5rem 1rem;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        padding: 0.75rem 1.5rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         position: sticky;
+        /* gap: 16px; */
         top: 0;
         z-index: 1000;
         width: 100%;
         box-sizing: border-box;
         flex-wrap: wrap;
+        /* ล็อค baseline เพื่อไม่ให้ page ใด ๆ ที่ไป set body { line-height / font-size } ทำให้ navbar ขยาย */
+        font-family: "Prompt", system-ui, sans-serif;
+        font-size: 14px;
+        line-height: 1.4;
+        min-height: 64px;
     }
+
+    /* ป้องกัน scale แต่ไม่ override font-family ของไอคอน (Font Awesome / Lucide) */
+    .app-navbar.navbar * {
+        font-size: inherit;
+        line-height: inherit;
+        box-sizing: border-box;
+    }
+
+    /* คืนค่า font-family สำหรับ font awesome (fa-* ใช้ pseudo + font-face ของตัวเอง) */
+    .app-navbar.navbar i[class^="fa-"],
+    .app-navbar.navbar i[class*=" fa-"] {
+        font-family: var(--fa-style-family-classic, "Font Awesome 6 Free") !important;
+        font-weight: 900;
+        /* solid icons */
+        font-style: normal;
+        speak: none;
+    }
+
+    /* lucide (ถ้าใช้ data-lucide) จะถูกแทนด้วย SVG ไม่ต้องแก้ แต่กันกรณีมี font icon อื่น */
 
     .navbar-menu {
         display: flex;
         align-items: center;
-        gap: 1rem;
-    }
-
-    .navbar-menu a {
-        color: #333;
-        text-decoration: none;
-        padding: 8px 14px;
-        border-radius: 6px;
-        transition: background 0.2s, color 0.2s;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-    }
-
-    .navbar-menu a:hover,
-    .navbar-menu a.active {
-        background: #f3f4f6;
-        color: #111;
-    }
-
-    .navbar-brand {
-        display: flex;
-        align-items: center;
-        font-weight: 600;
-        color: #000;
-        text-decoration: none;
-        white-space: nowrap;
-        /* ✅ ไม่ให้ตัดบรรทัด */
-        font-size: 15px;
-        gap: 10px;
-    }
-
-    .navbar-brand img {
-        height: 50px;
-        /* ✅ ย่อโลโก้ */
         width: auto;
-        border-radius: 50%;
+        gap: 0.5rem;
+        transition: all 0.3s ease;
     }
 
-    .dropdown {
-        position: relative;
-    }
-
-    .dropdown-toggle {
-        cursor: pointer;
-        padding: 8px 14px;
-        border-radius: 6px;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        transition: background 0.2s;
-    }
-
-    .dropdown-toggle:hover {
-        background: #f3f4f6;
-    }
-
-    .dropdown-menu {
-        display: none;
-        position: absolute;
-        top: 100%;
-        right: 0;
-        background: #fff;
-        border: 1px solid #e5e7eb;
-        border-radius: 8px;
-        min-width: 220px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        flex-direction: column;
-        z-index: 1000;
-        padding: 6px 0;
-    }
-
-    .dropdown.open .dropdown-menu {
-        display: flex;
-    }
-
-    .dropdown-menu a {
-        padding: 8px 14px;
-        color: #333;
-        font-size: 14px;
-    }
-
-    .dropdown-menu a:hover {
-        background: #f9fafb;
-    }
-
-    .user-avatar {
-        height: 35px;
-        width: 35px;
-        border-radius: 50%;
-        border: 2px solid #ddd;
-    }
-
-    .navbar-toggle {
-        display: none;
-        font-size: 1.5rem;
-        cursor: pointer;
-        background: none;
-        border: none;
-        color: #333;
-    }
-
-    /* ✅ Responsive */
-    @media (max-width: 768px) {
-        .navbar {
-            flex-direction: column;
-            align-items: flex-start;
-        }
-
-        .navbar-menu {
-            display: none;
-            flex-direction: column;
-            width: 100%;
-            padding: 0.5rem 0;
-            border-top: 1px solid #eee;
-        }
-
-        .navbar-menu.show {
-            display: flex;
-        }
-
-        .navbar-toggle {
-            display: block;
-            margin-left: auto;
-        }
-    }
-
-    /* Dropdown */
-    .dropdown {
-        position: relative;
-    }
-
-    .dropdown-toggle {
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-    }
-
-    /* Navbar Dropdown */
-    .navbar .dropdown-menu {
-        display: none;
-        position: absolute;
-        right: 0;
-        /* ✅ ชิดขอบขวา */
-        left: auto;
-        /* ✅ ไม่บังคับชิดซ้าย */
-        top: 100%;
-        margin-top: 8px;
-        background: #fff;
-        border-radius: 6px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, .1);
-        min-width: 180px;
-        z-index: 1000;
-    }
-
-    .navbar .dropdown.open .dropdown-menu {
-        display: block;
-    }
-
-
-    .dropdown-menu a {
-        padding: 8px 12px;
-        color: #333;
+    .app-navbar .navbar-menu a {
+        color: #374151;
         text-decoration: none;
-    }
-
-    .dropdown-menu a:hover {
-        background: #f3f4f6;
-    }
-
-    .user-avatar {
-        height: 35px;
-        width: 35px;
-        border-radius: 50%;
-        border: 2px solid #ddd;
-    }
-
-    /* Navbar Menu */
-    .navbar-menu a {
-        color: #333;
-        text-decoration: none;
-        padding: 8px 14px;
-        border-radius: 6px;
-        transition: background 0.2s, color 0.2s;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-    }
-
-    .navbar-menu a:hover,
-    .navbar-menu a.active {
-        background: #f3f4f6;
-        color: #111;
-    }
-
-    /* Dropdown Menu */
-    .dropdown-menu {
-        position: absolute;
-        top: 100%;
-        right: 0;
-        background: #fff;
-        border: 1px solid #e5e7eb;
+        padding: 10px 16px;
         border-radius: 8px;
-        min-width: 220px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        display: none;
-        flex-direction: column;
-        z-index: 1000;
-        padding: 6px 0;
-    }
-
-    .dropdown-menu a {
+        transition: all 0.2s ease;
         display: flex;
         align-items: center;
         gap: 8px;
-        padding: 8px 14px;
-        font-size: 14px;
-        color: #333;
+        font-size: inherit;
+        line-height: 1.4;
+        white-space: nowrap;
+        min-height: 44px;
+        box-sizing: border-box;
     }
 
-    .dropdown-menu a:hover {
-        background: #f9fafb;
+    .app-navbar .navbar-menu a:hover,
+    .app-navbar .navbar-menu a.active {
+        background: #e5e7eb;
+        color: #1f2937;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
 
-    /* ปุ่ม Settings + User ให้ cursor pointer */
-    .dropdown-toggle {
-        cursor: pointer;
-        padding: 8px 14px;
-        border-radius: 6px;
+    .app-navbar .navbar-brand {
         display: flex;
         align-items: center;
-        gap: 6px;
-        transition: background 0.2s;
+        font-weight: 600;
+        color: #1f2937;
+        text-decoration: none;
+        gap: 8px;
+        flex-shrink: 0;
+        max-width: 50%;
+        margin: 10px 0 10px 0;
     }
 
-    .dropdown-toggle:hover {
+    .app-navbar .navbar-brand img {
+        height: 42px;
+        width: auto;
+        border-radius: 50%;
+        flex-shrink: 0;
+    }
+
+    .app-navbar .navbar-brand span {
+        font-size: 16px;
+        font-weight: 600;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .app-navbar .dropdown {
+        position: relative;
+    }
+
+    .app-navbar .dropdown-toggle {
+        cursor: pointer;
+        padding: 10px 16px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.2s ease;
+        font-size: 14px;
+        min-height: 44px;
+        box-sizing: border-box;
+        user-select: none;
+    }
+
+    .app-navbar .dropdown-toggle:hover {
         background: #f3f4f6;
+        transform: translateY(-1px);
+    }
+
+    .app-navbar .dropdown-menu-navbar {
+        display: none;
+        position: absolute;
+        top: calc(100% + 8px);
+        right: 0;
+        /* left: 0; */
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        min-width: fit-content;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        z-index: 1050;
+        padding: 8px 0;
+    }
+
+    .app-navbar .dropdown.open .dropdown-menu-navbar {
+        display: block !important;
+    }
+
+    .app-navbar .dropdown-menu-navbar a {
+        padding: 12px 18px;
+        color: #374151;
+        font-size: 14px;
+        transition: all 0.15s ease;
+        border-radius: 0;
+        margin: 0 8px;
+        border-radius: 6px;
+    }
+
+    .app-navbar .dropdown-menu-navbar a:hover {
+        background: #f3f4f6;
+        color: #1f2937;
+    }
+
+    /* .app-navbar .user-avatar {
+        height: 35px;
+        width: 35px;
+        border-radius: 50%;
+        border: 2px solid #ddd;
+    } */
+
+    .app-navbar .navbar-toggle {
+        display: none;
+        font-size: 1.25rem;
+        cursor: pointer;
+        background: none;
+        border: none;
+        color: #374151;
+        padding: 8px;
+        border-radius: 6px;
+        min-height: 44px;
+        min-width: 44px;
+        transition: all 0.2s ease;
+        flex-shrink: 0;
+    }
+
+    .app-navbar .navbar-toggle:hover {
+        background: #f3f4f6;
+        color: #1f2937;
+    }
+
+    /* User Info in Dropdown */
+    .app-navbar .dropdown-menu-navbar .user-info {
+        padding: 12px 18px;
+        border-bottom: 1px solid #e5e7eb;
+        margin-bottom: 8px;
+    }
+
+    .app-navbar .dropdown-menu-navbar .user-info .user-name {
+        font-weight: 600;
+        color: #1f2937;
+        font-size: 14px;
+        margin-bottom: 2px;
+    }
+
+    .app-navbar .dropdown-menu-navbar .user-info .user-role {
+        font-size: 12px;
+        color: #6b7280;
+    }
+
+    /* Dropdown Menu Items */
+    .app-navbar .dropdown-menu-navbar a {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 18px;
+        font-size: 14px;
+        color: #374151;
+        margin: 0 8px;
+        border-radius: 6px;
+        transition: all 0.15s ease;
+    }
+
+    .app-navbar .dropdown-menu-navbar a:hover {
+        background: #f3f4f6;
+        color: #1f2937;
+    }
+
+    .app-navbar .dropdown-menu-navbar a i {
+        width: 16px;
+        text-align: center;
+        font-size: 14px;
+    }
+
+    /* Button Styling */
+    .app-navbar .buttonNav {
+        font-size: 14px;
+        font-weight: 500;
+        position: relative;
+    }
+
+    .app-navbar .buttonNav-item {
+        font-size: 14px;
+        font-weight: 400;
+    }
+
+    /* Icon spacing */
+    .app-navbar .navbar-menu i,
+    .app-navbar .dropdown-menu-navbar i {
+        flex-shrink: 0;
+    }
+
+    /* Active dropdown indicator */
+    .app-navbar .dropdown.open .dropdown-toggle {
+        background: #f3f4f6;
+    }
+
+    /* Dropdown caret animation */
+    .app-navbar .dropdown-toggle .fa-caret-down {
+        transition: transform 0.2s ease;
+    }
+
+    .app-navbar .dropdown.open .dropdown-toggle .fa-caret-down {
+        transform: rotate(180deg);
+    }
+
+    /* Mobile First Responsive */
+    @media (max-width: 1024px) {
+        .app-navbar.navbar {
+            padding: 0.75rem 1rem;
+        }
+
+        .app-navbar .navbar-menu {
+            gap: 0.25rem;
+        }
+
+        .app-navbar .navbar-menu a {
+            padding: 8px 12px;
+            font-size: 13px;
+        }
+    }
+
+    @media (max-width: 930px) {
+        .dropdown .dropdown-toggle span {
+            display: none;
+        }
+    }
+
+    @media (max-width: 820px) {
+        .dropdown .dropdown-toggle span {
+            display: inline;
+        }
+
+        .app-navbar.navbar {
+            flex-wrap: nowrap;
+            align-items: center;
+        }
+
+        .app-navbar .navbar-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: #fff;
+            border-top: 1px solid #e5e7eb;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            flex-direction: column;
+            padding: 1rem;
+            gap: 0.5rem;
+            /* max-height: calc(100vh - 80px); */
+            overflow-y: auto;
+        }
+
+        .app-navbar .navbar-menu.show {
+            display: flex;
+        }
+
+        .app-navbar .navbar-menu a {
+            width: 100%;
+            justify-content: flex-start;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .app-navbar .navbar-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .app-navbar .dropdown.open .dropdown-menu-navbar {
+            position: static !important;
+            display: block !important;
+            box-shadow: none;
+            border: none;
+            background: #f9fafb;
+            margin-top: 0.5rem;
+            border-radius: 8px;
+        }
+
+        .app-navbar .dropdown-menu-navbar {
+            display: none;
+        }
+    }
+
+    @media (max-width: 640px) {
+        .app-navbar .navbar-brand span {
+            display: none;
+        }
+
+        .app-navbar.navbar {
+            padding: 0.5rem 0.75rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .app-navbar .navbar-menu a {
+            font-size: 15px;
+            padding: 14px 16px;
+        }
+
+        .app-navbar .dropdown-menu-navbar a {
+            font-size: 14px;
+            padding: 12px 16px;
+        }
     }
 </style>
 
 <!-- Navbar Component -->
-<nav class="navbar">
-    <a href="{{ auth()->check() ? (auth()->user()->hasRole('user') ? route('dashboardkpi.index') : route('dashboard.index')) : route('dashboard.index') }}" class="navbar-brand">
+<nav class="navbar app-navbar" id="main-navbar">
+    <a href="{{ auth()->check() ? (auth()->user()->hasRole('user') ? route('dashboardkpi.index') : route('dashboard.index')) : route('dashboard.index') }}"
+        class="navbar-brand">
         <img src="/uploads/logonuthaiS-2.png" alt="Logo">
         <span>ระบบบริหารจัดการตัวชี้วัดเพื่อการรับรองสถาบันจากสภาการพยาบาล</span>
     </a>
 
     <!-- ปุ่ม Hamburger -->
-    <button class="navbar-toggle" onclick="document.querySelector('.navbar-menu').classList.toggle('show')">
+    <button class="navbar-toggle" id="navbar-toggle" aria-label="Toggle navigation">
         <i class="fa-solid fa-bars"></i>
     </button>
 
     @auth
-        <div class="navbar-menu">
+        <div class="navbar-menu" id="navbar-menu">
             @can('view-dashboard')
-                <a href="{{ route('dashboard.index') }}" class="{{ request()->routeIs('dashboard.index') ? 'active' : '' }}">
+                <a href="{{ route('dashboard.index') }}"
+                    class="{{ request()->routeIs('dashboard.index') ? 'active' : '' }} buttonNav">
                     <i class="fa-solid fa-gauge-high"></i> Dashboard
                 </a>
                 <a href="{{ route('dashboard.getData') }}"
-                    class="{{ request()->routeIs('dashboard.getData') ? 'active' : '' }}">
+                    class="{{ request()->routeIs('dashboard.getData') ? 'active' : '' }} buttonNav">
                     <i class="fa-solid fa-chart-column"></i> กราฟแสดงผลลัพธ์ตัวชี้วัด
                 </a>
             @endcan
 
             @hasanyrole('user')
                 <a href="{{ route('dashboardkpi.index') }}"
-                    class="{{ request()->is('dashboardkpi*') ? 'active' : '' }}">
+                    class="{{ request()->is('dashboardkpi*') ? 'active' : '' }} buttonNav">
                     <i class="fa-solid fa-gauge-high"></i> Dashboard ผู้ใช้งาน
                 </a>
-                <a href="{{ route('evidences.index') }}" class="{{ request()->is('evidences*') ? 'active' : '' }}">
+                <a href="{{ route('evidences.index') }}" class="{{ request()->is('evidences*') ? 'active' : '' }} buttonNav">
                     <i class="fa-solid fa-file"></i> หลักฐานของฉัน
                 </a>
             @endhasanyrole
 
             @can('view-indicator-dashboard')
-                <a href="{{ route('indicator.index') }}" class="{{ request()->is('indicator*') ? 'active' : '' }}">
+                <a href="{{ route('indicator.index') }}" class="{{ request()->is('indicator*') ? 'active' : '' }} buttonNav">
                     <i class="fa-solid fa-sliders"></i> จัดการตัวชี้วัด
                 </a>
             @endcan
 
             @hasanyrole('super_admin|system_admin|qa_admin')
                 <a href="{{ route('dashboardkpi.index') }}"
-                    class="{{ request()->routeIs('dashboardkpi.*') ? 'active' : '' }}">
+                    class="{{ request()->routeIs('dashboardkpi.*') ? 'active' : '' }} buttonNav">
                     <i class="fa-solid fa-chart-line"></i> ตรวจสอบตัวชี้วัด
                 </a>
             @endhasanyrole
 
             @hasanyrole('super_admin|system_admin')
-                <div class="dropdown" onclick="this.classList.toggle('open')">
-                    <div class="dropdown-toggle">
-                        <i class="fa-solid fa-gear"></i> ตั้งค่าระบบ <i class="fa-solid fa-caret-down ml-1"></i>
+                <div class="dropdown">
+                    <div class="dropdown-toggle" role="button" tabindex="0" onclick="toggleDropdown(this)">
+                        <i class="fa-solid fa-gear"></i>
+                        <span>ตั้งค่าระบบ</span>
+                        <i class="fa-solid fa-caret-down"></i>
                     </div>
-                    <div class="dropdown-menu">
+                    <div class="dropdown-menu-navbar">
                         @can('view-settings')
-                            <a href="{{ route('settings.index') }}"><i class="fa-solid fa-bell"></i> กำหนดวันแจ้งเตือน</a>
+                            <a href="{{ route('settings.index') }}" class="buttonNav-item">
+                                <i class="fa-solid fa-bell"></i> กำหนดวันแจ้งเตือน
+                            </a>
                         @endcan
                         @can('view-departments')
-                            <a href="{{ route('departments.index') }}"><i class="fa-solid fa-sitemap"></i> จัดการหน่วยงาน</a>
+                            <a href="{{ route('departments.index') }}" class="buttonNav-item">
+                                <i class="fa-solid fa-sitemap"></i> จัดการหน่วยงาน
+                            </a>
                         @endcan
                         @can('view-standards')
-                            <a href="{{ route('standards.index') }}"><i class="fa-solid fa-layer-group"></i>
-                                จัดการข้อมูลมาตรฐาน/ด้านต่างๆ</a>
+                            <a href="{{ route('standards.index') }}" class="buttonNav-item">
+                                <i class="fa-solid fa-layer-group"></i> จัดการข้อมูลมาตรฐาน/ด้านต่างๆ
+                            </a>
                         @endcan
                         @can('view-users')
-                            <a href="{{ route('users.index') }}"><i class="fa-solid fa-users"></i> จัดการผู้ใช้งาน</a>
+                            <a href="{{ route('users.index') }}" class="buttonNav-item">
+                                <i class="fa-solid fa-users"></i> จัดการผู้ใช้งาน
+                            </a>
                         @endcan
                         @can('view-evidence')
-                            <a href="{{ route('evidences.index') }}"><i class="fa-solid fa-folder-open"></i> จัดการหลักฐาน</a>
+                            <a href="{{ route('evidences.index') }}" class="buttonNav-item">
+                                <i class="fa-solid fa-folder-open"></i> จัดการหลักฐาน
+                            </a>
                         @endcan
                     </div>
                 </div>
             @endhasanyrole
 
-            <div class="dropdown" onclick="this.classList.toggle('open')">
-                <div class="dropdown-toggle">
-                    {{-- <img src="/uploads/avatar-type1.png" alt="User" class="user-avatar"> --}}
-                    <span class="sm:inline">{{ auth()->user()->name ?? 'ผู้ใช้' }}</span>
+            <div class="dropdown">
+                <div class="dropdown-toggle" role="button" tabindex="0" onclick="toggleDropdown(this)">
+                    <i class="fa-solid fa-user-circle"></i>
+                    <span>{{ auth()->user()->name ?? 'ผู้ใช้' }}</span>
+                    <i class="fa-solid fa-caret-down"></i>
                 </div>
-                <div class="dropdown-menu">
-                    <div class="px-3 py-2 text-xs text-gray-500 border-b">
-                        <div class="font-medium">{{ auth()->user()->name ?? 'ผู้ใช้' }}</div>
-                        <div class="text-xs">
-                            @if (auth()->user()->roles->isNotEmpty())
-                                บทบาท: {{ auth()->user()->roles->pluck('name')->join(', ') }}
-                            @endif
-                        </div>
+                <div class="dropdown-menu-navbar">
+                    <div class="user-info">
+                        <div class="user-name">{{ auth()->user()->name ?? 'ผู้ใช้' }}</div>
+                        @if (auth()->user()->roles->isNotEmpty())
+                            <div class="user-role">บทบาท: {{ auth()->user()->roles->pluck('name')->join(', ') }}</div>
+                        @endif
                     </div>
-                    <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                    <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
+                        class="buttonNav-item">
                         <i class="fa-solid fa-right-from-bracket"></i> ออกจากระบบ
                     </a>
                 </div>
@@ -361,10 +480,117 @@
     </form>
 @endauth
 
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Mobile menu toggle
+        const navbarToggle = document.getElementById('navbar-toggle');
+        const navbarMenu = document.getElementById('navbar-menu');
 
-<!-- Logout Form -->
-@auth
-    <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display:none;">
-        @csrf
-    </form>
-@endauth
+        if (navbarToggle && navbarMenu) {
+            navbarToggle.addEventListener('click', function() {
+                navbarMenu.classList.toggle('show');
+
+                // Update aria-expanded for accessibility
+                const isExpanded = navbarMenu.classList.contains('show');
+                navbarToggle.setAttribute('aria-expanded', isExpanded);
+
+                // Change icon
+                const icon = navbarToggle.querySelector('i');
+                if (icon) {
+                    icon.className = isExpanded ? 'fa-solid fa-times' : 'fa-solid fa-bars';
+                }
+            });
+        }
+
+        // Dropdown functionality
+        const dropdowns = document.querySelectorAll('.app-navbar .dropdown');
+        console.log('Found dropdowns:', dropdowns.length);
+
+        dropdowns.forEach((dropdown, index) => {
+            const toggle = dropdown.querySelector('.dropdown-toggle');
+            console.log(`Dropdown ${index} toggle found:`, !!toggle);
+
+            if (toggle) {
+                // Click handler
+                toggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('Dropdown clicked, current state:', dropdown.classList.contains(
+                        'open'));
+
+                    // Close other dropdowns
+                    dropdowns.forEach(otherDropdown => {
+                        if (otherDropdown !== dropdown) {
+                            otherDropdown.classList.remove('open');
+                        }
+                    });
+
+                    // Toggle current dropdown
+                    dropdown.classList.toggle('open');
+                    console.log('Dropdown new state:', dropdown.classList.contains('open'));
+                });
+
+                // Keyboard handler
+                toggle.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        toggle.click();
+                    }
+                    if (e.key === 'Escape') {
+                        dropdown.classList.remove('open');
+                    }
+                });
+            }
+        });
+
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.app-navbar .dropdown')) {
+                dropdowns.forEach(dropdown => {
+                    dropdown.classList.remove('open');
+                });
+            }
+        });
+
+        // Close mobile menu when clicking on links
+        const navLinks = document.querySelectorAll('.navbar-menu a');
+        navLinks.forEach(link => {
+            link.addEventListener('click', function() {
+                if (window.innerWidth <= 820) {
+                    navbarMenu.classList.remove('show');
+                    navbarToggle.setAttribute('aria-expanded', 'false');
+                    const icon = navbarToggle.querySelector('i');
+                    if (icon) {
+                        icon.className = 'fa-solid fa-bars';
+                    }
+                }
+            });
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 820) {
+                navbarMenu.classList.remove('show');
+                navbarToggle.setAttribute('aria-expanded', 'false');
+                const icon = navbarToggle.querySelector('i');
+                if (icon) {
+                    icon.className = 'fa-solid fa-bars';
+                }
+
+                // Close all dropdowns on desktop
+                dropdowns.forEach(dropdown => {
+                    dropdown.classList.remove('open');
+                });
+            }
+        });
+
+        // Fallback function for manual testing
+        window.toggleDropdown = function(element) {
+            const dropdown = element.closest('.dropdown');
+            if (dropdown) {
+                dropdown.classList.toggle('open');
+                console.log('Manual toggle - dropdown state:', dropdown.classList.contains('open'));
+            }
+        };
+    });
+</script>
