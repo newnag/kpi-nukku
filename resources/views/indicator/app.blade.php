@@ -298,6 +298,22 @@
 
             <!-- Action Buttons Group -->
             <div class="flex flex-wrap gap-3">
+                @if ($indicators->isNotEmpty())
+                    <!-- ปุ่มเปิด Modal -->
+                    <button type="button" onclick="document.getElementById('preset-modal').classList.remove('hidden')"
+                        class="h-fit bg-green-500 hover:bg-green-600 text-white rounded-lg px-4 py-2 flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0l-4 4m4-4v12" />
+                        </svg>
+                        Preset
+                    </button>
+
+                    <!-- Modal Component -->
+                    <x-indicator-preset-modal :indicators="$indicators" modalId="preset-modal" />
+                @endif
+
                 <button id="export_button"
                     class="h-fit bg-green-500 hover:bg-green-600 text-white rounded-lg px-4 py-2 flex items-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
@@ -557,12 +573,12 @@
             }
 
             /* .dataTables_wrapper {
-                                background-color: ;
-                            } */
+                                                        background-color: ;
+                                                    } */
 
             /* Length and Filter Controls */
             /* .dataTables_wrapper .dataTables_length,
-                            .dataTables_wrapper .dataTables_filter {} */
+                                                    .dataTables_wrapper .dataTables_filter {} */
 
             /* Dropdown Select Styling */
             .dataTables_wrapper .dataTables_length select {
@@ -577,8 +593,8 @@
             }
 
             /* .dataTables_wrapper .dataTables_paginate {
-                                padding-top: 1rem;
-                            } */
+                                                        padding-top: 1rem;
+                                                    } */
 
             .dataTables_wrapper .dataTables_paginate .paginate_button {
                 padding: 0.5rem 1rem;
@@ -602,9 +618,9 @@
             }
 
             /* .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
-                                background-color: #1d4ed8 !important;
-                                border-color: #1d4ed8;
-                            } */
+                                                        background-color: #1d4ed8 !important;
+                                                        border-color: #1d4ed8;
+                                                    } */
 
             table.dataTable thead th,
             table.dataTable tbody td {
@@ -613,6 +629,7 @@
             }
 
             @media (max-width: 640px) {
+
                 /* Mobile-specific styles */
                 .container {
                     padding: 10px;
@@ -629,6 +646,7 @@
             }
 
             @media (max-width: 768px) {
+
                 /* Tablet-specific styles */
                 .container {
                     padding: 20px;
@@ -646,6 +664,7 @@
             }
 
             @media (max-width: 1024px) {
+
                 /* Small Desktop-specific styles */
                 .container {
                     max-width: 900px;
@@ -657,6 +676,7 @@
             }
 
             @media (max-width: 1280px) {
+
                 /* Medium Desktop-specific styles */
                 .container {
                     max-width: 1100px;
@@ -668,6 +688,7 @@
             }
 
             @media (max-width: 1536px) {
+
                 /* Large Desktop-specific styles */
                 .container {
                     max-width: 1300px;
@@ -735,8 +756,8 @@
             }
 
             /* #myTable tbody tr:active {
-                        background-color: #e5e7eb !important;
-                    } */
+                                                background-color: #e5e7eb !important;
+                                            } */
 
             table.dataTable tbody tr {
                 background-color: inherit !important;

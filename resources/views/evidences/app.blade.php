@@ -56,152 +56,156 @@
                 </button>
 
                 <div id="filter-dropdown" class="dropdown-menus hidden">
-                    <div style="padding:12px 12px;">
-
-                        {{-- ปี --}}
-                        <h3 class="dropdown-title">ปี</h3>
-                        <div class="dropdown-multiselect" id="yearDropdown">
-                            <div class="dropdown-btn" onclick="toggleDropdown('yearDropdown')">
-                                <span id="year-label">เลือกปี</span>
-                                <i style="font-size:12px;">▼</i>
-                            </div>
-                            <div class="dropdown-content">
-                                @foreach ($years as $year)
-                                    <label>
-                                        <input type="checkbox" class="filter-option" data-column="8"
-                                            data-value="{{ $year }}">
-                                        <span style="margin-left:6px;">{{ $year }}</span>
-                                    </label>
-                                @endforeach
-                            </div>
-                        </div>
-
-                        <div class="dropdown-divider"></div>
-
-                        {{-- มาตรฐาน --}}
-                        <h3 class="dropdown-title">มาตรฐาน</h3>
-                        <div class="dropdown-multiselect" id="standardDropdown">
-                            <div class="dropdown-btn" onclick="toggleDropdown('standardDropdown')">
-                                <span id="standard-label">เลือกมาตรฐาน</span>
-                                <i style="font-size:12px;">▼</i>
-                            </div>
-                            <div class="dropdown-content">
-                                @foreach ($standards as $std)
-                                    <label>
-                                        <input type="checkbox" class="filter-option" data-column="9"
-                                            data-value="{{ $std }}">
-                                        <span style="margin-left:6px;">{{ $std }}</span>
-                                    </label>
-                                @endforeach
+                    <div class="filters-grid">
+                        <div class="filter-section">
+                            {{-- ปี --}}
+                            <h3 class="dropdown-title">ปี</h3>
+                            <div class="dropdown-multiselect" id="yearDropdown">
+                                <div class="dropdown-btn" onclick="toggleDropdown('yearDropdown')">
+                                    <span id="year-label">เลือกปี</span>
+                                    <i style="font-size:12px;">▼</i>
+                                </div>
+                                <div class="dropdown-content">
+                                    @foreach ($years as $year)
+                                        <label>
+                                            <input type="checkbox" class="filter-option" data-column="8"
+                                                data-value="{{ $year }}">
+                                            <span style="margin-left:6px;">{{ $year }}</span>
+                                        </label>
+                                    @endforeach
+                                </div>
                             </div>
                         </div>
 
-                        <div class="dropdown-divider"></div>
-
-                        {{-- ด้าน --}}
-                        <h3 class="dropdown-title">ด้าน</h3>
-                        <div class="dropdown-multiselect" id="dimensionDropdown">
-                            <div class="dropdown-btn" onclick="toggleDropdown('dimensionDropdown')">
-                                <span id="dimension-label">เลือกด้าน</span>
-                                <i style="font-size:12px;">▼</i>
+                        <div class="filter-section">
+                            {{-- มาตรฐาน --}}
+                            <h3 class="dropdown-title">มาตรฐาน</h3>
+                            <div class="dropdown-multiselect" id="standardDropdown">
+                                <div class="dropdown-btn" onclick="toggleDropdown('standardDropdown')">
+                                    <span id="standard-label">เลือกมาตรฐาน</span>
+                                    <i style="font-size:12px;">▼</i>
+                                </div>
+                                <div class="dropdown-content">
+                                    @foreach ($standards as $std)
+                                        <label>
+                                            <input type="checkbox" class="filter-option" data-column="9"
+                                                data-value="{{ $std }}">
+                                            <span style="margin-left:6px;">{{ $std }}</span>
+                                        </label>
+                                    @endforeach
+                                </div>
                             </div>
-                            <div class="dropdown-content">
-                                @foreach ($dimensions as $dim)
-                                    <label>
-                                        <input type="checkbox" class="filter-option" data-column="10"
-                                            data-value="{{ $dim }}">
-                                        <span style="margin-left:6px;">{{ $dim }}</span>
-                                    </label>
-                                @endforeach
+                        </div>
+                        <div class="filter-section">
+                            {{-- ด้าน --}}
+                            <h3 class="dropdown-title">ด้าน</h3>
+                            <div class="dropdown-multiselect" id="dimensionDropdown">
+                                <div class="dropdown-btn" onclick="toggleDropdown('dimensionDropdown')">
+                                    <span id="dimension-label">เลือกด้าน</span>
+                                    <i style="font-size:12px;">▼</i>
+                                </div>
+                                <div class="dropdown-content">
+                                    @foreach ($dimensions as $dim)
+                                        <label>
+                                            <input type="checkbox" class="filter-option" data-column="10"
+                                                data-value="{{ $dim }}">
+                                            <span style="margin-left:6px;">{{ $dim }}</span>
+                                        </label>
+                                    @endforeach
+                                </div>
                             </div>
                         </div>
 
-                        <div class="dropdown-divider"></div>
 
-                        {{-- ผู้รับผิดชอบ --}}
-                        <h3 class="dropdown-title">ผู้รับผิดชอบ</h3>
-                        <div class="dropdown-multiselect" id="collectorDropdown">
-                            <div class="dropdown-btn" onclick="toggleDropdown('collectorDropdown')">
-                                <span id="collector-label">เลือกผู้รับผิดชอบ</span>
-                                <i style="font-size:12px;">▼</i>
-                            </div>
-                            <div class="dropdown-content">
-                                @foreach ($collectors as $collector)
-                                    <label>
-                                        <input type="checkbox" class="filter-option" data-column="5"
-                                            data-value="{{ $collector }}">
-                                        <span style="margin-left:6px;">{{ $collector }}</span>
-                                    </label>
-                                @endforeach
-                            </div>
-                        </div>
-
-                        <div class="dropdown-divider"></div>
-
-                        {{-- หน่วยงาน --}}
-                        <h3 class="dropdown-title">หน่วยงาน</h3>
-                        <div class="dropdown-multiselect" id="deptDropdown">
-                            <div class="dropdown-btn" onclick="toggleDropdown('deptDropdown')">
-                                <span id="dept-label">เลือกหน่วยงาน</span>
-                                <i style="font-size:12px;">▼</i>
-                            </div>
-                            <div class="dropdown-content">
-                                @foreach ($departments as $dept)
-                                    <label>
-                                        <input type="checkbox" class="filter-option" data-column="12"
-                                            data-value="{{ $dept }}">
-                                        <span style="margin-left:6px;">{{ $dept }}</span>
-                                    </label>
-                                @endforeach
+                        <div class="filter-section">
+                            {{-- ผู้รับผิดชอบ --}}
+                            <h3 class="dropdown-title">ผู้รับผิดชอบ</h3>
+                            <div class="dropdown-multiselect" id="collectorDropdown">
+                                <div class="dropdown-btn" onclick="toggleDropdown('collectorDropdown')">
+                                    <span id="collector-label">เลือกผู้รับผิดชอบ</span>
+                                    <i style="font-size:12px;">▼</i>
+                                </div>
+                                <div class="dropdown-content">
+                                    @foreach ($collectors as $collector)
+                                        <label>
+                                            <input type="checkbox" class="filter-option" data-column="5"
+                                                data-value="{{ $collector }}">
+                                            <span style="margin-left:6px;">{{ $collector }}</span>
+                                        </label>
+                                    @endforeach
+                                </div>
                             </div>
                         </div>
 
-                        <div class="dropdown-divider"></div>
 
-                        {{-- ประเภทไฟล์ --}}
-                        <h3 class="dropdown-title">ประเภทไฟล์</h3>
-                        <div class="dropdown-multiselect" id="typeDropdown">
-                            <div class="dropdown-btn" onclick="toggleDropdown('typeDropdown')">
-                                <span id="type-label">เลือกประเภทไฟล์</span>
-                                <i style="font-size:12px;">▼</i>
-                            </div>
-                            <div class="dropdown-content">
-                                @foreach ($fileTypes as $type)
-                                    <label>
-                                        <input type="checkbox" class="filter-option" data-column="3"
-                                            data-value="{{ $type }}">
-                                        <span style="margin-left:6px;">{{ $type }}</span>
-                                    </label>
-                                @endforeach
-                            </div>
-                        </div>
-
-                        <div class="dropdown-divider"></div>
-
-                        {{-- สถานะ --}}
-                        <h3 class="dropdown-title">สถานะ</h3>
-                        <div class="dropdown-multiselect" id="statusDropdown">
-                            <div class="dropdown-btn" onclick="toggleDropdown('statusDropdown')">
-                                <span id="status-label">เลือกสถานะ</span>
-                                <i style="font-size:12px;">▼</i>
-                            </div>
-                            <div class="dropdown-content">
-                                @foreach ($statusList as $statusText)
-                                    <label>
-                                        <input type="checkbox" class="filter-option" data-column="11"
-                                            data-value="{{ $statusText }}">
-                                        <span style="margin-left:6px;">{{ $statusText }}</span>
-                                    </label>
-                                @endforeach
+                        <div class="filter-section">
+                            {{-- หน่วยงาน --}}
+                            <h3 class="dropdown-title">หน่วยงาน</h3>
+                            <div class="dropdown-multiselect" id="deptDropdown">
+                                <div class="dropdown-btn" onclick="toggleDropdown('deptDropdown')">
+                                    <span id="dept-label">เลือกหน่วยงาน</span>
+                                    <i style="font-size:12px;">▼</i>
+                                </div>
+                                <div class="dropdown-content">
+                                    @foreach ($departments as $dept)
+                                        <label>
+                                            <input type="checkbox" class="filter-option" data-column="12"
+                                                data-value="{{ $dept }}">
+                                            <span style="margin-left:6px;">{{ $dept }}</span>
+                                        </label>
+                                    @endforeach
+                                </div>
                             </div>
                         </div>
 
-                        <div class="dropdown-divider"></div>
 
-                        {{-- Buttons --}}
-                        <div style="display:flex; justify-content:space-between; gap:12px;">
-                            <button id="clear-filters" class="btn">ล้างตัวกรอง</button>
-                            <button id="apply-filters" class="btn btn-primary">ใช้ตัวกรอง</button>
+                        <div class="filter-section">
+                            {{-- ประเภทไฟล์ --}}
+                            <h3 class="dropdown-title">ประเภทไฟล์</h3>
+                            <div class="dropdown-multiselect" id="typeDropdown">
+                                <div class="dropdown-btn" onclick="toggleDropdown('typeDropdown')">
+                                    <span id="type-label">เลือกประเภทไฟล์</span>
+                                    <i style="font-size:12px;">▼</i>
+                                </div>
+                                <div class="dropdown-content">
+                                    @foreach ($fileTypes as $type)
+                                        <label>
+                                            <input type="checkbox" class="filter-option" data-column="3"
+                                                data-value="{{ $type }}">
+                                            <span style="margin-left:6px;">{{ $type }}</span>
+                                        </label>
+                                    @endforeach
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- <div class="filter-section">
+                       
+                            <h3 class="dropdown-title">สถานะ</h3>
+                            <div class="dropdown-multiselect" id="statusDropdown">
+                                <div class="dropdown-btn" onclick="toggleDropdown('statusDropdown')">
+                                    <span id="status-label">เลือกสถานะ</span>
+                                    <i style="font-size:12px;">▼</i>
+                                </div>
+                                <div class="dropdown-content">
+                                    @foreach ($statusList as $statusText)
+                                        <label>
+                                            <input type="checkbox" class="filter-option" data-column="11"
+                                                data-value="{{ $statusText }}">
+                                            <span style="margin-left:6px;">{{ $statusText }}</span>
+                                        </label>
+                                    @endforeach
+                                </div>
+                            </div>
+                        </div> --}}
+
+                        <div class="filters-actions">
+
+                            {{-- Buttons --}}
+                            <div style="display:flex; justify-content:space-between; gap:12px;">
+                                <button id="clear-filters" class="btn">ล้างตัวกรอง</button>
+                                <button id="apply-filters" class="btn btn-primary">ใช้ตัวกรอง</button>
+                            </div>
                         </div>
 
                     </div>
@@ -648,21 +652,21 @@
             --pad-4: 16px;
         }
 
-        #filter-dropdown {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 16px 24px;
-            max-height: 70vh;
-            overflow-y: auto;
-            padding: 16px;
-            box-sizing: border-box;
-        }
+        /* #filter-dropdown {
+                                                        display: grid;
+                                                        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                                                        gap: 16px 24px;
+                                                        max-height: 70vh;
+                                                        overflow-y: auto;
+                                                        padding: 16px;
+                                                        box-sizing: border-box;
+                                                    }
 
-        #filter-dropdown .dropdown-title {
-            grid-column: span 2;
-            /* ✅ ให้หัวข้อใหญ่กินเต็มแถว */
-            margin-top: 8px;
-        }
+                                                    #filter-dropdown .dropdown-title {
+                                                        grid-column: span 2;
+                                                      
+                                                        margin-top: 8px;
+                                                    } */
 
 
         .tooltip {
@@ -678,7 +682,7 @@
             /* tooltip อยู่ด้านบน */
             /* left: 50%; */
             /* transform: translateX(-50%);
-                                                                                                                                                                            background: #333; */
+                                                                                                                                                                                                                            background: #333; */
             color: #fff;
             font-size: 12px;
             /* padding: 5px 8px; */
@@ -752,104 +756,148 @@
         }
 
         /* ปุ่ม */
-        .btns {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 16px;
-            border-radius: var(--radius);
-            font: inherit;
-            cursor: pointer;
-            border: 0;
-            background: var(--white);
-            color: var(--gray-700);
-            border: 1px solid var(--gray-300);
-            transition: .15s background-color ease;
-        }
-
-        .btns:hover {
-            background: var(--gray-100);
-        }
-
-        .btn-primary {
-            background: var(--blue-600);
-            color: var(--white);
-            border-color: transparent;
-        }
-
-        .btn-primary:hover {
-            background: var(--blue-700);
-        }
-
-        /* Dropdown */
         .dropdown {
             position: relative;
             display: inline-block;
-            text-align: left;
         }
 
+        .btns {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            border: 1px solid #e5e7eb;
+            background: #fff;
+            color: #374151;
+            padding: 8px 12px;
+            border-radius: 8px;
+        }
+
+        .btns:hover {
+            background: #f9fafb;
+        }
 
         .dropdown-menus {
             position: absolute;
-            left: 0;
-            top: 100%;
+            left: -50px;
             margin-top: 8px;
-            width: 100%;
-            /* ✅ ใช้ 100% ของ container (เท่าปุ่ม) */
-            background: var(--white);
-            border-radius: 6px;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, .1), 0 4px 6px -2px rgba(0, 0, 0, .05);
-            border: 1px solid rgba(0, 0, 0, .05);
-            z-index: 9999;
-            padding: 4px 0;
-            display: block;
-            box-sizing: border-box;
-            /* ✅ กัน padding บวกเกิน */
-            min-width: max-content;
-            /* ✅ กัน dropdown เล็กเกินถ้ามีข้อความยาว */
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+            z-index: 50;
+            min-width: 280px;
         }
 
-        .dropdown-menus.hidden {
-            display: none !important;
+        .dropdown-menus .filters-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            padding: 12px 12px;
         }
 
-        .dropdown-item {
-            display: block;
-            width: 100%;
-            text-align: left;
-            padding: 8px 16px;
+        .dropdown-menus .filter-section {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            width: 360px;
             font-size: 14px;
-            color: #374151;
-            background: transparent;
-            border: 0;
         }
 
-        .dropdown-item:hover {
-            background: var(--gray-100);
+        .dropdown-menus .filters-actions {
+            grid-column: 1 / -1;
         }
 
-        .dropdown-divider {
-            height: 1px;
-            background: var(--gray-200);
-            margin: 12px 0;
+        @media (min-width: 768px) {
+            .dropdown-menus {
+                min-width: 720px;
+            }
+
+            .dropdown-menus .filters-grid {
+                grid-template-columns: 1fr 1fr;
+            }
         }
 
         .dropdown-title {
-            font-size: 14px;
             font-weight: 600;
             color: #111827;
-            margin-bottom: 8px;
+            margin: 8px 0;
         }
 
-        .dropdown-multiselect .dropdown-btn span,
-        .dropdown-multiselect .dropdown-content span {
-            white-space: normal;
-            /* ✅ ข้อความยาวจะตัดบรรทัด */
-            word-break: break-word;
+        .dropdown-multiselect {
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
         }
 
-        .filter-option {
-            accent-color: var(--blue-600);
+
+        /* .dropdown-divider {
+                height: 1px;
+                background: var(--gray-200);
+                margin: 12px 0;
+            } */
+
+
+        .dropdown-multiselect .dropdown-content {
+            display: none;
+            max-height: 220px;
+            overflow-y: auto;
+            border-top: 1px solid #e5e7eb;
+            padding: 8px 10px;
+        }
+
+        .dropdown-multiselect.open .dropdown-content {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            max-height: 150px;
+            overflow-y: scroll;
+        }
+
+        .dropdown-multiselect.open .dropdown-content label,
+        .dropdown-multiselect.open .dropdown-content input {
+            cursor: pointer;
+        }
+
+
+        .dropdown-divider {
+            height: 1px;
+            background: #e5e7eb;
+            margin: 10px 0;
+        }
+
+        .dropdown-tools {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            /* padding: 8px 0px; */
+            border-top: 1px dashed #e5e7eb;
+            border-bottom: 1px dashed #e5e7eb;
+            background: #fafafa;
+        }
+
+        .dropdown-tools .filter-search {
+            flex: 1;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            padding: 6px 8px;
+            font-size: 13px;
+        }
+
+        .dropdown-tools .tools-actions {
+            display: flex;
+            gap: 6px;
+        }
+
+        .dropdown-tools .tool-btn {
+            border: 1px solid #e5e7eb;
+            background: #fff;
+            color: #374151;
+            border-radius: 6px;
+            padding: 6px 8px;
+            font-size: 12px;
+        }
+
+        .dropdown-tools .tool-btn:hover {
+            background: #f3f4f6;
         }
 
         /* ตาราง */
@@ -1020,9 +1068,9 @@
             position: relative;
             display: inline-block;
             width: 100%;
-            /* ✅ ให้กว้างเต็ม cell ของ grid */
+        
             min-width: 200px;
-            /* ✅ แต่ไม่ต่ำกว่า 200px */
+            
         }
 
         .dropdown-multiselect .dropdown-btn {
@@ -1181,7 +1229,7 @@
         .dropdown-multiselect {
             position: relative;
             display: inline-block;
-            width: 220px;
+           
         }
 
         .dropdown-multiselect .dropdown-btn {

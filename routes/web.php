@@ -9,6 +9,7 @@ use App\Http\Controllers\DashboardKpiAdminController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\EvidenceController;
 use App\Http\Controllers\IndicatorController;
+use App\Http\Controllers\IndicatorPresetController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\StandardController;
 use App\Http\Controllers\UserController;
@@ -106,6 +107,22 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/{id}', [IndicatorController::class, 'delete'])
             ->name('delete')
             ->middleware('permission:delete-indicator');
+        // Export
+        Route::get('/{id}/export', [IndicatorPresetController::class, 'export'])
+            ->name('export')
+            ->middleware('permission:export-indicator');
+        // Import
+        Route::post('/import', [IndicatorPresetController::class, 'import'])
+            ->name('import')
+            ->middleware('permission:import-indicator');
+        // Gracefully handle accidental GET to /indicator/import by redirecting
+        Route::get('/import', function () {
+            return redirect()->route('indicator.index');
+        })->name('import.get');
+        // Bulk export presets (accepts GET with ids[])
+        Route::get('/export-bulk', [IndicatorPresetController::class, 'exportBulk'])
+            ->name('export.bulk')
+            ->middleware('permission:export-indicator');
     });
 
     // ===== USER MANAGEMENT ROUTES =====
