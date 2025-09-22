@@ -53,9 +53,9 @@ Route::middleware('auth')->controller(AuthController::class)->group(function () 
 });
 
 // Minimal home route for post-login redirect used in tests
-Route::middleware('auth')->get('/home', function () {
-    return response('ok');
-});
+// Route::middleware('auth')->get('/home', function () {
+//     return response('ok');
+// });
 
 /*
 |--------------------------------------------------------------------------
@@ -245,6 +245,11 @@ Route::middleware(['auth'])->group(function () {
             ->name('download')
             ->whereNumber('id')
             ->middleware('permission:download-evidence');
+        // Preview (เพิ่มใหม่)
+        Route::get('/{id}/preview', [EvidenceController::class, 'preview'])
+            ->name('preview')
+            ->whereNumber('id')
+            ->middleware('permission:view-evidence');
     });
 
     // ===== DASHBOARD KPI ROUTES =====

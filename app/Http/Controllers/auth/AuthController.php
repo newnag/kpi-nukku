@@ -7,6 +7,8 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
@@ -17,35 +19,72 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-        $credentials = $request->only(['email', 'password']);
-        $user = User::where('email', $credentials['email'] ?? null)->first();
-        if (! $user || ! Hash::check($credentials['password'] ?? '', $user->password)) {
-            return response()->json(['message' => 'Invalid credentials'], 401);
+        // $credentials = $request->validate([
+        //     'email' => ['required', 'string'],
+        //     'password' => ['required', 'string'],
+        // ]);
+
+        $key = Str::lower($request->input('email')) . '|' . $request->ip();
+        $maxAttempts = 5;
+        $decaySeconds = 60;
+
+        if (RateLimiter::tooManyAttempts($key, $maxAttempts)) {
+            return response()->json([
+                'message' => 'คุณพยายามเข้าสู่ระบบมากเกินไป กรุณารอ 1 นาทีแล้วลองใหม่อีกครั้ง.',
+            ], 429);
         }
+
+        $user = User::where('email', $request->email)->first();
+
+        if (! $user || ! Hash::check($request->password, $user->password)) {
+            RateLimiter::hit($key, $decaySeconds);
+
+            return response()->json([
+                'message' => 'กรุณากรอกอีเมลและรหัสผ่านให้ถูกต้อง',
+            ], 401);
+        }
+
+        if ($user->status === 'inactive') {
+            return response()->json(['message' => 'บัญชีของคุณถูกระงับการใช้งาน...'], 403);
+        }
+
+        RateLimiter::clear($key);
+
         Auth::login($user);
-        $request->session()->regenerate();
-        // For tests and simplicity, redirect to a minimal home endpoint
-        $redirect = '/home';
+        $request->session()->regenerate(); // prevent session fixation
 
-        // If the frontend expects JSON (AJAX login), return the target
-        if ($request->expectsJson()) {
-            return response()->json(['redirect' => $redirect]);
+        // ✅ เช็ก role ของ $user
+        // $redirect = '/dashboard'; // default
+
+        if ($user->hasRole('super_admin')) {
+            $redirect = '/dashboard';
+        } elseif ($user->hasRole('system_admin')) {
+            $redirect = '/dashboard';
+        } elseif ($user->hasRole('qa_admin')) {
+            $redirect = '/dashboard';
+        } elseif ($user->hasRole('administration_admin')) {
+            $redirect = '/dashboard';
+        } elseif ($user->hasRole('user')) {
+            $redirect = '/dashboardkpi';
         }
 
-        // For normal form posts: users go directly, others respect intended
-        return redirect($redirect);
+        return response()->json(['redirect' => $redirect]);
     }
+
 
     public function logout(Request $request)
     {
         Auth::logout();
+
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-        return redirect('/');
+
+        return redirect('/login')->with('success', 'ออกจากระบบสำเร็จ');
     }
 
     public function user(Request $request)
     {
+        // return view('auth.profile', ['user' => $request->user()]);
         return response()->json($request->user());
     }
 }

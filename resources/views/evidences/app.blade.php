@@ -1,4 +1,4 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 @section('title', 'เอกสารและหลักฐาน')
 @section('header', 'เอกสารและหลักฐาน')
 @section('subheader', 'ระบบบริหารจัดการข้อมูลการรับรองสถาบันจากสภาการพยาบาล')
@@ -241,34 +241,83 @@
                             <tr>
                                 <td>{{ $index + 1 }}</td>
                                 <td>
-                                    <div class="file-info">
-                                        <div class="file-icon">
-                                            @if (str_ends_with($evidence->type, 'pdf'))
-                                                <i data-lucide="file-text" style="color:#dc2626;"></i>
-                                            @elseif (str_ends_with($evidence->type, 'docx'))
-                                                <i data-lucide="file-text" style="color:#2563eb;"></i>
-                                            @elseif (str_ends_with($evidence->type, 'pptx'))
-                                                <i data-lucide="file-text" style="color:#eb7e25;"></i>
-                                            @elseif (str_ends_with($evidence->type, 'jpg') || str_ends_with($evidence->type, 'png'))
-                                                <i data-lucide="image" style="color:#16a34a;"></i>
-                                            @elseif (str_ends_with($evidence->type, 'xls') || str_ends_with($evidence->type, 'xlsx'))
-                                                <i data-lucide="file-spreadsheet" style="color:#059669;"></i>
-                                            @elseif ($evidence->type === 'url')
-                                                <i data-lucide="link" style="color:#9333ea;"></i>
-                                            @else
-                                                <i data-lucide="file" style="color:#6b7280;"></i>
-                                            @endif
-                                        </div>
-                                        <div class="file-details">
-                                            <div class="file-name">{{ $evidence->name }}</div>
-                                            @if ($evidence->detail)
-                                                <div class="file-description">
-                                                    {{ Str::limit(strip_tags($evidence->detail), 50) }}
+                                    @php $previewUrl = evidence_preview_url($evidence); @endphp
+                                    @php $isOffice = in_array($evidence->type, ['doc','docx','xls','xlsx','ppt','pptx']); @endphp
+
+                                    @if ($previewUrl && !$isOffice)
+                                        <a href="{{ $previewUrl }}" target="_blank" rel="noopener noreferrer"
+                                            class="block w-full text-left hover:bg-gray-50 rounded p-2">
+                                            <div class="file-info flex items-start space-x-2">
+                                                <div class="file-icon">
+                                                    @if ($evidence->type === 'pdf')
+                                                        <i data-lucide="file-text" style="color:#dc2626;"></i>
+                                                    @elseif (in_array($evidence->type, ['doc', 'docx']))
+                                                        <i data-lucide="file-text" style="color:#2563eb;"></i>
+                                                    @elseif (in_array($evidence->type, ['ppt', 'pptx']))
+                                                        <i data-lucide="file-text" style="color:#eb7e25;"></i>
+                                                    @elseif (in_array($evidence->type, ['jpg', 'jpeg', 'png', 'gif', 'svg']))
+                                                        <i data-lucide="image" style="color:#16a34a;"></i>
+                                                    @elseif (in_array($evidence->type, ['xls', 'xlsx']))
+                                                        <i data-lucide="file-spreadsheet" style="color:#059669;"></i>
+                                                    @elseif ($evidence->type === 'url')
+                                                        <i data-lucide="link" style="color:#9333ea;"></i>
+                                                    @else
+                                                        <i data-lucide="file" style="color:#6b7280;"></i>
+                                                    @endif
                                                 </div>
-                                            @endif
+                                                <div class="file-details">
+                                                    <div class="file-name text-blue-600 underline hover:text-blue-800">
+                                                        {{ $evidence->name }}
+                                                    </div>
+                                                    @if ($evidence->detail)
+                                                        <div class="file-description text-sm text-gray-500">
+                                                            {{ Str::limit(strip_tags($evidence->detail), 50) }}
+                                                        </div>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        </a>
+                                    @elseif($isOffice)
+                                        <div
+                                            class="block w-full text-left rounded p-2 hover:bg-gray-50 cursor-not-allowed">
+                                            <div class="file-info flex items-start space-x-2">
+                                                <div class="file-icon">
+                                                    @if (in_array($evidence->type, ['doc', 'docx']))
+                                                        <i data-lucide="file-text" style="color:#2563eb;"></i>
+                                                    @elseif (in_array($evidence->type, ['ppt', 'pptx']))
+                                                        <i data-lucide="file-text" style="color:#eb7e25;"></i>
+                                                    @elseif (in_array($evidence->type, ['xls', 'xlsx']))
+                                                        <i data-lucide="file-spreadsheet" style="color:#059669;"></i>
+                                                    @else
+                                                        <i data-lucide="file" style="color:#6b7280;"></i>
+                                                    @endif
+                                                </div>
+                                                <!-- ✅ Tooltip -->
+                                                <div class="file-details relative group">
+                                                    <div class="file-name text-gray-700 inline-block cursor-not-allowed">
+                                                        {{ $evidence->name }}
+                                                    </div>
+                                                    <div
+                                                        class="pointer-events-none absolute left-1/2 -translate-x-1/2 top-full mt-1 opacity-0 group-hover:opacity-100 w-max bg-gray-800 text-white text-xs rounded px-2 py-1 shadow z-50">
+                                                        ดาวน์โหลดเท่านั้น
+                                                    </div>
+
+                                                    @if ($evidence->detail)
+                                                        <div class="file-description text-sm text-gray-500">
+                                                            {{ Str::limit(strip_tags($evidence->detail), 50) }}
+                                                        </div>
+                                                    @endif
+                                                </div>
+                                            </div>
                                         </div>
-                                    </div>
+                                    @else
+                                        <span class="text-gray-400">ไม่มีไฟล์</span>
+                                    @endif
                                 </td>
+
+
+
+
                                 <td>{{ $evidence->total_size_human ?? '-' }}</td>
                                 <td data-search="{{ $evidence->type }}">{{ $evidence->type }}</td>
                                 <td data-order="{{ optional($evidence->created_at)->timestamp }}">
@@ -277,9 +326,40 @@
                                 <td data-search="{{ optional($evidence->user)->name ?? '' }}">
                                     {{ $evidence->user->name ?? '-' }}
                                 </td>
-                                <td data-search="{{ optional($indicator)->code ?? '' }}">
-                                    {{ $indicator->name ?? '-' }}
+                                @php
+                                    $is_assigned = (bool) ($indicator['is_assigned'] ?? false);
+                                    $rowUrl =
+                                        auth()->user() && auth()->user()->hasRole('user')
+                                            ? route('dashboardkpi.user.show', [
+                                                'id' => $indicator['id'],
+                                                'is_assigned' => $is_assigned,
+                                            ])
+                                            : route('dashboardkpi.admin.show', [
+                                                'id' => $indicator['id'],
+                                                'is_assigned' => $is_assigned,
+                                            ]);
+
+                                    $rowClass = $is_assigned ? 'assigned-row' : 'unassigned-row';
+                                @endphp
+
+                                <td data-search="{{ optional($indicator)->code ?? '' }}"
+                                    onclick="window.location='{{ $rowUrl }}';"
+                                    class="relative group cursor-pointer hover:bg-gray-50">
+
+                                    <span>{{ $indicator->name ?? '-' }}</span>
+
+                                    <!-- Tooltip -->
+                                    <div
+                                        class="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2
+         bg-gray-800 text-white text-xs rounded px-2 py-1 shadow-lg whitespace-nowrap z-50
+         invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-opacity duration-150">
+                                        กำลังไปหน้าการกรอกคะแนนตัวชี้วัด {{ $indicator->name ?? '-' }}
+                                    </div>
+
+
                                 </td>
+
+
                                 <td>
                                     <div class="evidence-actions">
                                         @if ($evidence->type === 'url' && !empty($evidence->path['urls'][0]))
@@ -524,6 +604,18 @@
             });
         </script>
     @endpush
+    <script>
+        function openPreview(url, title) {
+            document.getElementById('previewTitle').textContent = title;
+            document.getElementById('previewContent').innerHTML =
+                `<iframe src="${url}" class="w-full h-full"></iframe>`;
+            document.getElementById('previewModal').classList.remove('hidden');
+        }
+
+        function closePreview() {
+            document.getElementById('previewModal').classList.add('hidden');
+        }
+    </script>
 
     <!-- ========== CSS ========== -->
     <style>
@@ -586,7 +678,7 @@
             /* tooltip อยู่ด้านบน */
             /* left: 50%; */
             /* transform: translateX(-50%);
-                                                                                                            background: #333; */
+                                                                                                                                                                            background: #333; */
             color: #fff;
             font-size: 12px;
             /* padding: 5px 8px; */
@@ -616,6 +708,10 @@
             margin: 0 0 8px;
             font-size: 24px;
             color: #111827;
+        }
+
+        .table-container {
+            overflow: visible !important;
         }
 
         .controls {
