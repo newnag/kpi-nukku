@@ -7,7 +7,7 @@
 @section('content')
 
     <!-- Toggle Switch -->
-    <div style="text-align: right; margin-bottom:10px;">
+    <div class="text-end">
         <label class="switch">
             <input type="checkbox" id="toggle-filter">
             <span class="slider round"></span>
@@ -15,30 +15,22 @@
         <span style="margin-left:8px;">กรองข้อมูล</span>
     </div>
     <!-- Filter Card -->
-    <!-- ✅ เรียก Component filter-form -->
     <x-filter :years="$yearsForFilter" :standards="$allStandards" :departments="$departments" :collectors="$collectors" :dimensions="$dimensionStats" :action="route('dashboard.index')"
         :selectedYear="$displayYear" />
-
     <!-- Stats Cards -->
-    <div class="stat-title">
-        <h3>สถานะทั้งหมดของตัวชี้วัดต่อปี</h3>
-        <span class="year"id="display-years">{{ $displayYearText }}</span>
-    </div>
     <div class="stats-grid">
-
+        <div class="stat-title">
+            <h3>สถานะทั้งหมดของตัวชี้วัดต่อปี</h3>
+            <span class="year"id="display-years">{{ $displayYearText }}</span>
+        </div>
         <!-- Card  ความพึงพอใจ -->
         <div class="stat-card">
-
-
             <div class="stat-body">
                 <div class="chart-wrap">
                     <canvas id="satisfactionChart" width="310px" height="260"></canvas>
                 </div>
-
                 <div class="legend-wrap">
-
                     @php $totalStatus = array_sum($statusCounts); @endphp
-
                     @foreach ($legendConfig as $item)
                         @php
                             $count = $statusCounts[$item['key']] ?? 0;
@@ -54,10 +46,8 @@
                                     </div>
                                 </div>
                             </div>
-
                         </div> --}}
                     @endforeach
-
                     <div class="stats-card" id="card-total">
                         <div class="stats-icon">
                             <i class="fa fa-list"></i>
@@ -67,7 +57,6 @@
                             <div class="stats-label">จำนวนตัวชี้วัดทั้งหมด</div>
                         </div>
                     </div>
-
                     <div class="stats-card legend-item" data-key="complete">
                         <div class="stats-icon success">
                             <i class="fa fa-check-double"></i>
@@ -75,10 +64,8 @@
                         <div class="stats-info">
                             <div class="stats-value legend-count">{{ $statusCounts['complete'] ?? 0 }}</div>
                             <div class="stats-label">ผลการดำเนินงานครบถ้วนตามเกณฑ์มาตรการ</div>
-
                         </div>
                     </div>
-
                     <div class="stats-card legend-item" data-key="incomplete">
                         <div class="stats-icon warn">
                             <i class="fa fa-bell"></i>
@@ -86,10 +73,8 @@
                         <div class="stats-info">
                             <div class="stats-value legend-count">{{ $statusCounts['incomplete'] ?? 0 }}</div>
                             <div class="stats-label">ผลการดำเนินงานยังไม่ครบถ้วนตามเกณฑ์</div>
-
                         </div>
                     </div>
-
                     <div class="stats-card legend-item" data-key="pending">
                         <div class="stats-icon danger">
                             <i class="fa fa-times"></i>
@@ -100,22 +85,15 @@
 
                         </div>
                     </div>
-
-
                 </div>
             </div>
         </div>
         <div class="stat-title">
             <h3>รายการตัวบงชี้</h3>
-
         </div>
-
         <div class="containers">
-
             <div class="chart-header">
-
                 <div class="search-box flex-1 max-w-[420px]">
-
                     <div class="icon">
                         <!-- search icon -->
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none"
@@ -141,7 +119,6 @@
                     EXPORT TO EXCEL
                 </button>
             </div>
-
             <div class="dashboard-list">
                 <table class="table" id="dashboardTable">
 
@@ -230,23 +207,20 @@
             </div>
         </div>
     </div>
+@endsection
 
-
+@push('scripts')
     <!-- ตารางเอกสารและหลักฐาน -->
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/lucide@0.469.0/dist/umd/lucide.min.js"></script>
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
     <!-- DataTables -->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
-
-
     <script>
         document.getElementById('exportExell').addEventListener('click', function() {
             const params = new URLSearchParams();
@@ -278,8 +252,6 @@
             card.style.display = this.checked ? 'block' : 'none';
         });
     </script>
-
-
     <script>
         (function($) {
             let table, donutChart;
@@ -858,28 +830,10 @@
             });
         })(jQuery);
     </script>
+@endpush
 
-
-
+@push('styles')
     <style>
-        :root {
-            --blue-50: #eff6ff;
-            --blue-100: #dbeafe;
-            --blue-500: #3b82f6;
-            --blue-600: #2563eb;
-            --green-500: #22c55e;
-            --gray-50: #f9fafb;
-            --gray-100: #f3f4f6;
-            --gray-200: #e5e7eb;
-            --gray-300: #d1d5db;
-            --gray-400: #9ca3af;
-            --gray-500: #6b7280;
-            --gray-600: #4b5563;
-            --gray-700: #374151;
-            --gray-800: #1f2937;
-            --gray-900: #111827;
-        }
-
         .search-box {
             margin-left: 60px;
             margin-top: 30px;
@@ -960,10 +914,11 @@
 
         /* Stats Grid */
         .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-            gap: 24px;
-            margin-bottom: 32px;
+            display: flex;
+            flex-direction: column;
+            /* grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); */
+            gap: 20px;
+            /* margin-bottom: 32px; */
         }
 
         .stat-card {
@@ -988,14 +943,14 @@
             margin: 0;
         }
 
-        .stat-icon {
+        /* .stat-icon {
             width: 48px;
             height: 48px;
             border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
-        }
+        } */
 
         .user-icon {
             background: var(--blue-100);
@@ -1120,9 +1075,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            /* ดันปุ่มไปขวา */
             gap: 12px;
-            margin-bottom: 16px;
         }
 
         .chart-header h3 {
@@ -1292,14 +1245,6 @@
             }
         }
 
-        .stats-grid {
-            grid-template-columns: 1fr;
-        }
-
-        .stat-card {
-            padding: 16px;
-        }
-
         .satisfaction-chart {
             flex-direction: column;
             gap: 16px;
@@ -1307,7 +1252,6 @@
 
         .stat-footer {
             flex-direction: column;
-        }
         }
 
         @media (max-width: 480px) {
@@ -1425,7 +1369,7 @@
         }
 
         /* ตัวเลือก: วาง tooltip ด้านล่าง (ถ้าพื้นที่ด้านบนไม่พอ)
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   <span class="tip" data-tip="..." data-pos="bottom"> */
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               <span class="tip" data-tip="..." data-pos="bottom"> */
         .tip[data-pos="bottom"]::after {
             top: calc(100% + 10px);
             bottom: auto;
@@ -1514,9 +1458,6 @@
             border-radius: var(--card-radius);
             box-shadow: var(--shadow);
             padding: 18px 18px 20px;
-
-            margin-top: 15px;
-
         }
 
         .stat-header {
@@ -1531,7 +1472,9 @@
             display: flex;
             align-items: baseline;
             gap: 10px;
-            flex-wrap: wrap
+            flex-wrap: wrap;
+            padding-left: 30px;
+            /* margin-top: 6px; */
         }
 
         .stat-title h3 {
@@ -1904,23 +1847,24 @@
         .containers {
             width: 100%;
             max-width: 1500px;
-            margin: 0 auto;
+            /* margin: 0 auto; */
             background: white;
             border-radius: 10px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             overflow: hidden;
-            margin-top: 20px;
+            /* margin-top: 20px; */
         }
 
         .dashboard-list {
-            background: white;
-            border-radius: 10px;
+            /* background: white;
+                        border-radius: 10px;
+                        border: 2px solid #C2D9EB;
+                        margin-top: 40px;
+                        margin-bottom: 40px;
+                        margin-left: 60px;
+                        margin-right: 60px; */
+
             padding: 30px;
-            border: 2px solid #C2D9EB;
-            margin-top: 40px;
-            margin-bottom: 40px;
-            margin-left: 60px;
-            margin-right: 60px;
         }
 
         .table {
@@ -2022,5 +1966,4 @@
             vertical-align: middle;
         }
     </style>
-
-@endsection
+@endpush
