@@ -6,7 +6,7 @@
     <div class="flex items-center justify-center">
         <div class="max-w-md w-full ">
             <!-- Main Card -->
-            <div class="bg-white/80 backdrop-blur-sm shadow-2xl rounded-3xl p-8 border border-white/20 ">
+            <div class="bg-white/80 backdrop-blur-sm shadow-2xl rounded-3xl p-8 border border-white/20 min-w-md">
                 <!-- Logo Section -->
                 <div class="flex justify-center mb-6">
                     <div class="relative">
@@ -233,4 +233,16 @@
             // document.head.appendChild(style);
         })();
     </script>
+@endpush
+
+@push('styles')
+    <style>
+        .container {
+            display: flex;
+            /* text-align: center; */
+            align-items: center;
+            justify-content: center;
+
+        }
+    </style>
 @endpush
