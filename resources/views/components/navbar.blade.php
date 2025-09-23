@@ -46,7 +46,7 @@
         display: flex;
         align-items: center;
         width: auto;
-        gap: 0.5rem;
+        gap: 5px;
         transition: all 0.3s ease;
     }
 
@@ -267,7 +267,7 @@
         }
 
         .app-navbar .navbar-menu {
-            gap: 0.25rem;
+            gap: 5px;
         }
 
         .app-navbar .navbar-menu a {
@@ -589,13 +589,45 @@
             }
         });
 
-        // Fallback function for manual testing
-        window.toggleDropdown = function(element) {
-            const dropdown = element.closest('.dropdown');
-            if (dropdown) {
-                dropdown.classList.toggle('open');
-                console.log('Manual toggle - dropdown state:', dropdown.classList.contains('open'));
+        // Unified global dropdown toggler (safe for both navbar + filter multiselects)
+        (function(){
+            function unifiedToggle(arg){
+                // If string id -> treat as container id
+                if (typeof arg === 'string') {
+                    const target = document.getElementById(arg);
+                    if (target) {
+                        target.classList.toggle('open');
+                        return true;
+                    }
+                    console.warn('toggleDropdown: id not found', arg);
+                    return false;
+                }
+                // If element-like
+                if (arg && typeof arg === 'object') {
+                    const isEl = (arg instanceof Element) || typeof arg.closest === 'function';
+                    if (isEl) {
+                        // Direct multiselect container
+                        if (arg.classList && arg.classList.contains('dropdown-multiselect')) {
+                            arg.classList.toggle('open');
+                            return true;
+                        }
+                        const wrapper = arg.closest && arg.closest('.dropdown, .dropdown-multiselect');
+                        if (wrapper) {
+                            wrapper.classList.toggle('open');
+                            return true;
+                        }
+                    }
+                }
+                console.warn('toggleDropdown: unhandled argument', arg);
+                return false;
             }
-        };
+            // Only replace if not already our unified version
+            if (!window.toggleDropdown || !window.toggleDropdown.__unified) {
+                window.toggleDropdown = function(arg){
+                    try { return unifiedToggle(arg); } catch(e){ console.error('toggleDropdown error', e); }
+                };
+                window.toggleDropdown.__unified = true;
+            }
+        })();
     });
 </script>
