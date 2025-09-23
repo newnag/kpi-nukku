@@ -7,9 +7,9 @@
 
 @section('content')
     <div class="space-y-5">
-        <div class="flex justify-between">
-            <div class="flex flex-wrap gap-2 ">
-                <div class="relative w-screen sm:w-auto bg-white rounded-lg shadow-sm ">
+        <div class="flex flex-col sm:flex-row justify-between gap-4">
+            <div class="flex flex-col sm:flex-row flex-wrap gap-2 w-full sm:w-auto">
+                <div class="relative w-full sm:w-auto bg-white rounded-lg shadow-sm min-w-64">
                     <div class="absolute inset-y-0 left-3 flex items-center pointer-events-none">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24"
                             stroke="currentColor">
@@ -23,8 +23,7 @@
 
                 <!-- Sort Button with Dropdown -->
                 <div class="relative inline-block text-left" id="sort-dropdown-container">
-                    <button id="sort-button"
-                        class="h-fit border border-gray-300 rounded-lg px-4 py-2 bg-white text-gray-700 hover:bg-gray-100 flex items-center gap-2">
+                    <button id="sort-button" class="btns">
                         <span>เรียงลำดับ</span>
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
                             stroke="currentColor">
@@ -326,71 +325,72 @@
         </div>
 
         <!-- ตารางรายการตัวบ่งชี้ -->
-        <div class="border border-gray-200 rounded-lg shadow-sm xl:overflow-auto 2xl:overflow-visible">
-            <table id="myTable" class="w-full">
+        <div
+            class="overflow-x-auto border border-gray-200 rounded-lg shadow-sm sm:overflow-x-scroll md:overflow-x-auto lg:overflow-x-auto xl:overflow-auto 2xl:overflow-visible">
+            <table id="myTable" class="w-full min-w-full">
                 <thead>
                     <tr>
-                        <th class="w-fit  text-sm font-medium text-gray-900 cursor-pointer select-none"
+                        <th class="w-fit text-xs sm:text-sm font-medium text-gray-900 cursor-pointer select-none hidden sm:table-cell"
                             title="ปีของตัวชี้วัด">
-                            <div class="flex items-center justify-center  min-w-6">
+                            <div class="flex items-center justify-center min-w-6">
                                 ปี
                             </div>
                         </th>
-                        <th class="w-fit  text-sm font-medium text-gray-900 cursor-pointer select-none"
+                        <th class="w-fit text-xs sm:text-sm font-medium text-gray-900 cursor-pointer select-none hidden md:table-cell"
                             title="มาตรฐานตัวชี้วัด 3 หมวด">
-                            <div class="flex items-center justify-center  min-w-15">
+                            <div class="flex items-center justify-center min-w-15">
                                 มาตรฐาน
                             </div>
                         </th>
-                        <th class="w-fit  text-sm font-medium text-gray-900 cursor-pointer select-none"
+                        <th class="w-fit text-xs sm:text-sm font-medium text-gray-900 cursor-pointer select-none hidden lg:table-cell"
                             title="ด้านตัวชี้วัดใน 3 หมวด">
-                            <div class="flex items-center justify-center  min-w-20">
+                            <div class="flex items-center justify-center min-w-20">
                                 ด้าน
                             </div>
                         </th>
-                        <th class="w-full  text-sm font-medium text-gray-900 text-left cursor-pointer select-none"
+                        <th class="w-full text-xs sm:text-sm font-medium text-gray-900 text-left cursor-pointer select-none"
                             title="ชื่อตัวบ่งชี้">
-                            <div class="flex items-center justify-center min-w-56 ">
+                            <div class="flex items-center justify-center min-w-40 sm:min-w-56">
                                 ชื่อตัวบ่งชี้
                             </div>
                         </th>
-                        <th class="w-fit  text-sm font-medium text-gray-900 cursor-pointer select-none"
+                        <th class="w-fit text-xs sm:text-sm font-medium text-gray-900 cursor-pointer select-none"
                             title="รหัสตัวบ่งชี้">
-                            <div class="flex items-center justify-center min-w-9 ">
+                            <div class="flex items-center justify-center min-w-9">
                                 รหัส
                             </div>
                         </th>
-                        <th class="w-fit  text-sm font-medium text-gray-900 cursor-pointer select-none hidden md:table-cell"
+                        <th class="w-fit text-xs sm:text-sm font-medium text-gray-900 cursor-pointer select-none hidden xl:table-cell"
                             title="ประเภทตัวบ่งชี้ (คุณภาพ, ปริมาณ, คุณภาพ/ปริมาณ)">
-                            <div class="flex items-center justify-center min-w-11 ">
+                            <div class="flex items-center justify-center min-w-11">
                                 ประเภท
                             </div>
                         </th>
-                        <th class="w-fit text-sm font-medium text-gray-900 cursor-pointer select-none hidden md:table-cell"
+                        <th class="w-fit text-xs sm:text-sm font-medium text-gray-900 cursor-pointer select-none hidden xl:table-cell"
                             title="หน่วยงานที่รับผิดชอบในตัวบ่งชี้">
-                            <div class="flex items-center justify-center min-w-48">
+                            <div class="flex items-center justify-center min-w-32 lg:min-w-48">
                                 หน่วยงาน
                             </div>
                         </th>
-                        <th class="w-fit  text-sm font-medium text-gray-900 cursor-pointer select-none"
+                        <th class="w-fit text-xs sm:text-sm font-medium text-gray-900 cursor-pointer select-none hidden md:table-cell"
                             title="ผลลัพธ์จากการกรอกข้อมูลของตัวบ่งชี้">
                             <div class="flex items-center justify-center min-w-9">
                                 ผลลัพธ์
                             </div>
                         </th>
-                        <th class="w-fit  text-sm font-medium text-gray-900 cursor-pointer select-none hidden sm:table-cell"
+                        <th class="w-fit text-xs sm:text-sm font-medium text-gray-900 cursor-pointer select-none hidden lg:table-cell"
                             title="คะแนนเต็มของตัวบ่งชี้">
                             <div class="flex items-center justify-center min-w-9 text-nowrap">
                                 คะแนนเต็ม
                             </div>
                         </th>
-                        <th class="w-fit text-sm font-medium text-gray-900 cursor-pointer select-none"
+                        <th class="w-fit text-xs sm:text-sm font-medium text-gray-900 cursor-pointer select-none"
                             title="สถานะของตัวบ่งชี้">
                             <div class="flex items-center justify-center w-fit">
                                 สถานะ
                             </div>
                         </th>
-                        <th class="w-fit  text-sm font-medium text-gray-900 cursor-pointer select-none hidden sm:table-cell"
+                        <th class="w-fit text-xs sm:text-sm font-medium text-gray-900 cursor-pointer select-none "
                             title="สถานะเอกสาร">
                             <div class="flex items-center justify-center">
                                 เอกสาร
@@ -417,25 +417,30 @@
                             // Add a class on <tr> so we can style hover differently for assigned vs unassigned rows
                             $rowClass = $is_assigned ? 'assigned-row' : 'unassigned-row';
                         @endphp
-                        <tr class="{{ $rowClass }}"
-                            data-href="{{ $rowUrl }}" tabindex="0" role="link"
+                        <tr class="{{ $rowClass }}" data-href="{{ $rowUrl }}" tabindex="0" role="link"
                             aria-label="เปิด {{ $indicator['name'] }}" title="คลิกเพื่อดูรายละเอียด">
-                            <td class="max-w-6 text-sm text-gray-700 text-center align-top">{{ $indicator['year'] }}</td>
-                            <td class="max-w-15 text-sm text-balance text-gray-700 align-top">
+                            <td
+                                class="max-w-6 text-xs sm:text-sm text-gray-700 text-center align-top hidden sm:table-cell">
+                                {{ $indicator['year'] }}</td>
+                            <td
+                                class="max-w-15 text-xs sm:text-sm text-balance text-gray-700 align-top hidden md:table-cell">
                                 {{ $indicator['category']['name'] }}</td>
-                            <td class="max-w-15 text-sm text-balance text-gray-700 align-top">
+                            <td
+                                class="max-w-15 text-xs sm:text-sm text-balance text-gray-700 align-top hidden lg:table-cell">
                                 {{ $indicator['standard']['name'] }}</td>
-                            <td class="max-w-full text-pretty text-sm text-gray-700 align-top truncate">
-                                {{-- <span class="block truncate" title="{{ $indicator['name'] }}"> --}}
-                                {{ $indicator['name'] }}
-                                {{-- </span> --}}
+                            <td class="max-w-full text-pretty text-xs sm:text-sm text-gray-700 align-top">
+                                <div class="truncate max-w-40 sm:max-w-56" title="{{ $indicator['name'] }}">
+                                    {{ $indicator['name'] }}
+                                </div>
                             </td>
-                            <td class="max-w-9 text-center text-sm text-gray-700 truncate  align-top">
+                            <td class="max-w-9 text-center text-xs sm:text-sm text-gray-700 truncate align-top">
                                 {{ $indicator['code'] }}</td>
-                            <td class="max-w-11 text-sm text-gray-700 text-center align-top">
+                            <td
+                                class="max-w-11 text-xs sm:text-sm text-gray-700 text-center align-top hidden xl:table-cell">
                                 {{ $indicator['type'] ?? 'ไม่ระบุ' }}
                             </td>
-                            <td class="text-sm text-gray-700 align-top max-w-full cursor-auto" data-rowlink-ignore>
+                            <td class="text-xs sm:text-sm text-gray-700 align-top max-w-full cursor-auto hidden xl:table-cell"
+                                data-rowlink-ignore>
                                 @php
                                     // Unique, non-empty department names
                                     $departments = collect($indicator['assignments'] ?? [])
@@ -469,17 +474,17 @@
                                 @endif
                             </td>
 
-                            <td class=" text-sm text-gray-700 text-center align-top">
+                            <td class="text-xs sm:text-sm text-gray-700 text-center align-top hidden md:table-cell">
                                 {{ number_format($indicator['score_acc'], 2) ?? '0.00' }}
                             </td>
-                            <td class=" text-sm text-gray-700 text-center align-top">
+                            <td class="text-xs sm:text-sm text-gray-700 text-center align-top hidden lg:table-cell">
                                 {{ number_format($indicator['max_score'], 2) ?? '0.00' }}
                             </td>
                             @php
                                 $statusCode = (int) ($indicator['status'] ?? -1);
                             @endphp
 
-                            <td class=" text-sm text-center align-top" data-search="{{ $statusCode }}"
+                            <td class="text-xs sm:text-sm text-center align-top" data-search="{{ $statusCode }}"
                                 data-order="{{ $statusCode }}">
                                 @switch($statusCode)
                                     @case(0)
@@ -526,32 +531,26 @@
                             </td>
 
                             @php
-                                // Derive document status from criteria statuses (0/1/2)
-                                $criteria = collect($indicator['criteria'] ?? []);
-
-                                // Normalize to string to handle 0 vs "0"
-                                $has0 = $criteria->contains(fn($c) => (string) ($c['status'] ?? '') === '0');
-                                $has2 = $criteria->contains(fn($c) => (string) ($c['status'] ?? '') === '2');
-
-                                if ($criteria->isEmpty() || $has0) {
-                                    $docText = 'รอดำเนินการ';
-                                    $docOrder = 0;
-                                    $badgeCls = 'bg-gray-100 text-gray-800';
-                                } elseif ($has2) {
+                                if ($indicator['criteria_status'] == 2) {
+                                    $docText = 'ไม่ครบ';
+                                    $docOrder = 2;
+                                    $badgeCls = 'bg-red-100 text-red-800';
+                                } elseif ($indicator['criteria_status'] === 1) {
                                     $docText = 'ครบ';
                                     $docOrder = 1;
                                     $badgeCls = 'bg-green-100 text-green-800';
                                 } else {
-                                    $docText = 'ไม่ครบ';
-                                    $docOrder = 2;
-                                    $badgeCls = 'bg-red-100 text-red-800';
+                                    $docText = 'รอดำเนินการ';
+                                    $docOrder = 0;
+                                    $badgeCls = 'bg-gray-100 text-gray-800';
                                 }
                             @endphp
 
-                            <td class="align-top" data-search="{{ $docText }}" data-order="{{ $docOrder }}">
+                            <td class="align-top {{ $badgeCls }}" data-search="{{ $docText }}"
+                                data-order="{{ $docOrder }}">
                                 <div class="w-full items-center justify-center flex">
                                     <span
-                                        class="flex w-fit justify-center text-center px-2 py-1 font-medium rounded-full truncate text-xs {{ $badgeCls }}">
+                                        class="flex w-fit justify-center text-center px-2 py-1 font-medium rounded-full truncate text-xs">
                                         {{ $docText }}
                                     </span>
                                 </div>
@@ -606,14 +605,24 @@
                 color: #2563eb;
             }
 
+            /* Responsive Design for Different Screen Sizes */
+
+            /* Small screens (sm: 640px and below) */
             @media (max-width: 640px) {
+                .container {
+                    padding: 8px;
+                }
+
                 table.dataTable {
-                    font-size: .875rem;
+                    font-size: 0.75rem;
+                    width: 100% !important;
                 }
 
                 table.dataTable thead th,
                 table.dataTable tbody td {
-                    padding: 8px 4px;
+                    padding: 6px 3px;
+                    word-wrap: break-word;
+                    vertical-align: top;
                 }
 
                 table.dataTable thead th .sort-icon {
@@ -623,7 +632,124 @@
                 table.dataTable thead th.sorting,
                 table.dataTable thead th.sorting_asc,
                 table.dataTable thead th.sorting_desc {
-                    padding-right: 8px;
+                    padding-right: 6px;
+                }
+
+                /* Ensure table takes full width on small screens */
+                .dataTables_wrapper {
+                    overflow-x: auto;
+                    -webkit-overflow-scrolling: touch;
+                }
+
+                /* Adjust filter dropdown for mobile */
+                .dropdown-menus {
+                    left: -20px;
+                    min-width: 280px;
+                    max-width: calc(100vw - 40px);
+                }
+
+                .dropdown-menus .filter-section {
+                    width: 100%;
+                }
+
+                /* Mobile-friendly buttons */
+                .btn-view {
+                    font-size: 11px;
+                    padding: 4px 8px;
+                }
+
+                .status-badge {
+                    font-size: 11px;
+                    min-width: 50px;
+                    padding: 2px 6px;
+                }
+            }
+
+            /* Medium screens (md: 768px) */
+            @media (min-width: 641px) and (max-width: 768px) {
+                .container {
+                    padding: 12px;
+                }
+
+                table.dataTable {
+                    font-size: 0.875rem;
+                }
+
+                table.dataTable thead th,
+                table.dataTable tbody td {
+                    padding: 8px 4px;
+                }
+
+                .dropdown-menus {
+                    min-width: 400px;
+                }
+
+                .btn-view {
+                    font-size: 12px;
+                    padding: 5px 10px;
+                }
+            }
+
+            /* Large screens (lg: 1024px) */
+            @media (min-width: 769px) and (max-width: 1024px) {
+                .container {
+                    max-width: 900px;
+                    padding: 16px;
+                }
+
+                table.dataTable {
+                    font-size: 0.9rem;
+                }
+
+                table.dataTable thead th,
+                table.dataTable tbody td {
+                    padding: 9px 5px;
+                }
+
+                .dropdown-menus {
+                    min-width: 500px;
+                }
+            }
+
+            /* Extra large screens (xl: 1280px) */
+            @media (min-width: 1025px) and (max-width: 1280px) {
+                .container {
+                    max-width: 1100px;
+                    padding: 20px;
+                }
+
+                table.dataTable {
+                    font-size: 1rem;
+                }
+
+                table.dataTable thead th,
+                table.dataTable tbody td {
+                    padding: 10px 6px;
+                }
+
+                .dropdown-menus {
+                    min-width: 600px;
+                }
+            }
+
+            /* 2Extra large screens (2xl: 1536px and above) */
+            @media (min-width: 1281px) {
+                .container {
+                    max-width: 1400px;
+                    padding: 24px;
+                }
+
+                table.dataTable {
+                    font-size: 1rem;
+                }
+
+                table.dataTable thead th,
+                table.dataTable tbody td {
+                    padding: 12px 8px;
+                }
+
+                .dropdown-menus {
+                    min-width: 720px;
                 }
             }
 
@@ -637,6 +763,46 @@
                 padding: 16px;
                 box-sizing: border-box;
             }
+
+            /* Responsive adjustments for control elements */
+            @media (max-width: 640px) {
+                .filter-grid {
+                    grid-template-columns: 1fr;
+                    gap: 12px;
+                    padding: 12px;
+                }
+
+                /* Stack controls vertically on mobile */
+                .flex.justify-between {
+                    flex-direction: column;
+                    gap: 1rem;
+                }
+
+                /* Make buttons full width on small screens */
+                .btns {
+                    width: 100%;
+                    justify-content: center;
+                }
+
+                /* Ensure table doesn't break layout on very small screens */
+                .dataTables_wrapper {
+                    overflow-x: auto;
+                    -webkit-overflow-scrolling: touch;
+                }
+
+                /* Make table container responsive */
+                #myTable_wrapper {
+                    max-width: 100%;
+                    overflow-x: auto;
+                }
+
+                /* Improve icon sizes on mobile */
+                .status-icon,
+                [data-lucide] {
+                    width: 16px !important;
+                    height: 16px !important;
+                }
+            }
         </style>
 
         <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.dataTables.min.css">
@@ -644,18 +810,19 @@
             .container {
                 max-width: 1400px !important;
             }
+
             #myTable,
             table.dataTable {
                 width: 100% !important;
             }
 
             /* .dataTables_wrapper {
-                background-color: ;
-            } */
+                                                background-color: ;
+                                            } */
 
             /* Length and Filter Controls */
             /* .dataTables_wrapper .dataTables_length,
-            .dataTables_wrapper .dataTables_filter {} */
+                                            .dataTables_wrapper .dataTables_filter {} */
 
             /* Dropdown Select Styling */
             .dataTables_wrapper .dataTables_length select {
@@ -670,8 +837,8 @@
             }
 
             /* .dataTables_wrapper .dataTables_paginate {
-                padding-top: 1rem;
-            } */
+                                                padding-top: 1rem;
+                                            } */
 
             .dataTables_wrapper .dataTables_paginate .paginate_button {
                 padding: 0.5rem 1rem;
@@ -695,9 +862,9 @@
             }
 
             /* .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
-                        background-color: #1d4ed8 !important;
-                        border-color: #1d4ed8;
-                    } */
+                                                        background-color: #1d4ed8 !important;
+                                                        border-color: #1d4ed8;
+                                                    } */
 
             table.dataTable thead th,
             table.dataTable tbody td {
@@ -705,7 +872,8 @@
 
             }
 
-            @media (max-width: 768px) {
+            /* DataTables Responsive Controls */
+            @media (max-width: 640px) {
 
                 .dataTables_wrapper .dataTables_length,
                 .dataTables_wrapper .dataTables_filter,
@@ -714,6 +882,35 @@
                     text-align: left;
                     float: none;
                     width: 100%;
+                    margin: 5px 0;
+                }
+
+                .dataTables_wrapper .dataTables_length select {
+                    padding: 0.25rem;
+                    font-size: 0.875rem;
+                }
+
+                .dataTables_wrapper .dataTables_paginate .paginate_button {
+                    padding: 0.25rem 0.5rem;
+                    margin-left: 0.125rem;
+                    font-size: 0.75rem;
+                }
+            }
+
+            @media (min-width: 641px) and (max-width: 768px) {
+
+                .dataTables_wrapper .dataTables_length,
+                .dataTables_wrapper .dataTables_filter,
+                .dataTables_wrapper .dataTables_info,
+                .dataTables_wrapper .dataTables_paginate {
+                    text-align: left;
+                    float: none;
+                    width: 100%;
+                }
+
+                .dataTables_wrapper .dataTables_paginate .paginate_button {
+                    padding: 0.375rem 0.75rem;
+                    font-size: 0.875rem;
                 }
             }
 
@@ -769,40 +966,47 @@
 
             #myTable tbody tr:hover {
                 /* Default hover for rows without specific class */
-                background-color: #324456 !important; /* slate-50 */
+                background-color: #324456 !important;
+                /* slate-50 */
             }
 
             /* Subtle base background to distinguish unassigned rows even without hover */
             #myTable tbody tr.unassigned-row {
-                background-color: #f9fafb !important; /* gray-50 */
+                background-color: #f9fafb !important;
+                /* gray-50 */
             }
 
             /* Hover variants for assignment state */
             #myTable tbody tr.assigned-row:hover {
-                background-color: #dbeafe !important; /* blue-100 */
+                background-color: #dbeafe !important;
+                /* blue-100 */
             }
 
             #myTable tbody tr.unassigned-row:hover {
-                background-color: #e5e7eb !important; /* gray-200 */
+                background-color: #e5e7eb !important;
+                /* gray-200 */
             }
 
             /* Visual accent stripe on left edge for quick scanning */
             #myTable tbody tr.assigned-row {
-                box-shadow: inset 4px 0 0 0 #3b82f6; /* blue-500 */
+                box-shadow: inset 4px 0 0 0 #3b82f6;
+                /* blue-500 */
             }
 
             #myTable tbody tr.unassigned-row {
-                box-shadow: inset 4px 0 0 0 #cbd5e1; /* slate-300 */
+                box-shadow: inset 4px 0 0 0 #cbd5e1;
+                /* slate-300 */
             }
 
             /* Slightly dim text for unassigned rows to reduce visual weight */
             #myTable tbody tr.unassigned-row td {
-                color: #6b7280; /* gray-600 */
+                color: #6b7280;
+                /* gray-600 */
             }
 
             /* #myTable tbody tr:active {
-                        background-color: #e5e7eb !important;
-                        /* Tailwind gray-200 */
+                                                        background-color: #e5e7eb !important;
+                                                        /* Tailwind gray-200 */
             /* } */
 
             table.dataTable tbody tr {
@@ -823,30 +1027,7 @@
             }
 
 
-            /* Better mobile display for DataTables */
-            @media (max-width: 640px) {
-                table.dataTable {
-                    font-size: 0.875rem;
-                }
-
-                table.dataTable thead th,
-                table.dataTable tbody td {
-                    padding: 8px 4px;
-
-                }
-
-                /* Hide sort icons on very small screens */
-                table.dataTable thead th .sort-icon {
-                    display: none;
-                }
-
-                /* Make the whole header clickable on mobile */
-                table.dataTable thead th.sorting,
-                table.dataTable thead th.sorting_asc,
-                table.dataTable thead th.sorting_desc {
-                    padding-right: 8px;
-                }
-            }
+            /* Duplicate responsive section removed - consolidated above */
 
             /* Custom tooltip to show sorting capability */
             .sort-tooltip {
@@ -1109,6 +1290,21 @@
             function toggleDropdown(id) {
                 const el = document.getElementById(id);
                 if (!el) return;
+
+                // Close all other filter dropdowns first
+                const allDropdowns = ['yearDropdown', 'standardDropdown', 'dimensionDropdown', 'deptDropdown', 'typeDropdown',
+                    'statusDropdown'
+                ];
+                allDropdowns.forEach(dropdownId => {
+                    if (dropdownId !== id) {
+                        const otherEl = document.getElementById(dropdownId);
+                        if (otherEl) {
+                            otherEl.classList.remove('open');
+                        }
+                    }
+                });
+
+                // Toggle the clicked dropdown
                 el.classList.toggle('open');
             }
 
@@ -1214,12 +1410,16 @@
                     e.stopPropagation();
                     $('#filter-dropdown').toggleClass('hidden');
                     $('#sort-dropdown').addClass('hidden'); // Close other dropdown
+                    $('.dropdown-multiselect').removeClass('open'); // Close all filter section dropdowns
                 });
 
                 // Close dropdowns when clicking outside
                 $(document).on('click', function(e) {
-                    if (!$(e.target).closest('#sort-dropdown-container, #filter-dropdown-container').length) {
+                    if (!$(e.target).closest(
+                            '#sort-dropdown-container, #filter-dropdown-container, .dropdown-multiselect')
+                        .length) {
                         $('#sort-dropdown, #filter-dropdown').addClass('hidden');
+                        $('.dropdown-multiselect').removeClass('open');
                     }
                 });
 
@@ -1358,6 +1558,79 @@
                 });
 
 
+            });
+        </script>
+        <script>
+            // Initialize dropdown label counters on load
+            document.addEventListener('DOMContentLoaded', function() {
+                setupDropdownLabel('yearDropdown', 'year-label', 'เลือกปี');
+                setupDropdownLabel('standardDropdown', 'standard-label', 'เลือกมาตรฐาน');
+                setupDropdownLabel('dimensionDropdown', 'dimension-label', 'เลือกด้าน');
+                setupDropdownLabel('deptDropdown', 'dept-label', 'เลือกหน่วยงาน');
+                setupDropdownLabel('typeDropdown', 'type-label', 'เลือกประเภท');
+                setupDropdownLabel('statusDropdown', 'status-label', 'เลือกสถานะ');
+                setupDropdownLabel('assignedDropdown', 'assigned-label', 'เลือกการมอบหมาย');
+
+                // Keyboard accessibility for dropdown buttons
+                document.querySelectorAll('.dropdown-multiselect .dropdown-btn').forEach(btn => {
+                    btn.setAttribute('role', 'button');
+                    btn.setAttribute('tabindex', '0');
+                    btn.addEventListener('keydown', (e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            const id = btn.parentElement.id;
+                            toggleDropdown(id);
+                        }
+                    });
+                });
+
+                // Per-section search: live filter labels in the section
+                $(document).on('input', '.dropdown-tools .filter-search', function() {
+                    const tools = $(this).closest('.dropdown-tools');
+                    const sectionId = tools.data('section');
+                    const q = $(this).val().toString().toLowerCase();
+                    const content = $('#' + sectionId + ' .dropdown-content');
+                    content.find('label').each(function() {
+                        const text = $(this).text().toLowerCase();
+                        $(this).toggle(text.indexOf(q) !== -1);
+                    });
+                });
+
+                // Select all / Clear all in a section
+                $(document).on('click', '.dropdown-tools [data-action] ', function() {
+                    const action = $(this).data('action');
+                    const tools = $(this).closest('.dropdown-tools');
+                    const sectionId = tools.data('section');
+                    const content = $('#' + sectionId + ' .dropdown-content');
+                    const checkboxes = content.find('input.filter-option');
+
+                    if (action === 'select-all') {
+                        checkboxes.each(function() {
+                            if (!$(this).is(':checked')) {
+                                $(this).prop('checked', true).trigger('change');
+                            }
+                        });
+                    } else if (action === 'clear-all') {
+                        checkboxes.each(function() {
+                            if ($(this).is(':checked')) {
+                                $(this).prop('checked', false).trigger('change');
+                            }
+                        });
+                    }
+
+                    // Update label counters after bulk action
+                    const btn = document.querySelector('#' + sectionId + ' .dropdown-btn span');
+                    if (btn) {
+                        const defaultText = btn.id === 'year-label' ? 'เลือกปี' :
+                            btn.id === 'standard-label' ? 'เลือกมาตรฐาน' :
+                            btn.id === 'dimension-label' ? 'เลือกด้าน' :
+                            btn.id === 'dept-label' ? 'เลือกหน่วยงาน' :
+                            btn.id === 'type-label' ? 'เลือกประเภท' :
+                            btn.id === 'status-label' ? 'เลือกสถานะ' : '';
+                        const count = content.find('input.filter-option:checked').length;
+                        btn.textContent = count > 0 ? `${defaultText} (${count})` : defaultText;
+                    }
+                });
             });
         </script>
         <script>
