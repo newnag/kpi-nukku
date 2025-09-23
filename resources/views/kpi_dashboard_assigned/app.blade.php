@@ -77,7 +77,7 @@
                                 <div class="dropdown-multiselect" id="yearDropdown">
                                     <div class="dropdown-btn" onclick="toggleDropdown('yearDropdown')">
                                         <span id="year-label">เลือกปี</span>
-                                        <i style="font-size:12px;">▼</i>
+                                        <i class="fa-solid fa-caret-down"></i>
                                     </div>
                                     <div class="dropdown-content">
                                         <div class="dropdown-tools" data-section="yearDropdown">
@@ -109,7 +109,7 @@
                                 <div class="dropdown-multiselect" id="standardDropdown">
                                     <div class="dropdown-btn" onclick="toggleDropdown('standardDropdown')">
                                         <span id="standard-label">เลือกมาตรฐาน</span>
-                                        <i style="font-size:12px;">▼</i>
+                                        <i class="fa-solid fa-caret-down"></i>
                                     </div>
 
                                     <div class="dropdown-content">
@@ -140,7 +140,7 @@
                                 <div class="dropdown-multiselect" id="dimensionDropdown">
                                     <div class="dropdown-btn" onclick="toggleDropdown('dimensionDropdown')">
                                         <span id="dimension-label">เลือกด้าน</span>
-                                        <i style="font-size:12px;">▼</i>
+                                        <i class="fa-solid fa-caret-down"></i>
                                     </div>
                                     <div class="dropdown-content">
                                         <div class="dropdown-tools" data-section="dimensionDropdown">
@@ -170,7 +170,7 @@
                                 <div class="dropdown-multiselect" id="deptDropdown">
                                     <div class="dropdown-btn" onclick="toggleDropdown('deptDropdown')">
                                         <span id="dept-label">เลือกหน่วยงาน</span>
-                                        <i style="font-size:12px;">▼</i>
+                                        <i class="fa-solid fa-caret-down"></i>
                                     </div>
                                     <div class="dropdown-content">
                                         <div class="dropdown-tools" data-section="deptDropdown">
@@ -210,7 +210,7 @@
                                 <div class="dropdown-multiselect" id="typeDropdown">
                                     <div class="dropdown-btn" onclick="toggleDropdown('typeDropdown')">
                                         <span id="type-label">เลือกประเภท</span>
-                                        <i style="font-size:12px;">▼</i>
+                                        <i class="fa-solid fa-caret-down"></i>
                                     </div>
                                     <div class="dropdown-content">
                                         <div class="dropdown-tools" data-section="typeDropdown">
@@ -240,21 +240,22 @@
                                 <div class="dropdown-multiselect" id="statusDropdown">
                                     <div class="dropdown-btn" onclick="toggleDropdown('statusDropdown')">
                                         <span id="status-label">เลือกสถานะ</span>
-                                        <i style="font-size:12px;">▼</i>
+                                        <i class="fa-solid fa-caret-down"></i>
                                     </div>
                                     @php
                                         $statusMap = [
                                             0 => 'รอดำเนินการ',
-                                            1 => 'รอดำเนินการ / บันทึกร่าง',
-                                            2 => 'รอดำเนินการ / บันทึกจริง',
+                                            1 => 'รอดำเนินการ / บันทึกฉบับร่าง',
+                                            2 => 'รอดำเนินการ / บันทึกฉบับจริง',
                                             3 => 'ผลการดำเนินงานครบถ้วนตามเกณฑ์มาตรการ',
                                             4 => 'ผลการดำเนินงานยังไม่ครบถ้วนตามเกณฑ์',
                                         ];
 
-                                        $statusList = $indicators
+                                        $statusCodes = $indicators
                                             ->pluck('status')
                                             ->unique()
-                                            ->map(fn($s) => $statusMap[$s] ?? 'ไม่ทราบ');
+                                            ->sort()
+                                            ->values();
                                     @endphp
                                     <div class="dropdown-content">
                                         <div class="dropdown-tools" data-section="statusDropdown">
@@ -266,11 +267,11 @@
                                                     data-action="clear-all">ล้างทั้งหมด</button>
                                             </div>
                                         </div>
-                                        @foreach ($statusList as $statusText)
+                                        @foreach ($statusCodes as $statusCode)
                                             <label>
                                                 <input type="checkbox" class="filter-option status-option"
-                                                    data-column="9" data-value="{{ $statusText }}">
-                                                <span style="margin-left:6px;">{{ $statusText }}</span>
+                                                    data-column="9" data-value="{{ $statusCode }}">
+                                                <span style="margin-left:6px;">{{ $statusMap[$statusCode] ?? 'ไม่ระบุ' }}</span>
                                             </label>
                                         @endforeach
                                     </div>
@@ -284,7 +285,7 @@
                                 <div class="dropdown-multiselect" id="assignedDropdown">
                                     <div class="dropdown-btn" onclick="toggleDropdown('assignedDropdown')">
                                         <span id="assigned-label">เลือกการมอบหมาย</span>
-                                        <i style="font-size:12px;">▼</i>
+                                        <i class="fa-solid fa-caret-down"></i>
                                     </div>
                                     <div class="dropdown-content">
                                         <div class="dropdown-tools" data-section="assignedDropdown">
@@ -489,22 +490,22 @@
                                 @switch($statusCode)
                                     @case(0)
                                         <span class="tooltip" data-tooltip="รอดำเนินการ">
-                                            <i data-lucide="alert-triangle" class="w-5 h-5 text-red-500"></i>
+                                            <i data-lucide="clock" class="w-5 h-5 text-yellow-500"></i>
                                             <span class="sr-only">รอดำเนินการ</span>
                                         </span>
                                     @break
 
                                     @case(1)
-                                        <span class="tooltip" data-tooltip="รอดำเนินการ / บันทึกร่าง">
-                                            <i data-lucide="alert-triangle" class="w-5 h-5 text-red-500"></i>
-                                            <span class="sr-only">รอดำเนินการ / บันทึกร่าง</span>
+                                        <span class="tooltip" data-tooltip="รอดำเนินการ / บันทึกฉบับร่าง">
+                                            <i data-lucide="clock" class="w-5 h-5 text-yellow-500"></i>
+                                            <span class="sr-only">รอดำเนินการ / บันทึกฉบับร่าง</span>
                                         </span>
                                     @break
 
                                     @case(2)
-                                        <span class="tooltip" data-tooltip="รอดำเนินการ / บันทึกจริง">
-                                            <i data-lucide="alert-triangle" class="w-5 h-5 text-red-500"></i>
-                                            <span class="sr-only">รอดำเนินการ / บันทึกจริง</span>
+                                        <span class="tooltip" data-tooltip="รอดำเนินการ / บันทึกฉบับจริง">
+                                            <i data-lucide="clock" class="w-5 h-5 text-yellow-500"></i>
+                                            <span class="sr-only">รอดำเนินการ / บันทึกฉบับจริง</span>
                                         </span>
                                     @break
 
@@ -810,19 +811,22 @@
             .container {
                 max-width: 1400px !important;
             }
+            
+            /* Dropdown caret animation */
+            .dropdown-btn i,
+            .dropdown-btn .fa-caret-down {
+                transition: transform 0.2s ease;
+            }
+
+            .dropdown-multiselect.open .dropdown-btn i,
+            .dropdown-multiselect.open .dropdown-btn .fa-caret-down {
+                transform: rotate(180deg);
+            }
 
             #myTable,
             table.dataTable {
                 width: 100% !important;
             }
-
-            /* .dataTables_wrapper {
-                                                background-color: ;
-                                            } */
-
-            /* Length and Filter Controls */
-            /* .dataTables_wrapper .dataTables_length,
-                                            .dataTables_wrapper .dataTables_filter {} */
 
             /* Dropdown Select Styling */
             .dataTables_wrapper .dataTables_length select {
@@ -835,10 +839,6 @@
             .dataTables_wrapper .dataTables_info {
                 color: #4b5563;
             }
-
-            /* .dataTables_wrapper .dataTables_paginate {
-                                                padding-top: 1rem;
-                                            } */
 
             .dataTables_wrapper .dataTables_paginate .paginate_button {
                 padding: 0.5rem 1rem;
@@ -860,11 +860,6 @@
                 border-color: #ffffff;
                 color: white !important;
             }
-
-            /* .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
-                                                        background-color: #1d4ed8 !important;
-                                                        border-color: #1d4ed8;
-                                                    } */
 
             table.dataTable thead th,
             table.dataTable tbody td {
@@ -966,25 +961,16 @@
 
             #myTable tbody tr:hover {
                 /* Default hover for rows without specific class */
-                background-color: #324456 !important;
+                /* background-color: #324456 !important; */
                 /* slate-50 */
             }
 
-            /* Subtle base background to distinguish unassigned rows even without hover */
-            #myTable tbody tr.unassigned-row {
-                background-color: #f9fafb !important;
-                /* gray-50 */
+            table.dataTable tbody tr {
+                background-color: inherit !important;
             }
 
-            /* Hover variants for assignment state */
-            #myTable tbody tr.assigned-row:hover {
-                background-color: #dbeafe !important;
-                /* blue-100 */
-            }
-
-            #myTable tbody tr.unassigned-row:hover {
-                background-color: #e5e7eb !important;
-                /* gray-200 */
+            #myTable tbody tr:hover td {
+                background-color: inherit !important;
             }
 
             /* Visual accent stripe on left edge for quick scanning */
@@ -998,36 +984,38 @@
                 /* slate-300 */
             }
 
+            /* Subtle base background to distinguish unassigned rows even without hover */
+            #myTable tbody tr.unassigned-row {
+                background-color: #f9fafb !important;
+                /* gray-50 */
+            }
+
+            #myTable tbody tr.unassigned-row:hover {
+                background-color: #e5e7eb !important;
+                /* gray-200 */
+            }
+
+            /* Hover variants for assignment state */
+            #myTable tbody tr.assigned-row:hover {
+                background-color: #dbeafe !important;
+                /* blue-100 */
+            }
+
             /* Slightly dim text for unassigned rows to reduce visual weight */
             #myTable tbody tr.unassigned-row td {
-                color: #6b7280;
+                /* color: #6b7280; */
                 /* gray-600 */
             }
 
-            /* #myTable tbody tr:active {
-                                                        background-color: #e5e7eb !important;
-                                                        /* Tailwind gray-200 */
-            /* } */
-
-            table.dataTable tbody tr {
-                background-color: inherit !important;
+            #myTable tbody tr.unassigned-row:hover td {
+                /* background-color: #e5e7eb !important; */
+                /* gray-200 */
             }
 
-            /* Remove old specific override; handled by classes above */
-            /* table.dataTable tbody tr.bg-gray-100 { } */
-
-            /* Keyboard accessibility: show focus clearly on focused row */
-            #myTable tbody tr:focus,
-            #myTable tbody tr:focus-visible,
-            #myTable tbody tr:focus-within {
-                /* outline: 2px solid #93c5fd; */
-                /* outline-offset: -2px; */
-                /* background-color: #f8fafc !important; */
-                /* slate-50 */
+            #myTable tbody tr.assigned-row:hover td {
+                /* background-color: #dbeafe !important; */
+                /* blue-100 */
             }
-
-
-            /* Duplicate responsive section removed - consolidated above */
 
             /* Custom tooltip to show sorting capability */
             .sort-tooltip {
