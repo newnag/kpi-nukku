@@ -1,9 +1,9 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 
 @section('content')
     <div class="max-w-6xl mx-auto space-y-6">
         <h2 class="text-2xl font-bold mb-6">สร้างรายงาน SAR</h2>
-  @if(request('year'))
+        @if (request('year'))
             <div class="text-gray-600 mb-6">ปีการประเมิน: <span class="font-semibold">{{ request('year') }}</span></div>
         @endif
         <form method="POST" action="{{ route('sar_reports.update', $report->id) }}" class="space-y-6">
@@ -280,11 +280,30 @@
                 <textarea name="section4" id="section4" class="trumbowyg-textarea w-full">{{ old('section4', $report->section4 ?? '') }}</textarea>
             </div>
 
-            <div class="flex justify-end">
-                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md shadow">
+            <div class="flex justify-end space-x-2">
+
+                <div x-data="{ open: false }" class="relative flex justify-end">
+                    <button @click="open = !open"
+                        class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-md shadow inline-flex items-center">
+                        📤 Export
+                    </button>
+
+                    <div x-show="open" @click.away="open = false"
+                        class="absolute right-0 mt-2 w-40 bg-white border rounded-md shadow-lg z-50">
+                        <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">📄 DOCX</a>
+                        <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">📊 Excel</a>
+                        <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">📕 PDF</a>
+                    </div>
+                </div>
+
+                <!-- ปุ่ม Save -->
+                <button type="submit"
+                    class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md shadow inline-flex items-center">
                     💾 บันทึก
                 </button>
             </div>
+
+
         </form>
     </div>
 @endsection

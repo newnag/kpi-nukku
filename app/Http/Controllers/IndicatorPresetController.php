@@ -268,4 +268,110 @@ class IndicatorPresetController extends Controller
             'Content-Type'        => 'application/json',
         ]);
     }
+
+    /**
+     * Duplicate selected indicators (only selected items) into a target year.
+     */
+    public function duplicate(Request $request)
+    {
+        $validated = $request->validate([
+            'ids'         => 'required|array|min:1',
+            'ids.*'       => 'integer',
+            'target_year' => 'required|integer|min:2000|max:2100',
+        ]);
+
+        $ids        = (array) $validated['ids'];
+        $targetYear = (int) $validated['target_year'];
+
+        $indicators = Indicator::with([
+                'criterias',
+                'variables',
+                'formulas.variables',
+                'checklistItems',
+            ])->whereIn('id', $ids)
+            ->get();
+
+        if ($indicators->isEmpty()) {
+            return back()->with('error', 'No indicators found to duplicate.');
+        }
+
+        \DB::transaction(function () use ($indicators, $targetYear) {
+            // Align PostgreSQL sequences (safe to attempt; ignored by other drivers)
+            try {
+                DB::statement("SELECT setval(pg_get_serial_sequence('indicators','id'), COALESCE((SELECT MAX(id) FROM indicators), 0) + 1, false)");
+                DB::statement("SELECT setval(pg_get_serial_sequence('criterias','id'), COALESCE((SELECT MAX(id) FROM criterias), 0) + 1, false)");
+                DB::statement("SELECT setval(pg_get_serial_sequence('variables','id'), COALESCE((SELECT MAX(id) FROM variables), 0) + 1, false)");
+                DB::statement("SELECT setval(pg_get_serial_sequence('formulas','id'), COALESCE((SELECT MAX(id) FROM formulas), 0) + 1, false)");
+                DB::statement("SELECT setval(pg_get_serial_sequence('checklist_items','id'), COALESCE((SELECT MAX(id) FROM checklist_items), 0) + 1, false)");
+            } catch (\Throwable $e) {
+                // best-effort; continue even if statements fail
+                report($e);
+            }
+
+            foreach ($indicators as $indicator) {
+                // 1) Duplicate indicator
+                $copy = Indicator::create([
+                    'name'         => $indicator->name,
+                    'year'         => $targetYear,
+                    'code'         => $indicator->code,
+                    'description'  => $indicator->description,
+                    'condition'    => $indicator->condition,
+                    'annotation'   => $indicator->annotation,
+                    'deadline'     => optional($indicator->deadline)->format('Y-m-d'),
+                    'status'       => 0,
+                    'comment'      => $indicator->comment,
+                    'score_acc'    => 0,
+                    'max_score'    => $indicator->max_score,
+                    'type'         => $indicator->type,
+                    'categorie_id' => $indicator->categorie_id,
+                ]);
+
+                // 2) Criterias
+                foreach ($indicator->criterias as $c) {
+                    $copy->criterias()->create([
+                        'name'        => $c->name,
+                        'description' => $c->description,
+                        'sequence'    => $c->sequence,
+                        // status/report intentionally not copied to reset workflow content
+                    ]);
+                }
+
+                // 3) Variables (keep a map by label_name)
+                $variablesMap = [];
+                foreach ($indicator->variables as $v) {
+                    $nv = $copy->variables()->create([
+                        'variable_name' => $v->variable_name,
+                        'label_name'    => $v->label_name,
+                        'type'          => $v->type,
+                        'value'         => $v->value,
+                    ]);
+                    $variablesMap[$v->label_name] = $nv->id;
+                }
+
+                // 4) Formulas (relink variables by label_name)
+                foreach ($indicator->formulas as $f) {
+                    $nf = $copy->formulas()->create([
+                        'condition' => $f->condition,
+                    ]);
+                    foreach ($f->variables as $fv) {
+                        $label = $fv->label_name;
+                        if ($label && isset($variablesMap[$label])) {
+                            $nf->variables()->attach($variablesMap[$label]);
+                        }
+                    }
+                }
+
+                // 5) Checklist
+                foreach ($indicator->checklistItems as $cl) {
+                    $copy->checklistItems()->create([
+                        'required_items' => $cl->required_items,
+                        'score'          => $cl->score,
+                        'description'    => $cl->description,
+                    ]);
+                }
+            }
+        });
+
+        return back()->with('success', 'Indicators duplicated successfully!');
+    }
 }

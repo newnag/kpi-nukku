@@ -132,6 +132,23 @@
             Import Preset
         </button>
     </form>
+
+    <!-- Duplicate To Year -->
+    <form id="preset-duplicate-form-{{ $modalId }}" method="POST" action="{{ route('indicator.duplicate') }}"
+          class="flex-1 flex flex-col border rounded-lg p-4 space-y-3">
+        @csrf
+        <div>
+            <label class="block text-sm font-medium text-gray-700">คัดลอกไปยังปี</label>
+            <input type="number" name="target_year" value="{{ now()->year }}" min="2000" max="2100"
+                class="block w-full border rounded px-2 py-1 text-sm" required>
+        </div>
+        <div id="duplicate-ids-container-{{ $modalId }}"></div>
+
+        <button type="button" id="duplicate-submit-{{ $modalId }}"
+            class="mt-auto w-full bg-indigo-500 text-white py-2 rounded hover:bg-indigo-600">
+            Duplicate Selected
+        </button>
+    </form>
 </div>
 
     </div>
@@ -147,6 +164,9 @@ document.addEventListener("DOMContentLoaded", function () {
     const yearFilter = document.getElementById(`year-filter-${modalId}`);
     const searchBox = document.getElementById(`search-${modalId}`);
     const hiddenYear = document.getElementById(`hidden-year-${modalId}`);
+    const duplicateForm = document.getElementById(`preset-duplicate-form-${modalId}`);
+    const duplicateIdsContainer = document.getElementById(`duplicate-ids-container-${modalId}`);
+    const duplicateSubmitBtn = document.getElementById(`duplicate-submit-${modalId}`);
 
     // ฟังก์ชันรีเฟรช filter
     function applyFilter() {
@@ -184,5 +204,27 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // ✅ ค้นหา
     searchBox?.addEventListener("input", applyFilter);
+
+    // Duplicate: require at least one selected indicator
+    duplicateSubmitBtn?.addEventListener('click', function () {
+        if (!duplicateForm) return;
+        // Clear previous ids
+        if (duplicateIdsContainer) duplicateIdsContainer.innerHTML = '';
+
+        const checked = indicatorList.querySelectorAll("input[type=checkbox][name='ids[]']:checked");
+        if (checked.length === 0) {
+            alert('กรุณาเลือกตัวชี้วัดอย่างน้อย 1 รายการ');
+            return;
+        }
+        checked.forEach((cb) => {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'ids[]';
+            input.value = cb.value;
+            duplicateIdsContainer.appendChild(input);
+        });
+
+        duplicateForm.submit();
+    });
 });
 </script>

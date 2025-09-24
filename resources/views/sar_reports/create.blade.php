@@ -214,7 +214,7 @@
                                                     <th class="border px-2 py-1 w-32">การประเมินตนเอง</th>
                                                 </tr>
                                             </thead>
-                                            <tbody>
+                                         <tbody>
                                                 @php
                                                     $lines = [];
                                                     if (!empty($ind->comment)) {
@@ -225,17 +225,9 @@
                                                         );
                                                         $plain = strip_tags($plain);
                                                         $plain = html_entity_decode($plain, ENT_QUOTES, 'UTF-8');
-                                                        // Normalize non-breaking spaces and multiple spaces
-                                                        $plain = preg_replace('/[\x{00A0}\s]+/u', ' ', $plain);
                                                         $lines = preg_split('/\r\n|\r|\n/', $plain);
-                                                        $lines = array_filter(array_map(fn($t) => trim((string)$t), $lines));
+                                                        $lines = array_filter(array_map('trim', $lines));
                                                     }
-
-                                                    // Fallback: if no comment lines, use criteria names as lines
-                                                    if (empty($lines) && isset($ind->criterias)) {
-                                                        $lines = $ind->criterias->pluck('name')->filter()->map(fn($t) => trim((string)$t))->all();
-                                                    }
-
                                                     $score = $ind->self_score ?? ($ind->score_acc ?? null);
                                                 @endphp
 

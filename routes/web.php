@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\CategorieController;
@@ -11,6 +11,7 @@ use App\Http\Controllers\EvidenceController;
 use App\Http\Controllers\IndicatorController;
 use App\Http\Controllers\IndicatorPresetController;
 use App\Http\Controllers\SarReportController;
+use App\Http\Controllers\SarReportExportController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\StandardController;
 use App\Http\Controllers\UserController;
@@ -115,6 +116,10 @@ Route::middleware(['auth'])->group(function () {
         // Import
         Route::post('/import', [IndicatorPresetController::class, 'import'])
             ->name('import')
+            ->middleware('permission:import-indicator');
+        // Duplicate to year
+        Route::post('/duplicate', [IndicatorPresetController::class, 'duplicate'])
+            ->name('duplicate')
             ->middleware('permission:import-indicator');
         // Gracefully handle accidental GET to /indicator/import by redirecting
         Route::get('/import', function () {
@@ -263,7 +268,7 @@ Route::middleware(['auth'])->group(function () {
             ->name('download')
             ->whereNumber('id')
             ->middleware('permission:download-evidence');
-        // Preview (เพิ่มใหม่)
+        // Preview (Ã Â¹â‚¬Ã Â¸Å¾Ã Â¸Â´Ã Â¹Ë†Ã Â¸Â¡Ã Â¹Æ’Ã Â¸Â«Ã Â¸Â¡Ã Â¹Ë†)
         Route::get('/{id}/preview', [EvidenceController::class, 'preview'])
             ->name('preview')
             ->whereNumber('id')
@@ -308,4 +313,6 @@ Route::get('/sar_reports/create', [SarReportController::class, 'create'])
     ->name('sar_reports.create');
 Route::post('/sar_reports', [SarReportController::class, 'store'])
     ->name('sar_reports.store');
-
+Route::get('/sar_reports/{id}/export/docx', [SarReportExportController::class, 'docx'])->name('sar_reports.export.docx');
+Route::get('/sar_reports/{id}/export/xlsx', [SarReportExportController::class, 'xlsx'])->name('sar_reports.export.xlsx');
+Route::get('/sar_reports/{id}/export/pdf', [SarReportExportController::class, 'pdf'])->name('sar_reports.export.pdf');
