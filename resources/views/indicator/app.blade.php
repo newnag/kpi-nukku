@@ -6,7 +6,7 @@
 @section('subheader', 'ระบบบริหารจัดการข้อมูลการรับรองสถาบันจากสภาการพยาบาล')
 
 @section('content')
-    <div class="space-y-5">
+    <div class="space-y-5 sm:bg-amber-400 md:bg-green-500 lg:bg-blue-500 xl:bg-purple-500 2xl:bg-orange-600">
         <div class="flex flex-col sm:flex-row justify-between gap-4">
             <div class="flex flex-col sm:flex-row flex-wrap gap-2 w-full sm:w-auto">
                 <div class="relative w-full sm:w-auto bg-white rounded-lg shadow-sm min-w-64">
@@ -17,7 +17,8 @@
                                 d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                         </svg>
                     </div>
-                    <input type="text" id="custom-search" placeholder="ค้นหารายการตัวบ่งชี้"
+                    <input type="search" name="custom_search" id="custom-search" placeholder="ค้นหารายการตัวบ่งชี้..."
+                        aria-label="ค้นหารายการตัวบ่งชี้" aria-controls="myTable" autocomplete="off"
                         class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/40" />
                 </div>
 
@@ -69,8 +70,8 @@
                         </svg>
                     </button>
 
-                    <div id="filter-dropdown" class="dropdown-menus hidden">
-                        <div class="filters-grid">
+                    <div id="filter-dropdown" class="dropdown-menus">
+                        <div class="filter-grid">
                             <div class="filter-section">
                                 {{-- Section: ปี --}}
                                 <h3 class="dropdown-title">ปี</h3>
@@ -81,8 +82,8 @@
                                     </div>
                                     <div class="dropdown-content">
                                         <div class="dropdown-tools" data-section="yearDropdown">
-                                            <input type="text" class="filter-search" placeholder="ค้นหา..."
-                                                aria-label="ค้นหาปี">
+                                            <input type="text" name="year_search" class="filter-search"
+                                                placeholder="ค้นหา..." aria-label="ค้นหาปี">
                                             <div class="tools-actions">
                                                 <button type="button" class="tool-btn"
                                                     data-action="select-all">เลือกทั้งหมด</button>
@@ -92,8 +93,8 @@
                                         </div>
                                         @foreach ($indicators->pluck('year')->unique()->sortDesc() as $year)
                                             <label style="display:flex; align-items:center; margin-bottom:4px;">
-                                                <input type="checkbox" class="filter-option year-option" data-column="0"
-                                                    data-value="{{ $year }}">
+                                                <input type="checkbox" name="year[]" class="filter-option year-option"
+                                                    data-column="0" data-value="{{ $year }}">
                                                 <span style="margin-left:6px; font-size:14px; color:#374151;">
                                                     {{ $year }}
                                                 </span>
@@ -114,8 +115,8 @@
 
                                     <div class="dropdown-content">
                                         <div class="dropdown-tools" data-section="standardDropdown">
-                                            <input type="text" class="filter-search" placeholder="ค้นหา..."
-                                                aria-label="ค้นหามาตรฐาน">
+                                            <input type="text" name="standard_search" class="filter-search"
+                                                placeholder="ค้นหา..." aria-label="ค้นหามาตรฐาน">
                                             <div class="tools-actions">
                                                 <button type="button" class="tool-btn"
                                                     data-action="select-all">เลือกทั้งหมด</button>
@@ -125,8 +126,9 @@
                                         </div>
                                         @foreach ($indicators->pluck('standard.name')->unique() as $std)
                                             <label>
-                                                <input type="checkbox" class="filter-option standard-option"
-                                                    data-column="2" data-value="{{ $std }}">
+                                                <input type="checkbox" name="standard[]"
+                                                    class="filter-option standard-option" data-column="2"
+                                                    data-value="{{ $std }}">
                                                 <span style="margin-left:6px;">{{ $std }}</span>
                                             </label>
                                         @endforeach
@@ -144,8 +146,8 @@
                                     </div>
                                     <div class="dropdown-content">
                                         <div class="dropdown-tools" data-section="dimensionDropdown">
-                                            <input type="text" class="filter-search" placeholder="ค้นหา..."
-                                                aria-label="ค้นหาด้าน">
+                                            <input type="text" name="dimension_search" class="filter-search"
+                                                placeholder="ค้นหา..." aria-label="ค้นหาด้าน">
                                             <div class="tools-actions">
                                                 <button type="button" class="tool-btn"
                                                     data-action="select-all">เลือกทั้งหมด</button>
@@ -155,8 +157,9 @@
                                         </div>
                                         @foreach ($indicators->pluck('category.name')->unique() as $dim)
                                             <label>
-                                                <input type="checkbox" class="filter-option dimension-option"
-                                                    data-column="1" data-value="{{ $dim }}">
+                                                <input type="checkbox" name="dimension[]"
+                                                    class="filter-option dimension-option" data-column="1"
+                                                    data-value="{{ $dim }}">
                                                 <span style="margin-left:6px;">{{ $dim }}</span>
                                             </label>
                                         @endforeach
@@ -174,8 +177,8 @@
                                     </div>
                                     <div class="dropdown-content">
                                         <div class="dropdown-tools" data-section="deptDropdown">
-                                            <input type="text" class="filter-search" placeholder="ค้นหา..."
-                                                aria-label="ค้นหาหน่วยงาน">
+                                            <input type="text" name="dept_search" class="filter-search"
+                                                placeholder="ค้นหา..." aria-label="ค้นหาหน่วยงานที่รับผิดชอบ">
                                             <div class="tools-actions">
                                                 <button type="button" class="tool-btn"
                                                     data-action="select-all">เลือกทั้งหมด</button>
@@ -195,8 +198,8 @@
                                         @endphp
                                         @foreach ($deptOptions as $dept)
                                             <label>
-                                                <input type="checkbox" class="filter-option dept-option" data-column="6"
-                                                    data-value="{{ $dept }}">
+                                                <input type="checkbox" name="dept[]" class="filter-option dept-option"
+                                                    data-column="6" data-value="{{ $dept }}">
                                                 <span style="margin-left:6px;">{{ $dept }}</span>
                                             </label>
                                         @endforeach
@@ -205,8 +208,8 @@
                             </div>
 
                             <div class="filter-section">
-                                {{-- Section: ประเภทตัวชี้วัด --}}
-                                <h3 class="dropdown-title">ประเภทตัวชี้วัด</h3>
+                                {{-- Section: ประเภทตัวบ่งชี้ --}}
+                                <h3 class="dropdown-title">ประเภทตัวบ่งชี้</h3>
                                 <div class="dropdown-multiselect" id="typeDropdown">
                                     <div class="dropdown-btn" onclick="toggleDropdown('typeDropdown')">
                                         <span id="type-label">เลือกประเภท</span>
@@ -214,8 +217,8 @@
                                     </div>
                                     <div class="dropdown-content">
                                         <div class="dropdown-tools" data-section="typeDropdown">
-                                            <input type="text" class="filter-search" placeholder="ค้นหา..."
-                                                aria-label="ค้นหาประเภท">
+                                            <input type="text" name="type_search" class="filter-search"
+                                                placeholder="ค้นหา..." aria-label="ค้นหาประเภทตัวบ่งชี้">
                                             <div class="tools-actions">
                                                 <button type="button" class="tool-btn"
                                                     data-action="select-all">เลือกทั้งหมด</button>
@@ -225,8 +228,8 @@
                                         </div>
                                         @foreach ($indicators->pluck('type')->unique() as $type)
                                             <label style="display:flex; align-items:center; margin-bottom:4px;">
-                                                <input type="checkbox" class="filter-option type-option" data-column="5"
-                                                    data-value="{{ $type ?? 'ไม่ระบุ' }}">
+                                                <input type="checkbox" name="type[]" class="filter-option type-option"
+                                                    data-column="5" data-value="{{ $type ?? 'ไม่ระบุ' }}">
                                                 <span style="margin-left:6px; font-size:14px; color:#374151;">
                                                     {{ $type ?? 'ไม่ระบุ' }}
                                                 </span>
@@ -237,8 +240,8 @@
                             </div>
 
                             <div class="filter-section">
-                                {{-- Section: สถานะตัวชี้วัด --}}
-                                <h3 class="dropdown-title">สถานะตัวชี้วัด</h3>
+                                {{-- Section: สถานะตัวบ่งชี้ --}}
+                                <h3 class="dropdown-title">สถานะตัวบ่งชี้</h3>
                                 <div class="dropdown-multiselect" id="statusDropdown">
                                     <div class="dropdown-btn" onclick="toggleDropdown('statusDropdown')">
                                         <span id="status-label">เลือกสถานะ</span>
@@ -257,7 +260,8 @@
                                     @endphp
                                     <div class="dropdown-content">
                                         <div class="dropdown-tools" data-section="statusDropdown">
-
+                                            <input type="text" name="status_search" class="filter-search"
+                                                placeholder="ค้นหา..." aria-label="ค้นหาสถานะตัวบ่งชี้">
                                             <div class="tools-actions">
                                                 <button type="button" class="tool-btn"
                                                     data-action="select-all">เลือกทั้งหมด</button>
@@ -267,8 +271,9 @@
                                         </div>
                                         @foreach ($statusCodes as $statusCode)
                                             <label>
-                                                <input type="checkbox" class="filter-option status-option"
-                                                    data-column="9" data-value="{{ $statusCode }}">
+                                                <input type="checkbox" name="status[]"
+                                                    class="filter-option status-option" data-column="9"
+                                                    data-value="{{ $statusCode }}">
                                                 <span
                                                     style="margin-left:6px;">{{ $statusMap[$statusCode] ?? 'ไม่ระบุ' }}</span>
                                             </label>
@@ -278,15 +283,46 @@
                                 </div>
                             </div>
 
-                            <div class="filters-actions">
-                                {{-- Buttons --}}
-                                <div style="display:flex; justify-content:space-between; gap:12px; width:100%">
-                                    <button id="clear-filters" class="btn"
-                                        style="padding:6px 10px;">ล้างตัวกรอง</button>
-                                    <button id="apply-filters" class="btn btn-primary"
-                                        style="padding:6px 10px;">ใช้ตัวกรอง</button>
+                            <div class="filter-section">
+                                {{-- Section: สถานะเอกสาร --}}
+                                <h3 class="dropdown-title">สถานะเอกสาร</h3>
+                                <div class="dropdown-multiselect" id="statusEnvDropdown">
+                                    <div class="dropdown-btn" onclick="toggleDropdown('statusEnvDropdown')">
+                                        <span id="statusEnv-label">เลือกสถานะเอกสาร</span>
+                                        <i class="fa-solid fa-caret-down"></i>
+                                    </div>
+                                    @php
+                                        $docStatusOptions = ['รอดำเนินการ', 'ครบ', 'ไม่ครบ'];
+                                    @endphp
+                                    <div class="dropdown-content">
+                                        <div class="dropdown-tools" data-section="statusEnvDropdown">
+                                            <input type="text" name="doc_status_search" class="filter-search"
+                                                placeholder="ค้นหา..." aria-label="ค้นหาสถานะเอกสาร">
+                                            <div class="tools-actions">
+                                                <button type="button" class="tool-btn"
+                                                    data-action="select-all">เลือกทั้งหมด</button>
+                                                <button type="button" class="tool-btn"
+                                                    data-action="clear-all">ล้างทั้งหมด</button>
+                                            </div>
+                                        </div>
+                                        @foreach ($docStatusOptions as $docStatus)
+                                            <label>
+                                                <input type="checkbox" name="doc_status[]"
+                                                    class="filter-option statusenv-option" data-column="10"
+                                                    data-value="{{ $docStatus }}">
+                                                <span style="margin-left:6px;">{{ $docStatus }}</span>
+                                            </label>
+                                        @endforeach
+                                    </div>
+
                                 </div>
                             </div>
+                        </div>
+
+                        <div class="filters-actions">
+                            {{-- Buttons --}}
+                            <button id="clear-filters" class="btn px-1.5 py-2.5">ล้างตัวกรอง</button>
+                            <button id="apply-filters" class="btn btn-primary px-1.5 py-2.5">ใช้ตัวกรอง</button>
                         </div>
                     </div>
                 </div>
@@ -309,7 +345,7 @@
                         stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                     </svg>
-                    <span class="hidden sm:inline">เพิ่มตัวชี้วัด</span>
+                    <span class="hidden sm:inline">เพิ่มตัวบ่งชี้</span>
                 </button>
             </div>
         </div>
@@ -321,19 +357,19 @@
                 <thead>
                     <tr>
                         <th class="w-fit text-xs sm:text-sm font-medium text-gray-900 cursor-pointer select-none hidden sm:table-cell"
-                            title="ปีของตัวชี้วัด">
+                            title="ปีของตัวบ่งชี้">
                             <div class="flex items-center justify-center min-w-6">
                                 ปี
                             </div>
                         </th>
                         <th class="w-fit text-xs sm:text-sm font-medium text-gray-900 cursor-pointer select-none hidden md:table-cell"
-                            title="มาตรฐานตัวชี้วัด 3 หมวด">
+                            title="มาตรฐานตัวบ่งชี้ 3 หมวด">
                             <div class="flex items-center justify-center min-w-15">
                                 มาตรฐาน
                             </div>
                         </th>
                         <th class="w-fit text-xs sm:text-sm font-medium text-gray-900 cursor-pointer select-none hidden lg:table-cell"
-                            title="ด้านตัวชี้วัดใน 3 หมวด">
+                            title="ด้านตัวบ่งชี้ใน 3 หมวด">
                             <div class="flex items-center justify-center min-w-20">
                                 ด้าน
                             </div>
@@ -521,11 +557,8 @@
 
                             <td class="align-top {{ $badgeCls }}" data-search="{{ $docText }}"
                                 data-order="{{ $docOrder }}">
-                                <div class="w-full items-center justify-center flex">
-                                    <span
-                                        class="flex w-fit justify-center text-center px-2 py-1 font-medium rounded-full truncate text-xs">
-                                        {{ $docText }}
-                                    </span>
+                                <div class="justify-center text-center font-medium truncate text-xs">
+                                    {{ $docText }}
                                 </div>
                             </td>
                         </tr>
@@ -546,21 +579,7 @@
     @push('styles')
         <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.dataTables.min.css">
         <style>
-            .container {
-                max-width: 1400px !important;
-            }
-
-            /* Dropdown caret animation */
-            .dropdown-btn i,
-            .dropdown-btn .fa-caret-down {
-                transition: transform 0.2s ease;
-            }
-
-            .dropdown-multiselect.open .dropdown-btn i,
-            .dropdown-multiselect.open .dropdown-btn .fa-caret-down {
-                transform: rotate(180deg);
-            }
-
+            /* Datatable styles */
             #myTable,
             table.dataTable {
                 width: 100% !important;
@@ -603,194 +622,6 @@
             table.dataTable tbody td {
                 padding: 10px 4px;
 
-            }
-
-            /* DataTables Responsive Controls */
-            @media (max-width: 640px) {
-
-                .dataTables_wrapper .dataTables_length,
-                .dataTables_wrapper .dataTables_filter,
-                .dataTables_wrapper .dataTables_info,
-                .dataTables_wrapper .dataTables_paginate {
-                    text-align: left;
-                    float: none;
-                    width: 100%;
-                    margin: 5px 0;
-                }
-
-                .dataTables_wrapper .dataTables_length select {
-                    padding: 0.25rem;
-                    font-size: 0.875rem;
-                }
-
-                .dataTables_wrapper .dataTables_paginate .paginate_button {
-                    padding: 0.25rem 0.5rem;
-                    margin-left: 0.125rem;
-                    font-size: 0.75rem;
-                }
-            }
-
-            @media (min-width: 641px) and (max-width: 768px) {
-
-                .dataTables_wrapper .dataTables_length,
-                .dataTables_wrapper .dataTables_filter,
-                .dataTables_wrapper .dataTables_info,
-                .dataTables_wrapper .dataTables_paginate {
-                    text-align: left;
-                    float: none;
-                    width: 100%;
-                }
-
-                .dataTables_wrapper .dataTables_paginate .paginate_button {
-                    padding: 0.375rem 0.75rem;
-                    font-size: 0.875rem;
-                }
-            }
-
-            /* Small screens (sm: 640px and below) */
-            @media (max-width: 640px) {
-                .container {
-                    padding: 8px;
-                }
-
-                table.dataTable {
-                    font-size: 0.75rem;
-                    width: 100% !important;
-                }
-
-                table.dataTable thead th,
-                table.dataTable tbody td {
-                    padding: 6px 3px;
-                    word-wrap: break-word;
-                    vertical-align: top;
-                }
-
-                table.dataTable thead th .sort-icon {
-                    display: none;
-                }
-
-                table.dataTable thead th.sorting,
-                table.dataTable thead th.sorting_asc,
-                table.dataTable thead th.sorting_desc {
-                    padding-right: 6px;
-                }
-
-                /* Ensure table takes full width on small screens */
-                .dataTables_wrapper {
-                    overflow-x: auto;
-                    -webkit-overflow-scrolling: touch;
-                }
-
-                /* Adjust filter dropdown for mobile */
-                .dropdown-menus {
-                    left: -20px;
-                    min-width: 280px;
-                    max-width: calc(100vw - 40px);
-                }
-
-                .dropdown-menus .filter-section {
-                    width: 100%;
-                }
-
-                /* Mobile-friendly buttons */
-                .btn-view {
-                    font-size: 11px;
-                    padding: 4px 8px;
-                }
-
-                .status-badge {
-                    font-size: 11px;
-                    min-width: 50px;
-                    padding: 2px 6px;
-                }
-            }
-
-            /* Medium screens (md: 768px) */
-            @media (min-width: 641px) and (max-width: 768px) {
-                .container {
-                    padding: 12px;
-                }
-
-                table.dataTable {
-                    font-size: 0.875rem;
-                }
-
-                table.dataTable thead th,
-                table.dataTable tbody td {
-                    padding: 8px 4px;
-                }
-
-                .dropdown-menus {
-                    min-width: 400px;
-                }
-
-                .btn-view {
-                    font-size: 12px;
-                    padding: 5px 10px;
-                }
-            }
-
-            /* Large screens (lg: 1024px) */
-            @media (min-width: 769px) and (max-width: 1024px) {
-                .container {
-                    max-width: 900px;
-                    padding: 16px;
-                }
-
-                table.dataTable {
-                    font-size: 0.9rem;
-                }
-
-                table.dataTable thead th,
-                table.dataTable tbody td {
-                    padding: 9px 5px;
-                }
-
-                .dropdown-menus {
-                    min-width: 500px;
-                }
-            }
-
-            /* Extra large screens (xl: 1280px) */
-            @media (min-width: 1025px) and (max-width: 1280px) {
-                .container {
-                    max-width: 1100px;
-                    padding: 20px;
-                }
-
-                table.dataTable {
-                    font-size: 1rem;
-                }
-
-                table.dataTable thead th,
-                table.dataTable tbody td {
-                    padding: 10px 6px;
-                }
-
-                .dropdown-menus {
-                    min-width: 600px;
-                }
-            }
-
-            /* 2Extra large screens (2xl: 1536px and above) */
-            @media (min-width: 1281px) {
-                .container {
-                    max-width: 1400px;
-                    padding: 24px;
-                }
-
-                table.dataTable {
-                    font-size: 1rem;
-                }
-
-                table.dataTable thead th,
-                table.dataTable tbody td {
-                    padding: 12px 8px;
-                }
-
-                .dropdown-menus {
-                    min-width: 720px;
-                }
             }
 
             /* Table header styling for better sorting UX */
@@ -856,79 +687,11 @@
             #myTable tbody tr:hover td {
                 background-color: inherit !important;
             }
-
-            /* Duplicate responsive section removed - consolidated above */
-
-            .filter-grid {
-                display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-                /* อย่างน้อย 250px ถ้ามีที่ว่างจะแบ่ง 1fr */
-                gap: 16px 24px;
-                max-height: 70vh;
-                overflow-y: auto;
-                padding: 16px;
-                box-sizing: border-box;
-            }
-
-            /* Responsive adjustments for control elements */
-            @media (max-width: 640px) {
-                .filter-grid {
-                    grid-template-columns: 1fr;
-                    gap: 12px;
-                    padding: 12px;
-                }
-
-                /* Stack controls vertically on mobile */
-                .flex.justify-between {
-                    flex-direction: column;
-                    gap: 1rem;
-                }
-
-                /* Make buttons full width on small screens */
-                .btns {
-                    width: 100%;
-                    justify-content: center;
-                }
-
-                /* Ensure table doesn't break layout on very small screens */
-                .dataTables_wrapper {
-                    overflow-x: auto;
-                    -webkit-overflow-scrolling: touch;
-                }
-
-                /* Make table container responsive */
-                #myTable_wrapper {
-                    max-width: 100%;
-                    overflow-x: auto;
-                }
-
-                /* Improve icon sizes on mobile */
-                .status-icon,
-                [data-lucide] {
-                    width: 16px !important;
-                    height: 16px !important;
-                }
-            }
-
-            /* Custom tooltip to show sorting capability */
-            .sort-tooltip {
-                position: relative;
-            }
-
-            .sort-tooltip:hover:after {
-                content: "คลิกเพื่อเรียงลำดับ";
-                position: absolute;
-                top: -30px;
-                left: 50%;
-                transform: translateX(-50%);
-                background-color: rgba(0, 0, 0, 0.8);
-                color: white;
-                padding: 4px 8px;
-                border-radius: 4px;
-                font-size: 12px;
-                white-space: nowrap;
-                z-index: 10;
-
+        </style>
+        <style>
+            /* Base section styles */
+            .container {
+                max-width: 1400px !important;
             }
 
             .btn-view {
@@ -953,6 +716,21 @@
                 background: #dbeafe;
             }
 
+            .btns {
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+                border: 1px solid #e5e7eb;
+                background: #fff;
+                color: #374151;
+                padding: 8px 12px;
+                border-radius: 8px;
+            }
+
+            .btns:hover {
+                background: #f9fafb;
+            }
+
             .status-badge {
 
                 align-items: center;
@@ -969,72 +747,68 @@
                 white-space: nowrap;
             }
 
+            /* Dropdown caret animation */
+            .dropdown-btn i,
+            .dropdown-btn .fa-caret-down {
+                transition: transform 0.2s ease;
+            }
+
+            .dropdown-multiselect.open .dropdown-btn i,
+            .dropdown-multiselect.open .dropdown-btn .fa-caret-down {
+                transform: rotate(180deg);
+            }
+
             /* Minimal styles for custom multiselect dropdown */
             .dropdown {
                 position: relative;
                 display: inline-block;
             }
 
-            .btns {
-                display: inline-flex;
-                align-items: center;
-                gap: 6px;
-                border: 1px solid #e5e7eb;
-                background: #fff;
-                color: #374151;
-                padding: 8px 12px;
-                border-radius: 8px;
-            }
-
-            .btns:hover {
-                background: #f9fafb;
-            }
-
             .dropdown-menus {
                 position: absolute;
-                left: -50px;
                 margin-top: 8px;
+                left: 0;
                 background: #fff;
                 border: 1px solid #e5e7eb;
                 border-radius: 8px;
                 box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
                 z-index: 50;
-                min-width: 280px;
+                padding: 12px;
+
+                max-height: ;
+                overflow: scroll;
             }
 
-            .dropdown-menus .filters-grid {
+            .dropdown-menus .filter-grid {
                 display: grid;
-                grid-template-columns: 1fr;
+                grid-template-columns: 1fr 1fr;
                 gap: 12px;
-                padding: 12px 12px;
+                max-height: max-content;
+                overflow-y: auto;
+                padding-right: 4px;
             }
 
             .dropdown-menus .filter-section {
                 display: flex;
                 flex-direction: column;
-                gap: 6px;
-                width: 360px;
+                gap: 5px;
                 font-size: 14px;
+                width: 100%;
+                min-width: 360px;
             }
 
             .dropdown-menus .filters-actions {
-                grid-column: 1 / -1;
-            }
-
-            @media (min-width: 768px) {
-                .dropdown-menus {
-                    min-width: 720px;
-                }
-
-                .dropdown-menus .filters-grid {
-                    grid-template-columns: 1fr 1fr;
-                }
+                width: 100%;
+                display: flex;
+                justify-content: space-between;
+                margin: 12px 0 0 0;
             }
 
             .dropdown-title {
                 font-weight: 600;
                 color: #111827;
-                margin: 8px 0;
+                /* margin: 8px 0; */
+                padding-left: 6px;
             }
 
             .dropdown-multiselect {
@@ -1114,8 +888,28 @@
             .dropdown-tools .tool-btn:hover {
                 background: #f3f4f6;
             }
-        </style>
-        <style>
+
+            /* Custom tooltip to show sorting capability */
+            .sort-tooltip {
+                position: relative;
+            }
+
+            .sort-tooltip:hover:after {
+                content: "คลิกเพื่อเรียงลำดับ";
+                position: absolute;
+                top: -30px;
+                left: 50%;
+                transform: translateX(-50%);
+                background-color: rgba(0, 0, 0, 0.8);
+                color: white;
+                padding: 4px 8px;
+                border-radius: 4px;
+                font-size: 12px;
+                white-space: nowrap;
+                z-index: 10;
+
+            }
+
             .dashboard-list {
                 background: white;
                 border-radius: 10px;
@@ -1161,6 +955,217 @@
                 white-space: nowrap;
             }
         </style>
+        <style>
+            /* Responsive styles */
+
+            /* Base (mobile first: <640px) */
+            @media (max-width: 639px) {
+                .filter-grid {
+                    grid-template-columns: 1fr;
+                    gap: 12px;
+                    padding: 12px;
+                }
+
+                .flex.justify-between {
+                    flex-direction: column;
+                    gap: 1rem;
+                }
+
+                .btns {
+                    width: 100%;
+                    justify-content: center;
+                }
+
+                .dataTables_wrapper {
+                    overflow-x: auto;
+                    -webkit-overflow-scrolling: touch;
+                }
+
+                #myTable_wrapper {
+                    max-width: 100%;
+                    overflow-x: auto;
+                }
+
+                .status-icon,
+                [data-lucide] {
+                    width: 16px !important;
+                    height: 16px !important;
+                }
+
+                .dataTables_wrapper .dataTables_length,
+                .dataTables_wrapper .dataTables_filter,
+                .dataTables_wrapper .dataTables_info,
+                .dataTables_wrapper .dataTables_paginate {
+                    text-align: left;
+                    float: none;
+                    width: 100%;
+                    margin: 5px 0;
+                }
+
+                .dataTables_wrapper .dataTables_length select {
+                    padding: 0.25rem;
+                    font-size: 0.875rem;
+                }
+
+                .dataTables_wrapper .dataTables_paginate .paginate_button {
+                    padding: 0.25rem 0.5rem;
+                    margin-left: 0.125rem;
+                    font-size: 0.75rem;
+                }
+
+                .container {
+                    padding: 8px;
+                }
+
+                table.dataTable {
+                    font-size: 0.75rem;
+                    width: 100% !important;
+                }
+
+                table.dataTable thead th,
+                table.dataTable tbody td {
+                    padding: 6px 3px;
+                    word-wrap: break-word;
+                    vertical-align: top;
+                }
+
+                table.dataTable thead th .sort-icon {
+                    display: none;
+                }
+
+                table.dataTable thead th.sorting,
+                table.dataTable thead th.sorting_asc,
+                table.dataTable thead th.sorting_desc {
+                    padding-right: 6px;
+                }
+
+                .dropdown-menus {
+                    left: -20px;
+                    min-width: 280px;
+                    max-width: calc(100vw - 40px);
+                }
+
+                .dropdown-menus .filter-section {
+                    width: 100%;
+                }
+
+                .btn-view {
+                    font-size: 11px;
+                    padding: 4px 8px;
+                }
+
+                .status-badge {
+                    font-size: 11px;
+                    min-width: 50px;
+                    padding: 2px 6px;
+                }
+            }
+
+            /* sm ≥ 640px */
+            @media (min-width: 640px) {
+                .container {
+                    padding: 12px;
+                }
+
+                table.dataTable {
+                    font-size: 0.875rem;
+                }
+
+                table.dataTable thead th,
+                table.dataTable tbody td {
+                    padding: 8px 4px;
+                }
+
+                .dropdown-menus {
+                    min-width: 400px;
+                }
+
+                .btn-view {
+                    font-size: 12px;
+                    padding: 5px 10px;
+                }
+            }
+
+            /* md ≥ 768px */
+            @media (min-width: 768px) {
+                .container {
+                    max-width: 900px;
+                    padding: 16px;
+                }
+
+                table.dataTable {
+                    font-size: 0.9rem;
+                }
+
+                table.dataTable thead th,
+                table.dataTable tbody td {
+                    padding: 9px 5px;
+                }
+
+                .dropdown-menus {
+                    min-width: 500px;
+                }
+            }
+
+            /* lg ≥ 1024px */
+            @media (min-width: 1024px) {
+                .container {
+                    max-width: 1100px;
+                    padding: 20px;
+                }
+
+                table.dataTable {
+                    font-size: 1rem;
+                }
+
+                table.dataTable thead th,
+                table.dataTable tbody td {
+                    padding: 10px 6px;
+                }
+
+                .dropdown-menus {
+                    min-width: 640px;
+                }
+
+                .dropdown-menus .filter-grid {
+                    grid-template-columns: 1fr 1fr;
+                    gap: 12px;
+                }
+            }
+
+            /* xl ≥ 1280px */
+            @media (min-width: 1280px) {
+                .container {
+                    max-width: 1400px;
+                    padding: 24px;
+                }
+
+                table.dataTable {
+                    font-size: 1rem;
+                }
+
+                table.dataTable thead th,
+                table.dataTable tbody td {
+                    padding: 12px 8px;
+                }
+
+                .dropdown-menus {
+                    min-width: 720px;
+                }
+            }
+
+            /* 2xl ≥ 1536px */
+            @media (min-width: 1536px) {
+                .dropdown-menus {
+                    min-width: 720px;
+                }
+
+                /* .dropdown-menus .filter-grid {
+                    grid-template-columns: 1fr 1fr 1fr;
+                    gap: 16px;
+                } */
+            }
+        </style>
     @endpush
 
     @push('scripts')
@@ -1174,7 +1179,7 @@
 
                 // Close all other filter dropdowns first
                 const allDropdowns = ['yearDropdown', 'standardDropdown', 'dimensionDropdown', 'deptDropdown', 'typeDropdown',
-                    'statusDropdown'
+                    'statusDropdown', 'statusEnvDropdown'
                 ];
                 allDropdowns.forEach(dropdownId => {
                     if (dropdownId !== id) {
@@ -1245,7 +1250,7 @@
                         zeroRecords: "ไม่พบข้อมูลที่ตรงกับการค้นหา"
                     },
                     // Adjust the DOM structure for Tailwind CSS compatibility
-                    dom: '<"flex flex-col md:flex-row justify-between items-center p-3"<"flex-1 hidden"f><"flex"l>>' +
+                    dom: '<"flex flex-col md:flex-row justify-between items-center p-3"<"flex"l>>' +
                         't' +
                         '<"flex flex-col md:flex-row justify-between items-center p-3"<"flex-1"i><"flex"p>>',
 
@@ -1422,6 +1427,8 @@
                     $('#dept-label').text('เลือกหน่วยงาน');
                     $('#type-label').text('เลือกประเภท');
                     $('#status-label').text('เลือกสถานะ');
+                    $('#statusEnv-label').text('เลือกสถานะเอกสาร');
+
                 });
 
                 // Clear sort button
@@ -1451,6 +1458,8 @@
                 setupDropdownLabel('deptDropdown', 'dept-label', 'เลือกหน่วยงาน');
                 setupDropdownLabel('typeDropdown', 'type-label', 'เลือกประเภท');
                 setupDropdownLabel('statusDropdown', 'status-label', 'เลือกสถานะ');
+                // setupDropdownLabel('assignedEnvDropdown', 'assignedEnv-label', 'เลือกการมอบหมายเอกสาร');
+                setupDropdownLabel('statusEnvDropdown', 'statusEnv-label', 'เลือกสถานะเอกสาร');
 
                 // Keyboard accessibility for dropdown buttons
                 document.querySelectorAll('.dropdown-multiselect .dropdown-btn').forEach(btn => {
@@ -1507,7 +1516,8 @@
                             btn.id === 'dimension-label' ? 'เลือกด้าน' :
                             btn.id === 'dept-label' ? 'เลือกหน่วยงาน' :
                             btn.id === 'type-label' ? 'เลือกประเภท' :
-                            btn.id === 'status-label' ? 'เลือกสถานะ' : '';
+                            btn.id === 'status-label' ? 'เลือกสถานะ' :
+                            btn.id === 'statusEnv-label' ? 'เลือกสถานะเอกสาร' : '';
                         const count = content.find('input.filter-option:checked').length;
                         btn.textContent = count > 0 ? `${defaultText} (${count})` : defaultText;
                     }
