@@ -310,6 +310,8 @@
                     <x-indicator-preset-modal :indicators="$indicators" modalId="preset-modal" />
                 @endif
 
+            
+                <!-- ปุ่ม Export -->
                 <button id="export_button"
                     class="h-fit bg-green-500 hover:bg-green-600 text-white rounded-lg px-4 py-2 flex items-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
@@ -319,6 +321,30 @@
                     </svg>
                     <span class="hidden sm:inline">EXPORT TO EXCEL</span>
                 </button>
+
+                <!-- Global Year Export Modal (reusable) -->
+                <x-year-export-modal :years="$years" context="year-export" />
+
+                <!-- Modal -->
+                <div id="yearModal"
+                    class="hidden fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+                    <div class="bg-white rounded-lg shadow-lg p-6 w-80">
+                        <h2 class="text-lg font-semibold mb-4">เลือกปีที่ต้องการ Export</h2>
+                        <select id="yearSelect" class="w-full border rounded px-2 py-1 mb-4">
+                            <option value="">-- กรุณาเลือกปี --</option>
+                            @foreach ($years as $y)
+                                <option value="{{ $y }}">{{ $y }}</option>
+                            @endforeach
+                        </select>
+                        <div class="flex justify-end gap-2">
+                            <button id="cancelModal" class="px-3 py-1 bg-gray-300 rounded">ยกเลิก</button>
+                            <button id="confirmExport" class="px-3 py-1 bg-green-500 text-white rounded">ยืนยัน</button>
+                        </div>
+                    </div>
+                </div>
+
+
+
                 <button id="add_indicator_button"
                     class="h-fit bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-4 py-2 flex items-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
@@ -1183,6 +1209,31 @@
         <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
         <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
         <script>
+            const exportBtn = document.getElementById("export_button");
+            const modal = document.getElementById("yearModal");
+            const cancelBtn = document.getElementById("cancelModal");
+            const confirmBtn = document.getElementById("confirmExport");
+
+            exportBtn.addEventListener("click", () => {
+                // modal.classList.remove("hidden"); // disabled: using global modal component instead
+            });
+
+            cancelBtn.addEventListener("click", () => {
+                modal.classList.add("hidden");
+            });
+
+            confirmBtn.addEventListener("click", () => {
+                const year = document.getElementById("yearSelect").value;
+                if (year) {
+                    // 👉 ส่งไปยัง route export พร้อม year
+                    window.location.href = "{{ route('sar_reports.create') }}" + "?year=" + year;
+
+                } else {
+                    alert("กรุณาเลือกปีก่อน");
+                }
+            });
+        </script>
+        <script>
             // Helpers for dropdown widgets (like in assigned dashboard)
             function toggleDropdown(id) {
                 const el = document.getElementById(id);
@@ -1287,9 +1338,9 @@
                     }
                 });
 
-                $('#export_button').on('click', function() {
-                    alert('Export to Excel functionality will be implemented here');
-                });
+                // $('#export_button').on('click', function() {
+                //     alert('Export to Excel functionality will be implemented here');
+                // });
 
                 $('#add_indicator_button').on('click', function() {
                     window.location.href = "{{ route('indicator.create') }}";
@@ -1528,6 +1579,12 @@
                         btn.textContent = count > 0 ? `${defaultText} (${count})` : defaultText;
                     }
                 });
+            });
+        </script>
+        <script>
+            // Open the global year-export modal via event
+            document.getElementById('export_button')?.addEventListener('click', () => {
+                window.dispatchEvent(new CustomEvent('modal:open', { detail: { context: 'year-export' } }));
             });
         </script>
     @endpush

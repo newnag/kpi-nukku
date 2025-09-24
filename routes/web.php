@@ -10,6 +10,7 @@ use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\EvidenceController;
 use App\Http\Controllers\IndicatorController;
 use App\Http\Controllers\IndicatorPresetController;
+use App\Http\Controllers\SarReportController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\StandardController;
 use App\Http\Controllers\UserController;
@@ -293,3 +294,18 @@ Route::middleware('auth')->get('/export/indicators', function () {
         'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
     ]);
 });
+// Route::resource('sar_reports', SarReportController::class);
+// routes/web.php
+Route::post('/criterias/{id}/report', [SarReportController::class, 'updateReport'])
+    ->name('criterias.updateReport');
+Route::get('/sar_reports/{id}/edit', [SarReportController::class, 'edit'])
+    ->name('sar_reports.edit');
+Route::put('/sar_reports/{id}', [SarReportController::class, 'update'])
+    ->name('sar_reports.update');
+Route::get('/sar_reports', [SarReportController::class, 'index'])
+    ->name('sar_reports.index');
+Route::get('/sar_reports/create', [SarReportController::class, 'create'])
+    ->name('sar_reports.create');
+Route::post('/sar_reports', [SarReportController::class, 'store'])
+    ->name('sar_reports.store');
+
