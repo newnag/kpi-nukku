@@ -313,6 +313,12 @@ Route::get('/sar_reports/create', [SarReportController::class, 'create'])
     ->name('sar_reports.create');
 Route::post('/sar_reports', [SarReportController::class, 'store'])
     ->name('sar_reports.store');
-Route::get('/sar_reports/{id}/export/docx', [SarReportExportController::class, 'docx'])->name('sar_reports.export.docx');
-Route::get('/sar_reports/{id}/export/xlsx', [SarReportExportController::class, 'xlsx'])->name('sar_reports.export.xlsx');
-Route::get('/sar_reports/{id}/export/pdf', [SarReportExportController::class, 'pdf'])->name('sar_reports.export.pdf');
+Route::get('/sar_reports/{report}/export/docx', [SarReportController::class, 'export'])
+    ->name('sar_reports.export.docx')
+    ->defaults('type', 'docx');
+Route::get('/sar_reports/{report}/export/xlsx', [SarReportController::class, 'export'])
+    ->name('sar_reports.export.xlsx')
+    ->defaults('type', 'excel');
+Route::get('/sar_reports/{report}/export/pdf', [SarReportController::class, 'export'])
+    ->name('sar_reports.export.pdf')
+    ->defaults('type', 'pdf');

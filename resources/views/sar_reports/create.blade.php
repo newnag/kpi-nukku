@@ -281,7 +281,7 @@
 
             {{-- ส่วนที่ 4 --}}
             <div class="bg-white shadow rounded-lg p-6">
-                <h3 class="text-lg font-semibold border-b pb-2 mb-4">ส่วนที่ 4: อื่นๆ</h3>
+                <h3 class="text-lg font-semibold border-b pb-2 mb-4">ส่วนที่ 4: สรุปผลการประเมินตนเองตามเกณฑ์ของสภาการพยาบาล</h3>
                 <textarea name="section4" id="section4" class="trumbowyg-textarea w-full">{{ old('section4') }}</textarea>
             </div>
 
