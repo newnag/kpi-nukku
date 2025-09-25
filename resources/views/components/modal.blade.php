@@ -29,7 +29,10 @@
     document.documentElement.classList.toggle('modal-open', v);
     document.body.style.overflow = v ? 'hidden' : ''; // Prevent background scroll
     if (v) { $dispatch('modal:opened', { context: @js($context) }); }
-})" @modal:close.window="open = false" class="inline">
+})"
+    @modal:close.window="open = false"
+    @modal:open.window="(() => { const ctx = @js($context); const d = $event.detail || {}; if (!ctx || d.context === ctx) { open = true; } })()"
+    class="inline">
     {{-- Trigger --}}
     <div @click="open = true">
         {{ $trigger ?? '' }}

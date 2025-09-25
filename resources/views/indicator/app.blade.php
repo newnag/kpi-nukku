@@ -7,9 +7,9 @@
 
 @section('content')
     <div class="space-y-5">
-        <div class="flex justify-between">
-            <div class="flex flex-wrap gap-2 ">
-                <div class="relative w-screen sm:w-auto bg-white rounded-lg shadow-sm ">
+        <div class="flex flex-col sm:flex-row justify-between gap-4">
+            <div class="flex flex-col sm:flex-row flex-wrap gap-2 w-full sm:w-auto">
+                <div class="relative w-full sm:w-auto bg-white rounded-lg shadow-sm min-w-64">
                     <div class="absolute inset-y-0 left-3 flex items-center pointer-events-none">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24"
                             stroke="currentColor">
@@ -23,8 +23,7 @@
 
                 <!-- Sort Button with Dropdown -->
                 <div class="relative inline-block text-left" id="sort-dropdown-container">
-                    <button id="sort-button"
-                        class="h-fit border border-gray-300 rounded-lg px-4 py-2 bg-white text-gray-700 hover:bg-gray-100 flex items-center gap-2">
+                    <button id="sort-button" class="btns">
                         <span>เรียงลำดับ</span>
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
                             stroke="currentColor">
@@ -78,7 +77,7 @@
                                 <div class="dropdown-multiselect" id="yearDropdown">
                                     <div class="dropdown-btn" onclick="toggleDropdown('yearDropdown')">
                                         <span id="year-label">เลือกปี</span>
-                                        <i style="font-size:12px;">▼</i>
+                                        <i class="fa-solid fa-caret-down"></i>
                                     </div>
                                     <div class="dropdown-content">
                                         <div class="dropdown-tools" data-section="yearDropdown">
@@ -110,7 +109,7 @@
                                 <div class="dropdown-multiselect" id="standardDropdown">
                                     <div class="dropdown-btn" onclick="toggleDropdown('standardDropdown')">
                                         <span id="standard-label">เลือกมาตรฐาน</span>
-                                        <i style="font-size:12px;">▼</i>
+                                        <i class="fa-solid fa-caret-down"></i>
                                     </div>
 
                                     <div class="dropdown-content">
@@ -141,7 +140,7 @@
                                 <div class="dropdown-multiselect" id="dimensionDropdown">
                                     <div class="dropdown-btn" onclick="toggleDropdown('dimensionDropdown')">
                                         <span id="dimension-label">เลือกด้าน</span>
-                                        <i style="font-size:12px;">▼</i>
+                                        <i class="fa-solid fa-caret-down"></i>
                                     </div>
                                     <div class="dropdown-content">
                                         <div class="dropdown-tools" data-section="dimensionDropdown">
@@ -171,7 +170,7 @@
                                 <div class="dropdown-multiselect" id="deptDropdown">
                                     <div class="dropdown-btn" onclick="toggleDropdown('deptDropdown')">
                                         <span id="dept-label">เลือกหน่วยงาน</span>
-                                        <i style="font-size:12px;">▼</i>
+                                        <i class="fa-solid fa-caret-down"></i>
                                     </div>
                                     <div class="dropdown-content">
                                         <div class="dropdown-tools" data-section="deptDropdown">
@@ -211,7 +210,7 @@
                                 <div class="dropdown-multiselect" id="typeDropdown">
                                     <div class="dropdown-btn" onclick="toggleDropdown('typeDropdown')">
                                         <span id="type-label">เลือกประเภท</span>
-                                        <i style="font-size:12px;">▼</i>
+                                        <i class="fa-solid fa-caret-down"></i>
                                     </div>
                                     <div class="dropdown-content">
                                         <div class="dropdown-tools" data-section="typeDropdown">
@@ -243,26 +242,22 @@
                                 <div class="dropdown-multiselect" id="statusDropdown">
                                     <div class="dropdown-btn" onclick="toggleDropdown('statusDropdown')">
                                         <span id="status-label">เลือกสถานะ</span>
-                                        <i style="font-size:12px;">▼</i>
+                                        <i class="fa-solid fa-caret-down"></i>
                                     </div>
                                     @php
                                         $statusMap = [
                                             0 => 'รอดำเนินการ',
-                                            1 => 'รอดำเนินการ / บันทึกร่าง',
-                                            2 => 'รอดำเนินการ / บันทึกจริง',
+                                            1 => 'รอดำเนินการ / บันทึกฉบับร่าง',
+                                            2 => 'รอดำเนินการ / บันทึกฉบับจริง',
                                             3 => 'ผลการดำเนินงานครบถ้วนตามเกณฑ์มาตรการ',
                                             4 => 'ผลการดำเนินงานยังไม่ครบถ้วนตามเกณฑ์',
                                         ];
 
-                                        $statusList = $indicators
-                                            ->pluck('status')
-                                            ->unique()
-                                            ->map(fn($s) => $statusMap[$s] ?? 'ไม่ทราบ');
+                                        $statusCodes = $indicators->pluck('status')->unique()->sort()->values();
                                     @endphp
                                     <div class="dropdown-content">
                                         <div class="dropdown-tools" data-section="statusDropdown">
-                                            <input type="text" class="filter-search" placeholder="ค้นหา..."
-                                                aria-label="ค้นหาสถานะ">
+
                                             <div class="tools-actions">
                                                 <button type="button" class="tool-btn"
                                                     data-action="select-all">เลือกทั้งหมด</button>
@@ -270,11 +265,12 @@
                                                     data-action="clear-all">ล้างทั้งหมด</button>
                                             </div>
                                         </div>
-                                        @foreach ($statusList as $statusText)
+                                        @foreach ($statusCodes as $statusCode)
                                             <label>
                                                 <input type="checkbox" class="filter-option status-option"
-                                                    data-column="9" data-value="{{ $statusText }}">
-                                                <span style="margin-left:6px;">{{ $statusText }}</span>
+                                                    data-column="9" data-value="{{ $statusCode }}">
+                                                <span
+                                                    style="margin-left:6px;">{{ $statusMap[$statusCode] ?? 'ไม่ระบุ' }}</span>
                                             </label>
                                         @endforeach
                                     </div>
@@ -314,6 +310,8 @@
                     <x-indicator-preset-modal :indicators="$indicators" modalId="preset-modal" />
                 @endif
 
+            
+                <!-- ปุ่ม Export -->
                 <button id="export_button"
                     class="h-fit bg-green-500 hover:bg-green-600 text-white rounded-lg px-4 py-2 flex items-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
@@ -323,6 +321,30 @@
                     </svg>
                     <span class="hidden sm:inline">EXPORT TO EXCEL</span>
                 </button>
+
+                <!-- Global Year Export Modal (reusable) -->
+                <x-year-export-modal :years="$years" context="year-export" />
+
+                <!-- Modal -->
+                <div id="yearModal"
+                    class="hidden fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+                    <div class="bg-white rounded-lg shadow-lg p-6 w-80">
+                        <h2 class="text-lg font-semibold mb-4">เลือกปีที่ต้องการ Export</h2>
+                        <select id="yearSelect" class="w-full border rounded px-2 py-1 mb-4">
+                            <option value="">-- กรุณาเลือกปี --</option>
+                            @foreach ($years as $y)
+                                <option value="{{ $y }}">{{ $y }}</option>
+                            @endforeach
+                        </select>
+                        <div class="flex justify-end gap-2">
+                            <button id="cancelModal" class="px-3 py-1 bg-gray-300 rounded">ยกเลิก</button>
+                            <button id="confirmExport" class="px-3 py-1 bg-green-500 text-white rounded">ยืนยัน</button>
+                        </div>
+                    </div>
+                </div>
+
+
+
                 <button id="add_indicator_button"
                     class="h-fit bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-4 py-2 flex items-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
@@ -335,71 +357,72 @@
         </div>
 
         <!-- ตารางรายการตัวบ่งชี้ -->
-        <div class="border border-gray-200 rounded-lg shadow-sm xl:overflow-auto 2xl:overflow-visible">
-            <table id="myTable" class="w-full">
+        <div
+            class="overflow-x-auto border border-gray-200 rounded-lg shadow-sm sm:overflow-x-scroll md:overflow-x-auto lg:overflow-x-auto xl:overflow-auto 2xl:overflow-visible">
+            <table id="myTable" class="w-full min-w-full">
                 <thead>
                     <tr>
-                        <th class="w-fit  text-sm font-medium text-gray-900 cursor-pointer select-none"
+                        <th class="w-fit text-xs sm:text-sm font-medium text-gray-900 cursor-pointer select-none hidden sm:table-cell"
                             title="ปีของตัวชี้วัด">
-                            <div class="flex items-center justify-center  min-w-6">
+                            <div class="flex items-center justify-center min-w-6">
                                 ปี
                             </div>
                         </th>
-                        <th class="w-fit  text-sm font-medium text-gray-900 cursor-pointer select-none"
+                        <th class="w-fit text-xs sm:text-sm font-medium text-gray-900 cursor-pointer select-none hidden md:table-cell"
                             title="มาตรฐานตัวชี้วัด 3 หมวด">
-                            <div class="flex items-center justify-center  min-w-15">
+                            <div class="flex items-center justify-center min-w-15">
                                 มาตรฐาน
                             </div>
                         </th>
-                        <th class="w-fit  text-sm font-medium text-gray-900 cursor-pointer select-none"
+                        <th class="w-fit text-xs sm:text-sm font-medium text-gray-900 cursor-pointer select-none hidden lg:table-cell"
                             title="ด้านตัวชี้วัดใน 3 หมวด">
-                            <div class="flex items-center justify-center  min-w-20">
+                            <div class="flex items-center justify-center min-w-20">
                                 ด้าน
                             </div>
                         </th>
-                        <th class="w-full  text-sm font-medium text-gray-900 text-left cursor-pointer select-none"
+                        <th class="w-full text-xs sm:text-sm font-medium text-gray-900 text-left cursor-pointer select-none"
                             title="ชื่อตัวบ่งชี้">
-                            <div class="flex items-center justify-center min-w-56 ">
+                            <div class="flex items-center justify-center min-w-40 sm:min-w-56">
                                 ชื่อตัวบ่งชี้
                             </div>
                         </th>
-                        <th class="w-fit  text-sm font-medium text-gray-900 cursor-pointer select-none"
+                        <th class="w-fit text-xs sm:text-sm font-medium text-gray-900 cursor-pointer select-none"
                             title="รหัสตัวบ่งชี้">
-                            <div class="flex items-center justify-center min-w-9 ">
+                            <div class="flex items-center justify-center min-w-9">
                                 รหัส
                             </div>
                         </th>
-                        <th class="w-fit  text-sm font-medium text-gray-900 cursor-pointer select-none hidden md:table-cell"
+                        <th class="w-fit text-xs sm:text-sm font-medium text-gray-900 cursor-pointer select-none hidden xl:table-cell"
                             title="ประเภทตัวบ่งชี้ (คุณภาพ, ปริมาณ, คุณภาพ/ปริมาณ)">
-                            <div class="flex items-center justify-center min-w-11 ">
+                            <div class="flex items-center justify-center min-w-11">
                                 ประเภท
                             </div>
                         </th>
-                        <th class="w-fit text-sm font-medium text-gray-900 cursor-pointer select-none hidden md:table-cell"
+                        <th class="w-fit text-xs sm:text-sm font-medium text-gray-900 cursor-pointer select-none hidden xl:table-cell"
                             title="หน่วยงานที่รับผิดชอบในตัวบ่งชี้">
-                            <div class="flex items-center justify-center min-w-48">
+                            <div class="flex items-center justify-center min-w-32 lg:min-w-48">
                                 หน่วยงาน
                             </div>
                         </th>
-                        <th class="w-fit  text-sm font-medium text-gray-900 cursor-pointer select-none"
+                        <th class="w-fit text-xs sm:text-sm font-medium text-gray-900 cursor-pointer select-none hidden md:table-cell"
                             title="ผลลัพธ์จากการกรอกข้อมูลของตัวบ่งชี้">
                             <div class="flex items-center justify-center min-w-9">
                                 ผลลัพธ์
                             </div>
                         </th>
-                        <th class="w-fit  text-sm font-medium text-gray-900 cursor-pointer select-none hidden sm:table-cell"
+                        <th class="w-fit text-xs sm:text-sm font-medium text-gray-900 cursor-pointer select-none hidden lg:table-cell"
                             title="คะแนนเต็มของตัวบ่งชี้">
                             <div class="flex items-center justify-center min-w-9 text-nowrap">
                                 คะแนนเต็ม
                             </div>
                         </th>
-                        <th class="w-fit text-sm font-medium text-gray-900 cursor-pointer select-none"
+                        <th class="w-fit text-xs sm:text-sm font-medium text-gray-900 cursor-pointer select-none"
                             title="สถานะของตัวบ่งชี้">
                             <div class="flex items-center justify-center w-fit">
                                 สถานะ
                             </div>
                         </th>
-                        <th class="w-fit  text-sm font-medium text-gray-900 cursor-pointer select-none hidden sm:table-cell"
+                        <th class="w-fit text-xs sm:text-sm font-medium text-gray-900 cursor-pointer select-none"
                             title="สถานะเอกสาร">
                             <div class="flex items-center justify-center">
                                 เอกสาร
@@ -411,22 +434,28 @@
                     @forelse($indicators as $indicator)
                         <tr data-href="{{ route('indicator.show', $indicator['id']) }}" tabindex="0" role="link"
                             aria-label="เปิด {{ $indicator['name'] }}" title="คลิกเพื่อดูรายละเอียด">
-                            <td class="max-w-6 text-sm text-gray-700 text-center align-top">{{ $indicator['year'] }}</td>
-                            <td class="max-w-15 text-sm text-balance text-gray-700 align-top">
+                            <td
+                                class="max-w-6 text-xs sm:text-sm text-gray-700 text-center align-top hidden sm:table-cell">
+                                {{ $indicator['year'] }}</td>
+                            <td
+                                class="max-w-15 text-xs sm:text-sm text-balance text-gray-700 align-top hidden md:table-cell">
                                 {{ $indicator['category']['name'] }}</td>
-                            <td class="max-w-15 text-sm text-balance text-gray-700 align-top">
+                            <td
+                                class="max-w-15 text-xs sm:text-sm text-balance text-gray-700 align-top hidden lg:table-cell">
                                 {{ $indicator['standard']['name'] }}</td>
-                            <td class="max-w-full text-pretty text-sm text-gray-700 align-top truncate">
-                                {{-- <span class="block truncate" title="{{ $indicator['name'] }}"> --}}
-                                {{ $indicator['name'] }}
-                                {{-- </span> --}}
+                            <td class="max-w-full text-pretty text-xs sm:text-sm text-gray-700 align-top">
+                                <div class="truncate max-w-40 sm:max-w-56" title="{{ $indicator['name'] }}">
+                                    {{ $indicator['name'] }}
+                                </div>
                             </td>
-                            <td class="max-w-9 text-center text-sm text-gray-700 truncate  align-top">
+                            <td class="max-w-9 text-center text-xs sm:text-sm text-gray-700 truncate align-top">
                                 {{ $indicator['code'] }}</td>
-                            <td class="max-w-11 text-sm text-gray-700 text-center align-top">
+                            <td
+                                class="max-w-11 text-xs sm:text-sm text-gray-700 text-center align-top hidden xl:table-cell">
                                 {{ $indicator['type'] ?? 'ไม่ระบุ' }}
                             </td>
-                            <td class="text-sm text-gray-700 align-top max-w-full cursor-auto" data-rowlink-ignore>
+                            <td class="text-xs sm:text-sm text-gray-700 align-top max-w-full cursor-auto hidden xl:table-cell"
+                                data-rowlink-ignore>
                                 @php
                                     // Unique, non-empty department names
                                     $departments = collect($indicator['assignments'] ?? [])
@@ -460,36 +489,38 @@
                                 @endif
                             </td>
 
-                            <td class=" text-sm text-gray-700 text-center align-top">
+                            <td class="text-xs sm:text-sm text-gray-700 text-center align-top hidden md:table-cell">
                                 {{ number_format($indicator['score_acc'], 2) ?? '0.00' }}
                             </td>
-                            <td class=" text-sm text-gray-700 text-center align-top">
+                            <td class="text-xs sm:text-sm text-gray-700 text-center align-top hidden lg:table-cell">
                                 {{ number_format($indicator['max_score'], 2) ?? '0.00' }}
                             </td>
                             @php
                                 $statusCode = (int) ($indicator['status'] ?? -1);
                             @endphp
 
-                            <td class=" text-sm text-center align-top" data-search="{{ $statusCode }}"
+                            <td class="text-xs sm:text-sm text-center align-top" data-search="{{ $statusCode }}"
                                 data-order="{{ $statusCode }}">
                                 @switch($statusCode)
                                     @case(0)
-                                    @case(1)
-
-                                    @case(2)
-                                        <div class="flex justify-center items-center">
-                                            <span class="tip" data-tip="อยู่ระหว่างดำเนินการ">
-                                                <i data-lucide="clock" class="status-icon text-red-500"></i>
-                                            </span>
-                                        </div>
+                                        <span class="tooltip" data-tooltip="รอดำเนินการ">
+                                            <i data-lucide="clock" class="w-5 h-5 text-yellow-500"></i>
+                                            <span class="sr-only">รอดำเนินการ</span>
+                                        </span>
                                     @break
 
-                                    @case(4)
-                                        <div class="flex justify-center items-center">
-                                            <span class="tip" data-tip="ผลการดำเนินงานยังไม่ครบถ้วนตามเกณฑ์">
-                                                <i data-lucide="alert-triangle" class="status-icon text-yellow-500"></i>
-                                            </span>
-                                        </div>
+                                    @case(1)
+                                        <span class="tooltip" data-tooltip="รอดำเนินการ / บันทึกฉบับร่าง">
+                                            <i data-lucide="clock" class="w-5 h-5 text-yellow-500"></i>
+                                            <span class="sr-only">รอดำเนินการ / บันทึกฉบับร่าง</span>
+                                        </span>
+                                    @break
+
+                                    @case(2)
+                                        <span class="tooltip" data-tooltip="รอดำเนินการ / บันทึกฉบับจริง">
+                                            <i data-lucide="clock" class="w-5 h-5 text-yellow-500"></i>
+                                            <span class="sr-only">รอดำเนินการ / บันทึกฉบับจริง</span>
+                                        </span>
                                     @break
 
                                     @case(3)
@@ -515,32 +546,26 @@
                             </td>
 
                             @php
-                                // Derive document status from criteria statuses (0/1/2)
-                                $criteria = collect($indicator['criteria'] ?? []);
-
-                                // Normalize to string to handle 0 vs "0"
-                                $has0 = $criteria->contains(fn($c) => (string) ($c['status'] ?? '') === '0');
-                                $has2 = $criteria->contains(fn($c) => (string) ($c['status'] ?? '') === '2');
-
-                                if ($criteria->isEmpty() || $has0) {
-                                    $docText = 'รอดำเนินการ';
-                                    $docOrder = 0;
-                                    $badgeCls = 'bg-gray-100 text-gray-800';
-                                } elseif ($has2) {
+                                if ($indicator['criteria_status'] == 2) {
+                                    $docText = 'ไม่ครบ';
+                                    $docOrder = 2;
+                                    $badgeCls = 'bg-red-100 text-red-800';
+                                } elseif ($indicator['criteria_status'] === 1) {
                                     $docText = 'ครบ';
                                     $docOrder = 1;
                                     $badgeCls = 'bg-green-100 text-green-800';
                                 } else {
-                                    $docText = 'ไม่ครบ';
-                                    $docOrder = 2;
-                                    $badgeCls = 'bg-red-100 text-red-800';
+                                    $docText = 'รอดำเนินการ';
+                                    $docOrder = 0;
+                                    $badgeCls = 'bg-gray-100 text-gray-800';
                                 }
                             @endphp
 
-                            <td class="align-top" data-search="{{ $docText }}" data-order="{{ $docOrder }}">
+                            <td class="align-top {{ $badgeCls }}" data-search="{{ $docText }}"
+                                data-order="{{ $docOrder }}">
                                 <div class="w-full items-center justify-center flex">
                                     <span
-                                        class="flex w-fit justify-center text-center px-2 py-1 font-medium rounded-full truncate text-xs {{ $badgeCls }}">
+                                        class="flex w-fit justify-center text-center px-2 py-1 font-medium rounded-full truncate text-xs">
                                         {{ $docText }}
                                     </span>
                                 </div>
@@ -567,18 +592,21 @@
                 max-width: 1400px !important;
             }
 
+            /* Dropdown caret animation */
+            .dropdown-btn i,
+            .dropdown-btn .fa-caret-down {
+                transition: transform 0.2s ease;
+            }
+
+            .dropdown-multiselect.open .dropdown-btn i,
+            .dropdown-multiselect.open .dropdown-btn .fa-caret-down {
+                transform: rotate(180deg);
+            }
+
             #myTable,
             table.dataTable {
                 width: 100% !important;
             }
-
-            /* .dataTables_wrapper {
-                                                        background-color: ;
-                                                    } */
-
-            /* Length and Filter Controls */
-            /* .dataTables_wrapper .dataTables_length,
-                                                    .dataTables_wrapper .dataTables_filter {} */
 
             /* Dropdown Select Styling */
             .dataTables_wrapper .dataTables_length select {
@@ -591,10 +619,6 @@
             .dataTables_wrapper .dataTables_info {
                 color: #4b5563;
             }
-
-            /* .dataTables_wrapper .dataTables_paginate {
-                                                        padding-top: 1rem;
-                                                    } */
 
             .dataTables_wrapper .dataTables_paginate .paginate_button {
                 padding: 0.5rem 1rem;
@@ -617,85 +641,197 @@
                 color: white !important;
             }
 
-            /* .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
-                                                        background-color: #1d4ed8 !important;
-                                                        border-color: #1d4ed8;
-                                                    } */
-
             table.dataTable thead th,
             table.dataTable tbody td {
                 padding: 10px 4px;
 
             }
 
+            /* DataTables Responsive Controls */
             @media (max-width: 640px) {
 
-                /* Mobile-specific styles */
-                .container {
-                    padding: 10px;
+                .dataTables_wrapper .dataTables_length,
+                .dataTables_wrapper .dataTables_filter,
+                .dataTables_wrapper .dataTables_info,
+                .dataTables_wrapper .dataTables_paginate {
+                    text-align: left;
+                    float: none;
+                    width: 100%;
+                    margin: 5px 0;
                 }
 
-                #myTable {
-                    font-size: 0.8rem;
+                .dataTables_wrapper .dataTables_length select {
+                    padding: 0.25rem;
+                    font-size: 0.875rem;
+                }
+
+                .dataTables_wrapper .dataTables_paginate .paginate_button {
+                    padding: 0.25rem 0.5rem;
+                    margin-left: 0.125rem;
+                    font-size: 0.75rem;
+                }
+            }
+
+            @media (min-width: 641px) and (max-width: 768px) {
+
+                .dataTables_wrapper .dataTables_length,
+                .dataTables_wrapper .dataTables_filter,
+                .dataTables_wrapper .dataTables_info,
+                .dataTables_wrapper .dataTables_paginate {
+                    text-align: left;
+                    float: none;
+                    width: 100%;
+                }
+
+                .dataTables_wrapper .dataTables_paginate .paginate_button {
+                    padding: 0.375rem 0.75rem;
+                    font-size: 0.875rem;
+                }
+            }
+
+            /* Small screens (sm: 640px and below) */
+            @media (max-width: 640px) {
+                .container {
+                    padding: 8px;
+                }
+
+                table.dataTable {
+                    font-size: 0.75rem;
+                    width: 100% !important;
+                }
+
+                table.dataTable thead th,
+                table.dataTable tbody td {
+                    padding: 6px 3px;
+                    word-wrap: break-word;
+                    vertical-align: top;
+                }
+
+                table.dataTable thead th .sort-icon {
+                    display: none;
+                }
+
+                table.dataTable thead th.sorting,
+                table.dataTable thead th.sorting_asc,
+                table.dataTable thead th.sorting_desc {
+                    padding-right: 6px;
+                }
+
+                /* Ensure table takes full width on small screens */
+                .dataTables_wrapper {
+                    overflow-x: auto;
+                    -webkit-overflow-scrolling: touch;
+                }
+
+                /* Adjust filter dropdown for mobile */
+                .dropdown-menus {
+                    left: -20px;
+                    min-width: 280px;
+                    max-width: calc(100vw - 40px);
+                }
+
+                .dropdown-menus .filter-section {
+                    width: 100%;
+                }
+
+                /* Mobile-friendly buttons */
+                .btn-view {
+                    font-size: 11px;
+                    padding: 4px 8px;
+                }
+
+                .status-badge {
+                    font-size: 11px;
+                    min-width: 50px;
+                    padding: 2px 6px;
+                }
+            }
+
+            /* Medium screens (md: 768px) */
+            @media (min-width: 641px) and (max-width: 768px) {
+                .container {
+                    padding: 12px;
+                }
+
+                table.dataTable {
+                    font-size: 0.875rem;
+                }
+
+                table.dataTable thead th,
+                table.dataTable tbody td {
+                    padding: 8px 4px;
+                }
+
+                .dropdown-menus {
+                    min-width: 400px;
                 }
 
                 .btn-view {
                     font-size: 12px;
-                    padding: 4px 10px;
+                    padding: 5px 10px;
                 }
             }
 
-            @media (max-width: 768px) {
-
-                /* Tablet-specific styles */
+            /* Large screens (lg: 1024px) */
+            @media (min-width: 769px) and (max-width: 1024px) {
                 .container {
+                    max-width: 900px;
+                    padding: 16px;
+                }
+
+                table.dataTable {
+                    font-size: 0.9rem;
+                }
+
+                table.dataTable thead th,
+                table.dataTable tbody td {
+                    padding: 9px 5px;
+                }
+
+                .dropdown-menus {
+                    min-width: 500px;
+                }
+            }
+
+            /* Extra large screens (xl: 1280px) */
+            @media (min-width: 1025px) and (max-width: 1280px) {
+                .container {
+                    max-width: 1100px;
                     padding: 20px;
                 }
 
-                .dataTables_wrapper .dataTables_length,
-                .dataTables_wrapper .dataTables_filter {
-                    text-align: center;
+                table.dataTable {
+                    font-size: 1rem;
                 }
 
-                .btn-view {
-                    font-size: 13px;
-                    padding: 6px 12px;
-                }
-            }
-
-            @media (max-width: 1024px) {
-
-                /* Small Desktop-specific styles */
-                .container {
-                    max-width: 900px;
+                table.dataTable thead th,
+                table.dataTable tbody td {
+                    padding: 10px 6px;
                 }
 
                 .dropdown-menus {
-                    min-width: 200px;
+                    min-width: 600px;
                 }
             }
 
-            @media (max-width: 1280px) {
-
-                /* Medium Desktop-specific styles */
+            /* 2Extra large screens (2xl: 1536px and above) */
+            @media (min-width: 1281px) {
                 .container {
-                    max-width: 1100px;
+                    max-width: 1400px;
+                    padding: 24px;
+                }
+
+                table.dataTable {
+                    font-size: 1rem;
+                }
+
+                table.dataTable thead th,
+                table.dataTable tbody td {
+                    padding: 12px 8px;
                 }
 
                 .dropdown-menus {
-                    min-width: 250px;
-                }
-            }
-
-            @media (max-width: 1536px) {
-
-                /* Large Desktop-specific styles */
-                .container {
-                    max-width: 1300px;
-                }
-
-                .dropdown-menus {
-                    min-width: 300px;
+                    min-width: 720px;
                 }
             }
 
@@ -755,48 +891,15 @@
                 /* slate-50 */
             }
 
-            /* #myTable tbody tr:active {
-                                                background-color: #e5e7eb !important;
-                                            } */
-
             table.dataTable tbody tr {
                 background-color: inherit !important;
             }
 
-            /* Keyboard accessibility: show focus clearly on focused row */
-            #myTable tbody tr:focus,
-            #myTable tbody tr:focus-visible,
-            #myTable tbody tr:focus-within {
-                /* outline: 2px solid #93c5fd; */
-                /* outline-offset: -2px; */
-                background-color: #f8fafc !important;
-                /* slate-50 */
+            #myTable tbody tr:hover td {
+                background-color: inherit !important;
             }
 
-            /* Better mobile display for DataTables */
-            @media (max-width: 640px) {
-                table.dataTable {
-                    font-size: 0.875rem;
-                }
-
-                table.dataTable thead th,
-                table.dataTable tbody td {
-                    padding: 8px 4px;
-
-                }
-
-                /* Hide sort icons on very small screens */
-                table.dataTable thead th .sort-icon {
-                    display: none;
-                }
-
-                /* Make the whole header clickable on mobile */
-                table.dataTable thead th.sorting,
-                table.dataTable thead th.sorting_asc,
-                table.dataTable thead th.sorting_desc {
-                    padding-right: 8px;
-                }
-            }
+            /* Duplicate responsive section removed - consolidated above */
 
             .filter-grid {
                 display: grid;
@@ -807,6 +910,46 @@
                 overflow-y: auto;
                 padding: 16px;
                 box-sizing: border-box;
+            }
+
+            /* Responsive adjustments for control elements */
+            @media (max-width: 640px) {
+                .filter-grid {
+                    grid-template-columns: 1fr;
+                    gap: 12px;
+                    padding: 12px;
+                }
+
+                /* Stack controls vertically on mobile */
+                .flex.justify-between {
+                    flex-direction: column;
+                    gap: 1rem;
+                }
+
+                /* Make buttons full width on small screens */
+                .btns {
+                    width: 100%;
+                    justify-content: center;
+                }
+
+                /* Ensure table doesn't break layout on very small screens */
+                .dataTables_wrapper {
+                    overflow-x: auto;
+                    -webkit-overflow-scrolling: touch;
+                }
+
+                /* Make table container responsive */
+                #myTable_wrapper {
+                    max-width: 100%;
+                    overflow-x: auto;
+                }
+
+                /* Improve icon sizes on mobile */
+                .status-icon,
+                [data-lucide] {
+                    width: 16px !important;
+                    height: 16px !important;
+                }
             }
 
             /* Custom tooltip to show sorting capability */
@@ -1066,10 +1209,50 @@
         <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
         <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
         <script>
+            const exportBtn = document.getElementById("export_button");
+            const modal = document.getElementById("yearModal");
+            const cancelBtn = document.getElementById("cancelModal");
+            const confirmBtn = document.getElementById("confirmExport");
+
+            exportBtn.addEventListener("click", () => {
+                // modal.classList.remove("hidden"); // disabled: using global modal component instead
+            });
+
+            cancelBtn.addEventListener("click", () => {
+                modal.classList.add("hidden");
+            });
+
+            confirmBtn.addEventListener("click", () => {
+                const year = document.getElementById("yearSelect").value;
+                if (year) {
+                    // 👉 ส่งไปยัง route export พร้อม year
+                    window.location.href = "{{ route('sar_reports.create') }}" + "?year=" + year;
+
+                } else {
+                    alert("กรุณาเลือกปีก่อน");
+                }
+            });
+        </script>
+        <script>
             // Helpers for dropdown widgets (like in assigned dashboard)
             function toggleDropdown(id) {
                 const el = document.getElementById(id);
                 if (!el) return;
+
+                // Close all other filter dropdowns first
+                const allDropdowns = ['yearDropdown', 'standardDropdown', 'dimensionDropdown', 'deptDropdown', 'typeDropdown',
+                    'statusDropdown'
+                ];
+                allDropdowns.forEach(dropdownId => {
+                    if (dropdownId !== id) {
+                        const otherEl = document.getElementById(dropdownId);
+                        if (otherEl) {
+                            otherEl.classList.remove('open');
+                        }
+                    }
+                });
+
+                // Toggle the clicked dropdown
                 el.classList.toggle('open');
             }
 
@@ -1155,9 +1338,9 @@
                     }
                 });
 
-                $('#export_button').on('click', function() {
-                    alert('Export to Excel functionality will be implemented here');
-                });
+                // $('#export_button').on('click', function() {
+                //     alert('Export to Excel functionality will be implemented here');
+                // });
 
                 $('#add_indicator_button').on('click', function() {
                     window.location.href = "{{ route('indicator.create') }}";
@@ -1168,6 +1351,7 @@
                     e.stopPropagation();
                     $('#sort-dropdown').toggleClass('hidden');
                     $('#filter-dropdown').addClass('hidden'); // Close other dropdown
+                    $('.dropdown-multiselect').removeClass('open'); // Close all filter section dropdowns
                 });
 
                 // Filter dropdown functionality
@@ -1175,14 +1359,26 @@
                     e.stopPropagation();
                     $('#filter-dropdown').toggleClass('hidden');
                     $('#sort-dropdown').addClass('hidden'); // Close other dropdown
+                    $('.dropdown-multiselect').removeClass('open'); // Close all filter section dropdowns
                 });
 
                 // Close dropdowns when clicking outside
                 $(document).on('click', function(e) {
-                    if (!$(e.target).closest('#sort-dropdown-container, #filter-dropdown-container').length) {
+                    if (!$(e.target).closest(
+                            '#sort-dropdown-container, #filter-dropdown-container, .dropdown-multiselect')
+                        .length) {
                         $('#sort-dropdown, #filter-dropdown').addClass('hidden');
+                        $('.dropdown-multiselect').removeClass('open');
                     }
                 });
+
+                // Close all filter sub-dropdowns when clicking inside the main filter dropdown area
+                // $('#filter-dropdown').on('click', function(e) {
+                //     // Only close sub-dropdowns if not clicking on a dropdown button or its content
+                //     if (!$(e.target).closest('.dropdown-multiselect').length) {
+                //         $('.dropdown-multiselect').removeClass('open');
+                //     }
+                // });
 
                 // Handle sort options
                 $('.sort-option').on('click', function() {
@@ -1383,6 +1579,12 @@
                         btn.textContent = count > 0 ? `${defaultText} (${count})` : defaultText;
                     }
                 });
+            });
+        </script>
+        <script>
+            // Open the global year-export modal via event
+            document.getElementById('export_button')?.addEventListener('click', () => {
+                window.dispatchEvent(new CustomEvent('modal:open', { detail: { context: 'year-export' } }));
             });
         </script>
     @endpush

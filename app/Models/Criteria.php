@@ -14,6 +14,7 @@ class Criteria extends Model
         'sequence',
         'indicator_id',
         'status',
+        'report', // added field
     ];
 
     protected $table = 'criterias'; // matches migration
