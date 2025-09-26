@@ -6,10 +6,10 @@
 @section('subheader', 'ระบบบริหารจัดการข้อมูลการรับรองสถาบันจากสภาการพยาบาล')
 
 @section('content')
-    <div class="space-y-5 sm:bg-amber-400 md:bg-green-500 lg:bg-blue-500 xl:bg-purple-500 2xl:bg-orange-600">
-        <div class="flex flex-col sm:flex-row justify-between gap-4">
-            <div class="flex flex-col sm:flex-row flex-wrap gap-2 w-full sm:w-auto">
-                <div class="relative w-full sm:w-auto bg-white rounded-lg shadow-sm min-w-64">
+    <div>
+        <div class="card-header-table">
+            <div class="search-button-container">
+                <div class="search-bar shadow-sm">
                     <div class="absolute inset-y-0 left-3 flex items-center pointer-events-none">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24"
                             stroke="currentColor">
@@ -19,333 +19,328 @@
                     </div>
                     <input type="search" name="custom_search" id="custom-search" placeholder="ค้นหารายการตัวบ่งชี้..."
                         aria-label="ค้นหารายการตัวบ่งชี้" aria-controls="myTable" autocomplete="off"
-                        class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/40" />
+                        class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/40 sm:bg-amber-400 md:bg-green-500 lg:bg-blue-500 xl:bg-purple-500 2xl:bg-orange-600" />
                 </div>
 
-                <!-- Sort Button with Dropdown -->
-                <div class="relative inline-block text-left" id="sort-dropdown-container">
-                    <button id="sort-button" class="btns">
-                        <span>เรียงลำดับ</span>
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
-                            stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
-                        </svg>
-                    </button>
-                    <div id="sort-dropdown"
-                        class="hidden absolute left-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
-                        <div class="py-1" role="menu" aria-orientation="vertical">
-                            <button
-                                class="sort-option text-left block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                                data-column="0" data-order="asc" role="menuitem">ปี (น้อยไปมาก)</button>
-                            <button
-                                class="sort-option text-left block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                                data-column="0" data-order="desc" role="menuitem">ปี (มากไปน้อย)</button>
-                            <button
-                                class="sort-option text-left block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                                data-column="3" data-order="asc" role="menuitem">ชื่อตัวบ่งชี้ (A-Z)</button>
-                            <button
-                                class="sort-option text-left block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                                data-column="3" data-order="desc" role="menuitem">ชื่อตัวบ่งชี้ (Z-A)</button>
-                            <button
-                                class="sort-option text-left block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                                data-column="7" data-order="asc" role="menuitem">ผลลัพธ์ (น้อยไปมาก)</button>
-                            <button
-                                class="sort-option text-left block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                                data-column="7" data-order="desc" role="menuitem">ผลลัพธ์ (มากไปน้อย)</button>
-                            <button id="clear-sort"
-                                class=" text-left block w-full px-4 py-2 text-sm text-gray-600 hover:bg-gray-100">ล้างตัวเรียงลำดับ</button>
+                <div class="sort-filter-container">
+                    <!-- Sort Button with Dropdown -->
+                    <div class="dropdown-inds w-full" id="sort-dropdown-container">
+                        <button id="sort-button" class="btns">
+                            <span>เรียงลำดับ</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
+                            </svg>
+                        </button>
+                        <div id="sort-dropdown"
+                            class="hidden absolute left-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+                            <div class="py-1" role="menu" aria-orientation="vertical">
+                                <button
+                                    class="sort-option text-left block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                    data-column="0" data-order="asc" role="menuitem">ปี (น้อยไปมาก)</button>
+                                <button
+                                    class="sort-option text-left block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                    data-column="0" data-order="desc" role="menuitem">ปี (มากไปน้อย)</button>
+                                <button
+                                    class="sort-option text-left block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                    data-column="3" data-order="asc" role="menuitem">ชื่อตัวบ่งชี้ (A-Z)</button>
+                                <button
+                                    class="sort-option text-left block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                    data-column="3" data-order="desc" role="menuitem">ชื่อตัวบ่งชี้ (Z-A)</button>
+                                <button
+                                    class="sort-option text-left block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                    data-column="7" data-order="asc" role="menuitem">ผลลัพธ์ (น้อยไปมาก)</button>
+                                <button
+                                    class="sort-option text-left block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                    data-column="7" data-order="desc" role="menuitem">ผลลัพธ์ (มากไปน้อย)</button>
+                                <button id="clear-sort"
+                                    class=" text-left block w-full px-4 py-2 text-sm text-gray-600 hover:bg-gray-100">ล้างตัวเรียงลำดับ</button>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- Filter Button with Dropdown (styled like assigned dashboard) -->
-                <div class="dropdown" id="filter-dropdown-container">
-                    <button id="filter-button" class="btns">
-                        <span>กรองข้อมูล</span>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none"
-                            viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
-                        </svg>
-                    </button>
+                    <!-- Filter Button with Dropdown (styled like assigned dashboard) -->
+                    <div class="dropdown-inds w-full" id="filter-dropdown-container">
+                        <button id="filter-button" class="btns">
+                            <span>กรองข้อมูล</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+                            </svg>
+                        </button>
 
-                    <div id="filter-dropdown" class="dropdown-menus">
-                        <div class="filter-grid">
-                            <div class="filter-section">
-                                {{-- Section: ปี --}}
-                                <h3 class="dropdown-title">ปี</h3>
-                                <div class="dropdown-multiselect" id="yearDropdown">
-                                    <div class="dropdown-btn" onclick="toggleDropdown('yearDropdown')">
-                                        <span id="year-label">เลือกปี</span>
-                                        <i class="fa-solid fa-caret-down"></i>
-                                    </div>
-                                    <div class="dropdown-content">
-                                        <div class="dropdown-tools" data-section="yearDropdown">
-                                            <input type="text" name="year_search" class="filter-search"
-                                                placeholder="ค้นหา..." aria-label="ค้นหาปี">
-                                            <div class="tools-actions">
-                                                <button type="button" class="tool-btn"
-                                                    data-action="select-all">เลือกทั้งหมด</button>
-                                                <button type="button" class="tool-btn"
-                                                    data-action="clear-all">ล้างทั้งหมด</button>
-                                            </div>
+                        <div id="filter-dropdown" class="dropdown-menus "> {{-- hidden --}}
+                            <div class="filter-grid">
+                                <div class="filter-section">
+                                    {{-- Section: ปี --}}
+                                    <h3 class="dropdown-title">ปี</h3>
+                                    <div class="dropdown-multiselect" id="yearDropdown">
+                                        <div class="dropdown-btn" onclick="toggleDropdown('yearDropdown')">
+                                            <span id="year-label">เลือกปี</span>
+                                            <i class="fa-solid fa-caret-down"></i>
                                         </div>
-                                        @foreach ($indicators->pluck('year')->unique()->sortDesc() as $year)
-                                            <label style="display:flex; align-items:center; margin-bottom:4px;">
-                                                <input type="checkbox" name="year[]" class="filter-option year-option"
-                                                    data-column="0" data-value="{{ $year }}">
-                                                <span style="margin-left:6px; font-size:14px; color:#374151;">
-                                                    {{ $year }}
-                                                </span>
-                                            </label>
-                                        @endforeach
+                                        <div class="dropdown-content">
+                                            <div class="dropdown-tools" data-section="yearDropdown">
+                                                <input type="text" name="year_search" class="filter-search"
+                                                    placeholder="ค้นหา..." aria-label="ค้นหาปี">
+                                                <div class="tools-actions">
+                                                    <button type="button" class="tool-btn"
+                                                        data-action="select-all">ทั้งหมด</button>
+                                                    <button type="button" class="tool-btn"
+                                                        data-action="clear-all">ล้างทั้งหมด</button>
+                                                </div>
+                                            </div>
+                                            @foreach ($indicators->pluck('year')->unique()->sortDesc() as $year)
+                                                <label>
+                                                    <input type="checkbox" name="year[]" class="filter-option"
+                                                        data-column="0" data-value="{{ $year }}">
+                                                    <span>
+                                                        {{ $year }}
+                                                    </span>
+                                                </label>
+                                            @endforeach
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            <div class="filter-section">
-                                {{-- Section: มาตรฐาน --}}
-                                <h3 class="dropdown-title">มาตรฐาน</h3>
-                                <div class="dropdown-multiselect" id="standardDropdown">
-                                    <div class="dropdown-btn" onclick="toggleDropdown('standardDropdown')">
-                                        <span id="standard-label">เลือกมาตรฐาน</span>
-                                        <i class="fa-solid fa-caret-down"></i>
-                                    </div>
-
-                                    <div class="dropdown-content">
-                                        <div class="dropdown-tools" data-section="standardDropdown">
-                                            <input type="text" name="standard_search" class="filter-search"
-                                                placeholder="ค้นหา..." aria-label="ค้นหามาตรฐาน">
-                                            <div class="tools-actions">
-                                                <button type="button" class="tool-btn"
-                                                    data-action="select-all">เลือกทั้งหมด</button>
-                                                <button type="button" class="tool-btn"
-                                                    data-action="clear-all">ล้างทั้งหมด</button>
-                                            </div>
+                                <div class="filter-section">
+                                    {{-- Section: มาตรฐาน --}}
+                                    <h3 class="dropdown-title">มาตรฐาน</h3>
+                                    <div class="dropdown-multiselect" id="standardDropdown">
+                                        <div class="dropdown-btn" onclick="toggleDropdown('standardDropdown')">
+                                            <span id="standard-label">เลือกมาตรฐาน</span>
+                                            <i class="fa-solid fa-caret-down"></i>
                                         </div>
-                                        @foreach ($indicators->pluck('standard.name')->unique() as $std)
-                                            <label>
-                                                <input type="checkbox" name="standard[]"
-                                                    class="filter-option standard-option" data-column="2"
-                                                    data-value="{{ $std }}">
-                                                <span style="margin-left:6px;">{{ $std }}</span>
-                                            </label>
-                                        @endforeach
+
+                                        <div class="dropdown-content">
+                                            <div class="dropdown-tools" data-section="standardDropdown">
+                                                <input type="text" name="standard_search" class="filter-search"
+                                                    placeholder="ค้นหา..." aria-label="ค้นหามาตรฐาน">
+                                                <div class="tools-actions">
+                                                    <button type="button" class="tool-btn"
+                                                        data-action="select-all">ทั้งหมด</button>
+                                                    <button type="button" class="tool-btn"
+                                                        data-action="clear-all">ล้างทั้งหมด</button>
+                                                </div>
+                                            </div>
+                                            @foreach ($indicators->pluck('standard.name')->unique() as $std)
+                                                <label>
+                                                    <input type="checkbox" name="standard[]" class="filter-option "
+                                                        data-column="2" data-value="{{ $std }}">
+                                                    <span>{{ $std }}</span>
+                                                </label>
+                                            @endforeach
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            <div class="filter-section">
-                                {{-- Section: ด้าน --}}
-                                <h3 class="dropdown-title">ด้าน</h3>
-                                <div class="dropdown-multiselect" id="dimensionDropdown">
-                                    <div class="dropdown-btn" onclick="toggleDropdown('dimensionDropdown')">
-                                        <span id="dimension-label">เลือกด้าน</span>
-                                        <i class="fa-solid fa-caret-down"></i>
-                                    </div>
-                                    <div class="dropdown-content">
-                                        <div class="dropdown-tools" data-section="dimensionDropdown">
-                                            <input type="text" name="dimension_search" class="filter-search"
-                                                placeholder="ค้นหา..." aria-label="ค้นหาด้าน">
-                                            <div class="tools-actions">
-                                                <button type="button" class="tool-btn"
-                                                    data-action="select-all">เลือกทั้งหมด</button>
-                                                <button type="button" class="tool-btn"
-                                                    data-action="clear-all">ล้างทั้งหมด</button>
-                                            </div>
+                                <div class="filter-section">
+                                    {{-- Section: ด้าน --}}
+                                    <h3 class="dropdown-title">ด้าน</h3>
+                                    <div class="dropdown-multiselect" id="dimensionDropdown">
+                                        <div class="dropdown-btn" onclick="toggleDropdown('dimensionDropdown')">
+                                            <span id="dimension-label">เลือกด้าน</span>
+                                            <i class="fa-solid fa-caret-down"></i>
                                         </div>
-                                        @foreach ($indicators->pluck('category.name')->unique() as $dim)
-                                            <label>
-                                                <input type="checkbox" name="dimension[]"
-                                                    class="filter-option dimension-option" data-column="1"
-                                                    data-value="{{ $dim }}">
-                                                <span style="margin-left:6px;">{{ $dim }}</span>
-                                            </label>
-                                        @endforeach
+                                        <div class="dropdown-content">
+                                            <div class="dropdown-tools" data-section="dimensionDropdown">
+                                                <input type="text" name="dimension_search" class="filter-search"
+                                                    placeholder="ค้นหา..." aria-label="ค้นหาด้าน">
+                                                <div class="tools-actions">
+                                                    <button type="button" class="tool-btn"
+                                                        data-action="select-all">ทั้งหมด</button>
+                                                    <button type="button" class="tool-btn"
+                                                        data-action="clear-all">ล้างทั้งหมด</button>
+                                                </div>
+                                            </div>
+                                            @foreach ($indicators->pluck('category.name')->unique() as $dim)
+                                                <label>
+                                                    <input type="checkbox" name="dimension[]" class="filter-option"
+                                                        data-column="1" data-value="{{ $dim }}">
+                                                    <span>{{ $dim }}</span>
+                                                </label>
+                                            @endforeach
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            <div class="filter-section">
-                                {{-- Section: หน่วยงานที่รับผิดชอบ --}}
-                                <h3 class="dropdown-title">หน่วยงานที่รับผิดชอบ</h3>
-                                <div class="dropdown-multiselect" id="deptDropdown">
-                                    <div class="dropdown-btn" onclick="toggleDropdown('deptDropdown')">
-                                        <span id="dept-label">เลือกหน่วยงาน</span>
-                                        <i class="fa-solid fa-caret-down"></i>
-                                    </div>
-                                    <div class="dropdown-content">
-                                        <div class="dropdown-tools" data-section="deptDropdown">
-                                            <input type="text" name="dept_search" class="filter-search"
-                                                placeholder="ค้นหา..." aria-label="ค้นหาหน่วยงานที่รับผิดชอบ">
-                                            <div class="tools-actions">
-                                                <button type="button" class="tool-btn"
-                                                    data-action="select-all">เลือกทั้งหมด</button>
-                                                <button type="button" class="tool-btn"
-                                                    data-action="clear-all">ล้างทั้งหมด</button>
+                                <div class="filter-section">
+                                    {{-- Section: หน่วยงานที่รับผิดชอบ --}}
+                                    <h3 class="dropdown-title">หน่วยงานที่รับผิดชอบ</h3>
+                                    <div class="dropdown-multiselect" id="deptDropdown">
+                                        <div class="dropdown-btn" onclick="toggleDropdown('deptDropdown')">
+                                            <span id="dept-label">เลือกหน่วยงาน</span>
+                                            <i class="fa-solid fa-caret-down"></i>
+                                        </div>
+                                        <div class="dropdown-content">
+                                            <div class="dropdown-tools" data-section="deptDropdown">
+                                                <input type="text" name="dept_search" class="filter-search"
+                                                    placeholder="ค้นหา..." aria-label="ค้นหาหน่วยงานที่รับผิดชอบ">
+                                                <div class="tools-actions">
+                                                    <button type="button" class="tool-btn"
+                                                        data-action="select-all">ทั้งหมด</button>
+                                                    <button type="button" class="tool-btn"
+                                                        data-action="clear-all">ล้างทั้งหมด</button>
+                                                </div>
                                             </div>
+                                            @php
+                                                $deptOptions = $indicators
+                                                    ->flatMap(function ($i) {
+                                                        return collect($i['assignments'] ?? [])
+                                                            ->pluck('user.department_name')
+                                                            ->filter();
+                                                    })
+                                                    ->unique()
+                                                    ->values();
+                                            @endphp
+                                            @foreach ($deptOptions as $dept)
+                                                <label>
+                                                    <input type="checkbox" name="dept[]" class="filter-option "
+                                                        data-column="6" data-value="{{ $dept }}">
+                                                    <span>{{ $dept }}</span>
+                                                </label>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="filter-section">
+                                    {{-- Section: ประเภทตัวบ่งชี้ --}}
+                                    <h3 class="dropdown-title">ประเภทตัวบ่งชี้</h3>
+                                    <div class="dropdown-multiselect" id="typeDropdown">
+                                        <div class="dropdown-btn" onclick="toggleDropdown('typeDropdown')">
+                                            <span id="type-label">เลือกประเภท</span>
+                                            <i class="fa-solid fa-caret-down"></i>
+                                        </div>
+                                        <div class="dropdown-content">
+                                            <div class="dropdown-tools" data-section="typeDropdown">
+                                                <input type="text" name="type_search" class="filter-search"
+                                                    placeholder="ค้นหา..." aria-label="ค้นหาประเภทตัวบ่งชี้">
+                                                <div class="tools-actions">
+                                                    <button type="button" class="tool-btn"
+                                                        data-action="select-all">ทั้งหมด</button>
+                                                    <button type="button" class="tool-btn"
+                                                        data-action="clear-all">ล้างทั้งหมด</button>
+                                                </div>
+                                            </div>
+                                            @foreach ($indicators->pluck('type')->unique() as $type)
+                                                <label>
+                                                    <input type="checkbox" name="type[]" class="filter-option "
+                                                        data-column="5" data-value="{{ $type ?? 'ไม่ระบุ' }}">
+                                                    <span>
+                                                        {{ $type ?? 'ไม่ระบุ' }}
+                                                    </span>
+                                                </label>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="filter-section">
+                                    {{-- Section: สถานะตัวบ่งชี้ --}}
+                                    <h3 class="dropdown-title">สถานะตัวบ่งชี้</h3>
+                                    <div class="dropdown-multiselect" id="statusDropdown">
+                                        <div class="dropdown-btn" onclick="toggleDropdown('statusDropdown')">
+                                            <span id="status-label">เลือกสถานะ</span>
+                                            <i class="fa-solid fa-caret-down"></i>
                                         </div>
                                         @php
-                                            $deptOptions = $indicators
-                                                ->flatMap(function ($i) {
-                                                    return collect($i['assignments'] ?? [])
-                                                        ->pluck('user.department_name')
-                                                        ->filter();
-                                                })
-                                                ->unique()
-                                                ->values();
+                                            $statusMap = [
+                                                0 => 'รอดำเนินการ',
+                                                1 => 'รอดำเนินการ / บันทึกฉบับร่าง',
+                                                2 => 'รอดำเนินการ / บันทึกฉบับจริง',
+                                                3 => 'ผลการดำเนินงานครบถ้วนตามเกณฑ์มาตรการ',
+                                                4 => 'ผลการดำเนินงานยังไม่ครบถ้วนตามเกณฑ์',
+                                            ];
+
+                                            $statusCodes = $indicators->pluck('status')->unique()->sort()->values();
                                         @endphp
-                                        @foreach ($deptOptions as $dept)
-                                            <label>
-                                                <input type="checkbox" name="dept[]" class="filter-option dept-option"
-                                                    data-column="6" data-value="{{ $dept }}">
-                                                <span style="margin-left:6px;">{{ $dept }}</span>
-                                            </label>
-                                        @endforeach
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="filter-section">
-                                {{-- Section: ประเภทตัวบ่งชี้ --}}
-                                <h3 class="dropdown-title">ประเภทตัวบ่งชี้</h3>
-                                <div class="dropdown-multiselect" id="typeDropdown">
-                                    <div class="dropdown-btn" onclick="toggleDropdown('typeDropdown')">
-                                        <span id="type-label">เลือกประเภท</span>
-                                        <i class="fa-solid fa-caret-down"></i>
-                                    </div>
-                                    <div class="dropdown-content">
-                                        <div class="dropdown-tools" data-section="typeDropdown">
-                                            <input type="text" name="type_search" class="filter-search"
-                                                placeholder="ค้นหา..." aria-label="ค้นหาประเภทตัวบ่งชี้">
-                                            <div class="tools-actions">
-                                                <button type="button" class="tool-btn"
-                                                    data-action="select-all">เลือกทั้งหมด</button>
-                                                <button type="button" class="tool-btn"
-                                                    data-action="clear-all">ล้างทั้งหมด</button>
+                                        <div class="dropdown-content">
+                                            <div class="dropdown-tools" data-section="statusDropdown">
+                                                <input type="text" name="status_search" class="filter-search"
+                                                    placeholder="ค้นหา..." aria-label="ค้นหาสถานะตัวบ่งชี้">
+                                                <div class="tools-actions">
+                                                    <button type="button" class="tool-btn"
+                                                        data-action="select-all">ทั้งหมด</button>
+                                                    <button type="button" class="tool-btn"
+                                                        data-action="clear-all">ล้างทั้งหมด</button>
+                                                </div>
                                             </div>
+                                            @foreach ($statusCodes as $statusCode)
+                                                <label>
+                                                    <input type="checkbox" name="status[]" class="filter-option"
+                                                        data-column="9" data-value="{{ $statusCode }}">
+                                                    <span>{{ $statusMap[$statusCode] ?? 'ไม่ระบุ' }}</span>
+                                                </label>
+                                            @endforeach
                                         </div>
-                                        @foreach ($indicators->pluck('type')->unique() as $type)
-                                            <label style="display:flex; align-items:center; margin-bottom:4px;">
-                                                <input type="checkbox" name="type[]" class="filter-option type-option"
-                                                    data-column="5" data-value="{{ $type ?? 'ไม่ระบุ' }}">
-                                                <span style="margin-left:6px; font-size:14px; color:#374151;">
-                                                    {{ $type ?? 'ไม่ระบุ' }}
-                                                </span>
-                                            </label>
-                                        @endforeach
+
                                     </div>
                                 </div>
-                            </div>
 
-                            <div class="filter-section">
-                                {{-- Section: สถานะตัวบ่งชี้ --}}
-                                <h3 class="dropdown-title">สถานะตัวบ่งชี้</h3>
-                                <div class="dropdown-multiselect" id="statusDropdown">
-                                    <div class="dropdown-btn" onclick="toggleDropdown('statusDropdown')">
-                                        <span id="status-label">เลือกสถานะ</span>
-                                        <i class="fa-solid fa-caret-down"></i>
-                                    </div>
-                                    @php
-                                        $statusMap = [
-                                            0 => 'รอดำเนินการ',
-                                            1 => 'รอดำเนินการ / บันทึกฉบับร่าง',
-                                            2 => 'รอดำเนินการ / บันทึกฉบับจริง',
-                                            3 => 'ผลการดำเนินงานครบถ้วนตามเกณฑ์มาตรการ',
-                                            4 => 'ผลการดำเนินงานยังไม่ครบถ้วนตามเกณฑ์',
-                                        ];
-
-                                        $statusCodes = $indicators->pluck('status')->unique()->sort()->values();
-                                    @endphp
-                                    <div class="dropdown-content">
-                                        <div class="dropdown-tools" data-section="statusDropdown">
-                                            <input type="text" name="status_search" class="filter-search"
-                                                placeholder="ค้นหา..." aria-label="ค้นหาสถานะตัวบ่งชี้">
-                                            <div class="tools-actions">
-                                                <button type="button" class="tool-btn"
-                                                    data-action="select-all">เลือกทั้งหมด</button>
-                                                <button type="button" class="tool-btn"
-                                                    data-action="clear-all">ล้างทั้งหมด</button>
+                                <div class="filter-section">
+                                    {{-- Section: สถานะเอกสาร --}}
+                                    <h3 class="dropdown-title">สถานะเอกสาร</h3>
+                                    <div class="dropdown-multiselect" id="statusEnvDropdown">
+                                        <div class="dropdown-btn" onclick="toggleDropdown('statusEnvDropdown')">
+                                            <span id="statusEnv-label">เลือกสถานะเอกสาร</span>
+                                            <i class="fa-solid fa-caret-down"></i>
+                                        </div>
+                                        @php
+                                            $docStatusOptions = ['รอดำเนินการ', 'ครบ', 'ไม่ครบ'];
+                                        @endphp
+                                        <div class="dropdown-content">
+                                            <div class="dropdown-tools" data-section="statusEnvDropdown">
+                                                <input type="text" name="doc_status_search" class="filter-search"
+                                                    placeholder="ค้นหา..." aria-label="ค้นหาสถานะเอกสาร">
+                                                <div class="tools-actions">
+                                                    <button type="button" class="tool-btn"
+                                                        data-action="select-all">ทั้งหมด</button>
+                                                    <button type="button" class="tool-btn"
+                                                        data-action="clear-all">ล้างทั้งหมด</button>
+                                                </div>
                                             </div>
+                                            @foreach ($docStatusOptions as $docStatus)
+                                                <label>
+                                                    <input type="checkbox" name="doc_status[]" class="filter-option"
+                                                        data-column="10" data-value="{{ $docStatus }}">
+                                                    <span>{{ $docStatus }}</span>
+                                                </label>
+                                            @endforeach
                                         </div>
-                                        @foreach ($statusCodes as $statusCode)
-                                            <label>
-                                                <input type="checkbox" name="status[]"
-                                                    class="filter-option status-option" data-column="9"
-                                                    data-value="{{ $statusCode }}">
-                                                <span
-                                                    style="margin-left:6px;">{{ $statusMap[$statusCode] ?? 'ไม่ระบุ' }}</span>
-                                            </label>
-                                        @endforeach
-                                    </div>
 
+                                    </div>
                                 </div>
                             </div>
 
-                            <div class="filter-section">
-                                {{-- Section: สถานะเอกสาร --}}
-                                <h3 class="dropdown-title">สถานะเอกสาร</h3>
-                                <div class="dropdown-multiselect" id="statusEnvDropdown">
-                                    <div class="dropdown-btn" onclick="toggleDropdown('statusEnvDropdown')">
-                                        <span id="statusEnv-label">เลือกสถานะเอกสาร</span>
-                                        <i class="fa-solid fa-caret-down"></i>
-                                    </div>
-                                    @php
-                                        $docStatusOptions = ['รอดำเนินการ', 'ครบ', 'ไม่ครบ'];
-                                    @endphp
-                                    <div class="dropdown-content">
-                                        <div class="dropdown-tools" data-section="statusEnvDropdown">
-                                            <input type="text" name="doc_status_search" class="filter-search"
-                                                placeholder="ค้นหา..." aria-label="ค้นหาสถานะเอกสาร">
-                                            <div class="tools-actions">
-                                                <button type="button" class="tool-btn"
-                                                    data-action="select-all">เลือกทั้งหมด</button>
-                                                <button type="button" class="tool-btn"
-                                                    data-action="clear-all">ล้างทั้งหมด</button>
-                                            </div>
-                                        </div>
-                                        @foreach ($docStatusOptions as $docStatus)
-                                            <label>
-                                                <input type="checkbox" name="doc_status[]"
-                                                    class="filter-option statusenv-option" data-column="10"
-                                                    data-value="{{ $docStatus }}">
-                                                <span style="margin-left:6px;">{{ $docStatus }}</span>
-                                            </label>
-                                        @endforeach
-                                    </div>
-
-                                </div>
+                            <div class="filters-actions">
+                                {{-- Buttons --}}
+                                <button id="clear-filters" class="btn px-1.5 py-2.5">ล้างตัวกรอง</button>
+                                <button id="apply-filters" class="btn btn-primary px-1.5 py-2.5">ใช้ตัวกรอง</button>
                             </div>
-                        </div>
-
-                        <div class="filters-actions">
-                            {{-- Buttons --}}
-                            <button id="clear-filters" class="btn px-1.5 py-2.5">ล้างตัวกรอง</button>
-                            <button id="apply-filters" class="btn btn-primary px-1.5 py-2.5">ใช้ตัวกรอง</button>
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- Action Buttons Group -->
-            <div class="flex flex-wrap gap-3">
-                <button id="export_button"
-                    class="h-fit bg-green-500 hover:bg-green-600 text-white rounded-lg px-4 py-2 flex items-center gap-2">
+            <div class="action-buttons-container">
+                <button id="export_button" class="bg-green-500 hover:bg-green-600">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0l-4 4m4-4v12" />
                     </svg>
-                    <span class="hidden sm:inline">EXPORT TO EXCEL</span>
+                    <span>EXPORT TO EXCEL</span>
                 </button>
-                <button id="add_indicator_button"
-                    class="h-fit bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-4 py-2 flex items-center gap-2">
+                <button id="add_indicator_button" class="bg-blue-600 hover:bg-blue-700">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                     </svg>
-                    <span class="hidden sm:inline">เพิ่มตัวบ่งชี้</span>
+                    <span>เพิ่มตัวบ่งชี้</span>
                 </button>
             </div>
         </div>
@@ -353,7 +348,7 @@
         <!-- ตารางรายการตัวบ่งชี้ -->
         <div
             class="overflow-x-auto border border-gray-200 rounded-lg shadow-sm sm:overflow-x-scroll md:overflow-x-auto lg:overflow-x-auto xl:overflow-auto 2xl:overflow-visible">
-            <table id="myTable" class="w-full min-w-full">
+            <table id="myTable" class="w-full min-w-full ">
                 <thead>
                     <tr>
                         <th class="w-fit text-xs sm:text-sm font-medium text-gray-900 cursor-pointer select-none hidden sm:table-cell"
@@ -692,54 +687,118 @@
             /* Base section styles */
             .container {
                 max-width: 1400px !important;
+                min-height: 750px !important;
             }
 
-            .btn-view {
-                text-decoration: none;
-                display: inline-flex;
+            .card-header-table {
+                display: flex;
+                flex-direction: row;
+                justify-content: space-between;
+                gap: 26px;
+                padding: 16px;
+            }
+
+            .card-header-table .search-button-container {
+                display: flex;
+                flex-direction: row;
+                gap: 8px;
+                width: 100%;
+                height: fit-content;
+            }
+
+            .search-bar input {
+                font-size: 14px;
+            }
+
+            .search-button-container .search-bar {
+                position: relative;
+                display: flex;
                 align-items: center;
-                gap: 6px;
-                padding: 6px 14px;
-                border-radius: 6px;
-                border: 1px solid #3b82f6;
-                background: transparent;
-                /* ✅ โปร่งใส */
+                border-radius: 8px;
+                width: 70%;
+                min-width: 250px;
+                height: fit-content;
+                background-color: white;
+            }
+
+            .search-button-container .sort-filter-container {
+                display: flex;
+                flex-direction: row;
+                gap: 8px;
+                height: fit-content;
+                width: fit-content;
+            }
+
+            .card-header-table .action-buttons-container {
+                display: flex;
+                flex-direction: row;
+                gap: 12px;
+
+            }
+
+            .action-buttons-container button {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 4px;
+                font-size: 14px;
+                height: 100%;
+                width: fit-content;
+                color: white;
                 cursor: pointer;
-                font-size: 13px;
-                font-weight: 500;
+                transition: background-color 0.2s ease;
+                border-radius: 8px;
+                padding: 8px 16px;
                 white-space: nowrap;
-                color: #3b82f6;
-                transition: all 0.2s ease-in-out;
             }
 
-            .btn-view:hover {
-                background: #dbeafe;
-            }
-
+            /* Button styles */
             .btns {
                 display: inline-flex;
                 align-items: center;
-                gap: 6px;
+                justify-content: center;
+                gap: 8px;
                 border: 1px solid #e5e7eb;
                 background: #fff;
                 color: #374151;
-                padding: 8px 12px;
+                padding: 8px 16px;
                 border-radius: 8px;
+                cursor: pointer;
+                font-size: 14px;
+                font-weight: 500;
+                transition: all 0.2s ease;
+                white-space: nowrap;
+                text-decoration: none;
+                height: 100%;
             }
 
             .btns:hover {
                 background: #f9fafb;
+                border-color: #d1d5db;
+                transform: translateY(-1px);
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            }
+
+            .btns:active {
+                transform: translateY(0);
+                box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+            }
+
+            .btns svg {
+                width: 16px;
+                height: 16px;
+                transition: transform 0.2s ease;
+            }
+
+            .btns:hover svg {
+                transform: scale(1.05);
             }
 
             .status-badge {
-
                 align-items: center;
                 justify-content: center;
                 min-width: 64px;
-                /* กำหนดความกว้างขั้นต่ำ ให้ badge กว้างเท่ากัน */
                 padding: 4px 10px;
-
-                /* pill shape */
                 font-size: 13px;
                 font-weight: 500;
                 line-height: 1.4;
@@ -758,34 +817,40 @@
                 transform: rotate(180deg);
             }
 
+            .dropdown-multiselect.open .dropdown-content label,
+            .dropdown-multiselect.open .dropdown-content input {
+                cursor: pointer;
+            }
+
             /* Minimal styles for custom multiselect dropdown */
-            .dropdown {
+            .dropdown-inds {
                 position: relative;
                 display: inline-block;
+                /* text-align: left; */
+                width: fit-content;
+                height: fit-content;
             }
 
             .dropdown-menus {
                 position: absolute;
+                top: 100%;
+                left: calc(100% - 355px);
+                /* margin-right: 20px; */
                 margin-top: 8px;
-                left: 0;
                 background: #fff;
                 border: 1px solid #e5e7eb;
                 border-radius: 8px;
                 box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
                 z-index: 50;
                 padding: 12px;
-
-                max-height: ;
-                overflow: scroll;
+                max-height: 400px;
             }
 
             .dropdown-menus .filter-grid {
                 display: grid;
                 grid-template-columns: 1fr 1fr;
                 gap: 12px;
-                max-height: max-content;
-                overflow-y: auto;
-                padding-right: 4px;
+                height: 310px;
             }
 
             .dropdown-menus .filter-section {
@@ -794,7 +859,7 @@
                 gap: 5px;
                 font-size: 14px;
                 width: 100%;
-                min-width: 360px;
+                min-width: 350px;
             }
 
             .dropdown-menus .filters-actions {
@@ -807,7 +872,6 @@
             .dropdown-title {
                 font-weight: 600;
                 color: #111827;
-                /* margin: 8px 0; */
                 padding-left: 6px;
             }
 
@@ -828,36 +892,42 @@
             .dropdown-multiselect .dropdown-content {
                 display: none;
                 max-height: 220px;
+                height: 100%;
                 overflow-y: auto;
                 border-top: 1px solid #e5e7eb;
                 padding: 8px 10px;
+
             }
 
             .dropdown-multiselect.open .dropdown-content {
                 display: flex;
                 flex-direction: column;
-                gap: 3px;
+                position: absolute;
+                margin-top: 3px;
+                gap: 4px;
                 max-height: 150px;
+                max-width: 350px;
                 overflow-y: scroll;
+                z-index: 50;
+                background: #fff;
+                border: 1px solid #e5e7eb;
+                border-radius: 8px;
+                box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+
             }
 
-            .dropdown-multiselect.open .dropdown-content label,
-            .dropdown-multiselect.open .dropdown-content input {
-                cursor: pointer;
-            }
-
-
-            .dropdown-divider {
-                height: 1px;
-                background: #e5e7eb;
-                margin: 10px 0;
+            .dropdown-multiselect.open .dropdown-content label {
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                padding: 3px 4px;
             }
 
             .dropdown-tools {
                 display: flex;
                 align-items: center;
                 gap: 8px;
-                /* padding: 8px 0px; */
+                width: 100%;
                 border-top: 1px dashed #e5e7eb;
                 border-bottom: 1px dashed #e5e7eb;
                 background: #fafafa;
@@ -868,7 +938,7 @@
                 border: 1px solid #e5e7eb;
                 border-radius: 6px;
                 padding: 6px 8px;
-                font-size: 13px;
+                font-size: 12px;
             }
 
             .dropdown-tools .tools-actions {
@@ -882,7 +952,9 @@
                 color: #374151;
                 border-radius: 6px;
                 padding: 6px 8px;
-                font-size: 12px;
+                font-size: 10px;
+                cursor: pointer;
+                /* transition: all 0.2s ease; */
             }
 
             .dropdown-tools .tool-btn:hover {
@@ -960,20 +1032,17 @@
 
             /* Base (mobile first: <640px) */
             @media (max-width: 639px) {
+
+                /* Layout adjustments */
+                .container {
+                    padding: 8px;
+                }
+
+                /* Filter grid */
                 .filter-grid {
                     grid-template-columns: 1fr;
                     gap: 12px;
                     padding: 12px;
-                }
-
-                .flex.justify-between {
-                    flex-direction: column;
-                    gap: 1rem;
-                }
-
-                .btns {
-                    width: 100%;
-                    justify-content: center;
                 }
 
                 .dataTables_wrapper {
@@ -1039,32 +1108,105 @@
                     padding-right: 6px;
                 }
 
-                .dropdown-menus {
-                    left: -20px;
-                    min-width: 280px;
-                    max-width: calc(100vw - 40px);
-                }
-
-                .dropdown-menus .filter-section {
-                    width: 100%;
-                }
-
-                .btn-view {
-                    font-size: 11px;
-                    padding: 4px 8px;
-                }
-
                 .status-badge {
                     font-size: 11px;
                     min-width: 50px;
                     padding: 2px 6px;
                 }
+
+                .dropdown-menus {}
+
+                .dropdown-multiselect {}
+
+                .dropdown-multiselect .dropdown-btn {}
+
+                .dropdown-multiselect .dropdown-content {
+                    display: none;
+                    max-height: 220px;
+                    height: 100%;
+                    overflow-y: auto;
+                    border-top: 1px solid #e5e7eb;
+                    padding: 8px 10px;
+
+                }
+
+                .dropdown-multiselect.open .dropdown-content {
+                    display: flex;
+                    flex-direction: column;
+                    position: absolute;
+                    margin-top: 3px;
+                    gap: 4px;
+                    max-height: 150px;
+                    max-width: 350px;
+                    overflow-y: scroll;
+                    z-index: 50;
+                    background: #fff;
+                    border: 1px solid #e5e7eb;
+                    border-radius: 8px;
+                    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+
+                }
+
+                /* Responsive content */
+                .card-header-table {
+                    flex-direction: column-reverse;
+                    gap: 16px;
+                    padding: 12px 6px;
+                }
+
+                .card-header-table .search-button-container {
+                    flex-direction: column;
+                }
+
+                .card-header-table .action-buttons-container {
+                    /* width: 100%; */
+                    justify-content: space-between;
+                    gap: 8px;
+                }
+
+                .search-button-container .search-bar {
+                    width: 100%;
+                }
+
+                .search-button-container .sort-filter-container {
+                    width: 100%;
+                    justify-content: space-between;
+                    gap: 8px;
+                }
+
+                .dropdown-inds {
+                    width: 100%;
+                }
+
+                .dropdown-inds .btns {
+                    width: 100%;
+                }
+
+                /* Font Size control */
+                .search-bar input {
+                    font-size: 12px;
+                }
+
+                .action-buttons-container button {
+                    font-size: 12px;
+                    /* height: 100%; */
+                    width: 100%;
+                }
+
+                .btns {
+                    font-size: 12px;
+                }
             }
 
             /* sm ≥ 640px */
-            @media (min-width: 640px) {
+            @media (min-width: 640px) and (max-width: 767px) {
                 .container {
                     padding: 12px;
+                }
+
+                .flex.flex-wrap.gap-2 {
+                    flex-direction: row;
+                    gap: 8px;
                 }
 
                 table.dataTable {
@@ -1077,17 +1219,114 @@
                 }
 
                 .dropdown-menus {
-                    min-width: 400px;
+                    position: absolute;
+                    left: calc(100% - 385px);
+                    top: 100%;
+                    margin-top: 8px;
+                    background: #fff;
+                    border: 1px solid #e5e7eb;
+                    border-radius: 8px;
+                    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+                    z-index: 50;
+                    padding: 12px;
                 }
 
-                .btn-view {
-                    font-size: 12px;
-                    padding: 5px 10px;
+                .dropdown-menus .filter-grid {
+                    display: grid;
+                    grid-template-columns: 1fr;
+                    gap: 12px;
+                    height: 310px;
+                    overflow-y: auto;
+                    width: fit-content;
                 }
+
+                .dropdown-menus .filter-section {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 5px;
+                    font-size: 14px;
+                    width: 350px;
+                }
+
+                .dropdown-menus .filters-actions {
+                    width: 350px;
+                    display: flex;
+                    justify-content: space-between;
+                    margin: 12px 0 0 0;
+                }
+
+                .dropdown-title {
+                    font-weight: 600;
+                    color: #111827;
+                    padding-left: 6px;
+                }
+
+                .dropdown-multiselect {
+                    border: 1px solid #e5e7eb;
+                    border-radius: 8px;
+                }
+
+                .dropdown-multiselect .dropdown-btn {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    width: 100%;
+                    padding: 8px 10px;
+                    cursor: pointer;
+                }
+
+                .dropdown-multiselect .dropdown-content {
+                    display: none;
+                    /* max-height: 220px; */
+                    overflow-y: auto;
+                    border-top: 1px solid #e5e7eb;
+                    padding: 8px 10px;
+
+                    /* background-color: red; */
+                }
+
+                .dropdown-multiselect.open .dropdown-content {
+                    display: flex;
+                    flex-direction: column;
+                    position: initial;
+                    gap: 3px;
+                    overflow-y: scroll;
+                    z-index: 50;
+                }
+
+                /* Responsive content */
+                .card-header-table {
+                    flex-direction: column-reverse;
+                    gap: 16px;
+                    padding: 12px 6px;
+                }
+
+                .card-header-table .search-button-container {
+                    align-items: center;
+                }
+
+                .search-button-container .search-bar {
+                    width: 100%;
+                }
+
+                /* Font Size control */
+                .search-bar input {
+                    font-size: 12px;
+                }
+
+                .action-buttons-container button {
+                    font-size: 12px;
+                    height: fit-content;
+                }
+
+                .btns {
+                    font-size: 12px;
+                }
+
             }
 
             /* md ≥ 768px */
-            @media (min-width: 768px) {
+            @media (min-width: 768px) and (max-width: 1023px) {
                 .container {
                     max-width: 900px;
                     padding: 16px;
@@ -1103,12 +1342,117 @@
                 }
 
                 .dropdown-menus {
-                    min-width: 500px;
+                    position: absolute;
+                    left: calc(100% - 260px);
+                    top: 100%;
+                    margin-top: 8px;
+                    background: #fff;
+                    border: 1px solid #e5e7eb;
+                    border-radius: 8px;
+                    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+                    z-index: 50;
+                    padding: 12px;
+                }
+
+                .dropdown-menus .filter-grid {
+                    display: grid;
+                    grid-template-columns: 1fr;
+                    gap: 12px;
+                    height: 310px;
+                    overflow-y: auto;
+                    width: fit-content;
+                }
+
+                .dropdown-menus .filter-section {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 5px;
+                    font-size: 14px;
+                    width: 350px;
+                }
+
+                .dropdown-menus .filters-actions {
+                    width: 350px;
+                    display: flex;
+                    justify-content: space-between;
+                    margin: 12px 0 0 0;
+                }
+
+                .dropdown-title {
+                    font-weight: 600;
+                    color: #111827;
+                    padding-left: 6px;
+                }
+
+                .dropdown-multiselect {
+                    border: 1px solid #e5e7eb;
+                    border-radius: 8px;
+                }
+
+                .dropdown-multiselect .dropdown-btn {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    width: 100%;
+                    padding: 8px 10px;
+                    cursor: pointer;
+                }
+
+                .dropdown-multiselect .dropdown-content {
+                    display: none;
+                    /* max-height: 220px; */
+                    overflow-y: auto;
+                    border-top: 1px solid #e5e7eb;
+                    padding: 8px 10px;
+
+                    /* background-color: red; */
+                }
+
+                .dropdown-multiselect.open .dropdown-content {
+                    display: flex;
+                    flex-direction: column;
+                    position: initial;
+                    gap: 3px;
+                    overflow-y: scroll;
+                    z-index: 50;
+                }
+
+                /* Responsive content */
+                .card-header-table {
+                    padding: 16px 6px;
+                    gap: 13px;
+                }
+
+                .card-header-table .action-buttons-container {
+                    gap: 8px;
+                }
+
+                .search-button-container .search-bar {
+                    width: 100%;
+                }
+
+                .action-buttons-container button span {
+                    display: none;
+                }
+
+                /* Font Size control */
+                .search-bar input {
+                    font-size: 12px;
+                }
+
+                .action-buttons-container button {
+                    font-size: 12px;
+                    height: fit-content;
+                    min-width: 36px;
+                }
+
+                .btns {
+                    font-size: 12px;
                 }
             }
 
             /* lg ≥ 1024px */
-            @media (min-width: 1024px) {
+            @media (min-width: 1024px) and (max-width: 1279px) {
                 .container {
                     max-width: 1100px;
                     padding: 20px;
@@ -1123,18 +1467,28 @@
                     padding: 10px 6px;
                 }
 
+                /* Responsive content */
                 .dropdown-menus {
-                    min-width: 640px;
+                    left: calc(100% - 390px);
                 }
 
-                .dropdown-menus .filter-grid {
-                    grid-template-columns: 1fr 1fr;
-                    gap: 12px;
+                /* Font Size control */
+                .search-bar input {
+                    font-size: 13px;
                 }
+
+                .action-buttons-container button {
+                    font-size: 13px;
+                }
+
+                .btns {
+                    font-size: 13px;
+                }
+
             }
 
             /* xl ≥ 1280px */
-            @media (min-width: 1280px) {
+            @media (min-width: 1280px) and (max-width: 1535px) {
                 .container {
                     max-width: 1400px;
                     padding: 24px;
@@ -1150,21 +1504,14 @@
                 }
 
                 .dropdown-menus {
-                    min-width: 720px;
+                    left: calc(100% - 380px);
                 }
+
+
             }
 
             /* 2xl ≥ 1536px */
-            @media (min-width: 1536px) {
-                .dropdown-menus {
-                    min-width: 720px;
-                }
-
-                /* .dropdown-menus .filter-grid {
-                    grid-template-columns: 1fr 1fr 1fr;
-                    gap: 16px;
-                } */
-            }
+            @media (min-width: 1536px) {}
         </style>
     @endpush
 
@@ -1311,12 +1658,12 @@
                 });
 
                 // Close all filter sub-dropdowns when clicking inside the main filter dropdown area
-                // $('#filter-dropdown').on('click', function(e) {
-                //     // Only close sub-dropdowns if not clicking on a dropdown button or its content
-                //     if (!$(e.target).closest('.dropdown-multiselect').length) {
-                //         $('.dropdown-multiselect').removeClass('open');
-                //     }
-                // });
+                $('#filter-dropdown').on('click', function(e) {
+                    // Only close sub-dropdowns if not clicking on a dropdown button or its content
+                    if (!$(e.target).closest('.dropdown-multiselect').length) {
+                        $('.dropdown-multiselect').removeClass('open');
+                    }
+                });
 
                 // Handle sort options
                 $('.sort-option').on('click', function() {
@@ -1417,7 +1764,7 @@
                     // Reset button text
                     $('#filter-button span').text('กรองข้อมูล');
 
-                    // Clear all column searches
+                    // ล้างทั้งหมด column searches
                     table.columns().search('').draw();
 
                     // Reset labels
@@ -1486,7 +1833,7 @@
                     });
                 });
 
-                // Select all / Clear all in a section
+                // Select all / ล้างทั้งหมด in a section
                 $(document).on('click', '.dropdown-tools [data-action] ', function() {
                     const action = $(this).data('action');
                     const tools = $(this).closest('.dropdown-tools');
