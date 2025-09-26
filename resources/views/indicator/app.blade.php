@@ -19,7 +19,7 @@
                     </div>
                     <input type="search" name="custom_search" id="custom-search" placeholder="ค้นหารายการตัวบ่งชี้..."
                         aria-label="ค้นหารายการตัวบ่งชี้" aria-controls="myTable" autocomplete="off"
-                        class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/40 sm:bg-amber-400 md:bg-green-500 lg:bg-blue-500 xl:bg-purple-500 2xl:bg-orange-600" />
+                        class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/40" />
                 </div>
 
                 <div class="sort-filter-container">
@@ -55,7 +55,7 @@
                                     class="sort-option text-left block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                                     data-column="7" data-order="desc" role="menuitem">ผลลัพธ์ (มากไปน้อย)</button>
                                 <button id="clear-sort"
-                                    class=" text-left block w-full px-4 py-2 text-sm text-gray-600 hover:bg-gray-100">ล้างตัวเรียงลำดับ</button>
+                                    class="sort-option text-left block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">ล้างตัวเรียงลำดับ</button>
                             </div>
                         </div>
                     </div>
@@ -71,11 +71,11 @@
                             </svg>
                         </button>
 
-                        <div id="filter-dropdown" class="dropdown-menus "> {{-- hidden --}}
+                        <div id="filter-dropdown" class="dropdown-menus hidden">
                             <div class="filter-grid">
                                 <div class="filter-section">
                                     {{-- Section: ปี --}}
-                                    <h3 class="dropdown-title">ปี</h3>
+                                    <span class="dropdown-title">ปี</span>
                                     <div class="dropdown-multiselect" id="yearDropdown">
                                         <div class="dropdown-btn" onclick="toggleDropdown('yearDropdown')">
                                             <span id="year-label">เลือกปี</span>
@@ -107,7 +107,7 @@
 
                                 <div class="filter-section">
                                     {{-- Section: มาตรฐาน --}}
-                                    <h3 class="dropdown-title">มาตรฐาน</h3>
+                                    <span class="dropdown-title">มาตรฐาน</span>
                                     <div class="dropdown-multiselect" id="standardDropdown">
                                         <div class="dropdown-btn" onclick="toggleDropdown('standardDropdown')">
                                             <span id="standard-label">เลือกมาตรฐาน</span>
@@ -138,7 +138,7 @@
 
                                 <div class="filter-section">
                                     {{-- Section: ด้าน --}}
-                                    <h3 class="dropdown-title">ด้าน</h3>
+                                    <span class="dropdown-title">ด้าน</span>
                                     <div class="dropdown-multiselect" id="dimensionDropdown">
                                         <div class="dropdown-btn" onclick="toggleDropdown('dimensionDropdown')">
                                             <span id="dimension-label">เลือกด้าน</span>
@@ -168,7 +168,7 @@
 
                                 <div class="filter-section">
                                     {{-- Section: หน่วยงานที่รับผิดชอบ --}}
-                                    <h3 class="dropdown-title">หน่วยงานที่รับผิดชอบ</h3>
+                                    <span class="dropdown-title">หน่วยงานที่รับผิดชอบ</span>
                                     <div class="dropdown-multiselect" id="deptDropdown">
                                         <div class="dropdown-btn" onclick="toggleDropdown('deptDropdown')">
                                             <span id="dept-label">เลือกหน่วยงาน</span>
@@ -208,7 +208,7 @@
 
                                 <div class="filter-section">
                                     {{-- Section: ประเภทตัวบ่งชี้ --}}
-                                    <h3 class="dropdown-title">ประเภทตัวบ่งชี้</h3>
+                                    <span class="dropdown-title">ประเภทตัวบ่งชี้</span>
                                     <div class="dropdown-multiselect" id="typeDropdown">
                                         <div class="dropdown-btn" onclick="toggleDropdown('typeDropdown')">
                                             <span id="type-label">เลือกประเภท</span>
@@ -240,7 +240,7 @@
 
                                 <div class="filter-section">
                                     {{-- Section: สถานะตัวบ่งชี้ --}}
-                                    <h3 class="dropdown-title">สถานะตัวบ่งชี้</h3>
+                                    <span class="dropdown-title">สถานะตัวบ่งชี้</span>
                                     <div class="dropdown-multiselect" id="statusDropdown">
                                         <div class="dropdown-btn" onclick="toggleDropdown('statusDropdown')">
                                             <span id="status-label">เลือกสถานะ</span>
@@ -282,7 +282,7 @@
 
                                 <div class="filter-section">
                                     {{-- Section: สถานะเอกสาร --}}
-                                    <h3 class="dropdown-title">สถานะเอกสาร</h3>
+                                    <span class="dropdown-title">สถานะเอกสาร</span>
                                     <div class="dropdown-multiselect" id="statusEnvDropdown">
                                         <div class="dropdown-btn" onclick="toggleDropdown('statusEnvDropdown')">
                                             <span id="statusEnv-label">เลือกสถานะเอกสาร</span>
@@ -857,9 +857,10 @@
                 display: flex;
                 flex-direction: column;
                 gap: 5px;
-                font-size: 14px;
                 width: 100%;
                 min-width: 350px;
+                font-size: 14px;
+                color: #374151;
             }
 
             .dropdown-menus .filters-actions {
@@ -1038,13 +1039,6 @@
                     padding: 8px;
                 }
 
-                /* Filter grid */
-                .filter-grid {
-                    grid-template-columns: 1fr;
-                    gap: 12px;
-                    padding: 12px;
-                }
-
                 .dataTables_wrapper {
                     overflow-x: auto;
                     -webkit-overflow-scrolling: touch;
@@ -1114,37 +1108,82 @@
                     padding: 2px 6px;
                 }
 
-                .dropdown-menus {}
+                .dropdown-menus {
+                    position: absolute;
+                    /* left: calc(100% - 375px); */
+                    left:auto;
+                    right: 0;
+                    top: 100%;
+                    margin-top: 8px;
+                    background: #fff;
+                    border: 1px solid #e5e7eb;
+                    border-radius: 8px;
+                    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+                    z-index: 50;
+                    padding: 6px;
+                }
 
-                .dropdown-multiselect {}
+                .dropdown-menus .filter-grid {
+                    display: grid;
+                    grid-template-columns: 1fr;
+                    gap: 12px;
+                    height: 310px;
+                    overflow-y: auto;
+                    width: fit-content;
+                }
 
-                .dropdown-multiselect .dropdown-btn {}
+                .dropdown-menus .filter-section {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 5px;
+                    font-size: 14px;
+                    width: 350px;
+                    font-size: 13px;
+                }
+
+                .dropdown-menus .filters-actions {
+                    width: 350px;
+                    display: flex;
+                    justify-content: space-between;
+                    margin: 12px 0 0 0;
+                    font-size: 13px;
+                }
+
+                .dropdown-title {
+                    font-weight: 600;
+                    color: #111827;
+                    padding-left: 6px;
+                }
+
+                .dropdown-multiselect {
+                    border: 1px solid #e5e7eb;
+                    border-radius: 8px;
+                }
+
+                .dropdown-multiselect .dropdown-btn {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    width: 100%;
+                    padding: 8px 10px;
+                    cursor: pointer;
+                }
 
                 .dropdown-multiselect .dropdown-content {
                     display: none;
-                    max-height: 220px;
-                    height: 100%;
                     overflow-y: auto;
                     border-top: 1px solid #e5e7eb;
                     padding: 8px 10px;
-
+                    background-color: white;
                 }
 
                 .dropdown-multiselect.open .dropdown-content {
                     display: flex;
                     flex-direction: column;
-                    position: absolute;
-                    margin-top: 3px;
-                    gap: 4px;
-                    max-height: 150px;
-                    max-width: 350px;
+                    position: initial;
+                    gap: 3px;
                     overflow-y: scroll;
                     z-index: 50;
-                    background: #fff;
-                    border: 1px solid #e5e7eb;
-                    border-radius: 8px;
-                    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
-
                 }
 
                 /* Responsive content */
@@ -1189,12 +1228,15 @@
 
                 .action-buttons-container button {
                     font-size: 12px;
-                    /* height: 100%; */
                     width: 100%;
                 }
 
                 .btns {
                     font-size: 12px;
+                }
+
+                .sort-option {
+                    font-size: 13px;
                 }
             }
 
@@ -1244,8 +1286,8 @@
                     display: flex;
                     flex-direction: column;
                     gap: 5px;
-                    font-size: 14px;
                     width: 350px;
+                    font-size: 13px;
                 }
 
                 .dropdown-menus .filters-actions {
@@ -1253,6 +1295,7 @@
                     display: flex;
                     justify-content: space-between;
                     margin: 12px 0 0 0;
+                    font-size: 13px;
                 }
 
                 .dropdown-title {
@@ -1277,12 +1320,10 @@
 
                 .dropdown-multiselect .dropdown-content {
                     display: none;
-                    /* max-height: 220px; */
                     overflow-y: auto;
                     border-top: 1px solid #e5e7eb;
                     padding: 8px 10px;
-
-                    /* background-color: red; */
+                    background-color: white;
                 }
 
                 .dropdown-multiselect.open .dropdown-content {
@@ -1321,6 +1362,14 @@
 
                 .btns {
                     font-size: 12px;
+                }
+
+                .sort-option {
+                    font-size: 13px;
+                }
+
+                .filters-actions {
+                    font-size: 13px;
                 }
 
             }
