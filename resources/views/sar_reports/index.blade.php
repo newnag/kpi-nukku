@@ -27,10 +27,15 @@
                         <td class="border px-2 py-1">{{ $r->created_at ? $r->created_at->format('d/m/Y') : '-' }}</td>
 
 
-                     <td class="border px-2 py-1 space-x-2">
-    <a href="{{ route('sar_reports.edit', $r->id) }}" class="text-blue-600">แก้ไข</a>
-    <a href="{{ route('sar_reports.create') }}" class="text-green-600">เพิ่ม</a>
-</td>
+                        <td class="border px-2 py-1 space-x-2">
+                            <a href="{{ route('sar_reports.edit', $r->id) }}" class="text-blue-600">แก้ไข</a>
+                            <a href="{{ route('sar_reports.create') }}" class="text-green-600">เพิ่ม</a>
+                            <form action="{{ route('sar_reports.destroy', $r->id) }}" method="POST" class="inline"
+                                onsubmit="return confirm('คุณแน่ใจหรือว่าต้องการลบรายการนี้?');">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="text-red-600">ลบ</button>
+                        </td>
 
                     </tr>
                 @empty

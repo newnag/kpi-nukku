@@ -451,6 +451,11 @@
                                 <i class="fa-solid fa-folder-open"></i> จัดการหลักฐาน
                             </a>
                         @endcan
+                        @can('view-sar_report')
+                            <a href="{{ route('sar_reports.index') }}" class="buttonNav-item">
+                                <i class="fa-solid fa-file-lines"></i> จัดการเอกสาร
+                            </a>
+                        @endcan
                     </div>
                 </div>
             @endhasanyrole
@@ -590,8 +595,8 @@
         });
 
         // Unified global dropdown toggler (safe for both navbar + filter multiselects)
-        (function(){
-            function unifiedToggle(arg){
+        (function() {
+            function unifiedToggle(arg) {
                 // If string id -> treat as container id
                 if (typeof arg === 'string') {
                     const target = document.getElementById(arg);
@@ -623,8 +628,12 @@
             }
             // Only replace if not already our unified version
             if (!window.toggleDropdown || !window.toggleDropdown.__unified) {
-                window.toggleDropdown = function(arg){
-                    try { return unifiedToggle(arg); } catch(e){ console.error('toggleDropdown error', e); }
+                window.toggleDropdown = function(arg) {
+                    try {
+                        return unifiedToggle(arg);
+                    } catch (e) {
+                        console.error('toggleDropdown error', e);
+                    }
                 };
                 window.toggleDropdown.__unified = true;
             }

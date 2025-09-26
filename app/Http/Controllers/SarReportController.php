@@ -197,7 +197,7 @@ class SarReportController extends Controller
             'success' => true,
             'message' => 'บันทึกสำเร็จ',
             'report'  => $criteria->report,
-        ]);
+        ]); 
     }
 
 

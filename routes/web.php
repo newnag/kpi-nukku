@@ -268,11 +268,53 @@ Route::middleware(['auth'])->group(function () {
             ->name('download')
             ->whereNumber('id')
             ->middleware('permission:download-evidence');
-        // Preview (Ã Â¹â‚¬Ã Â¸Å¾Ã Â¸Â´Ã Â¹Ë†Ã Â¸Â¡Ã Â¹Æ’Ã Â¸Â«Ã Â¸Â¡Ã Â¹Ë†)
+        // Preview 
         Route::get('/{id}/preview', [EvidenceController::class, 'preview'])
             ->name('preview')
             ->whereNumber('id')
             ->middleware('permission:view-evidence');
+    });
+    // ===== SAR REPORT ROUTES =====
+    Route::prefix('sar_reports')->name('sar_reports.')->middleware('permission:view-sar_report')->group(function () {
+        // View
+        Route::get('/', [SarReportController::class, 'index'])->name('index');      
+        Route::get('/{id}/show', [SarReportController::class, 'show'])->name('show');
+        // Export (type-specific routes with implicit model binding)
+        Route::get('/{report}/export/docx', [SarReportController::class, 'export'])
+            ->name('export.docx')
+            ->defaults('type', 'docx')
+            ->middleware('permission:export-sar_report');
+        Route::get('/{report}/export/xlsx', [SarReportController::class, 'export'])
+            ->name('export.xlsx')
+            ->defaults('type', 'excel')
+            ->middleware('permission:export-sar_report');
+        Route::get('/{report}/export/pdf', [SarReportController::class, 'export'])
+            ->name('export.pdf')
+            ->defaults('type', 'pdf')
+            ->middleware('permission:export-sar_report');
+        // Create
+        Route::get('/create', [SarReportController::class, 'create'])
+            ->name('create')
+            ->middleware('permission:create-sar_report');
+        Route::post('/store', [SarReportController::class, 'store'])
+            ->name('store')
+            ->middleware('permission:create-sar_report');
+        // Edit & Update
+        Route::get('/{id}/edit', [SarReportController::class, 'edit'])
+            ->name('edit')
+            ->middleware('permission:edit-sar_report');
+        Route::put('/{id}', [SarReportController::class, 'update'])
+            ->name('update')
+            ->middleware('permission:edit-sar_report');
+        // Delete
+        Route::delete('/{id}', [SarReportController::class, 'destroy'])
+            ->name('destroy')
+            ->middleware('permission:delete-sar_report');       
+        // Update Report Content for a Criteria
+        Route::post('/criterias/{id}/report', [SarReportController::class, 'updateReport'])
+            ->name('criterias.updateReport')
+            ->middleware('permission:edit-sar_report');
+        
     });
 
     // ===== DASHBOARD KPI ROUTES =====
@@ -301,24 +343,25 @@ Route::middleware('auth')->get('/export/indicators', function () {
 });
 // Route::resource('sar_reports', SarReportController::class);
 // routes/web.php
-Route::post('/criterias/{id}/report', [SarReportController::class, 'updateReport'])
-    ->name('criterias.updateReport');
-Route::get('/sar_reports/{id}/edit', [SarReportController::class, 'edit'])
-    ->name('sar_reports.edit');
-Route::put('/sar_reports/{id}', [SarReportController::class, 'update'])
-    ->name('sar_reports.update');
-Route::get('/sar_reports', [SarReportController::class, 'index'])
-    ->name('sar_reports.index');
-Route::get('/sar_reports/create', [SarReportController::class, 'create'])
-    ->name('sar_reports.create');
-Route::post('/sar_reports', [SarReportController::class, 'store'])
-    ->name('sar_reports.store');
-Route::get('/sar_reports/{report}/export/docx', [SarReportController::class, 'export'])
-    ->name('sar_reports.export.docx')
-    ->defaults('type', 'docx');
-Route::get('/sar_reports/{report}/export/xlsx', [SarReportController::class, 'export'])
-    ->name('sar_reports.export.xlsx')
-    ->defaults('type', 'excel');
-Route::get('/sar_reports/{report}/export/pdf', [SarReportController::class, 'export'])
-    ->name('sar_reports.export.pdf')
-    ->defaults('type', 'pdf');
+
+// Route::post('/criterias/{id}/report', [SarReportController::class, 'updateReport'])
+//     ->name('criterias.updateReport');
+// Route::get('/sar_reports/{id}/edit', [SarReportController::class, 'edit'])
+//     ->name('sar_reports.edit');
+// Route::put('/sar_reports/{id}', [SarReportController::class, 'update'])
+//     ->name('sar_reports.update');
+// Route::get('/sar_reports', [SarReportController::class, 'index'])
+//     ->name('sar_reports.index');
+// Route::get('/sar_reports/create', [SarReportController::class, 'create'])
+//     ->name('sar_reports.create');
+// Route::post('/sar_reports', [SarReportController::class, 'store'])
+//     ->name('sar_reports.store');
+// Route::get('/sar_reports/{report}/export/docx', [SarReportController::class, 'export'])
+//     ->name('sar_reports.export.docx')
+//     ->defaults('type', 'docx');
+// Route::get('/sar_reports/{report}/export/xlsx', [SarReportController::class, 'export'])
+//     ->name('sar_reports.export.xlsx')
+//     ->defaults('type', 'excel');
+// Route::get('/sar_reports/{report}/export/pdf', [SarReportController::class, 'export'])
+//     ->name('sar_reports.export.pdf')
+//     ->defaults('type', 'pdf');
