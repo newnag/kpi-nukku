@@ -60,7 +60,7 @@ class StandardController extends Controller
         // ตรวจสอบว่ามี Indicator ที่เชื่อมโยงกับ Category นี้หรือไม่
         if ($standard->indicators()->count() > 0) {
             return redirect()->route('standards.index')
-                ->with('error', 'ไม่สามารถลบมาตรฐานนี้ได้ เพราะมีการใช้งานอยู่ในระบบ (มีตัวชี้วัดที่ใช้งาน)');
+                ->with('error', 'ไม่สามารถลบมาตรฐานนี้ได้ เพราะมีการใช้งานอยู่ในระบบ (มีตัวบ่งชี้ที่ใช้งาน)');
         }
 
 

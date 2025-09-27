@@ -67,7 +67,7 @@ class CategorieController extends Controller
         // ตรวจสอบว่ามี Indicator ที่เชื่อมโยงกับ Category นี้หรือไม่
         if ($category->indicators()->count() > 0) {
             return redirect()->route('categories.index')
-                ->with('error', 'ไม่สามารถลบด้านนี้ได้ เพราะมีการใช้งานอยู่ในระบบ (มีตัวชี้วัดที่ใช้งาน)');
+                ->with('error', 'ไม่สามารถลบด้านนี้ได้ เพราะมีการใช้งานอยู่ในระบบ (มีตัวบ่งชี้ที่ใช้งาน)');
         }
 
        
