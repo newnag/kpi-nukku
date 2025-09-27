@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'รายละเอียดตัวชี้วัด')
+@section('title', 'รายละเอียดตัวบ่งชี้')
 
 @push('styles')
     <style>
@@ -163,12 +163,12 @@ $statusDotClass = $opt['dot'] ?? 'bg-slate-500';
         <div class="w-full max-w-1200px mx-auto">
             {{-- Header --}}
             <div class="banner rounded-t-2xl border border-slate-200 p-5 ">
-                <h1 class="text-2xl sm:text-3xl text-center font-bold">รายละเอียดตัวชี้วัด</h1>
+                <h1 class="text-2xl sm:text-3xl text-center font-bold">รายละเอียดตัวบ่งชี้</h1>
             </div>
             <div class="mb-5 w-full px-4 sm:px-6 lg:px-8 py-6 bg-white rounded-b-2xl-2xl border border-slate-200 shadow-sm">
                 <div class="space-y-6 sm:space-y-5">
                     {{-- Card 1: Basic --}}
-                    <x-card number="1" title="ข้อมูลตัวชี้วัด">
+                    <x-card number="1" title="ข้อมูลตัวบ่งชี้">
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4">
                             <div>
                                 <div class="text-sm text-slate-500">ปีการประเมิน</div>
@@ -176,39 +176,39 @@ $statusDotClass = $opt['dot'] ?? 'bg-slate-500';
                             </div>
 
                             <div>
-                                <div class="text-sm text-slate-500">คะแนนตัวชี้วัด</div>
+                                <div class="text-sm text-slate-500">คะแนนตัวบ่งชี้</div>
                                 <div class="font-medium text-slate-900">
                                     {{ $maxScore !== null ? number_format((float) $maxScore, 2) : '-' }}
                                 </div>
                             </div>
 
                             <div class="sm:col-span-2">
-                                <div class="text-sm text-slate-500">ชื่อตัวชี้วัด</div>
+                                <div class="text-sm text-slate-500">ชื่อตัวบ่งชี้</div>
                                 <div class="font-medium text-slate-900">{{ $name ?: '-' }}</div>
                             </div>
 
                             <div>
-                                <div class="text-sm text-slate-500">รหัสตัวชี้วัด</div>
+                                <div class="text-sm text-slate-500">รหัสตัวบ่งชี้</div>
                                 <div class="font-medium text-slate-900">{{ $code ?: '-' }}</div>
                             </div>
 
                             <div>
-                                <div class="text-sm text-slate-500">มาตรฐานตัวชี้วัด</div>
+                                <div class="text-sm text-slate-500">มาตรฐานตัวบ่งชี้</div>
                                 <div class="font-medium text-slate-900">{{ $standardName }}</div>
                             </div>
 
                             <div>
-                                <div class="text-sm text-slate-500">ด้านตัวชี้วัด</div>
+                                <div class="text-sm text-slate-500">ด้านตัวบ่งชี้</div>
                                 <div class="font-medium text-slate-900">{{ $categoryName }}</div>
                             </div>
 
                             <div>
-                                <div class="text-sm text-slate-500 ">ประเภทตัวชี้วัด</div>
+                                <div class="text-sm text-slate-500 ">ประเภทตัวบ่งชี้</div>
                                 <div class="font-medium text-slate-900">{{ $type ?: '-' }}</div>
                             </div>
 
                             <div>
-                                <div class="text-sm text-slate-500">สถานะตัวชี้วัด</div>
+                                <div class="text-sm text-slate-500">สถานะตัวบ่งชี้</div>
                                 <div class="mt-1">
                                     <x-status-badge :status="$status" size="sm" />
                                 </div>
@@ -253,7 +253,7 @@ $statusDotClass = $opt['dot'] ?? 'bg-slate-500';
 
 
                     {{-- Card 3: Description (richtext) --}}
-                    <x-card number="3" title="คำอธิบายตัวชี้วัด">
+                    <x-card number="3" title="คำอธิบายตัวบ่งชี้">
                         <x-richtext-content :html="$descHtml" empty="-" />
                     </x-card>
 
@@ -458,12 +458,12 @@ $statusDotClass = $opt['dot'] ?? 'bg-slate-500';
 
                         <div class="flex flex-col sm:flex-row gap-3 order-1 sm:order-2">
                             <form action="{{ route('indicator.delete', $dg('id')) }}" method="POST"
-                                onsubmit="return confirm('ต้องการลบตัวชี้วัดนี้ใช่หรือไม่?')">
+                                onsubmit="return confirm('ต้องการลบตัวบ่งชี้นี้ใช่หรือไม่?')">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit"
                                     class="inline-flex items-center justify-center gap-2 rounded-xl bg-rose-600 text-white px-6 py-3 hover:bg-rose-700 text-sm md:text-base transition-colors">
-                                    ลบตัวชี้วัด
+                                    ลบตัวบ่งชี้
                                 </button>
                             </form>
 

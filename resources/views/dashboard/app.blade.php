@@ -20,7 +20,7 @@
     <!-- Stats Cards -->
     <div class="stats-grid">
         <div class="stat-title">
-            <h3>สถานะทั้งหมดของตัวชี้วัดต่อปี</h3>
+            <h3>สถานะทั้งหมดของตัวบ่งชี้ต่อปี</h3>
             <span class="year"id="display-years">{{ $displayYearText }}</span>
         </div>
         <!-- Card  ความพึงพอใจ -->
@@ -54,7 +54,7 @@
                         </div>
                         <div class="stats-info">
                             <div class="stats-value" id="indicator-total">0</div>
-                            <div class="stats-label">จำนวนตัวชี้วัดทั้งหมด</div>
+                            <div class="stats-label">จำนวนตัวบ่งชี้ทั้งหมด</div>
                         </div>
                     </div>
                     <div class="stats-card legend-item" data-key="complete">
@@ -126,14 +126,14 @@
                         <tr>
                             {{-- <th>ลำดับ</th> --}}
                             <th>ปีการประเมิน</th>
-                            <th>มาตรฐานตัวชี้วัด</th>
+                            <th>มาตรฐานตัวบ่งชี้</th>
                             <th>ชื่อตัวบ่งชี้</th>
                             <th>รหัส</th>
-                            <th>ประเภทตัวชี้วัด</th>
+                            <th>ประเภทตัวบ่งชี้</th>
                             <th>หน่วยงานที่รับผิดชอบ</th>
                             <th>ผลลัพธ์</th>
                             <th>คะแนนรวม</th>
-                            <th>สถานะตัวชี้วัด</th>
+                            <th>สถานะตัวบ่งชี้</th>
                             {{-- <th>สถานะเอกสาร</th> --}}
                         </tr>
                     </thead>
@@ -434,7 +434,7 @@
                         max
                     };
                 }
-                // นับจำนวนตัวชี้วัดจากผลกรองจริง
+                // นับจำนวนตัวบ่งชี้จากผลกรองจริง
                 function updateIndicatorTotal() {
                     const selectedYear = ($('#filter-year').val() || '').toString();
                     const fallbackYear = getLatestYear();

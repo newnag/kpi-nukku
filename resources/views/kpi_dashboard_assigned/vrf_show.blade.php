@@ -49,7 +49,7 @@
                 </div>
 
                 <div class="info-row">
-                    <span class="label">สถานะตัวชี้วัด:</span>
+                    <span class="label">สถานะตัวบ่งชี้:</span>
                     <x-status-badge :status="$indicator->status" size="sm" />
                 </div>
 
@@ -57,7 +57,7 @@
             <hr class="section-divider">
 
             <div class="card ">
-                <h2 class="card-title">คำอธิบายตัวชี้วัด</h2>
+                <h2 class="card-title">คำอธิบายตัวบ่งชี้</h2>
                 <div class="description-box">
                     {!! $indicator->description ?? '-' !!}
                 </div>
@@ -347,10 +347,10 @@
                     <i class="fa fa-save"></i> บันทึกผลลัพธ์
                 </button>
 
-                <x-modal title="เปลี่ยนสถานะตัวชี้วัด" size="sm" :context="'status'">
+                <x-modal title="เปลี่ยนสถานะตัวบ่งชี้" size="sm" :context="'status'">
                     <x-slot:trigger>
                         <button type="button" class=" btn-outlines" data-allow-when-locked="true">
-                            <i class="fa-solid fa-gear"></i>เปลี่ยนสถานะตัวชี้วัด
+                            <i class="fa-solid fa-gear"></i>เปลี่ยนสถานะตัวบ่งชี้
                         </button>
                     </x-slot:trigger>
 
