@@ -77,7 +77,6 @@
         color: #1f2937;
         text-decoration: none;
         gap: 8px;
-        flex-shrink: 0;
         max-width: 50%;
         margin: 10px 0 10px 0;
     }
