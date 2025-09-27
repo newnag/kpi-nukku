@@ -1,4 +1,4 @@
-﻿@extends('layouts.app')
+@extends('layouts.app')
 
 @section('title', 'รายการตัวบ่งชี้ที่ได้รับมอบหมาย')
 
@@ -742,6 +742,7 @@
                 max-width: 400px;
                 background: #fff;
                 border-radius: 8px;
+                height: fit-content;
             }
 
             .search-bar input {
@@ -816,6 +817,7 @@
                 position: relative;
                 display: inline-block;
                 width: fit-content;
+                height: fit-content;
             }
 
             .dropdown-menus {
