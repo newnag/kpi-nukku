@@ -56,7 +56,7 @@
         align-items: center;
         gap: 8px;
         font-size: 14px;
-        line-height: 1.4;
+        /* line-height: 1.4; */
         white-space: nowrap;
         /* min-height: 30px; */
         box-sizing: border-box;
@@ -373,7 +373,7 @@
     <a href="{{ auth()->check() ? (auth()->user()->hasRole('user') ? route('dashboardkpi.index') : route('dashboard.index')) : route('dashboard.index') }}"
         class="navbar-brand">
         <img src="/uploads/logonuthaiS-2.png" alt="Logo">
-        <span>ระบบบริหารจัดการตัวชี้วัดเพื่อการรับรองสถาบันจากสภาการพยาบาล</span>
+        <span>ระบบบริหาร KPI เพื่อการรับรองสถาบันจากสภาการพยาบาล</span>
     </a>
 
     <!-- ปุ่ม Hamburger -->

@@ -59,7 +59,7 @@
                     </div>
                     <div class="stats-card legend-item" data-key="complete">
                         <div class="stats-icon success">
-                            <i class="fa fa-check-double"></i>
+                            <i  data-lucide="check-circle"></i>
                         </div>
                         <div class="stats-info">
                             <div class="stats-value legend-count">{{ $statusCounts['complete'] ?? 0 }}</div>
@@ -68,7 +68,7 @@
                     </div>
                     <div class="stats-card legend-item" data-key="incomplete">
                         <div class="stats-icon warn">
-                            <i class="fa fa-bell"></i>
+                            <i data-lucide="alert-triangle"></i>
                         </div>
                         <div class="stats-info">
                             <div class="stats-value legend-count">{{ $statusCounts['incomplete'] ?? 0 }}</div>
@@ -77,7 +77,7 @@
                     </div>
                     <div class="stats-card legend-item" data-key="pending">
                         <div class="stats-icon danger">
-                            <i class="fa fa-times"></i>
+                            <i  data-lucide="clock"></i>
                         </div>
                         <div class="stats-info">
                             <div class="stats-value legend-count">{{ $statusCounts['pending'] ?? 0 }}</div>
