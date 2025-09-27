@@ -2,6 +2,18 @@
 
 This matrix summarizes key permissions per role as configured in `database/seeders/RolesAndPermissionsSeeder.php` and validated by tests.
 
+## Seeding (How to Apply)
+
+- Seed only roles/permissions:
+  - `php artisan db:seed --class=Database\\Seeders\\RolesAndPermissionsSeeder`
+- Full refresh with all demo data (destructive):
+  - `php artisan migrate:fresh --seed`
+  - This runs `DatabaseSeeder`, which in turn calls roles, permissions, users, and sample content seeders.
+
+Notes
+- After seeding, Spatie permission cache is cleared automatically by the seeder.
+- Guards: all permissions/roles use the `web` guard.
+
 ## Legend
 - Y: permitted
 - N: not permitted
@@ -26,7 +38,7 @@ This matrix summarizes key permissions per role as configured in `database/seede
 
 Notes
 - “View” in Users/Departments/Categories/Standards means read-only according to seeder.
-- Routes are protected in `routes/web.php` via `permission:*` and `auth:sanctum`.
+- Routes are protected in `routes/web.php` via `permission:*` and session `auth` guard in this project’s tests.
 - Verified by tests in `tests/Feature/RolesMatrixByRoleTest.php` and `tests/Feature/NavbarVisibilityByRoleTest.php`.
 
 ---
@@ -61,4 +73,3 @@ Notes
 - “View” หมายถึงดูได้อย่างเดียว (ตาม seeder) ไม่สามารถสร้าง/แก้ไข/ลบ
 - เส้นทางถูกป้องกันด้วย `permission:*` และ `auth:sanctum` (ดูที่ `routes/web.php`)
 - ยืนยันด้วยเทสต์ `tests/Feature/RolesMatrixByRoleTest.php` และ `tests/Feature/NavbarVisibilityByRoleTest.php`
-

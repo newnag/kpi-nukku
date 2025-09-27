@@ -19,33 +19,47 @@ class IndicatorController extends Controller
 {
     public function index()
     {
+
         $indicators = Indicator::with([
             'category.standard',
             'assignments.user',
             'criterias',
             // 'evidences',
         ])
-            ->orderByRaw("
-            CASE LEFT(code, 3)
-                WHEN 'NCS' THEN 1
-                WHEN 'NCO' THEN 2
-                WHEN 'NCP' THEN 3
-                ELSE 4
-            END
-        ")
-            ->orderByRaw("
-            CASE 
-                WHEN split_part(code, '-', 2) ~ '^[0-9]+$' 
-                THEN CAST(split_part(code, '-', 2) AS INTEGER)
-                ELSE 999999
-            END
-        ")
             ->get()
-            ->map(fn ($i) => $this->serializeIndicatorForList($i));
-
+            // Database-agnostic ordering (SQLite-friendly):
+            // 1) prefix rank by first 3 chars (NCS,NCO,NCP => 1,2,3 else 4)
+            // 2) numeric part after first '-' if numeric; else 999999
+            ->sortBy(function ($i) {
+                $code = (string) ($i->code ?? '');
+                $prefix = substr($code, 0, 3);
+                $rank = match ($prefix) {
+                    'NCS' => 1,
+                    'NCO' => 2,
+                    'NCP' => 3,
+                    default => 4,
+                };
+                $num = 999999;
+                $dashPos = strpos($code, '-');
+                if ($dashPos !== false) {
+                    $after = substr($code, $dashPos + 1);
+                    if (preg_match('/^\d+$/', $after)) {
+                        $num = (int) $after;
+                    }
+                }
+                // Compose sortable key
+                return sprintf('%02d-%06d-%s', $rank, $num, $code);
+            })
+            ->values()
+            ->map(fn($i) => $this->serializeIndicatorForList($i));
+            
+        $years = Indicator::whereNotNull('year')
+            ->selectRaw('DISTINCT year')
+            ->orderBy('year', 'desc')
+            ->pluck('year');
         // dd($indicators);
 
-        return view('indicator.app', compact('indicators'));
+        return view('indicator.app', compact('indicators' , 'years'));
 
         // return response()->json(['indicators' => $indicators]);
     }
@@ -59,7 +73,7 @@ class IndicatorController extends Controller
         $data['usersForAssign'] = User::select('id', 'name', 'department_id')
             ->orderBy('name')
             ->get()
-            ->map(fn ($u) => [
+            ->map(fn($u) => [
                 'id' => $u->id,
                 'name' => $u->name,
                 'department_id' => $u->department_id,
@@ -163,7 +177,7 @@ class IndicatorController extends Controller
 
             // สร้าง assignments หลายรายการ
             $indicator->assignments()->createMany(
-                collect($validated['user_ids'])->unique()->values()->map(fn ($uid) => ['collector' => $uid])->all()
+                collect($validated['user_ids'])->unique()->values()->map(fn($uid) => ['collector' => $uid])->all()
             );
 
             $criteriaCount = $this->syncCriterias($indicator, $validated['criteria'] ?? []);
@@ -182,7 +196,7 @@ class IndicatorController extends Controller
             DB::rollBack();
 
             return back()
-                ->withErrors(['error' => 'เกิดข้อผิดพลาดในการบันทึก: '.$e->getMessage()])
+                ->withErrors(['error' => 'เกิดข้อผิดพลาดในการบันทึก: ' . $e->getMessage()])
                 ->withInput();
         }
     }
@@ -196,7 +210,7 @@ class IndicatorController extends Controller
         $data['usersForAssign'] = User::select('id', 'name', 'department_id')
             ->orderBy('name')
             ->get()
-            ->map(fn ($u) => [
+            ->map(fn($u) => [
                 'id' => $u->id,
                 'name' => $u->name,
                 'department_id' => $u->department_id,
@@ -330,7 +344,7 @@ class IndicatorController extends Controller
                 ->with('success', 'ตัวบ่งชี้ถูกอัปเดตเรียบร้อยแล้ว');
         } catch (\Throwable $e) {
             return back()
-                ->withErrors(['error' => 'เกิดข้อผิดพลาดในการอัปเดต: '.$e->getMessage()])
+                ->withErrors(['error' => 'เกิดข้อผิดพลาดในการอัปเดต: ' . $e->getMessage()])
                 ->withInput();
         }
     }
@@ -352,7 +366,7 @@ class IndicatorController extends Controller
             DB::rollBack();
 
             return back()
-                ->withErrors(['error' => 'เกิดข้อผิดพลาดในการลบ: '.$e->getMessage()]);
+                ->withErrors(['error' => 'เกิดข้อผิดพลาดในการลบ: ' . $e->getMessage()]);
         }
     }
 
@@ -404,8 +418,8 @@ class IndicatorController extends Controller
         // - If any criteria has status 0 => overall 0 (รอดำเนินการ)
         // - Else if any criteria has status 2 => overall 2 (เอกสารไม่ครบถ้วน)
         // - Else => 1 (เอกสารครบถ้วน)
-        $hasPending = $i->criterias->contains(fn ($c) => (int) ($c->status ?? -1) === 0);
-        $hasIncomplete = $i->criterias->contains(fn ($c) => (int) ($c->status ?? -1) === 2);
+        $hasPending = $i->criterias->contains(fn($c) => (int) ($c->status ?? -1) === 0);
+        $hasIncomplete = $i->criterias->contains(fn($c) => (int) ($c->status ?? -1) === 2);
         $criteriaStatus = $hasPending ? 0 : ($hasIncomplete ? 2 : 1);
 
         return [

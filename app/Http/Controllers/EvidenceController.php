@@ -490,6 +490,59 @@ class EvidenceController extends Controller
         }
     }
 
+    public function preview($id)
+    {
+        $e = Evidence::findOrFail($id);
+        $raw  = $e->getRawOriginal('path');
+        $json = json_decode((string) $raw, true);
+
+        if (json_last_error() === JSON_ERROR_NONE && isset($json['files'][0])) {
+            $file = $json['files'][0];
+            $rel  = $this->normalizePath($file['path'] ?? null);
+
+            if ($rel && Storage::disk('public')->exists($rel)) {
+                $absolutePath = Storage::disk('public')->path($rel);
+                $ext = strtolower(pathinfo($absolutePath, PATHINFO_EXTENSION));
+
+                // ✅ Convert office → pdf
+                if (in_array($ext, ['doc', 'docx', 'ppt', 'pptx', 'xls', 'xlsx'])) {
+                    $tempDir = storage_path('app/converted');
+                    if (!is_dir($tempDir)) {
+                        mkdir($tempDir, 0775, true);
+                    }
+
+                    $converted = $this->convertToPdf($absolutePath, $tempDir);
+                    if ($converted) {
+                        return response()->file($converted, [
+                            'Content-Type' => 'application/pdf',
+                            'Content-Disposition' => 'inline; filename="' . $e->name . '.pdf"'
+                        ]);
+                    }
+                    // Fallback to online viewers if configured
+                    $viewer = strtolower((string) env('EVIDENCE_OFFICE_VIEWER', 'server'));
+                    $publicUrl = asset('storage/' . ltrim($rel, '/'));
+                    if (in_array($viewer, ['office_online', 'office', 'msoffice', 'online', 'auto'])) {
+                        return redirect()->away('https://view.officeapps.live.com/op/embed.aspx?src=' . urlencode($publicUrl));
+                    } elseif ($viewer === 'google' || $viewer === 'gdocs') {
+                        return redirect()->away('https://docs.google.com/gview?embedded=1&url=' . urlencode($publicUrl));
+                    }
+                }
+
+                // ✅ ถ้าเป็น pdf/image อยู่แล้ว
+                return response()->file($absolutePath, [
+                    'Content-Type' => $file['mime_type'] ?? $this->determineMime($absolutePath, null, $e->type ?? null),
+                    'Content-Disposition' => 'inline; filename="' . $e->name . '"'
+                ]);
+            }
+        }
+
+        return response()->json(['success' => false, 'message' => 'File not found'], 404);
+    }
+
+
+
+
+
 
     /**
      * Download evidence file.
@@ -631,6 +684,26 @@ class EvidenceController extends Controller
 
         // Fallback by extension when MIME not available
         return in_array($ext, ['pdf', 'jpg', 'jpeg', 'png', 'gif', 'svg', 'txt', 'csv', 'htm', 'html'], true);
+    }
+    private function convertToPdf(string $inputPath, string $outputDir): ?string
+    {
+        $isWindows = strtoupper(substr(PHP_OS, 0, 3)) === 'WIN';
+
+        $soffice = $isWindows
+            ? '"C:\\Program Files\\LibreOffice\\program\\soffice.exe"'
+            : 'soffice';
+
+        $command = $soffice . ' --headless --convert-to pdf --outdir '
+            . escapeshellarg($outputDir) . ' ' . escapeshellarg($inputPath);
+
+        exec($command, $output, $returnVar);
+
+        if ($returnVar === 0) {
+            $pdfPath = $outputDir . '/' . pathinfo($inputPath, PATHINFO_FILENAME) . '.pdf';
+            return file_exists($pdfPath) ? $pdfPath : null;
+        }
+
+        return null;
     }
 
     /**

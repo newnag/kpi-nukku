@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 
-class AuthController extends Controller
+class AuthenticatedSessionController extends Controller
 {
     public function showLoginForm()
     {

@@ -27,6 +27,9 @@ class PermissionsTableSeeder extends Seeder
             'view-indicator',
             'edit-indicator',
             'delete-indicator',
+            'export-indicator',
+            'import-indicator',
+            
 
             // ===== Users =====
             'view-users',

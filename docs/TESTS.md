@@ -5,7 +5,7 @@ This document summarizes the automated tests in the repository, how to run them,
 ## Overview
 
 - Framework: Laravel 12, PHPUnit 11
-- Total: 43 tests, 138 assertions (at time of writing)
+- Total: 53 tests, 218 assertions (current)
 - Scope: Authentication, authorization, indicators (API + controller), evidence (upload/download/toggle), users/departments/categories/standards CRUD, exports, resources, and helper services.
 
 Roles/Permissions Matrix
@@ -20,9 +20,27 @@ Roles/Permissions Matrix
 - Example: `vendor/bin/phpunit --filter IndicatorControllerE2eTest --testdox`
 
 Notes
-- Web routes enforced by `auth:sanctum` use `actingAs($user, 'sanctum')` in tests.
-- Roles/permissions are seeded in `tests/TestCase.php` during setUp.
-- Some dashboard SQL is Postgres-specific; tests assert only permission denial (403) on that route to avoid SQLite incompatibilities.
+- Web routes use the default session `web` guard in tests (`actingAs($user)`), with sanctum used where routes specify its middleware.
+- Roles/permissions are seeded via `RolesAndPermissionsSeeder` where needed (see `NavbarVisibilityByRoleTest`, `RolesMatrixByRoleTest`).
+- Indicator list ordering is DB-agnostic: controller sorts in PHP to avoid SQLite vs Postgres differences.
+
+## Data Reset & Seeding
+
+- Reset DB and seed everything (destructive):
+  - `php artisan migrate:fresh --seed`
+- Seed only roles/permissions (idempotent):
+  - `php artisan db:seed --class=Database\\Seeders\\RolesAndPermissionsSeeder`
+- Note: The seeder clears Spatie permission cache automatically.
+
+## End-to-End (E2E) Verification
+
+- Indicators flow: `tests/Feature/IndicatorControllerE2eTest.php`
+  - Creates indicator with criteria and generates checklist (count-based)
+  - Updates indicator: syncs criteria, variables/formula, regenerates checklist
+- Permissions flow: `tests/Feature/RolesMatrixByRoleTest.php`
+  - Verifies access across key routes for each role
+- Navbar visibility: `tests/Feature/NavbarVisibilityByRoleTest.php`
+  - Ensures menu items show/hide correctly per role/permission
 
 ## Feature Tests
 
@@ -51,6 +69,7 @@ Notes
 
 - `app/Services/ChecklistGenerator.php`: encapsulates combination generation and checklist syncing (used in `IndicatorController`).
 - `app/Support/PathNormalizer.php`: central path normalization (used in `EvidenceController`).
+- `database/seeders/RolesAndPermissionsSeeder.php`: seeds roles and permissions in one step.
 
 ## Adding New Tests
 
@@ -61,9 +80,67 @@ Notes
 
 ## Troubleshooting
 
-- SQLite vs Postgres: Dashboard ordering SQL uses Postgres functions; deny-only assertions avoid SQLite errors.
-- Permissions: Ensure `permission:*` strings match `routes/web.php`. Tests create missing permissions if needed.
+- SQLite vs Postgres: Controller uses PHP-side sorting for indicator list, avoiding DB-specific SQL.
+- Permissions: Ensure `permission:*` strings match `routes/web.php`. If seeding manually, run `php artisan db:seed --class=Database\\Seeders\\RolesAndPermissionsSeeder`.
 
+
+# คู่มือการทดสอบ (TH, อัปเดต)
+
+เอกสารนี้สรุปชุดทดสอบอัตโนมัติ วิธีการรัน ขอบเขตที่ครอบคลุม และคำสั่งสำหรับรีเซ็ต/เตรียมข้อมูลใหม่ทั้งหมด
+
+## ภาพรวม
+
+- Framework: Laravel 12, PHPUnit 11
+- รวม: 53 tests, 218 assertions (ปัจจุบัน)
+- ขอบเขต: การยืนยันตัวตน/กำหนดสิทธิ์, ตัวชี้วัด (API + Controller), หลักฐาน (อัปโหลด/ดาวน์โหลด/สลับสถานะ), CRUD ผู้ใช้/หน่วยงาน/หมวดหมู่/มาตรฐาน, ส่งออกไฟล์, Resources และ Service helper
+
+เมทริกซ์บทบาท/สิทธิ์
+- ดูเอกสาร: `docs/ROLES_MATRIX.md`
+- เทสการมองเห็นเมนู: `tests/Feature/NavbarVisibilityByRoleTest.php`
+
+## การรันเทส
+
+- รันทั้งหมด: `php artisan test`
+- รันเฉพาะคลาส: `vendor/bin/phpunit --filter ClassName`
+- ตัวอย่าง: `vendor/bin/phpunit --filter IndicatorControllerE2eTest --testdox`
+
+หมายเหตุ
+- ในเทสใช้ session guard `web` (`actingAs($user)`); กรณีมีเส้นทางที่กำหนด sanctum จะใช้ตาม middleware ที่ตั้งไว้
+- การ seed บทบาท/สิทธิ์ทำผ่าน `RolesAndPermissionsSeeder` ในเทสที่เกี่ยวข้อง (เช่น `NavbarVisibilityByRoleTest`, `RolesMatrixByRoleTest`)
+- รายการตัวชี้วัด (Indicator list) เรียงลำดับในฝั่ง PHP เพื่อลดความต่างของ SQLite กับ Postgres
+
+## การรีเซ็ตข้อมูลและ Seed ใหม่ทั้งหมด
+
+- รีเซ็ตฐานข้อมูลและ seed ทั้งหมด (ลบข้อมูลเดิม):
+  - `php artisan migrate:fresh --seed`
+- seed เฉพาะบทบาท/สิทธิ์ (รันซ้ำได้ปลอดภัย):
+  - `php artisan db:seed --class=Database\\Seeders\\RolesAndPermissionsSeeder`
+- หมายเหตุ: seeder จะล้าง cache ของ Spatie permission ให้อัตโนมัติ
+
+## การยืนยันแบบ End-to-End (E2E)
+
+- กระบวนการตัวชี้วัด: `tests/Feature/IndicatorControllerE2eTest.php`
+  - สร้างตัวชี้วัด + เกณฑ์ และสร้าง checklist จากจำนวน (count-based)
+  - อัปเดตตัวชี้วัด: sync เกณฑ์ ตัวแปร/สูตร และสร้าง checklist ใหม่
+- กระบวนการสิทธิ์การเข้าถึง: `tests/Feature/RolesMatrixByRoleTest.php`
+  - ตรวจสอบสิทธิ์การเข้าถึงเส้นทางหลักสำหรับแต่ละบทบาท
+- การมองเห็นเมนูบน Navbar: `tests/Feature/NavbarVisibilityByRoleTest.php`
+  - ตรวจสอบการแสดง/ซ่อนเมนูตามบทบาท/สิทธิ์
+
+## รายการชุดเทสเด่น
+
+- Access & Routing: `tests/Feature/AccessAndRoutingTest.php` — ตรวจสอบการ redirect และการเข้าถึง `/home`
+- Auth: `tests/Feature/AuthTest.php` (ล็อกอินไป `/home`, ออกสู่ระบบไป `/`), `tests/Feature/AuthAdditionalTest.php` (ล็อกอินผิด 401 JSON)
+- Permissions Matrix: `tests/Feature/PermissionsMatrixTest.php`
+- Indicators (API / Controller): `tests/Feature/IndicatorTest.php`, `tests/Feature/IndicatorApiPermissionsAndValidationTest.php`, `tests/Feature/IndicatorControllerE2eTest.php`
+- Evidence: `tests/Feature/EvidenceTest.php`
+- Export: `tests/Feature/FileExportTest.php`, `tests/Feature/ExportGuestTest.php`
+- CRUD พื้นฐาน: Users / Departments / Categories / Standards
+
+## แนวทางแก้ปัญหา
+
+- ความต่าง SQLite vs Postgres: ใช้การเรียงลำดับใน PHP สำหรับรายการตัวชี้วัด เพื่อลดปัญหา SQL เฉพาะค่าย
+- Permissions: ตรวจให้ตรงกับ `routes/web.php` (`permission:*`); หาก seed เองให้รัน `php artisan db:seed --class=Database\\Seeders\\RolesAndPermissionsSeeder`
 
 # คู่มือการทดสอบ (TH)
 
