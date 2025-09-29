@@ -1,7 +1,7 @@
 @props(['indicators', 'standards' => [], 'modalId' => 'preset-modal'])
 
-<div id="{{ $modalId }}" class="fixed inset-0 bg-black/50 hidden z-[9999] flex items-center justify-center">
-    <div class="bg-white rounded-lg shadow-lg   w-full max-w-4xl p-6 relative mb-3">
+<div id="{{ $modalId }}" class="fixed inset-0 bg-black/50 hidden z-[9999] flex items-center justify-center p-3 sm:p-6">
+    <div class="bg-white rounded-lg shadow-lg w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-2xl xl:max-w-4xl 2xl:max-w-5xl p-4 sm:p-6 relative mx-auto">
 
         <!-- ปุ่มปิด -->
         <button type="button"
@@ -36,7 +36,7 @@
 
      <div x-data="{ showFilters: false }" class="mb-4">
     <!-- ✅ Toggle Switch -->
-    <div class="flex items-center justify-end mb-3">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-end gap-2 sm:gap-0 mb-3">
         <span class="mr-3 text-sm font-medium text-gray-700">แสดงตัวกรอง</span>
         <label class="relative inline-flex items-center cursor-pointer">
             <input type="checkbox" x-model="showFilters" class="sr-only peer">
@@ -52,10 +52,10 @@
     </div>
 
     <!-- ✅ ฟิลเตอร์ -->
-    <div x-show="showFilters" x-transition class="space-y-3 bg-gray-50 p-4 rounded-lg shadow">
+    <div x-show="showFilters" x-transition class="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-gray-50 p-3 sm:p-4 rounded-lg shadow">
         <div>
-            <label class="block text-sm font-medium text-gray-700">กรองตามปี</label>
-            <select id="year-filter-{{ $modalId }}" class="w-full border rounded px-2 py-1 text-sm focus:ring focus:ring-green-200">
+            <label class="block text-xs sm:text-sm font-medium text-gray-700 mb-1">กรองตามปี</label>
+            <select id="year-filter-{{ $modalId }}" class="w-full border rounded px-2 py-1 text-xs sm:text-sm focus:ring focus:ring-green-200">
                 <option value="">-- แสดงทั้งหมด --</option>
                 @foreach ($years as $y)
                     <option value="{{ $y }}">{{ $y }}</option>
@@ -64,8 +64,8 @@
         </div>
 
         <div>
-            <label class="block text-sm font-medium text-gray-700">กรองตามมาตรฐาน</label>
-            <select id="standard-filter-{{ $modalId }}" class="w-full border rounded px-2 py-1 text-sm focus:ring focus:ring-green-200">
+            <label class="block text-xs sm:text-sm font-medium text-gray-700 mb-1">กรองตามมาตรฐาน</label>
+            <select id="standard-filter-{{ $modalId }}" class="w-full border rounded px-2 py-1 text-xs sm:text-sm focus:ring focus:ring-green-200">
                 <option value="">-- แสดงทั้งหมด --</option>
                 @foreach ($standards as $std)
                     <option value="{{ data_get($std, 'id') }}">{{ data_get($std, 'name') }}</option>
@@ -80,22 +80,22 @@
         <div class="mb-3">
             <input type="text" id="search-{{ $modalId }}"
                    placeholder="ค้นหาตัวชี้วัด..."
-                   class="w-full border rounded px-2 py-1 text-sm">
+                   class="w-full border rounded px-2 py-1 text-xs sm:text-sm focus:ring focus:ring-green-200">
         </div>
 
         <!-- ✅ Select All -->
         <div class="flex items-center space-x-2 mb-3">
             <input type="checkbox" id="select-all-{{ $modalId }}" class="rounded border-gray-300">
-            <label for="select-all-{{ $modalId }}" class="text-sm font-medium">เลือกทั้งหมด</label>
+            <label for="select-all-{{ $modalId }}" class="text-xs sm:text-sm font-medium">เลือกทั้งหมด</label>
         </div>
 
         <!-- ✅ Check list Indicators -->
-      <!-- ✅ Export + Import เป็น 2 คอลัมน์ -->
-<div class="flex flex-col md:flex-row gap-4">
+      <!-- ✅ Export + Import เป็น responsive grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
     <!-- Export Preset -->
     <form id="preset-export-form" method="GET" action="{{ route('indicator.export.bulk') }}"
-          class="flex-1 flex flex-col border rounded-lg p-4">
-        <div class="max-h-64 overflow-y-auto border rounded p-2 mb-4"
+          class="flex flex-col border rounded-lg p-3 sm:p-4">
+        <div class="max-h-48 sm:max-h-64 overflow-y-auto border rounded p-2 mb-3 sm:mb-4 text-xs sm:text-sm"
              id="indicator-list-{{ $modalId }}">
             @foreach ($indicators as $ind)
                 <label class="flex items-center space-x-2 py-1 indicator-item"
@@ -109,43 +109,43 @@
         </div>
         <input type="hidden" name="year" id="hidden-year-{{ $modalId }}" value="">
         <button type="submit"
-            class="mt-auto block w-full text-center bg-blue-500 text-white py-2 rounded hover:bg-blue-600">
+            class="mt-auto block w-full text-center bg-blue-500 text-white py-2 rounded hover:bg-blue-600 text-xs sm:text-sm font-medium">
             Export Preset
         </button>
     </form>
 
     <!-- Import Preset -->
     <form action="{{ route('indicator.import') }}" method="POST" enctype="multipart/form-data"
-          class="flex-1 flex flex-col border rounded-lg p-4 space-y-3">
+          class="flex flex-col border rounded-lg p-3 sm:p-4 space-y-3">
         @csrf
         <!-- เลือกไฟล์ -->
         <input type="file" name="preset_file" accept=".json" required
-            class="block w-full border rounded px-2 py-1 text-sm">
+            class="block w-full border rounded px-2 py-1 text-xs sm:text-sm focus:ring focus:ring-green-200">
 
         <!-- เลือกปี -->
-        <label class="block text-sm font-medium text-gray-700">ปีที่ต้องการนำเข้า</label>
+        <label class="block text-xs sm:text-sm font-medium text-gray-700">ปีที่ต้องการนำเข้า</label>
         <input type="number" name="year" value="{{ now()->year }}" min="2000" max="2100"
-            class="block w-full border rounded px-2 py-1 text-sm" required>
+            class="block w-full border rounded px-2 py-1 text-xs sm:text-sm focus:ring focus:ring-green-200" required>
 
         <button type="submit"
-            class="mt-auto w-full bg-green-500 text-white py-2 rounded hover:bg-green-600">
+            class="mt-auto w-full bg-green-500 text-white py-2 rounded hover:bg-green-600 text-xs sm:text-sm font-medium">
             Import Preset
         </button>
     </form>
 
     <!-- Duplicate To Year -->
     <form id="preset-duplicate-form-{{ $modalId }}" method="POST" action="{{ route('indicator.duplicate') }}"
-          class="flex-1 flex flex-col border rounded-lg p-4 space-y-3">
+          class="flex flex-col border rounded-lg p-3 sm:p-4 space-y-3">
         @csrf
         <div>
-            <label class="block text-sm font-medium text-gray-700">คัดลอกไปยังปี</label>
+            <label class="block text-xs sm:text-sm font-medium text-gray-700">คัดลอกไปยังปี</label>
             <input type="number" name="target_year" value="{{ now()->year }}" min="2000" max="2100"
-                class="block w-full border rounded px-2 py-1 text-sm" required>
+                class="block w-full border rounded px-2 py-1 text-xs sm:text-sm focus:ring focus:ring-green-200" required>
         </div>
         <div id="duplicate-ids-container-{{ $modalId }}"></div>
 
         <button type="button" id="duplicate-submit-{{ $modalId }}"
-            class="mt-auto w-full bg-indigo-500 text-white py-2 rounded hover:bg-indigo-600">
+            class="mt-auto w-full bg-indigo-500 text-white py-2 rounded hover:bg-indigo-600 text-xs sm:text-sm font-medium">
             Duplicate Selected
         </button>
     </form>
