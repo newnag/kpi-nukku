@@ -117,25 +117,25 @@
                 </select>
             </div>
             <div class="field">
-                <label>รหัสตัวชี้วัด</label>
+                <label>รหัสตัวบ่งชี้</label>
                 <select id="filter-code">
                     <option value="">ทั้งหมด</option>
                 </select>
             </div>
             <div class="field">
-                <label>มาตรฐานตัวชี้วัด</label>
+                <label>มาตรฐานตัวบ่งชี้</label>
                 <select id="filter-standard">
                     <option value="">ทั้งหมด</option>
                 </select>
             </div>
             <div class="field">
-                <label>ด้านตัวชี้วัด</label>
+                <label>ด้านตัวบ่งชี้</label>
                 <select id="filter-dimension">
                     <option value="">ทั้งหมด</option>
                 </select>
             </div>
             <div class="field">
-                <label>ประเภทตัวชี้วัด</label>
+                <label>ประเภทตัวบ่งชี้</label>
                 <select id="filter-type">
                     <option value="">ทั้งหมด</option>
                 </select>
@@ -238,7 +238,7 @@
                         </div>
                     @endif
                 @else
-                    <div style="color:#6b7280;margin-bottom:16px;">ไม่มีข้อมูลตัวชี้วัดที่มีการบันทึกผลลัพธ์</div>
+                    <div style="color:#6b7280;margin-bottom:16px;">ไม่มีข้อมูลตัวบ่งชี้ที่มีการบันทึกผลลัพธ์</div>
                 @endif
             @endforeach
         </div>

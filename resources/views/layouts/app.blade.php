@@ -21,13 +21,7 @@
 </head>
 
 <body>
-
-    <!-- Navbar -->
-    {{-- <header> --}}
-        <x-navbar />
-    {{-- </header> --}}
-
-
+    <x-navbar />
     <!-- Main Content Area -->
     <main class="main-content">
         <div class="container">
@@ -43,27 +37,6 @@
                     @endforeach
                 </ul>
             @endif
-
-            <!-- Flash Messages -->
-            {{-- @if (session('success'))
-                    <div class="alert alert-success">
-                        <span>{{ session('success') }}</span>
-                        <button onclick="this.parentElement.remove()">×</button>
-                    </div>
-                @endif
-                @if (session('error'))
-                    <div class="alert alert-danger">
-                        <span>{{ session('error') }}</span>
-                        <button onclick="this.parentElement.remove()">×</button>
-                    </div>
-                @endif
-                @if (session('warning'))
-                    <div class="alert alert-warning">
-                        <span>{{ session('warning') }}</span>
-                        <button onclick="this.parentElement.remove()">×</button>
-                    </div>
-                @endif --}}
-
             @if (View::hasSection('header') || View::hasSection('subheader'))
                 <div class="page-header">
                     <div class="page-header-content">

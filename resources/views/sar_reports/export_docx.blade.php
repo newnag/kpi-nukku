@@ -5,9 +5,9 @@
     <title>SAR Report {{ $report->year }}</title>
     <style>
         body {
-            font-family: "TH Sarabun New", "Sarabun", sans-serif;
-            font-size: 16pt;
-            line-height: 1.4;
+            /* font-family: "TH Sarabun New", "Sarabun", sans-serif;
+            font-size: 16pt; */
+            /* line-height: 1.4; */
         }
 
         h2, h3, h4, h5 {

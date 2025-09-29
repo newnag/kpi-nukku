@@ -12,13 +12,12 @@ html {
 
 body {
     font-family: "Prompt", sans-serif;
-    background: #f8f9fa;
+    background: white;
     margin: 0;
     padding: 0;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-    line-height: 1.6;
 }
 
 /* ===== LAYOUT COMPONENTS ===== */
@@ -34,11 +33,11 @@ body {
 
 .container {
     width: 100%;
-    max-width: 1140px; /* sensible default for desktop */
+    max-width: 1140px;
     margin: 0 auto;
-    padding: 1rem; /* tighter on small screens, expand via media queries */
+    padding: 1rem;
     flex: 1 1 auto;
-    min-width: 0; /* prevent flex overflow for nested flex/grid */
+    min-width: 0;
 }
 
 /* ===== FOOTER ===== */
@@ -58,7 +57,7 @@ body {
     background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
     border: 1px solid #e2e8f0;
     border-radius: 16px;
-    padding: 2rem;
+    padding: 1.5rem;
     margin-bottom: 2rem;
     box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
     position: relative;

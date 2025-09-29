@@ -7,20 +7,17 @@
         justify-content: space-between;
         align-items: center;
         background: #fff;
-        padding: 0.75rem 1.5rem;
+        padding: 6px 12px;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         position: sticky;
-        /* gap: 16px; */
         top: 0;
         z-index: 1000;
         width: 100%;
         box-sizing: border-box;
         flex-wrap: wrap;
-        /* ล็อค baseline เพื่อไม่ให้ page ใด ๆ ที่ไป set body { line-height / font-size } ทำให้ navbar ขยาย */
         font-family: "Prompt", system-ui, sans-serif;
         font-size: 14px;
         line-height: 1.4;
-        min-height: 64px;
     }
 
     /* ป้องกัน scale แต่ไม่ override font-family ของไอคอน (Font Awesome / Lucide) */
@@ -35,7 +32,6 @@
     .app-navbar.navbar i[class*=" fa-"] {
         font-family: var(--fa-style-family-classic, "Font Awesome 6 Free") !important;
         font-weight: 900;
-        /* solid icons */
         font-style: normal;
         speak: none;
     }
@@ -53,16 +49,16 @@
     .app-navbar .navbar-menu a {
         color: #374151;
         text-decoration: none;
-        padding: 10px 16px;
+        padding: 8px 16px;
         border-radius: 8px;
         transition: all 0.2s ease;
         display: flex;
         align-items: center;
         gap: 8px;
-        font-size: inherit;
-        line-height: 1.4;
+        font-size: 14px;
+        /* line-height: 1.4; */
         white-space: nowrap;
-        min-height: 44px;
+        /* min-height: 30px; */
         box-sizing: border-box;
     }
 
@@ -81,20 +77,19 @@
         color: #1f2937;
         text-decoration: none;
         gap: 8px;
-        flex-shrink: 0;
         max-width: 50%;
         margin: 10px 0 10px 0;
     }
 
     .app-navbar .navbar-brand img {
-        height: 42px;
+        height: 36px;
         width: auto;
         border-radius: 50%;
         flex-shrink: 0;
     }
 
     .app-navbar .navbar-brand span {
-        font-size: 16px;
+        font-size: 14px;
         font-weight: 600;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -107,14 +102,14 @@
 
     .app-navbar .dropdown-toggle {
         cursor: pointer;
-        padding: 10px 16px;
+        padding: 8px 16px;
         border-radius: 8px;
         display: flex;
         align-items: center;
         gap: 8px;
         transition: all 0.2s ease;
         font-size: 14px;
-        min-height: 44px;
+        /* min-height: 44px; */
         box-sizing: border-box;
         user-select: none;
     }
@@ -144,7 +139,7 @@
     }
 
     .app-navbar .dropdown-menu-navbar a {
-        padding: 12px 18px;
+        padding: 8px 16px;
         color: #374151;
         font-size: 14px;
         transition: all 0.15s ease;
@@ -262,9 +257,9 @@
 
     /* Mobile First Responsive */
     @media (max-width: 1024px) {
-        .app-navbar.navbar {
+        /* .app-navbar.navbar {
             padding: 0.75rem 1rem;
-        }
+        } */
 
         .app-navbar .navbar-menu {
             gap: 5px;
@@ -274,10 +269,14 @@
             padding: 8px 12px;
             font-size: 13px;
         }
+
+        .dropdown .dropdown-toggle .dropdown-toggle-span {
+            display: none;
+        }
     }
 
     @media (max-width: 930px) {
-        .dropdown .dropdown-toggle span {
+        .dropdown .dropdown-toggle .dropdown-toggle-span {
             display: none;
         }
     }
@@ -288,7 +287,7 @@
             width: 100%;
         }
 
-        .app-navbar .dropdown .dropdown-toggle span {
+        .app-navbar .dropdown .dropdown-toggle .dropdown-toggle-span {
             display: initial;
         }
 
@@ -391,7 +390,7 @@
                 </a>
                 <a href="{{ route('dashboard.getData') }}"
                     class="{{ request()->routeIs('dashboard.getData') ? 'active' : '' }} buttonNav">
-                    <i class="fa-solid fa-chart-column"></i> กราฟแสดงผลลัพธ์ตัวชี้วัด
+                    <i class="fa-solid fa-chart-column"></i> กราฟแสดงผลลัพธ์ตัวบ่งชี้
                 </a>
             @endcan
 
@@ -407,14 +406,14 @@
 
             @can('view-indicator-dashboard')
                 <a href="{{ route('indicator.index') }}" class="{{ request()->is('indicator*') ? 'active' : '' }} buttonNav">
-                    <i class="fa-solid fa-sliders"></i> จัดการตัวชี้วัด
+                    <i class="fa-solid fa-sliders"></i> จัดการตัวบ่งชี้
                 </a>
             @endcan
 
             @hasanyrole('super_admin|system_admin|qa_admin')
                 <a href="{{ route('dashboardkpi.index') }}"
                     class="{{ request()->routeIs('dashboardkpi.*') ? 'active' : '' }} buttonNav">
-                    <i class="fa-solid fa-chart-line"></i> ตรวจสอบตัวชี้วัด
+                    <i class="fa-solid fa-chart-line"></i> ตรวจสอบตัวบ่งชี้
                 </a>
             @endhasanyrole
 
@@ -422,7 +421,7 @@
                 <div class="dropdown">
                     <div class="dropdown-toggle" role="button" tabindex="0" onclick="toggleDropdown(this)">
                         <i class="fa-solid fa-gear"></i>
-                        <span>ตั้งค่าระบบ</span>
+                        <span class="dropdown-toggle-span">ตั้งค่าระบบ</span>
                         <i class="fa-solid fa-caret-down"></i>
                     </div>
                     <div class="dropdown-menu-navbar">
@@ -463,7 +462,7 @@
             <div class="dropdown">
                 <div class="dropdown-toggle" role="button" tabindex="0" onclick="toggleDropdown(this)">
                     <i class="fa-solid fa-user-circle"></i>
-                    <span>{{ auth()->user()->name ?? 'ผู้ใช้' }}</span>
+                    <span class="dropdown-toggle-span">{{ auth()->user()->name ?? 'ผู้ใช้' }}</span>
                     <i class="fa-solid fa-caret-down"></i>
                 </div>
                 <div class="dropdown-menu-navbar">

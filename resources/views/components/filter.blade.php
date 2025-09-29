@@ -27,9 +27,9 @@
                 </select>
             </div>
 
-            <!-- รหัสตัวชี้วัด -->
+            <!-- รหัสตัวบ่งชี้ -->
             <div class="field">
-                <label>รหัสตัวชี้วัด</label>
+                <label>รหัสตัวบ่งชี้</label>
                 <select id="filter-code" name="code">
                     <option value="">ทั้งหมด</option>
                 </select>
@@ -38,7 +38,7 @@
             <!-- มาตรฐาน -->
             <!-- มาตรฐาน -->
             <div class="field">
-                <label>มาตรฐานตัวชี้วัด</label>
+                <label>มาตรฐานตัวบ่งชี้</label>
                 <select id="filter-standard" name="standard_id">
                     <option value="">ทั้งหมด</option>
                     @foreach ($standards as $std)
@@ -52,7 +52,7 @@
 
             <!-- ด้าน -->
             <div class="field">
-                <label>ด้านตัวชี้วัด</label>
+                <label>ด้านตัวบ่งชี้</label>
                 <select id="filter-dimension" name="category_id"> <!-- ✅ ใช้ category_id -->
                     <option value="">ทั้งหมด</option>
                     @foreach ($dimensions as $dim)

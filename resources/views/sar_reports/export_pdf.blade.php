@@ -6,9 +6,9 @@
     <style>
         /* Use a Unicode font that DomPDF supports; Sarabun if available */
         body {
-            font-family: "TH Sarabun New", "Sarabun", DejaVu Sans, sans-serif;
-            font-size: 16px;
-            line-height: 1.5;
+            /* font-family: "TH Sarabun New", "Sarabun", DejaVu Sans, sans-serif;
+            font-size: 16px; */
+            /* line-height: 1.5; */
         }
         h2 { text-align: center; margin: 0 0 12px 0; }
         h3 { font-size: 18px; margin: 18px 0 8px 0; }

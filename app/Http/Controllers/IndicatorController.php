@@ -191,7 +191,7 @@ class IndicatorController extends Controller
 
             return redirect()
                 ->route('indicator.show', $indicator->id)
-                ->with('success', 'ตัวชี้วัดถูกสร้างเรียบร้อยแล้ว');
+                ->with('success', 'ตัวบ่งชี้ถูกสร้างเรียบร้อยแล้ว');
         } catch (\Throwable $e) {
             DB::rollBack();
 
@@ -341,7 +341,7 @@ class IndicatorController extends Controller
 
             return redirect()
                 ->route('indicator.show', $id)
-                ->with('success', 'ตัวชี้วัดถูกอัปเดตเรียบร้อยแล้ว');
+                ->with('success', 'ตัวบ่งชี้ถูกอัปเดตเรียบร้อยแล้ว');
         } catch (\Throwable $e) {
             return back()
                 ->withErrors(['error' => 'เกิดข้อผิดพลาดในการอัปเดต: ' . $e->getMessage()])
@@ -361,7 +361,7 @@ class IndicatorController extends Controller
 
             return redirect()
                 ->route('indicator.index')
-                ->with('success', 'ตัวชี้วัดถูกลบเรียบร้อยแล้ว');
+                ->with('success', 'ตัวบ่งชี้ถูกลบเรียบร้อยแล้ว');
         } catch (\Throwable $e) {
             DB::rollBack();
 

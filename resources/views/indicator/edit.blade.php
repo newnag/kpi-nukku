@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'แก้ไขตัวชี้วัด')
+@section('title', 'แก้ไขตัวบ่งชี้')
 
 @push('styles')
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/trumbowyg@2.31.0/dist/ui/trumbowyg.min.css">
@@ -94,32 +94,32 @@
             <div class="w-full max-w-1200px mx-auto">
 
                 <div class="banner rounded-t-2xl border border-slate-200 p-5">
-                    <h1 class="text-2xl sm:text-3xl text-center font-bold">แก้ไขตัวชี้วัด</h1>
+                    <h1 class="text-2xl sm:text-3xl text-center font-bold">แก้ไขตัวบ่งชี้</h1>
                 </div>
 
                 <div class="mb-5 w-full px-4 sm:px-6 lg:px-8 py-6 bg-white rounded-b-2xl border border-slate-200 shadow-sm">
                     <div class="space-y-6 sm:space-y-8">
 
                         {{-- Card 1: Basic --}}
-                        <x-card number="1" title="ข้อมูลตัวชี้วัด">
+                        <x-card number="1" title="ข้อมูลตัวบ่งชี้">
                             <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
                                 <x-input name="year" type="number" maxlength="4" pattern="\d{4}" :value="$year"
                                     label="ปีการประเมิน" placeholder="กรอกปีการประเมิน" required />
-                                <x-input name="name" :value="$name" label="ชื่อตัวชี้วัด"
-                                    placeholder="กรุณากรอกชื่อตัวชี้วัด" required />
-                                <x-input name="code" :value="$code" label="รหัสตัวชี้วัด" placeholder="เช่น NCS-1"
+                                <x-input name="name" :value="$name" label="ชื่อตัวบ่งชี้"
+                                    placeholder="กรุณากรอกชื่อตัวบ่งชี้" required />
+                                <x-input name="code" :value="$code" label="รหัสตัวบ่งชี้" placeholder="เช่น NCS-1"
                                     required />
                                 <x-input name="max_score" type="number" step="1" :value="$maxScore"
-                                    label="คะแนนตัวชี้วัด" placeholder="กรุณากรอกคะแนน" required
+                                    label="คะแนนตัวบ่งชี้" placeholder="กรุณากรอกคะแนน" required
                                     x-model.number="score_acc" />
 
-                                <x-select name="standard_id" :options="$standards" :value="$std" label="มาตรฐานตัวชี้วัด"
-                                    placeholder="กรุณาเลือกมาตรฐานตัวชี้วัด" required />
+                                <x-select name="standard_id" :options="$standards" :value="$std" label="มาตรฐานตัวบ่งชี้"
+                                    placeholder="กรุณาเลือกมาตรฐานตัวบ่งชี้" required />
 
-                                <x-select name="category_id" :options="$categories" :value="$category" label="ด้านตัวชี้วัด"
+                                <x-select name="category_id" :options="$categories" :value="$category" label="ด้านตัวบ่งชี้"
                                     placeholder="กรุณาเลือกด้าน" searchable required />
 
-                                <x-select name="type" :options="['คุณภาพ' => 'คุณภาพ', 'ปริมาณ' => 'ปริมาณ' , 'คุณภาพ/ปริมาณ' => 'คุณภาพ/ปริมาณ' ]" :value="$rawType" label="ประเภทตัวชี้วัด"
+                                <x-select name="type" :options="['คุณภาพ' => 'คุณภาพ', 'ปริมาณ' => 'ปริมาณ' , 'คุณภาพ/ปริมาณ' => 'คุณภาพ/ปริมาณ' ]" :value="$rawType" label="ประเภทตัวบ่งชี้"
                                     placeholder="กรุณาเลือกประเภท" required />
 
                                 <x-input name="deadline" type="date" :value="$deadline" label="วันสิ้นสุดการประเมิน"
@@ -167,8 +167,8 @@
                         </x-card>
 
                         {{-- Card 3: Description --}}
-                        <x-card number="3" title="คำอธิบายตัวชี้วัด">
-                            <x-richtext name="description" :value="$desc" placeholder="กรอกคำอธิบายตัวชี้วัด" />
+                        <x-card number="3" title="คำอธิบายตัวบ่งชี้">
+                            <x-richtext name="description" :value="$desc" placeholder="กรอกคำอธิบายตัวบ่งชี้" />
                         </x-card>
 
                         {{-- Card 4: Criteria & Condition --}}
@@ -310,7 +310,7 @@
                                 <div>
                                     <x-richtext name="comment" :value="$comment" placeholder="คำอธิบายเกณฑ์ให้คะแนน" />
                                     <label class="block">
-                                        <span class="text-sm font-medium text-slate-700">คะแนนเต็มทั้งหมดของตัวชี้วัด</span>
+                                        <span class="text-sm font-medium text-slate-700">คะแนนเต็มทั้งหมดของตัวบ่งชี้</span>
                                         <input type="text" :value="score_acc" readonly
                                             class="p-2 mt-1 w-full bg-gray-100 rounded-xl border border-slate-300 text-sm md:text-base cursor-not-allowed"
                                             placeholder="คะแนนจะปรากฏที่นี่">
