@@ -4,9 +4,7 @@
 @section('subheader', 'ระบบบริหารจัดการข้อมูลการรับรองสถาบันจากสภาการพยาบาล')
 
 @section('content')
-    <div class="max-w-5xl mx-auto bg-white shadow rounded p-6">
-
-        <div class="flex flex-col sm:flex-row justify-between gap-4 mb-4">
+<div class="flex flex-col sm:flex-row justify-between gap-4 mb-4">
             <div class="flex flex-col sm:flex-row flex-wrap gap-2 w-full sm:w-auto">
                 <div class="relative w-full sm:w-auto bg-white rounded-lg shadow-sm min-w-64">
                     <div class="absolute inset-y-0 left-3 flex items-center pointer-events-none">
@@ -59,7 +57,17 @@
 
 
             </div>
+            <div>
+                <x-year-export-modal :years="$years" context="year-export"
+                    class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md inline-flex items-center space-x-2 shadow">
+                    <i data-lucide="upload" class="w-4 h-4"></i>
+                    <span>EXPORT</span>
+                </x-year-export-modal>
+            </div>
         </div>
+    <div class=" mx-auto bg-white shadow rounded ">
+
+        
         <div class="overflow-x-auto border border-gray-200 rounded-lg shadow-sm">
             <table id="myTable" class="w-full min-w-full">
                 <thead>
@@ -103,11 +111,11 @@
                                             </a>
 
                                             <!-- ปุ่มเพิ่ม -->
-                                            <a href="{{ route('sar_reports.create') }}"
+                                            {{-- <a href="{{ route('sar_reports.create') }}"
                                                 class="flex items-center px-4 py-2 text-sm text-green-600 hover:bg-green-50 hover:text-green-700 transition-colors">
                                                 <i data-lucide="plus-circle" class="w-4 h-4"></i>
                                                 <span class="ml-2">เพิ่ม</span>
-                                            </a>
+                                            </a> --}}
 
                                             <!-- ปุ่มลบ -->
                                             <form action="{{ route('sar_reports.destroy', $r->id) }}" method="POST"
@@ -184,9 +192,11 @@
             background-color: #3b82f6 !important;
             color: white !important;
         }
-table.dataTable tbody tr {
-    background-color: inherit !important;
-}
+
+        table.dataTable tbody tr {
+            background-color: inherit !important;
+        }
+
         #myTable_wrapper {
             max-width: 100%;
             overflow-x: auto;

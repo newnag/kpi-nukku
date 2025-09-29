@@ -18,6 +18,8 @@
     <script src="//unpkg.com/alpinejs" defer></script>
     @stack('styles')
 
+    <!-- Prevent Alpine.js flash of unstyled content -->
+    <style>[x-cloak]{ display: none !important; }</style>
 </head>
 
 <body>

@@ -281,36 +281,40 @@
 
             {{-- ส่วนที่ 4 --}}
             <div class="bg-white shadow rounded-lg p-6">
-                <h3 class="text-lg font-semibold border-b pb-2 mb-4">ส่วนที่ 4: สรุปผลการประเมินตนเองตามเกณฑ์ของสภาการพยาบาล</h3>
+                <h3 class="text-lg font-semibold border-b pb-2 mb-4">ส่วนที่ 4:
+                    สรุปผลการประเมินตนเองตามเกณฑ์ของสภาการพยาบาล</h3>
                 <textarea name="section4" id="section4" class="trumbowyg-textarea w-full">{{ old('section4', $report->section4 ?? '') }}</textarea>
             </div>
 
             <div class="flex justify-end space-x-2">
 
-             <div x-data="{ open: false }" class="relative flex justify-end">
-    <button type="button" @click="open = !open"
-        class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-md shadow inline-flex items-center">
-        📤 Export
-    </button>
+                <div x-data="{ open: false }" class="relative flex justify-end">
+                    <button type="button" @click="open = !open"
+                        class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-md shadow inline-flex items-center">
+                        <i data-lucide="download" class="w-4 h-4 mr-2"></i> Export
+                    </button>
 
-    <div x-show="open" @click.outside="open = false"
-        class="absolute right-0 mt-2 w-40 bg-white border rounded-md shadow-lg z-50"
-        x-cloak>
-        <a type="button" href="{{ route('sar_reports.export.docx', $report->id) }}"
-           class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">📄 DOCX</a>
-        <a type="button" href="{{ route('sar_reports.export.xlsx', $report->id) }}"
-           class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">📊 Excel</a>
-        <a type="button" href="{{ route('sar_reports.export.pdf', $report->id) }}"
-           class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">📕 PDF</a>
-    </div>
-</div>
-
-
+                    <div x-show="open" @click.outside="open = false"
+                        class="absolute right-0 mt-2 w-40 bg-white border rounded-md shadow-lg z-50" x-cloak>
+                        <a type="button" href="{{ route('sar_reports.export.docx', $report->id) }}"
+                            class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                            <i data-lucide="file-text" class="w-4 h-4 mr-2"></i> DOCX
+                        </a>
+                        <a type="button" href="{{ route('sar_reports.export.xlsx', $report->id) }}"
+                            class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                            <i data-lucide="file-spreadsheet" class="w-4 h-4 mr-2"></i> Excel
+                        </a>
+                        <a type="button" href="{{ route('sar_reports.export.pdf', $report->id) }}"
+                            class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                            <i data-lucide="file-type" class="w-4 h-4 mr-2"></i> PDF
+                        </a>
+                    </div>
+                </div>
 
                 <!-- ปุ่ม Save -->
                 <button type="submit"
                     class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md shadow inline-flex items-center">
-                    💾 บันทึก
+                    <i data-lucide="save" class="w-4 h-4 mr-2"></i> บันทึก
                 </button>
             </div>
 
