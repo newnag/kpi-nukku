@@ -261,34 +261,41 @@
 
 
     <!-- ตารางเอกสารและหลักฐาน -->
-    <div
-        class="overflow-x-auto border border-gray-200 rounded-lg shadow-sm sm:overflow-x-scroll md:overflow-x-auto lg:overflow-x-auto xl:overflow-auto 2xl:overflow-visible">
+    <div class="border border-gray-200 rounded-lg overflow-x-auto ">
         <table id="evidenceTable" class="w-full min-w-full">
             <thead>
                 <tr>
-                    <th class="w-fit text-xs sm:text-sm font-medium text-gray-900 cursor-pointer select-none hidden sm:table-cell" title="ลำดับ">
-                        <div class="flex items-center justify-center min-w-12">ลำดับ</div>
+                    <th class="w-fit text-xs sm:text-sm font-medium text-gray-900 cursor-pointer select-none hidden sm:table-cell"
+                        title="ลำดับ">
+                        <div class="flex items-center justify-center">ลำดับ</div>
                     </th> <!-- 0 -->
-                    <th class="w-full text-xs sm:text-sm font-medium text-gray-900 cursor-pointer select-none" title="ชื่อไฟล์">
+                    <th class="w-full text-xs sm:text-sm font-medium text-gray-900 cursor-pointer select-none"
+                        title="ชื่อไฟล์">
                         <div class="flex items-center justify-start min-w-40 sm:min-w-56">ชื่อไฟล์</div>
                     </th> <!-- 1 -->
-                    <th class="w-fit text-xs sm:text-sm font-medium text-gray-900 cursor-pointer select-none hidden md:table-cell" title="ขนาดไฟล์">
+                    <th class="w-fit text-xs sm:text-sm font-medium text-gray-900 cursor-pointer select-none hidden md:table-cell"
+                        title="ขนาดไฟล์">
                         <div class="flex items-center justify-center min-w-9">ขนาด</div>
                     </th> <!-- 2 -->
-                    <th class="w-fit text-xs sm:text-sm font-medium text-gray-900 cursor-pointer select-none hidden lg:table-cell" title="ประเภทไฟล์">
+                    <th class="w-fit text-xs sm:text-sm font-medium text-gray-900 cursor-pointer select-none hidden lg:table-cell"
+                        title="ประเภทไฟล์">
                         <div class="flex items-center justify-center min-w-11">ประเภท</div>
                     </th> <!-- 3 -->
-                    <th class="w-fit text-xs sm:text-sm font-medium text-gray-900 cursor-pointer select-none hidden xl:table-cell" title="วันที่อัปโหลด">
+                    <th class="w-fit text-xs sm:text-sm font-medium text-gray-900 cursor-pointer select-none hidden xl:table-cell"
+                        title="วันที่อัปโหลด">
                         <div class="flex items-center justify-center min-w-28">วันที่อัปโหลด</div>
                     </th> <!-- 4 -->
-                    <th class="w-fit text-xs sm:text-sm font-medium text-gray-900 cursor-pointer select-none hidden lg:table-cell" title="ชื่อผู้อัปโหลด">
+                    <th class="w-fit text-xs sm:text-sm font-medium text-gray-900 cursor-pointer select-none hidden lg:table-cell"
+                        title="ชื่อผู้อัปโหลด">
                         <div class="flex items-center justify-center min-w-32">ชื่อผู้อัปโหลด</div>
                     </th> <!-- 5 -->
-                    <th class="w-fit text-xs sm:text-sm font-medium text-gray-900 cursor-pointer select-none" title="ตัวบ่งชี้">
+                    <th class="w-fit text-xs sm:text-sm font-medium text-gray-900 cursor-pointer select-none"
+                        title="ตัวบ่งชี้">
                         <div class="flex items-center justify-center min-w-40 sm:min-w-56">ตัวบ่งชี้</div>
                     </th> <!-- 6 -->
-                    <th class="w-fit text-xs sm:text-sm font-medium text-gray-900 cursor-pointer select-none" title="จัดการ">
-                        <div class="flex items-center justify-center min-w-20">จัดการ</div>
+                    <th class="w-fit text-xs sm:text-sm font-medium text-gray-900 cursor-pointer select-none"
+                        title="จัดการ">
+                        <div class="flex items-center justify-center">จัดการ</div>
                     </th> <!-- 7 -->
 
                     <!-- ✅ hidden columns -->
@@ -305,38 +312,46 @@
                         $indicator = $evidence->criteria->indicator ?? null;
                     @endphp
                     <tr>
-                        <td class="text-center text-xs sm:text-sm text-gray-700 hidden sm:table-cell">{{ $index + 1 }}</td>
-                        <td class="text-xs sm:text-sm align-top">
+                        <td class="w-fit text-center text-xs sm:text-sm text-gray-700 hidden sm:table-cell">{{ $index + 1 }}
+                        </td>
+                        <td class="text-xs sm:text-sm align-top max-w-52 truncate">
                             @php $previewUrl = evidence_preview_url($evidence); @endphp
                             @php $isOffice = in_array($evidence->type, ['doc','docx','xls','xlsx','ppt','pptx']); @endphp
 
                             @if ($previewUrl && !$isOffice)
                                 <a href="{{ $previewUrl }}" target="_blank" rel="noopener noreferrer"
-                                    class="block w-fit text-left rounded p-2">
-                                    <div class="file-info flex space-x-2 items-start text-left ">
+                                    class="block w-fit text-left ">
+                                    <div class="file-info flex space-x-2 items-start text-left h-auto">
                                         <div class="file-icon w-fit h-fit">
                                             @if ($evidence->type === 'pdf')
-                                                <i data-lucide="file-text" style="width:20px; height:20px; color:#dc2626;"></i>
+                                                <i data-lucide="file-text"
+                                                    style="width:20px; height:20px; color:#dc2626;"></i>
                                             @elseif (in_array($evidence->type, ['doc', 'docx']))
-                                                <i data-lucide="file-text" style="width:20px; height:20px; color:#2563eb;"></i>
+                                                <i data-lucide="file-text"
+                                                    style="width:20px; height:20px; color:#2563eb;"></i>
                                             @elseif (in_array($evidence->type, ['ppt', 'pptx']))
-                                                <i data-lucide="file-text" style="width:20px; height:20px; color:#eb7e25;"></i>
+                                                <i data-lucide="file-text"
+                                                    style="width:20px; height:20px; color:#eb7e25;"></i>
                                             @elseif (in_array($evidence->type, ['jpg', 'jpeg', 'png', 'gif', 'svg']))
-                                                <i data-lucide="image" style="width:20px; height:20px; color:#16a34a;"></i>
+                                                <i data-lucide="image"
+                                                    style="width:20px; height:20px; color:#16a34a;"></i>
                                             @elseif (in_array($evidence->type, ['xls', 'xlsx']))
-                                                <i data-lucide="file-spreadsheet" style="width:20px; height:20px; color:#059669;"></i>
+                                                <i data-lucide="file-spreadsheet"
+                                                    style="width:20px; height:20px; color:#059669;"></i>
                                             @elseif ($evidence->type === 'url')
                                                 <i data-lucide="link" style="width:20px; height:20px; color:#9333ea;"></i>
                                             @else
                                                 <i data-lucide="file" style="width:20px; height:20px; color:#6b7280;"></i>
                                             @endif
                                         </div>
-                                        <div class="file-details max-w-56">
-                                            <div class="file-name text-blue-600 underline hover:text-red-600 truncate" title="{{ $evidence->name }}">
+                                        <div class="file-details relative group">
+                                            <div class="file-name text-blue-600 underline hover:text-red-600"
+                                                title="{{ $evidence->name }}">
                                                 {{ $evidence->name }}
                                             </div>
                                             @if ($evidence->detail)
-                                                <div class="file-description text-sm text-gray-500 truncate" title="{{ strip_tags($evidence->detail) }}">
+                                                <div class="file-description text-sm text-gray-500"
+                                                    title="{{ strip_tags($evidence->detail) }}">
                                                     {{ Str::limit(strip_tags($evidence->detail), 50) }}
                                                 </div>
                                             @endif
@@ -348,17 +363,21 @@
                                     <div class="file-info flex space-x-2 items-start">
                                         <div class="file-icon w-5 h-5 ">
                                             @if (in_array($evidence->type, ['doc', 'docx']))
-                                                <i data-lucide="file-text" style="width:20px; height:20px; color:#2563eb;"></i>
+                                                <i data-lucide="file-text"
+                                                    style="width:20px; height:20px; color:#2563eb;"></i>
                                             @elseif (in_array($evidence->type, ['ppt', 'pptx']))
-                                                <i data-lucide="file-text" style="width:20px; height:20px; color:#eb7e25;"></i>
+                                                <i data-lucide="file-text"
+                                                    style="width:20px; height:20px; color:#eb7e25;"></i>
                                             @elseif (in_array($evidence->type, ['xls', 'xlsx']))
-                                                <i data-lucide="file-spreadsheet" style="width:20px; height:20px; color:#059669;"></i>
+                                                <i data-lucide="file-spreadsheet"
+                                                    style="width:20px; height:20px; color:#059669;"></i>
                                             @else
                                                 <i data-lucide="file" style="width:20px; height:20px; color:#6b7280;"></i>
                                             @endif
                                         </div>
-                                        <div class="file-details relative group max-w-56">
-                                            <div class="file-name text-gray-700 cursor-not-allowed truncate" title="{{ $evidence->name }}">
+                                        <div class="file-details relative group">
+                                            <div class="file-name text-gray-700 cursor-not-allowed hover:text-red-600"
+                                                title="{{ $evidence->name }}">
                                                 {{ $evidence->name }}
                                             </div>
                                             <div
@@ -367,7 +386,8 @@
                                             </div>
 
                                             @if ($evidence->detail)
-                                                <div class="file-description text-sm text-gray-500 truncate" title="{{ strip_tags($evidence->detail) }}">
+                                                <div class="file-description text-sm text-gray-500"
+                                                    title="{{ strip_tags($evidence->detail) }}">
                                                     {{ Str::limit(strip_tags($evidence->detail), 50) }}
                                                 </div>
                                             @endif
@@ -378,8 +398,10 @@
                                 <span class="text-gray-400">ไม่มีไฟล์</span>
                             @endif
                         </td>
-                        <td class="text-center text-xs sm:text-sm text-gray-700 hidden md:table-cell">{{ $evidence->total_size_human ?? '-' }}</td>
-                        <td class="text-center text-xs sm:text-sm text-gray-700 hidden lg:table-cell" data-search="{{ $evidence->type }}">
+                        <td class="text-center text-xs sm:text-sm text-gray-700 hidden md:table-cell">
+                            {{ $evidence->total_size_human ?? '-' }}</td>
+                        <td class="text-center text-xs sm:text-sm text-gray-700 hidden lg:table-cell"
+                            data-search="{{ $evidence->type }}">
                             {{ $evidence->type }}</td>
                         <td class="text-center text-xs sm:text-sm text-gray-700 hidden xl:table-cell"
                             data-order="{{ optional($evidence->created_at)->timestamp }}">
@@ -405,16 +427,15 @@
                             $rowClass = $is_assigned ? 'assigned-row' : 'unassigned-row';
                         @endphp
 
-                        <td data-search="{{ optional($indicator)->code ?? '' }}"
-                            onclick="window.location='{{ $rowUrl }}';" class="relative group cursor-pointer ">
+                        <td data-search="{{ optional($indicator)->code ?? '' }}" class="relative group  ">
 
-                            <span
-                                class="text-xs text-balance sm:text-sm text-gray-700 hover:text-red-600">{{ $indicator->name ?? '-' }}</span>
+                            <span onclick="window.location='{{ $rowUrl }}';"
+                                class="text-xs text-balance sm:text-sm text-gray-700 hover:text-red-600 cursor-pointer">{{ $indicator->name ?? '-' }}</span>
 
                             <!-- Tooltip -->
                             <div
-                                class="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2
-         bg-gray-800 text-white text-xs rounded px-2 py-1 shadow-lg whitespace-nowrap z-50
+                                class="pointer-events-none absolute bottom-full left-1/5 -translate-x-1/2 mb-2
+         bg-gray-800 text-white text-xs rounded px-2 py-1 shadow-lg whitespace-nowrap z-500000 
          invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-opacity duration-150">
                                 กำลังไปหน้าการกรอกคะแนนตัวชี้วัด {{ $indicator->name ?? '-' }}
                             </div>
@@ -423,17 +444,25 @@
                         </td>
 
 
-                        <td class="text-center">
-                            <div class="evidence-actions">
+                        <td class="text-center w-fit">
+                            <div class="evidence-actions flex justify-center items-center w-fit">
                                 @if ($evidence->type === 'url' && !empty($evidence->path['urls'][0]))
-                                    <button type="button" class="btn-link"
-                                        onclick="window.open('{{ $evidence->path['urls'][0] }}', '_blank')">
-                                        <i data-lucide="external-link"></i> เปิดลิงก์
+                                    <button type="button" 
+                                        class="inline-flex items-center justify-center gap-1 px-2 py-1.5 sm:px-3 sm:py-2 text-xs sm:text-sm font-medium text-purple-700 bg-purple-100 border border-purple-200 rounded-md hover:bg-purple-200 hover:border-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-1 transition-all duration-200 min-w-[70px] sm:min-w-[90px]"
+                                        onclick="window.open('{{ $evidence->path['urls'][0] }}', '_blank')"
+                                        title="เปิดลิงก์ในแท็บใหม่">
+                                        <i data-lucide="external-link" class="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0"></i>
+                                        <span class="hidden xs:inline sm:inline whitespace-nowrap">เปิดลิงก์</span>
+                                        <span class="xs:hidden sm:hidden">เปิด</span>
                                     </button>
                                 @else
-                                    <button type="button" class="btn-download"
-                                        onclick="window.location.href='{{ route('evidences.download', $evidence->id) }}'">
-                                        <i data-lucide="download"></i> ดาวน์โหลด
+                                    <button type="button" 
+                                        class="inline-flex items-center justify-center gap-1 px-2 py-1.5 sm:px-3 sm:py-2 text-xs sm:text-sm font-medium text-blue-700 bg-blue-100 border border-blue-200 rounded-md hover:bg-blue-200 hover:border-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition-all duration-200 min-w-[70px] sm:min-w-[90px]"
+                                        onclick="window.location.href='{{ route('evidences.download', $evidence->id) }}'"
+                                        title="ดาวน์โหลดไฟล์">
+                                        <i data-lucide="download" class="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0"></i>
+                                        <span class="hidden sm:inline whitespace-nowrap">ดาวน์โหลด</span>
+                                        <span class="inline sm:hidden">DL</span>
                                     </button>
                                 @endif
                             </div>
@@ -521,7 +550,9 @@
                     info: "แสดง _START_ ถึง _END_ จากทั้งหมด _TOTAL_ รายการ",
                     emptyTable: "ไม่พบข้อมูล",
                     zeroRecords: "ไม่พบข้อมูลที่ตรงกับการค้นหา"
-                }
+                },
+                    // Adjust the DOM structure for Tailwind CSS compatibility (removed 'f' to disable built-in search)
+                    dom: 't' + '<"flex flex-col md:flex-row justify-between items-center p-3"<"flex-1"i><"flex"p>>',
             });
             table.on('draw', function() {
                 if (window.lucide?.createIcons) lucide.createIcons();
@@ -1012,8 +1043,10 @@
         /* ================ Action Buttons ================ */
         .evidence-actions {
             display: flex;
-            gap: 8px;
+            gap: 6px;
             flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
         }
 
         .btn-download,
@@ -1023,6 +1056,7 @@
             text-decoration: none;
             display: inline-flex;
             align-items: center;
+            justify-content: center;
             gap: 4px;
             padding: 6px 10px;
             border-radius: 6px;
@@ -1032,43 +1066,81 @@
             font-size: 12px;
             white-space: nowrap;
             transition: all .2s ease;
+            min-width: 70px;
         }
 
         .btn-link {
-            color: #398ECA;
-            border-color: #398ECA;
+            color: #9333ea;
+            background-color: #f3e8ff;
+            border-color: #c084fc;
         }
 
         .btn-link:hover {
-            background: #ecfdf5;
+            background-color: #e9d5ff;
+            border-color: #a855f7;
+            transform: translateY(-1px);
         }
 
         .btn-download {
-            color: #059669;
-            border-color: #059669;
+            color: #1d4ed8;
+            background-color: #dbeafe;
+            border-color: #60a5fa;
         }
 
         .btn-download:hover {
-            background: #ecfdf5;
+            background-color: #bfdbfe;
+            border-color: #3b82f6;
+            transform: translateY(-1px);
         }
 
         .btn-edit {
-            color: #398ECA;
-            border-color: #398ECA;
+            color: #059669;
+            background-color: #d1fae5;
+            border-color: #34d399;
         }
 
         .btn-edit:hover {
-            background: #eff6ff;
+            background-color: #a7f3d0;
+            border-color: #10b981;
+            transform: translateY(-1px);
         }
 
         .btn-delete {
             color: #dc2626;
-            border-color: #dc2626;
+            background-color: #fee2e2;
+            border-color: #f87171;
         }
 
         .btn-delete:hover {
-            background: #fee2e2;
-            border-color: #fecaca;
+            background-color: #fecaca;
+            border-color: #ef4444;
+            transform: translateY(-1px);
+        }
+
+        /* Custom breakpoint for extra small screens */
+        @media (max-width: 475px) {
+            .xs\:hidden {
+                display: none !important;
+            }
+        }
+
+        @media (min-width: 476px) {
+            .xs\:inline {
+                display: inline !important;
+            }
+        }
+
+        /* Custom breakpoint for extra small screens */
+        @media (max-width: 475px) {
+            .xs\:hidden {
+                display: none !important;
+            }
+        }
+
+        @media (min-width: 476px) {
+            .xs\:inline {
+                display: inline !important;
+            }
         }
 
         /* Status badges */
@@ -1173,18 +1245,17 @@
 
             .filter-section,
             .filters-actions {
-                min-width: auto;
-                width: 100%;
+                width: 350px;
+                font-size: 13px;
             }
 
             .dropdown-multiselect.open .dropdown-content {
-                max-width: 100%;
+                position: initial;
             }
 
             .sort-filter-container {
-                display: flex;
-                gap: 8px;
                 width: 100%;
+                justify-content: space-between;
             }
 
             .dropdown-inds,
@@ -1193,8 +1264,27 @@
             }
 
             .evidence-actions {
-                flex-direction: column;
+                flex-direction: row;
                 gap: 4px;
+                justify-content: center;
+            }
+
+            .btn-download,
+            .btn-link,
+            .btn-edit,
+            .btn-delete {
+                padding: 4px 6px;
+                font-size: 11px;
+                min-width: 60px;
+                gap: 2px;
+            }
+
+            .btn-download i,
+            .btn-link i,
+            .btn-edit i,
+            .btn-delete i {
+                width: 12px !important;
+                height: 12px !important;
             }
         }
 
@@ -1216,7 +1306,7 @@
             }
 
             .dropdown-menus {
-                left: 0;
+                left: calc(100% - 385px);
             }
 
             .filter-grid {
@@ -1227,8 +1317,8 @@
 
             .filter-section,
             .filters-actions {
-                min-width: auto;
-                width: 100%;
+                width: 350px;
+                font-size: 13px;
             }
 
             .search-bar {
@@ -1236,12 +1326,13 @@
             }
 
             .search-bar input,
+            .action-buttons-container button,
             .btns {
-                font-size: 13px;
+                font-size: 12px;
             }
 
             .filters-actions {
-                margin-top: 8px;
+                font-size: 13px;
             }
         }
 
@@ -1258,32 +1349,45 @@
             }
 
             .search-button-container {
-                flex-direction: row;
+                width: 90%;
             }
 
             .dropdown-menus {
-                left: 0;
+                left: calc(100% - 300px);
             }
 
             .filter-grid {
-                grid-template-columns: 1fr 1fr;
+                grid-template-columns: 1fr;
                 height: 310px;
                 overflow-y: auto;
             }
 
             .filter-section,
             .filters-actions {
-                min-width: 300px;
+                width: 350px;
             }
 
             .card-header-table {
-                gap: 20px;
-                padding: 0 12px 16px;
+                gap: 13px;
+                padding: 0 6px 16px;
+            }
+
+            .action-buttons-container {
+                gap: 8px;
+            }
+
+            .action-buttons-container button span {
+                display: none;
             }
 
             .search-bar input,
+            .action-buttons-container button,
             .btns {
-                font-size: 14px;
+                font-size: 12px;
+            }
+
+            .action-buttons-container button {
+                min-width: 36px;
             }
         }
 
@@ -1295,7 +1399,7 @@
             }
 
             .dropdown-menus {
-                left: 0;
+                left: calc(100% - 440px);
             }
 
             .search-bar input,
@@ -1307,12 +1411,12 @@
         /* 1280px–1535px */
         @media (min-width: 1280px) and (max-width: 1535px) {
             .container {
-                padding: 24px;
+                /* padding: 24px; */
                 max-width: 1400px;
             }
 
             .dropdown-menus {
-                left: 0;
+                left: calc(100% - 200px);
             }
         }
 
