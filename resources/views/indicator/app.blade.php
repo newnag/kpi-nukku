@@ -915,10 +915,6 @@
                     -webkit-overflow-scrolling: touch;
                 }
 
-                table.dataTable {
-                    font-size: .75rem;
-                }
-
                 table.dataTable thead th,
                 table.dataTable tbody td {
                     padding: 6px 3px;
@@ -937,13 +933,11 @@
 
                 .dataTables_wrapper .dataTables_length select {
                     padding: .25rem;
-                    font-size: .875rem;
                 }
 
                 .dataTables_wrapper .dataTables_paginate .paginate_button {
                     padding: .25rem .5rem;
                     margin-left: .125rem;
-                    font-size: .75rem;
                 }
 
                 .card-header-table {
@@ -1011,10 +1005,6 @@
                     padding: 12px;
                 }
 
-                table.dataTable {
-                    font-size: .875rem;
-                }
-
                 table.dataTable thead th,
                 table.dataTable tbody td {
                     padding: 8px 4px;
@@ -1062,10 +1052,6 @@
                 .container {
                     max-width: 900px;
                     padding: 16px;
-                }
-
-                table.dataTable {
-                    font-size: .9rem;
                 }
 
                 table.dataTable thead th,
@@ -1124,10 +1110,6 @@
                     padding: 20px;
                 }
 
-                table.dataTable {
-                    font-size: 1rem;
-                }
-
                 .dropdown-menus {
                     left: calc(100% - 390px);
                 }
@@ -1144,10 +1126,6 @@
                 .container {
                     max-width: 1400px;
                     padding: 24px;
-                }
-
-                table.dataTable {
-                    font-size: 1rem;
                 }
 
                 .dropdown-menus {
