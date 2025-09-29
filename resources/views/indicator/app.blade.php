@@ -358,7 +358,7 @@
 
         <!-- ตารางรายการตัวบ่งชี้ -->
         <div
-            class="overflow-x-auto border border-gray-200 rounded-lg shadow-sm sm:overflow-x-scroll md:overflow-x-auto lg:overflow-x-auto xl:overflow-auto 2xl:overflow-visible">
+            class=" border border-gray-200 rounded-lg shadow-sm overflow-x-hidden">
             <table id="myTable" class="w-full min-w-full ">
                 <thead>
                     <tr>
@@ -443,8 +443,8 @@
                             <td
                                 class="max-w-15 text-xs sm:text-sm text-balance text-gray-700 align-top hidden lg:table-cell">
                                 {{ $indicator['standard']['name'] }}</td>
-                            <td class="max-w-full text-pretty text-xs sm:text-sm text-gray-700 align-top">
-                                <div class="truncate max-w-40 sm:max-w-56" title="{{ $indicator['name'] }}">
+                            <td class="max-w-full text-xs sm:text-sm text-gray-700 align-top">
+                                <div class="text-pretty" title="{{ $indicator['name'] }}">
                                     {{ $indicator['name'] }}
                                 </div>
                             </td>

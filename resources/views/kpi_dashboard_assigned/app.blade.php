@@ -362,7 +362,7 @@
 
     <!-- ตารางรายการตัวบ่งชี้ -->
     <div
-        class="overflow-x-auto border border-gray-200 rounded-lg shadow-sm sm:overflow-x-scroll md:overflow-x-auto lg:overflow-x-auto xl:overflow-auto 2xl:overflow-visible">
+        class="border border-gray-200 rounded-lg shadow-sm overflow-x-hidden">
         <table id="myTable" class="w-full min-w-full">
             <thead>
                 <tr>
@@ -462,7 +462,7 @@
                         <td class="max-w-15 text-xs sm:text-sm text-balance text-gray-700 align-top hidden lg:table-cell">
                             {{ $indicator['standard']['name'] }}</td>
                         <td class="max-w-full text-pretty text-xs sm:text-sm text-gray-700 align-top">
-                            <div class="truncate max-w-40 sm:max-w-56" title="{{ $indicator['name'] }}">
+                            <div class="text-pretty" title="{{ $indicator['name'] }}">
                                 {{ $indicator['name'] }}
                             </div>
                         </td>
@@ -1183,7 +1183,7 @@
             @media (min-width: 1280px) and (max-width: 1535px) {
                 .container {
                     max-width: 1400px;
-                    padding: 24px;
+                    /* padding: 24px; */
                 }
 
                 .dropdown-menus {
@@ -1275,7 +1275,7 @@
                         zeroRecords: "ไม่พบข้อมูลที่ตรงกับการค้นหา"
                     },
                     // Adjust the DOM structure for Tailwind CSS compatibility (removed 'f' to disable built-in search)
-                    dom: '<"flex flex-col md:flex-row justify-between items-center p-3"<"flex"l>>' +
+                    dom: '<"flex flex-col w-full md:flex-row justify-between items-center p-3"<"flex"l>>' +
                         't' +
                         '<"flex flex-col md:flex-row justify-between items-center p-3"<"flex-1"i><"flex"p>>',
 
