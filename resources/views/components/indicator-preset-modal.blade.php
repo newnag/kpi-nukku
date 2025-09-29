@@ -6,7 +6,7 @@
         <!-- ปุ่มปิด -->
         <button type="button"
             onclick="document.getElementById('{{ $modalId }}').classList.add('hidden')"
-            class="absolute top-2 right-2 text-gray-500 hover:text-gray-700">
+            class="absolute top-2 right-2 text-gray-500 hover:text-red-700 z-50">
             ✕
         </button>
 
