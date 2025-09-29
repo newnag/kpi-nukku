@@ -68,10 +68,7 @@ class SarReportController extends Controller
             'standard_id' => 'nullable|exists:standards,id',
             'indicator_id' => 'nullable|exists:indicators,id',
             'criteria_id' => 'nullable|exists:criterias,id',
-            'performance_result' => 'nullable|string',
-            'performance_report' => 'nullable|string',
-            'self_score' => 'nullable|numeric',
-            'comment' => 'nullable|string',
+            'title' => 'nullable|string|max:255',
         ]);
 
         // If required relational fields are missing, derive sensible defaults
@@ -154,10 +151,7 @@ class SarReportController extends Controller
             'standard_id' => 'nullable|exists:standards,id',
             'indicator_id' => 'nullable|exists:indicators,id',
             'criteria_id' => 'nullable|exists:criterias,id',
-            'performance_result' => 'nullable|string',
-            'performance_report' => 'nullable|string',
-            'self_score' => 'nullable|numeric',
-            'comment' => 'nullable|string',
+           'title' => 'nullable|string|max:255',
         ]);
 
         $payload = [
@@ -168,10 +162,7 @@ class SarReportController extends Controller
             'standard_id' => $data['standard_id'] ?? $report->standard_id,
             'indicator_id' => $data['indicator_id'] ?? $report->indicator_id,
             'criteria_id' => $data['criteria_id'] ?? $report->criteria_id,
-            'performance_result' => $data['performance_result'] ?? $report->performance_result,
-            'performance_report' => $data['performance_report'] ?? $report->performance_report,
-            'self_score' => $data['self_score'] ?? $report->self_score,
-            'comment' => $data['comment'] ?? $report->comment,
+            'title' => $data['title'] ?? $report->title,
             'updated_by' => Auth::id(),
         ];
 
@@ -224,6 +215,25 @@ class SarReportController extends Controller
     //         $element->addText(strip_tags($content));
     //     }
     // }
+
+    public function destroy($id)
+    {
+        try {
+            $report = SarReport::findOrFail($id);
+
+            
+
+            $report->delete();
+
+            return redirect()
+                ->route('sar_reports.index')
+                ->with('success', 'ลบรายงานสำเร็จ');
+        } catch (\Throwable $e) {
+            return back()
+                ->with('error', 'ไม่สามารถลบรายการได้')
+                ->withErrors(['delete' => $e->getMessage()]);
+        }
+    }
 
     protected function addHtmlSafe($element, ?string $html): void
     {

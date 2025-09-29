@@ -10,7 +10,12 @@
             @csrf
             @method('PUT')
             <input type="hidden" name="year" value="{{ $report->year }}">
-
+            {{-- ชื่อเรื่อง --}}
+            <div class="bg-white shadow rounded-lg p-6">
+                <label for="title" class="block text-lg font-semibold mb-2">ชื่อเรื่อง (ถ้ามี)</label>
+                <input type="text" name="title" id="title" class="w-full border rounded px-3 py-2"
+                    value="{{ old('title', $report->title) }}" placeholder="เช่น รายงานการประเมินตนเอง ประจำปี 2566">
+            </div>
             {{-- ส่วนที่ 1 --}}
             <div class="bg-white shadow rounded-lg p-6">
                 <h3 class="text-lg font-semibold border-b pb-2 mb-4">ส่วนที่ 1: ข้อมูลทั่วไปคณะพยาบาลศาสตร์</h3>
