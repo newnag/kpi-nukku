@@ -326,15 +326,27 @@
 
             <!-- Action Buttons Group -->
             <div class="action-buttons-container">
-                <button id="export_button" class="bg-green-500 hover:bg-green-600">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0l-4 4m4-4v12" />
-                    </svg>
-                    <span>EXPORT TO EXCEL</span>
-                </button>
-                <button id="add_indicator_button" class="bg-blue-600 hover:bg-blue-700">
+                @if ($indicators->isNotEmpty())
+                    <!-- ปุ่มเปิด Modal -->
+                    <button type="button" onclick="document.getElementById('preset-modal').classList.remove('hidden')"
+                        class="h-fit bg-purple-500 hover:bg-purple-600 text-white rounded-lg px-4 py-2 flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0l-4 4m4-4v12" />
+                        </svg>
+                        Preset
+                    </button>
+
+                    <!-- Modal Component -->
+                    <x-indicator-preset-modal :indicators="$indicators" modalId="preset-modal" />
+                @endif
+
+                <!-- Global Year Export Modal (reusable) -->
+                <x-year-export-modal :years="$years" context="year-export" />
+
+                <button id="add_indicator_button"
+                    class="h-fit bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-4 py-2 flex items-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
@@ -669,6 +681,7 @@
                 width: 60%;
                 min-width: 250px;
                 max-width: 400px;
+                height: fit-content;
                 background: #fff;
                 border-radius: 8px;
             }
@@ -686,6 +699,7 @@
             .action-buttons-container {
                 display: flex;
                 gap: 12px;
+                height: fit-content;
             }
 
             .action-buttons-container button {
@@ -693,7 +707,7 @@
                 align-items: center;
                 gap: 4px;
                 font-size: 14px;
-                color: #fff;
+                /* color: #fff; */
                 border-radius: 8px;
                 padding: 8px 16px;
                 white-space: nowrap;
@@ -745,6 +759,7 @@
                 position: relative;
                 display: inline-block;
                 width: fit-content;
+                height: fit-content;
             }
 
             .dropdown-menus {
@@ -1146,6 +1161,7 @@
     @push('scripts')
         <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
         <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
         <script>
             // Helpers for dropdown widgets (like in assigned dashboard)
             function toggleDropdown(id) {
@@ -1251,9 +1267,9 @@
                     }
                 });
 
-                $('#export_button').on('click', function() {
-                    alert('Export to Excel functionality will be implemented here');
-                });
+                // $('#export_button').on('click', function() {
+                //     alert('Export to Excel functionality will be implemented here');
+                // });
 
                 $('#add_indicator_button').on('click', function() {
                     window.location.href = "{{ route('indicator.create') }}";
@@ -1499,4 +1515,5 @@
                 });
             });
         </script>
+
     @endpush
