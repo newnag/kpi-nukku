@@ -16,18 +16,10 @@ class FormulasTableSeeder extends Seeder
     {
         
 
-
+        \DB::table('formulas')->delete();
         
         \DB::table('formulas')->insert(array (
             0 => 
-            array (
-                'id' => 18,
-                'condition' => 'input_1/defined_1*defined_2',
-                'created_at' => '2025-09-15 13:25:18',
-                'updated_at' => '2025-09-15 13:25:18',
-                'indicator_id' => 2,
-            ),
-            1 => 
             array (
                 'id' => 19,
                 'condition' => 'input_1*defined_1/input_2',
@@ -35,7 +27,7 @@ class FormulasTableSeeder extends Seeder
                 'updated_at' => '2025-09-15 13:37:35',
                 'indicator_id' => 3,
             ),
-            2 => 
+            1 => 
             array (
                 'id' => 33,
                 'condition' => 'IF(input_1/input_2 >= 1/6, 15,
@@ -46,7 +38,7 @@ IF(input_1/input_2 >= 1/8, 5,
                         'updated_at' => '2025-09-16 03:40:32',
                         'indicator_id' => 6,
                     ),
-                    3 => 
+                    2 => 
                     array (
                         'id' => 34,
                     'condition' => 'IF((input_1/input_2*defined_1)=100,15,
@@ -56,15 +48,7 @@ IF((input_1/input_2*defined_1)>=80,5,0)))',
                         'updated_at' => '2025-09-16 03:49:26',
                         'indicator_id' => 7,
                     ),
-                    4 => 
-                    array (
-                        'id' => 35,
-                    'condition' => 'IF(input_1>1,5)',
-                        'created_at' => '2025-09-16 06:02:05',
-                        'updated_at' => '2025-09-16 06:02:05',
-                        'indicator_id' => 37,
-                    ),
-                    5 => 
+                    3 => 
                     array (
                         'id' => 36,
                     'condition' => 'IF((input_1/input_2*defined_1)>=91,5,
@@ -78,7 +62,7 @@ IF((input_1/input_2*defined_1)>=61,1,0)
             'updated_at' => '2025-09-16 06:09:14',
             'indicator_id' => 39,
         ),
-        6 => 
+        4 => 
         array (
             'id' => 37,
         'condition' => 'IF((input_1/input_2*defined_1)>=91,5,
@@ -92,7 +76,7 @@ IF((input_1/input_2*defined_1)>=61,1,0)
 'updated_at' => '2025-09-16 06:12:27',
 'indicator_id' => 40,
 ),
-7 => 
+5 => 
 array (
 'id' => 38,
 'condition' => 'IF((input_1/input_2*defined_1)>=97,5,
@@ -102,7 +86,7 @@ IF((input_1/input_2*defined_1)>=95,3,0)
 'updated_at' => '2025-09-16 06:15:18',
 'indicator_id' => 41,
 ),
-8 => 
+6 => 
 array (
 'id' => 39,
 'condition' => 'IF((input_1/input_2*defined_1)>=90,5,
@@ -112,7 +96,7 @@ IF((input_1/input_2*defined_1)>=85,3,0)
 'updated_at' => '2025-09-16 06:18:44',
 'indicator_id' => 42,
 ),
-9 => 
+7 => 
 array (
 'id' => 40,
 'condition' => 'IF((input_1/input_2*defined_1)=100,10,
@@ -122,7 +106,7 @@ IF((input_1/input_2*defined_1)>=95,5,0)
 'updated_at' => '2025-09-16 06:31:19',
 'indicator_id' => 44,
 ),
-10 => 
+8 => 
 array (
 'id' => 41,
 'condition' => 'IF((input_1/input_2*defined_1)>=90,40,
@@ -136,7 +120,7 @@ IF((input_1/input_2*defined_1)>=60,10,0)
 'updated_at' => '2025-09-16 06:36:00',
 'indicator_id' => 45,
 ),
-11 => 
+9 => 
 array (
 'id' => 42,
 'condition' => 'IF((input_1/input_2*defined_1)=100,10,
@@ -152,15 +136,7 @@ IF((input_1/input_2*defined_1)>=80,2,0)
 'updated_at' => '2025-09-16 06:38:36',
 'indicator_id' => 46,
 ),
-12 => 
-array (
-'id' => 43,
-'condition' => 'IF((input_1/defined_1) * defined_2==70,25,0)',
-'created_at' => '2025-09-16 06:47:50',
-'updated_at' => '2025-09-16 06:47:50',
-'indicator_id' => 49,
-),
-13 => 
+10 => 
 array (
 'id' => 44,
 'condition' => 'IF(input_1=1,2,
@@ -176,7 +152,7 @@ IF(input_1=5,10,0)
 'updated_at' => '2025-09-16 06:51:18',
 'indicator_id' => 50,
 ),
-14 => 
+11 => 
 array (
 'id' => 45,
 'condition' => 'IF((input_1/input_2*defined_1)>=90,20,
@@ -190,7 +166,7 @@ IF((input_1/input_2*defined_1)>=60,5,0)
 'updated_at' => '2025-09-16 06:59:33',
 'indicator_id' => 53,
 ),
-15 => 
+12 => 
 array (
 'id' => 46,
 'condition' => 'IF((input_1/input_2*defined_1)>=100,10,IF((input_1/input_2)*defined_1>0,5,0))',
@@ -198,13 +174,37 @@ array (
 'updated_at' => '2025-09-16 07:22:18',
 'indicator_id' => 55,
 ),
-16 => 
+13 => 
 array (
 'id' => 62,
 'condition' => 'IF((input_1/input_2)*15 >= 15, 15, 0)',
 'created_at' => '2025-09-16 08:11:41',
 'updated_at' => '2025-09-16 08:11:41',
 'indicator_id' => 5,
+),
+14 => 
+array (
+'id' => 1,
+'condition' => '(((input_1 / input_2) * 100) / 40) * 10',
+'created_at' => '2025-09-30 03:54:32',
+'updated_at' => '2025-09-30 03:54:32',
+'indicator_id' => 2,
+),
+15 => 
+array (
+'id' => 2,
+'condition' => 'IF((((input_1/input_2)*100)/70) * 25>=70,25,0)',
+'created_at' => '2025-09-30 03:57:19',
+'updated_at' => '2025-09-30 03:57:19',
+'indicator_id' => 49,
+),
+16 => 
+array (
+'id' => 3,
+'condition' => 'IF(input_1>1,5,0)',
+'created_at' => '2025-09-30 04:00:02',
+'updated_at' => '2025-09-30 04:00:02',
+'indicator_id' => 37,
 ),
 ));
         

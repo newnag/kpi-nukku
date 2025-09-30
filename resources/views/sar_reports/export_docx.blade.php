@@ -4,46 +4,69 @@
     <meta charset="UTF-8">
     <title>SAR Report {{ $report->year }}</title>
     <style>
-        body {
-            /* font-family: "TH Sarabun New", "Sarabun", sans-serif;
-            font-size: 16pt; */
-            /* line-height: 1.4; */
+        @php
+            $sarReg  = str_replace('\\\\', '/', storage_path('fonts/Sarabun-Regular.ttf'));
+            $sarBold = str_replace('\\\\', '/', storage_path('fonts/Sarabun-Bold.ttf'));
+        @endphp
+
+        @font-face {
+            font-family: 'SarabunLocal';
+            font-style: normal;
+            font-weight: 400;
+            src: url('{{ $sarReg }}') format('truetype');
+        }
+        @font-face {
+            font-family: 'SarabunLocal';
+            font-style: normal;
+            font-weight: 700;
+            src: url('{{ $sarBold }}') format('truetype');
         }
 
-        h2, h3, h4, h5 {
-            margin: 12px 0 6px 0;
-            font-weight: bold;
-        }
+        body, * { font-family: "SarabunLocal", sans-serif !important; }
+        body { font-size: 13px; line-height: 1.4; }
 
-        h2 { text-align: center; font-size: 20pt; }
-        h3 { font-size: 18pt; border-bottom: 1px solid #000; padding-bottom: 4px; }
+        h2 { text-align: center; font-size: 20px; margin-bottom: 20px; }
+        h3 { font-size: 18px; margin-top: 20px; border-bottom: 1px solid #000; }
+        h4 { font-size: 16px; margin-top: 12px; }
+        h5 { font-size: 15px; margin-top: 10px; }
+
+        p { margin: 0 0 6px 0; }
+        ul { margin: 0; padding-left: 18px; }
 
         table {
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 16px;
         }
-
-        th, td {
+        thead { display: table-header-group; }
+        tfoot { display: table-footer-group; }
+        /* Allow rows to split across pages to prevent truncation of long rows */
+        tr { page-break-inside: auto; }
+        td, th {
             border: 1px solid #000;
-            padding: 6px;
+            padding: 4px 5px;
             vertical-align: top;
+            word-break: break-word;
+            white-space: pre-line; /* keep line breaks but collapse spaces */
         }
+        th { background: #f0f0f0; text-align: center; }
 
-        th {
-            background: #f0f0f0;
-            text-align: center;
-        }
+        .score { text-align: center; font-weight: bold; }
 
-        .criteria-preview {
-            font-size: 14pt;
-            color: #444;
-        }
+        /* Criteria table column widths */
+        .criteria-table th:nth-child(1),
+        .criteria-table td:nth-child(1) { width: 40px; }
+        .criteria-table th:nth-child(3),
+        .criteria-table td:nth-child(3) { width: 80px; }
+        .criteria-table th:nth-child(4),
+        .criteria-table td:nth-child(4) { width: 200px; }
+        .criteria-table th:nth-child(5),
+        .criteria-table td:nth-child(5) { width: 150px; }
 
-        .score {
-            text-align: center;
-            font-weight: bold;
-        }
+        .criteria-table td,
+        .criteria-table th,
+        .score-table td,
+        .score-table th { font-size: 12px; }
     </style>
 </head>
 <body>
@@ -139,16 +162,33 @@
                     <tbody>
                         @forelse ($lines as $line)
                             @php
-                                $scoreFromLine = null;
-                                if (preg_match('/([0-9]+(?:\.[0-9]+)?)\s*คะแนน/u', $line, $mm)) {
-                                    $scoreFromLine = (float) $mm[1];
-                                }
-                                $match = $score !== null && $scoreFromLine !== null && abs($scoreFromLine - (float) $score) < 0.001;
-                            @endphp
+                                                        $scoreFromLine = null;
+                                                        if (
+                                                            preg_match(
+                                                                '/\(\s*(?:([0-9]+(?:\.[0-9]+)?)\s*คะแนน|คะแนน\s*([0-9]+(?:\.[0-9]+)?)|([0-9]+(?:\.[0-9]+)?))\s*\)/u',
+                                                                $line,
+                                                                $mm,
+                                                            )
+                                                        ) {
+                                                            $scoreFromLine =
+                                                                (float) (array_values(
+                                                                    array_filter([
+                                                                        $mm[1] ?? null,
+                                                                        $mm[2] ?? null,
+                                                                        $mm[3] ?? null,
+                                                                    ]),
+                                                                )[0] ?? null);
+                                                        }
+
+                                                        $match =
+                                                            $score !== null &&
+                                                            $scoreFromLine !== null &&
+                                                            abs($scoreFromLine - (float) $score) < 0.001;
+                                                    @endphp
                             <tr>
                                 <td>{{ $line }}</td>
                                 <td class="score">{{ $scoreFromLine ? $scoreFromLine . ' คะแนน' : '...... คะแนน' }}</td>
-                                <td class="score">{{ $match ? '✓' : '' }}</td>
+                                <td class="score">{{ $match ? '✓' : '-' }}</td>
                             </tr>
                         @empty
                             <tr>

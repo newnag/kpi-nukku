@@ -268,11 +268,53 @@ Route::middleware(['auth'])->group(function () {
             ->name('download')
             ->whereNumber('id')
             ->middleware('permission:download-evidence');
-        // Preview (Ã Â¹â‚¬Ã Â¸Å¾Ã Â¸Â´Ã Â¹Ë†Ã Â¸Â¡Ã Â¹Æ’Ã Â¸Â«Ã Â¸Â¡Ã Â¹Ë†)
+        // Preview 
         Route::get('/{id}/preview', [EvidenceController::class, 'preview'])
             ->name('preview')
             ->whereNumber('id')
             ->middleware('permission:view-evidence');
+    });
+    // ===== SAR REPORT ROUTES =====
+    Route::prefix('sar_reports')->name('sar_reports.')->middleware('permission:view-sar_report')->group(function () {
+        // View
+        Route::get('/', [SarReportController::class, 'index'])->name('index');
+        Route::get('/{id}/show', [SarReportController::class, 'show'])->name('show');
+        // Export (type-specific routes with implicit model binding)
+        Route::get('/{report}/export/docx', [SarReportController::class, 'export'])
+            ->name('export.docx')
+            ->defaults('type', 'docx')
+            ->middleware('permission:export-sar_report');
+        // Excel export should follow the same naming/prefix pattern as others
+        Route::get('/{report}/export/xlsx', [SarReportController::class, 'export'])
+            ->name('export.xlsx')
+            ->defaults('type', 'excel')
+            ->middleware('permission:export-sar_report');
+        Route::get('/{report}/export/pdf', [SarReportController::class, 'export'])
+            ->name('export.pdf')
+            ->defaults('type', 'pdf')
+            ->middleware('permission:export-sar_report');
+        // Create
+        Route::get('/create', [SarReportController::class, 'create'])
+            ->name('create')
+            ->middleware('permission:create-sar_report');
+        Route::post('/store', [SarReportController::class, 'store'])
+            ->name('store')
+            ->middleware('permission:create-sar_report');
+        // Edit & Update
+        Route::get('/{id}/edit', [SarReportController::class, 'edit'])
+            ->name('edit')
+            ->middleware('permission:edit-sar_report');
+        Route::put('/{id}', [SarReportController::class, 'update'])
+            ->name('update')
+            ->middleware('permission:edit-sar_report');
+        // Delete
+        Route::delete('/{id}', [SarReportController::class, 'destroy'])
+            ->name('destroy')
+            ->middleware('permission:delete-sar_report');
+        // Update Report Content for a Criteria
+        Route::post('/criterias/{id}/report', [SarReportController::class, 'updateReport'])
+            ->name('criterias.updateReport')
+            ->middleware('permission:edit-sar_report');
     });
 
     // ===== DASHBOARD KPI ROUTES =====
@@ -301,24 +343,86 @@ Route::middleware('auth')->get('/export/indicators', function () {
 });
 // Route::resource('sar_reports', SarReportController::class);
 // routes/web.php
-Route::post('/criterias/{id}/report', [SarReportController::class, 'updateReport'])
-    ->name('criterias.updateReport');
-Route::get('/sar_reports/{id}/edit', [SarReportController::class, 'edit'])
-    ->name('sar_reports.edit');
-Route::put('/sar_reports/{id}', [SarReportController::class, 'update'])
-    ->name('sar_reports.update');
-Route::get('/sar_reports', [SarReportController::class, 'index'])
-    ->name('sar_reports.index');
-Route::get('/sar_reports/create', [SarReportController::class, 'create'])
-    ->name('sar_reports.create');
-Route::post('/sar_reports', [SarReportController::class, 'store'])
-    ->name('sar_reports.store');
-Route::get('/sar_reports/{report}/export/docx', [SarReportController::class, 'export'])
-    ->name('sar_reports.export.docx')
-    ->defaults('type', 'docx');
-Route::get('/sar_reports/{report}/export/xlsx', [SarReportController::class, 'export'])
-    ->name('sar_reports.export.xlsx')
-    ->defaults('type', 'excel');
-Route::get('/sar_reports/{report}/export/pdf', [SarReportController::class, 'export'])
-    ->name('sar_reports.export.pdf')
-    ->defaults('type', 'pdf');
+
+// Route::post('/criterias/{id}/report', [SarReportController::class, 'updateReport'])
+//     ->name('criterias.updateReport');
+// Route::get('/sar_reports/{id}/edit', [SarReportController::class, 'edit'])
+//     ->name('sar_reports.edit');
+// Route::put('/sar_reports/{id}', [SarReportController::class, 'update'])
+//     ->name('sar_reports.update');
+// Route::get('/sar_reports', [SarReportController::class, 'index'])
+//     ->name('sar_reports.index');
+// Route::get('/sar_reports/create', [SarReportController::class, 'create'])
+//     ->name('sar_reports.create');
+// Route::post('/sar_reports', [SarReportController::class, 'store'])
+//     ->name('sar_reports.store');
+// Route::get('/sar_reports/{report}/export/docx', [SarReportController::class, 'export'])
+//     ->name('sar_reports.export.docx')
+//     ->defaults('type', 'docx');
+// Route::get('/sar_reports/{report}/export/xlsx', [SarReportController::class, 'export'])
+//     ->name('sar_reports.export.xlsx')
+//     ->defaults('type', 'excel');
+// Route::get('/sar_reports/{report}/export/pdf', [SarReportController::class, 'export'])
+//     ->name('sar_reports.export.pdf')
+//     ->defaults('type', 'pdf');
+
+use Barryvdh\DomPDF\Facade\Pdf;
+
+Route::get('/test', function () {
+    // Ensure Thai-capable fonts are available to Dompdf
+    try {
+        $pub = public_path('fonts');
+        $dst = storage_path('fonts');
+        if (!is_dir($dst)) @mkdir($dst, 0755, true);
+        if (is_dir($pub)) {
+            foreach (glob($pub . DIRECTORY_SEPARATOR . '*.ttf') as $f) {
+                $t = $dst . DIRECTORY_SEPARATOR . basename($f);
+                if (!file_exists($t)) @copy($f, $t);
+            }
+        }
+        $sar = $dst . DIRECTORY_SEPARATOR . 'Sarabun-Regular.ttf';
+        $sarb = $dst . DIRECTORY_SEPARATOR . 'Sarabun-Bold.ttf';
+        if (!file_exists($sar) || filesize($sar) < 200000 || !file_exists($sarb) || filesize($sarb) < 200000) {
+            $winFonts = getenv('WINDIR') ? getenv('WINDIR') . DIRECTORY_SEPARATOR . 'Fonts' : 'C:\\Windows\\Fonts';
+            $tahoma = $winFonts . DIRECTORY_SEPARATOR . 'tahoma.ttf';
+            $tahomab = $winFonts . DIRECTORY_SEPARATOR . 'tahomabd.ttf';
+            if (@is_file($tahoma) && @is_file($tahomab)) {
+                @copy($tahoma, $sar);
+                @copy($tahomab, $sarb);
+            }
+        }
+    } catch (\Throwable $e) {
+    }
+
+    $pdf = Pdf::loadView('pdf_test')
+        ->setPaper('a4', 'portrait')
+        ->setOptions([
+            'isHtml5ParserEnabled' => true,
+            'isRemoteEnabled' => true,
+            'defaultFont' => 'SarabunLocal',
+            'enableFontSubsetting' => false,
+            'fontDir' => storage_path('fonts'),
+            'fontCache' => storage_path('fonts'),
+            'chroot' => base_path(),
+            'log_output_file' => storage_path('logs/dompdf.log'),
+            'logOutputFile' => storage_path('logs/dompdf.log'),
+        ]);
+
+    // Explicitly register the Sarabun font family with Dompdf's font metrics
+    try {
+        $dompdf = $pdf->getDomPDF();
+        $fm = $dompdf->getFontMetrics();
+        $fm->registerFont('SarabunLocal', [
+            'normal' => storage_path('fonts/Sarabun-Regular.ttf'),
+            'bold'   => storage_path('fonts/Sarabun-Bold.ttf'),
+        ]);
+    } catch (\Throwable $e) {
+        // ignore
+    }
+    return $pdf->stream('thai-test.pdf');
+});
+
+// View raw HTML of the same template to verify encoding independent of Dompdf
+Route::get('/test-html', function () {
+    return view('pdf_test');
+});

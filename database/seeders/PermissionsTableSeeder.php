@@ -67,6 +67,14 @@ class PermissionsTableSeeder extends Seeder
             'delete-evidence',
             'download-evidence',
 
+            // ===== Sar Report =====
+            'view-sar_report',
+            'export-sar_report',    
+            'create-sar_report',
+            'edit-sar_report',
+            'delete-sar_report',
+
+        
             // ===== Dashboard =====
             'view-dashboard',
             'export-dashboard',

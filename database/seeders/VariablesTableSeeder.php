@@ -16,120 +16,43 @@ class VariablesTableSeeder extends Seeder
     {
         
 
-   
+        \DB::table('variables')->delete();
         
         \DB::table('variables')->insert(array (
             0 => 
             array (
-                'id' => 37,
+                'id' => 212,
                 'variable_name' => 'input_1',
-                'label_name' => 'ร้อยละของอาจารย์ประจำที่มีคุณวุฒิปริญญาเอก',
+                'label_name' => 'จำนวนบันฑิตที่มีคุณลักษณะที่พึงประสงค์ ครบตามที่กำหนดไว้ในหลักสูตร',
                 'type' => 'input',
-                'value' => 60.0,
-                'indicator_id' => 2,
-                'created_at' => '2025-09-15 13:25:18',
-                'updated_at' => '2025-09-16 07:49:37',
+                'value' => NULL,
+                'indicator_id' => 55,
+                'created_at' => '2025-09-30 03:27:46',
+                'updated_at' => '2025-09-30 03:27:46',
             ),
             1 => 
             array (
-                'id' => 38,
-                'variable_name' => 'defined_1',
-                'label_name' => 'ตัวหาร',
-                'type' => 'defined',
-                'value' => 40.0,
-                'indicator_id' => 2,
-                'created_at' => '2025-09-15 13:25:18',
-                'updated_at' => '2025-09-15 13:25:18',
+                'id' => 213,
+                'variable_name' => 'input_2',
+                'label_name' => 'จำนวนบันฑิตทั้งหมดในปีการศึกษานั้น',
+                'type' => 'input',
+                'value' => NULL,
+                'indicator_id' => 55,
+                'created_at' => '2025-09-30 03:27:46',
+                'updated_at' => '2025-09-30 03:27:46',
             ),
             2 => 
             array (
-                'id' => 39,
-                'variable_name' => 'defined_2',
+                'id' => 214,
+                'variable_name' => 'defined_1',
                 'label_name' => 'ตัวคูณ',
                 'type' => 'defined',
-                'value' => 10.0,
-                'indicator_id' => 2,
-                'created_at' => '2025-09-15 13:25:18',
-                'updated_at' => '2025-09-15 13:25:18',
+                'value' => 100.0,
+                'indicator_id' => 55,
+                'created_at' => '2025-09-30 03:27:46',
+                'updated_at' => '2025-09-30 03:27:46',
             ),
             3 => 
-            array (
-                'id' => 40,
-                'variable_name' => 'input_1',
-                'label_name' => 'จำนวนอาจารย์พยาบาลประจำที่มีคุณสมบัติตามเก็ณฑ์',
-                'type' => 'input',
-                'value' => NULL,
-                'indicator_id' => 3,
-                'created_at' => '2025-09-15 13:37:35',
-                'updated_at' => '2025-09-15 13:37:35',
-            ),
-            4 => 
-            array (
-                'id' => 41,
-                'variable_name' => 'input_2',
-                'label_name' => 'จำนวนอาจารย์ประจำทั้งหมดของสถายบันรวมทุกคุณวุฒิการศึกษา',
-                'type' => 'input',
-                'value' => NULL,
-                'indicator_id' => 3,
-                'created_at' => '2025-09-15 13:37:35',
-                'updated_at' => '2025-09-15 13:37:35',
-            ),
-            5 => 
-            array (
-                'id' => 42,
-                'variable_name' => 'defined_1',
-                'label_name' => 'ตัวคูณ',
-                'type' => 'defined',
-                'value' => 100.0,
-                'indicator_id' => 3,
-                'created_at' => '2025-09-15 13:37:35',
-                'updated_at' => '2025-09-15 13:37:35',
-            ),
-            6 => 
-            array (
-                'id' => 85,
-                'variable_name' => 'input_1',
-                'label_name' => 'ค่าเฉลี่ยของของการประเมินคณะผู้บริหาร',
-                'type' => 'input',
-                'value' => NULL,
-                'indicator_id' => 37,
-                'created_at' => '2025-09-16 06:02:05',
-                'updated_at' => '2025-09-16 06:02:05',
-            ),
-            7 => 
-            array (
-                'id' => 86,
-                'variable_name' => 'input_1',
-                'label_name' => 'จำนวนโครงการ/กิจกรรมที่มีผลการดำเนินงานเป็นไปตามเป้าหมายที่กำหนดไว้ในแผลกลยุทธ์/ยุทธศาสตร์',
-                'type' => 'input',
-                'value' => NULL,
-                'indicator_id' => 39,
-                'created_at' => '2025-09-16 06:09:14',
-                'updated_at' => '2025-09-16 06:09:14',
-            ),
-            8 => 
-            array (
-                'id' => 87,
-                'variable_name' => 'input_2',
-                'label_name' => 'จำนวนโครงการ/กิจกรรททั้งหมดในแต่ละปีงบประมาณ',
-                'type' => 'input',
-                'value' => NULL,
-                'indicator_id' => 39,
-                'created_at' => '2025-09-16 06:09:14',
-                'updated_at' => '2025-09-16 06:09:14',
-            ),
-            9 => 
-            array (
-                'id' => 88,
-                'variable_name' => 'defined_1',
-                'label_name' => 'ตัวคูณ',
-                'type' => 'defined',
-                'value' => 100.0,
-                'indicator_id' => 39,
-                'created_at' => '2025-09-16 06:09:14',
-                'updated_at' => '2025-09-16 06:09:14',
-            ),
-            10 => 
             array (
                 'id' => 89,
                 'variable_name' => 'input_1',
@@ -140,7 +63,7 @@ class VariablesTableSeeder extends Seeder
                 'created_at' => '2025-09-16 06:12:27',
                 'updated_at' => '2025-09-16 06:12:27',
             ),
-            11 => 
+            4 => 
             array (
                 'id' => 90,
                 'variable_name' => 'input_2',
@@ -151,7 +74,7 @@ class VariablesTableSeeder extends Seeder
                 'created_at' => '2025-09-16 06:12:27',
                 'updated_at' => '2025-09-16 06:12:27',
             ),
-            12 => 
+            5 => 
             array (
                 'id' => 77,
                 'variable_name' => 'input_1',
@@ -162,7 +85,7 @@ class VariablesTableSeeder extends Seeder
                 'created_at' => '2025-09-16 03:40:32',
                 'updated_at' => '2025-09-16 03:40:48',
             ),
-            13 => 
+            6 => 
             array (
                 'id' => 91,
                 'variable_name' => 'defined_1',
@@ -173,7 +96,7 @@ class VariablesTableSeeder extends Seeder
                 'created_at' => '2025-09-16 06:12:27',
                 'updated_at' => '2025-09-16 06:12:27',
             ),
-            14 => 
+            7 => 
             array (
                 'id' => 92,
                 'variable_name' => 'input_1',
@@ -184,7 +107,7 @@ class VariablesTableSeeder extends Seeder
                 'created_at' => '2025-09-16 06:15:18',
                 'updated_at' => '2025-09-16 06:15:18',
             ),
-            15 => 
+            8 => 
             array (
                 'id' => 93,
                 'variable_name' => 'input_2',
@@ -195,7 +118,7 @@ class VariablesTableSeeder extends Seeder
                 'created_at' => '2025-09-16 06:15:18',
                 'updated_at' => '2025-09-16 06:15:18',
             ),
-            16 => 
+            9 => 
             array (
                 'id' => 78,
                 'variable_name' => 'input_2',
@@ -206,40 +129,7 @@ class VariablesTableSeeder extends Seeder
                 'created_at' => '2025-09-16 03:40:32',
                 'updated_at' => '2025-09-16 03:41:08',
             ),
-            17 => 
-            array (
-                'id' => 82,
-                'variable_name' => 'input_1',
-                'label_name' => 'จำนวนรายวิชาที่มีอาจารย์พยาบาลประจำวิชาพยาบาลวิชาชีพสอนภาคปฏิบัติ ไม่เกิน 1:8',
-                'type' => 'input',
-                'value' => NULL,
-                'indicator_id' => 7,
-                'created_at' => '2025-09-16 03:49:26',
-                'updated_at' => '2025-09-16 03:49:26',
-            ),
-            18 => 
-            array (
-                'id' => 83,
-                'variable_name' => 'input_2',
-                'label_name' => 'จำนวนรายวิชาภาคปฏิบัติที่เปิดสอนในรายปีการศึกษาที่ครบวาระการรับรองสถาบัน',
-                'type' => 'input',
-                'value' => NULL,
-                'indicator_id' => 7,
-                'created_at' => '2025-09-16 03:49:26',
-                'updated_at' => '2025-09-16 03:49:26',
-            ),
-            19 => 
-            array (
-                'id' => 84,
-                'variable_name' => 'defined_1',
-                'label_name' => 'ตัวคูณ',
-                'type' => 'defined',
-                'value' => 100.0,
-                'indicator_id' => 7,
-                'created_at' => '2025-09-16 03:49:26',
-                'updated_at' => '2025-09-16 03:49:26',
-            ),
-            20 => 
+            10 => 
             array (
                 'id' => 94,
                 'variable_name' => 'defined_1',
@@ -250,7 +140,7 @@ class VariablesTableSeeder extends Seeder
                 'created_at' => '2025-09-16 06:15:18',
                 'updated_at' => '2025-09-16 06:15:18',
             ),
-            21 => 
+            11 => 
             array (
                 'id' => 95,
                 'variable_name' => 'input_1',
@@ -261,7 +151,7 @@ class VariablesTableSeeder extends Seeder
                 'created_at' => '2025-09-16 06:18:44',
                 'updated_at' => '2025-09-16 06:18:44',
             ),
-            22 => 
+            12 => 
             array (
                 'id' => 96,
                 'variable_name' => 'input_2',
@@ -272,7 +162,7 @@ class VariablesTableSeeder extends Seeder
                 'created_at' => '2025-09-16 06:18:44',
                 'updated_at' => '2025-09-16 06:18:44',
             ),
-            23 => 
+            13 => 
             array (
                 'id' => 97,
                 'variable_name' => 'defined_1',
@@ -283,7 +173,7 @@ class VariablesTableSeeder extends Seeder
                 'created_at' => '2025-09-16 06:18:44',
                 'updated_at' => '2025-09-16 06:18:44',
             ),
-            24 => 
+            14 => 
             array (
                 'id' => 98,
                 'variable_name' => 'input_1',
@@ -294,7 +184,7 @@ class VariablesTableSeeder extends Seeder
                 'created_at' => '2025-09-16 06:31:19',
                 'updated_at' => '2025-09-16 06:31:19',
             ),
-            25 => 
+            15 => 
             array (
                 'id' => 99,
                 'variable_name' => 'input_2',
@@ -305,7 +195,7 @@ class VariablesTableSeeder extends Seeder
                 'created_at' => '2025-09-16 06:31:19',
                 'updated_at' => '2025-09-16 06:31:19',
             ),
-            26 => 
+            16 => 
             array (
                 'id' => 100,
                 'variable_name' => 'defined_1',
@@ -316,7 +206,7 @@ class VariablesTableSeeder extends Seeder
                 'created_at' => '2025-09-16 06:31:19',
                 'updated_at' => '2025-09-16 06:31:19',
             ),
-            27 => 
+            17 => 
             array (
                 'id' => 101,
                 'variable_name' => 'input_1',
@@ -327,7 +217,7 @@ class VariablesTableSeeder extends Seeder
                 'created_at' => '2025-09-16 06:36:00',
                 'updated_at' => '2025-09-16 06:36:00',
             ),
-            28 => 
+            18 => 
             array (
                 'id' => 102,
                 'variable_name' => 'input_2',
@@ -338,7 +228,7 @@ class VariablesTableSeeder extends Seeder
                 'created_at' => '2025-09-16 06:36:00',
                 'updated_at' => '2025-09-16 06:36:00',
             ),
-            29 => 
+            19 => 
             array (
                 'id' => 103,
                 'variable_name' => 'defined_1',
@@ -349,73 +239,7 @@ class VariablesTableSeeder extends Seeder
                 'created_at' => '2025-09-16 06:36:00',
                 'updated_at' => '2025-09-16 06:36:00',
             ),
-            30 => 
-            array (
-                'id' => 104,
-                'variable_name' => 'input_1',
-                'label_name' => 'จำนวนรวมของผู้สอบผ่านในการสอบครั้งแรกย้อนหลัง 3 ปี',
-                'type' => 'input',
-                'value' => NULL,
-                'indicator_id' => 46,
-                'created_at' => '2025-09-16 06:38:36',
-                'updated_at' => '2025-09-16 06:38:36',
-            ),
-            31 => 
-            array (
-                'id' => 105,
-                'variable_name' => 'input_2',
-                'label_name' => 'จำนวนรวมของผู้สำเร็จการศึกษาในปีการศึกษานั้นๆย้อนหลัง 3 ปี',
-                'type' => 'input',
-                'value' => NULL,
-                'indicator_id' => 46,
-                'created_at' => '2025-09-16 06:38:36',
-                'updated_at' => '2025-09-16 06:38:36',
-            ),
-            32 => 
-            array (
-                'id' => 106,
-                'variable_name' => 'defined_1',
-                'label_name' => 'ตัวคูณ',
-                'type' => 'defined',
-                'value' => 100.0,
-                'indicator_id' => 46,
-                'created_at' => '2025-09-16 06:38:36',
-                'updated_at' => '2025-09-16 06:38:36',
-            ),
-            33 => 
-            array (
-                'id' => 107,
-                'variable_name' => 'input_1',
-                'label_name' => 'ร้อยละของผลงานทางวิชาการ',
-                'type' => 'input',
-                'value' => NULL,
-                'indicator_id' => 49,
-                'created_at' => '2025-09-16 06:47:50',
-                'updated_at' => '2025-09-16 06:47:50',
-            ),
-            34 => 
-            array (
-                'id' => 108,
-                'variable_name' => 'defined_1',
-                'label_name' => 'ตัวหาร',
-                'type' => 'defined',
-                'value' => 70.0,
-                'indicator_id' => 49,
-                'created_at' => '2025-09-16 06:47:50',
-                'updated_at' => '2025-09-16 06:47:50',
-            ),
-            35 => 
-            array (
-                'id' => 109,
-                'variable_name' => 'defined_2',
-                'label_name' => 'ตัวคูณ',
-                'type' => 'defined',
-                'value' => 25.0,
-                'indicator_id' => 49,
-                'created_at' => '2025-09-16 06:47:50',
-                'updated_at' => '2025-09-16 06:47:50',
-            ),
-            36 => 
+            20 => 
             array (
                 'id' => 110,
                 'variable_name' => 'input_1',
@@ -426,7 +250,7 @@ class VariablesTableSeeder extends Seeder
                 'created_at' => '2025-09-16 06:51:18',
                 'updated_at' => '2025-09-16 06:51:18',
             ),
-            37 => 
+            21 => 
             array (
                 'id' => 111,
                 'variable_name' => 'input_1',
@@ -437,7 +261,7 @@ class VariablesTableSeeder extends Seeder
                 'created_at' => '2025-09-16 06:59:33',
                 'updated_at' => '2025-09-16 06:59:33',
             ),
-            38 => 
+            22 => 
             array (
                 'id' => 112,
                 'variable_name' => 'input_2',
@@ -448,7 +272,7 @@ class VariablesTableSeeder extends Seeder
                 'created_at' => '2025-09-16 06:59:33',
                 'updated_at' => '2025-09-16 06:59:33',
             ),
-            39 => 
+            23 => 
             array (
                 'id' => 113,
                 'variable_name' => 'defined_1',
@@ -459,40 +283,7 @@ class VariablesTableSeeder extends Seeder
                 'created_at' => '2025-09-16 06:59:33',
                 'updated_at' => '2025-09-16 06:59:33',
             ),
-            40 => 
-            array (
-                'id' => 114,
-                'variable_name' => 'input_1',
-                'label_name' => 'จำนวนบันฑิตที่มีคุณลักษณะที่พึงประสงค์ ครบตามที่กำหนดไว้ในหลักสูตร',
-                'type' => 'input',
-                'value' => NULL,
-                'indicator_id' => 55,
-                'created_at' => '2025-09-16 07:22:18',
-                'updated_at' => '2025-09-16 07:22:18',
-            ),
-            41 => 
-            array (
-                'id' => 115,
-                'variable_name' => 'input_2',
-                'label_name' => 'จำนวนบันฑิตทั้งหมดในปีการศึกษานั้น',
-                'type' => 'input',
-                'value' => NULL,
-                'indicator_id' => 55,
-                'created_at' => '2025-09-16 07:22:18',
-                'updated_at' => '2025-09-16 07:22:18',
-            ),
-            42 => 
-            array (
-                'id' => 116,
-                'variable_name' => 'defined_1',
-                'label_name' => 'ตัวคูณ',
-                'type' => 'defined',
-                'value' => 100.0,
-                'indicator_id' => 55,
-                'created_at' => '2025-09-16 07:22:18',
-                'updated_at' => '2025-09-16 07:22:18',
-            ),
-            43 => 
+            24 => 
             array (
                 'id' => 153,
                 'variable_name' => 'input_2',
@@ -503,7 +294,7 @@ class VariablesTableSeeder extends Seeder
                 'created_at' => '2025-09-16 08:11:41',
                 'updated_at' => '2025-09-16 08:22:34',
             ),
-            44 => 
+            25 => 
             array (
                 'id' => 154,
                 'variable_name' => 'input_1',
@@ -513,6 +304,226 @@ class VariablesTableSeeder extends Seeder
                 'indicator_id' => 5,
                 'created_at' => '2025-09-16 08:11:41',
                 'updated_at' => '2025-09-16 08:22:34',
+            ),
+            26 => 
+            array (
+                'id' => 155,
+                'variable_name' => 'input_1',
+                'label_name' => 'ร้อยละของอาจารย์ประจำที่มีคุณวุฒิปริญญาเอก',
+                'type' => 'input',
+                'value' => 60.0,
+                'indicator_id' => 58,
+                'created_at' => '2025-09-26 07:38:08',
+                'updated_at' => '2025-09-26 07:38:08',
+            ),
+            27 => 
+            array (
+                'id' => 156,
+                'variable_name' => 'defined_1',
+                'label_name' => 'ตัวหาร',
+                'type' => 'defined',
+                'value' => 40.0,
+                'indicator_id' => 58,
+                'created_at' => '2025-09-26 07:38:08',
+                'updated_at' => '2025-09-26 07:38:08',
+            ),
+            28 => 
+            array (
+                'id' => 157,
+                'variable_name' => 'defined_2',
+                'label_name' => 'ตัวคูณ',
+                'type' => 'defined',
+                'value' => 10.0,
+                'indicator_id' => 58,
+                'created_at' => '2025-09-26 07:38:08',
+                'updated_at' => '2025-09-26 07:38:08',
+            ),
+            29 => 
+            array (
+                'id' => 182,
+                'variable_name' => 'defined_1',
+                'label_name' => 'ตัวคูณ',
+                'type' => 'defined',
+                'value' => 100.0,
+                'indicator_id' => 3,
+                'created_at' => '2025-09-29 09:39:31',
+                'updated_at' => '2025-09-29 09:39:31',
+            ),
+            30 => 
+            array (
+                'id' => 183,
+                'variable_name' => 'input_2',
+                'label_name' => 'จำนวนอาจารย์ประจำทั้งหมดของสถายบันรวมทุกคุณวุฒิการศึกษา',
+                'type' => 'input',
+                'value' => NULL,
+                'indicator_id' => 3,
+                'created_at' => '2025-09-29 09:39:31',
+                'updated_at' => '2025-09-29 09:39:31',
+            ),
+            31 => 
+            array (
+                'id' => 184,
+                'variable_name' => 'input_1',
+                'label_name' => 'จำนวนอาจารย์พยาบาลประจำที่มีคุณสมบัติตามเก็ณฑ์',
+                'type' => 'input',
+                'value' => NULL,
+                'indicator_id' => 3,
+                'created_at' => '2025-09-29 09:39:31',
+                'updated_at' => '2025-09-29 09:39:31',
+            ),
+            32 => 
+            array (
+                'id' => 189,
+                'variable_name' => 'input_1',
+                'label_name' => 'จำนวนอาจารย์ประจำที่มีคุณวุฒิปริญญาเอก',
+                'type' => 'input',
+                'value' => NULL,
+                'indicator_id' => 2,
+                'created_at' => '2025-09-30 02:37:59',
+                'updated_at' => '2025-09-30 02:42:40',
+            ),
+            33 => 
+            array (
+                'id' => 190,
+                'variable_name' => 'input_2',
+                'label_name' => 'จำนวนอาจารย์ประจำทั้งหมด',
+                'type' => 'input',
+                'value' => NULL,
+                'indicator_id' => 2,
+                'created_at' => '2025-09-30 02:37:59',
+                'updated_at' => '2025-09-30 02:42:40',
+            ),
+            34 => 
+            array (
+                'id' => 191,
+                'variable_name' => 'input_1',
+                'label_name' => 'จำนวนรายวิชาที่มีอาจารย์พยาบาลประจำวิชาพยาบาลวิชาชีพสอนภาคปฏิบัติ ไม่เกิน 1:8',
+                'type' => 'input',
+                'value' => NULL,
+                'indicator_id' => 7,
+                'created_at' => '2025-09-30 02:51:41',
+                'updated_at' => '2025-09-30 02:51:41',
+            ),
+            35 => 
+            array (
+                'id' => 192,
+                'variable_name' => 'input_2',
+                'label_name' => 'จำนวนรายวิชาภาคปฏิบัติที่เปิดสอนในรายปีการศึกษาที่ครบวาระการรับรองสถาบัน',
+                'type' => 'input',
+                'value' => NULL,
+                'indicator_id' => 7,
+                'created_at' => '2025-09-30 02:51:41',
+                'updated_at' => '2025-09-30 02:51:41',
+            ),
+            36 => 
+            array (
+                'id' => 193,
+                'variable_name' => 'defined_1',
+                'label_name' => 'ตัวคูณ',
+                'type' => 'defined',
+                'value' => 100.0,
+                'indicator_id' => 7,
+                'created_at' => '2025-09-30 02:51:41',
+                'updated_at' => '2025-09-30 02:51:41',
+            ),
+            37 => 
+            array (
+                'id' => 195,
+                'variable_name' => 'input_1',
+                'label_name' => 'ค่าเฉลี่ยของของการประเมินคณะผู้บริหาร',
+                'type' => 'input',
+                'value' => NULL,
+                'indicator_id' => 37,
+                'created_at' => '2025-09-30 03:00:07',
+                'updated_at' => '2025-09-30 03:00:07',
+            ),
+            38 => 
+            array (
+                'id' => 196,
+                'variable_name' => 'input_1',
+                'label_name' => 'จำนวนโครงการ/กิจกรรมที่มีผลการดำเนินงานเป็นไปตามเป้าหมายที่กำหนดไว้ในแผลกลยุทธ์/ยุทธศาสตร์',
+                'type' => 'input',
+                'value' => NULL,
+                'indicator_id' => 39,
+                'created_at' => '2025-09-30 03:02:00',
+                'updated_at' => '2025-09-30 03:02:00',
+            ),
+            39 => 
+            array (
+                'id' => 197,
+                'variable_name' => 'input_2',
+                'label_name' => 'จำนวนโครงการ/กิจกรรททั้งหมดในแต่ละปีงบประมาณ',
+                'type' => 'input',
+                'value' => NULL,
+                'indicator_id' => 39,
+                'created_at' => '2025-09-30 03:02:00',
+                'updated_at' => '2025-09-30 03:02:00',
+            ),
+            40 => 
+            array (
+                'id' => 198,
+                'variable_name' => 'defined_1',
+                'label_name' => 'ตัวคูณ',
+                'type' => 'defined',
+                'value' => 100.0,
+                'indicator_id' => 39,
+                'created_at' => '2025-09-30 03:02:00',
+                'updated_at' => '2025-09-30 03:02:00',
+            ),
+            41 => 
+            array (
+                'id' => 199,
+                'variable_name' => 'input_1',
+                'label_name' => 'จำนวนรวมของผู้สอบผ่านในการสอบครั้งแรกย้อนหลัง 3 ปี',
+                'type' => 'input',
+                'value' => NULL,
+                'indicator_id' => 46,
+                'created_at' => '2025-09-30 03:03:01',
+                'updated_at' => '2025-09-30 03:03:01',
+            ),
+            42 => 
+            array (
+                'id' => 200,
+                'variable_name' => 'input_2',
+                'label_name' => 'จำนวนรวมของผู้สำเร็จการศึกษาในปีการศึกษานั้นๆย้อนหลัง 3 ปี',
+                'type' => 'input',
+                'value' => NULL,
+                'indicator_id' => 46,
+                'created_at' => '2025-09-30 03:03:01',
+                'updated_at' => '2025-09-30 03:03:01',
+            ),
+            43 => 
+            array (
+                'id' => 201,
+                'variable_name' => 'defined_1',
+                'label_name' => 'ตัวคูณ',
+                'type' => 'defined',
+                'value' => 100.0,
+                'indicator_id' => 46,
+                'created_at' => '2025-09-30 03:03:01',
+                'updated_at' => '2025-09-30 03:03:01',
+            ),
+            44 => 
+            array (
+                'id' => 204,
+                'variable_name' => 'input_2',
+            'label_name' => 'จำนวนอาจารย์ประจำทั้งหมด ( ปี1+ปี2+ปี3+ปี4+ปี5 )',
+                'type' => 'input',
+                'value' => NULL,
+                'indicator_id' => 49,
+                'created_at' => '2025-09-30 03:23:18',
+                'updated_at' => '2025-09-30 03:23:40',
+            ),
+            45 => 
+            array (
+                'id' => 205,
+                'variable_name' => 'input_1',
+            'label_name' => 'ผลรวมถ่วงน้ำหนักของบทความวิจัยและผลงานวิชาการที่ตีพิมพ์เผยแพร่ ( ปี1+ปี2+ปี3+ปี4+ปี5 )',
+                'type' => 'input',
+                'value' => NULL,
+                'indicator_id' => 49,
+                'created_at' => '2025-09-30 03:23:18',
+                'updated_at' => '2025-09-30 03:23:40',
             ),
         ));
         

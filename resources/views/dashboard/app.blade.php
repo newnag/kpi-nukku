@@ -59,7 +59,7 @@
                     </div>
                     <div class="stats-card legend-item" data-key="complete">
                         <div class="stats-icon success">
-                            <i  data-lucide="check-circle"></i>
+                            <i data-lucide="check-circle"></i>
                         </div>
                         <div class="stats-info">
                             <div class="stats-value legend-count">{{ $statusCounts['complete'] ?? 0 }}</div>
@@ -77,7 +77,7 @@
                     </div>
                     <div class="stats-card legend-item" data-key="pending">
                         <div class="stats-icon danger">
-                            <i  data-lucide="clock"></i>
+                            <i data-lucide="clock"></i>
                         </div>
                         <div class="stats-info">
                             <div class="stats-value legend-count">{{ $statusCounts['pending'] ?? 0 }}</div>
@@ -105,20 +105,19 @@
                     <input type="text" id="custom-search" class="search-input" placeholder="ค้นหารายการตัวบ่งชี้">
                 </div>
 
-                <button id="exportExell" class="btn-export-excel">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                        <path d="M9 12l3 3 3-3" stroke="#16a34a" stroke-width="2" stroke-linecap="round"
-                            stroke-linejoin="round" />
-                        <path d="M12 3v12" stroke="#16a34a" stroke-width="2" stroke-linecap="round"
-                            stroke-linejoin="round" />
-                        <path d="M5 21h14a2 2 0 0 0 2-2v-4" stroke="#16a34a" stroke-width="2" stroke-linecap="round"
-                            stroke-linejoin="round" />
-                        <path d="M3 15v4a2 2 0 0 0 2 2" stroke="#16a34a" stroke-width="2" stroke-linecap="round"
-                            stroke-linejoin="round" />
+                <!-- ปุ่ม Export -->
+                <button id="exportExell" type="button"
+                    class="h-fit bg-green-500 hover:bg-green-600 text-white rounded-lg px-3 sm:px-4 py-2 flex items-center gap-2 text-xs sm:text-sm font-medium">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 sm:h-5 sm:w-5" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0l-4 4m4-4v12" />
                     </svg>
-                    EXPORT TO EXCEL
+                    <span class="hidden sm:inline">EXPORT</span>
+                    <span class="sm:hidden">EXP</span>
                 </button>
             </div>
+
             <div class="dashboard-list">
                 <table class="table" id="dashboardTable">
 
@@ -944,13 +943,13 @@
         }
 
         /* .stat-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        } */
+                    width: 48px;
+                    height: 48px;
+                    border-radius: 8px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                } */
 
         .user-icon {
             background: var(--blue-100);
@@ -1073,9 +1072,10 @@
 
         .chart-header {
             display: flex;
-            align-items: center;
-            justify-content: space-between;
+            align-items: flex-end;
             gap: 12px;
+            margin-right: 20px;
+            justify-content: space-between;
         }
 
         .chart-header h3 {
@@ -1369,7 +1369,7 @@
         }
 
         /* ตัวเลือก: วาง tooltip ด้านล่าง (ถ้าพื้นที่ด้านบนไม่พอ)
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               <span class="tip" data-tip="..." data-pos="bottom"> */
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       <span class="tip" data-tip="..." data-pos="bottom"> */
         .tip[data-pos="bottom"]::after {
             top: calc(100% + 10px);
             bottom: auto;
@@ -1857,12 +1857,12 @@
 
         .dashboard-list {
             /* background: white;
-                        border-radius: 10px;
-                        border: 2px solid #C2D9EB;
-                        margin-top: 40px;
-                        margin-bottom: 40px;
-                        margin-left: 60px;
-                        margin-right: 60px; */
+                                border-radius: 10px;
+                                border: 2px solid #C2D9EB;
+                                margin-top: 40px;
+                                margin-bottom: 40px;
+                                margin-left: 60px;
+                                margin-right: 60px; */
 
             padding: 30px;
         }

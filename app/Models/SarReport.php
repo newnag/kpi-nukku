@@ -9,10 +9,9 @@ class SarReport extends Model
 {
     protected $fillable = [
         'year',
+        'title',
         'section1', 'section2', 'section4',
         'standard_id', 'indicator_id', 'criteria_id',
-        'performance_result', 'performance_report',
-        'self_score', 'comment',
         'created_by', 'updated_by'
     ];
 

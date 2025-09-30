@@ -3,14 +3,20 @@
 @section('content')
     <div class="max-w-6xl mx-auto space-y-6">
         <h2 class="text-2xl font-bold mb-1">สร้างรายงาน SAR</h2>
-        @if(request('year'))
+        @if (request('year'))
             <div class="text-gray-600 mb-6">ปีการประเมิน: <span class="font-semibold">{{ request('year') }}</span></div>
         @endif
+
 
         <form method="POST" action="{{ route('sar_reports.store') }}" class="space-y-6">
             @csrf
             <input type="hidden" name="year" value="{{ request('year') }}">
-
+            {{-- ชื่อเรื่อง --}}
+            <div class="bg-white shadow rounded-lg p-6">
+                <label for="title" class="block text-lg font-semibold mb-2">ชื่อเรื่อง (ถ้ามี)</label>
+                <input type="text" name="title" id="title" class="w-full border rounded px-3 py-2"
+                    value="{{ old('title') }}" placeholder="เช่น รายงานการประเมินตนเอง ประจำปี 2566">
+            </div>
             {{-- ส่วนที่ 1 --}}
             <div class="bg-white shadow rounded-lg p-6">
                 <h3 class="text-lg font-semibold border-b pb-2 mb-4">ส่วนที่ 1: ข้อมูลทั่วไปคณะพยาบาลศาสตร์</h3>
@@ -36,7 +42,7 @@
 
                             @foreach ($inds as $ind)
                                 @php
-                                    if (request('year') && (string)$ind->year !== (string)request('year')) {
+                                    if (request('year') && (string) $ind->year !== (string) request('year')) {
                                         continue;
                                     }
                                 @endphp
@@ -152,7 +158,7 @@
                                                                             class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
                                                                             @click.stop="
                     saving = true;
-                    fetch('{{ route('criterias.updateReport', $cri->id) }}', {
+                    fetch('{{ route('sar_reports.criterias.updateReport', $cri->id) }}', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -214,7 +220,7 @@
                                                     <th class="border px-2 py-1 w-32">การประเมินตนเอง</th>
                                                 </tr>
                                             </thead>
-                                         <tbody>
+                                            <tbody>
                                                 @php
                                                     $lines = [];
                                                     if (!empty($ind->comment)) {
@@ -235,10 +241,22 @@
                                                     @php
                                                         $scoreFromLine = null;
                                                         if (
-                                                            preg_match('/([0-9]+(?:\.[0-9]+)?)\s*คะแนน/u', $line, $mm)
+                                                            preg_match(
+                                                                '/\(\s*(?:([0-9]+(?:\.[0-9]+)?)\s*คะแนน|คะแนน\s*([0-9]+(?:\.[0-9]+)?)|([0-9]+(?:\.[0-9]+)?))\s*\)/u',
+                                                                $line,
+                                                                $mm,
+                                                            )
                                                         ) {
-                                                            $scoreFromLine = (float) $mm[1];
+                                                            $scoreFromLine =
+                                                                (float) (array_values(
+                                                                    array_filter([
+                                                                        $mm[1] ?? null,
+                                                                        $mm[2] ?? null,
+                                                                        $mm[3] ?? null,
+                                                                    ]),
+                                                                )[0] ?? null);
                                                         }
+
                                                         $match =
                                                             $score !== null &&
                                                             $scoreFromLine !== null &&
@@ -281,13 +299,19 @@
 
             {{-- ส่วนที่ 4 --}}
             <div class="bg-white shadow rounded-lg p-6">
-                <h3 class="text-lg font-semibold border-b pb-2 mb-4">ส่วนที่ 4: สรุปผลการประเมินตนเองตามเกณฑ์ของสภาการพยาบาล</h3>
+                <h3 class="text-lg font-semibold border-b pb-2 mb-4">ส่วนที่ 4:
+                    สรุปผลการประเมินตนเองตามเกณฑ์ของสภาการพยาบาล</h3>
                 <textarea name="section4" id="section4" class="trumbowyg-textarea w-full">{{ old('section4') }}</textarea>
             </div>
 
-            <div class="flex justify-end">
-                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md shadow">
-                    💾 บันทึก
+            <div class="flex justify-end gap-3">
+                <a href="{{ route('sar_reports.index') }}"
+                   class="bg-white text-blue-600 border border-blue-600 px-6 py-2 rounded-md shadow inline-flex items-center hover:bg-blue-50">
+                    <i data-lucide="arrow-left" class="w-4 h-4 mr-2"></i> กลับ
+                </a>
+                <button type="submit"
+                        class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md shadow inline-flex items-center">
+                    <i data-lucide="save" class="w-4 h-4 mr-2"></i> บันทึก
                 </button>
             </div>
         </form>

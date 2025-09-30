@@ -450,6 +450,11 @@
                                 <i class="fa-solid fa-folder-open"></i> จัดการหลักฐาน
                             </a>
                         @endcan
+                        @can('view-sar_report')
+                            <a href="{{ route('sar_reports.index') }}" class="buttonNav-item">
+                                <i class="fa-solid fa-file-lines"></i> จัดการเอกสาร
+                            </a>
+                        @endcan
                     </div>
                 </div>
             @endhasanyrole
