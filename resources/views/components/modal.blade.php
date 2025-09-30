@@ -1,26 +1,19 @@
 @props([
     'title' => null, // header text
-    'size' => 'md', // sm | md | lg | xl
+    'size' => 'md', // sm | md | lg | xl | 2xl
     'closeOnBg' => true, // click backdrop to close
     'context' => null, // string to identify which modal opened
-    'fullOnMobile' => true, // fullscreen on small screens
 ])
 
 @php
-    // Width at >= sm breakpoint (Tailwind utilities)
     $panelWidth =
         [
-            'sm' => 'sm:max-w-md',
-            'md' => 'sm:max-w-lg',
-            'lg' => 'sm:max-w-2xl',
-            'xl' => 'sm:max-w-4xl',
-        ][$size] ?? 'sm:max-w-lg';
-
-    // Mobile behavior classes
-    $mobileShell = $fullOnMobile ? 'w-screen h-screen sm:w-full sm:h-auto' : 'w-full';
-
-    // Height & overflow management
-    // On mobile: full screen; On larger screens: constrained height
+            'sm' => 'max-w-sm sm:max-w-md',
+            'md' => 'max-w-sm sm:max-w-md md:max-w-lg',
+            'lg' => 'max-w-sm zsm:max-w-md md:max-w-lg lg:max-w-2xl',
+            'xl' => 'max-w-sm sm:max-w-md md:max-w-lg lg:max-w-2xl xl:max-w-4xl',
+            '2xl' => 'max-w-sm sm:max-w-md md:max-w-lg lg:max-w-2xl xl:max-w-4xl 2xl:max-w-6xl',
+        ][$size] ?? 'max-w-sm sm:max-w-md md:max-w-lg';
     $panelFrame = 'bg-white border border-slate-200 shadow-xl flex flex-col overflow-hidden modal-panel';
 @endphp
 
@@ -29,8 +22,7 @@
     document.documentElement.classList.toggle('modal-open', v);
     document.body.style.overflow = v ? 'hidden' : ''; // Prevent background scroll
     if (v) { $dispatch('modal:opened', { context: @js($context) }); }
-})"
-    @modal:close.window="open = false"
+})" @modal:close.window="open = false"
     @modal:open.window="(() => { const ctx = @js($context); const d = $event.detail || {}; if (!ctx || d.context === ctx) { open = true; } })()"
     class="inline">
     {{-- Trigger --}}
@@ -43,30 +35,32 @@
         <div x-show="open" x-cloak class="fixed inset-0 flex items-center justify-center p-3 sm:p-6"
             @keydown.escape.window="open = false" role="dialog" aria-modal="true" aria-label="{{ $title ?? 'Modal' }}">
             {{-- Backdrop --}}
-            <div class="absolute inset-0 bg-black/10 opacity-50" @if ($closeOnBg) @click="open = false" @endif></div>
+            <div class="absolute inset-0 bg-black/10 opacity-50"
+                @if ($closeOnBg) @click="open = false" @endif></div>
 
-            {{-- Panel wrapper (centering + width) --}}
-            <div class="relative mx-auto w-full {{ $panelWidth }} {{ $mobileShell }}">
+            {{-- Panel wrapper (centering + width)  *** {{ $mobileShell }} --}}
+            <div class="relative mx-auto w-full {{ $panelWidth }} ">
                 {{-- Panel --}}
-                <div class="{{ $panelFrame }} sm:rounded-xl rounded-none sm:max-h-[85vh] max-h-screen">
+                <div class="{{ $panelFrame }} rounded-xl sm:max-h-[85vh] max-h-screen">
                     {{-- Header (sticky) --}}
                     <div
-                        class="flex items-center justify-between px-5 py-3 border-b border-slate-200 bg-white sticky top-0 z-10">
-                        <h3 class="text-base font-semibold text-slate-800 truncate">
+                        class="flex items-center justify-between px-3 sm:px-5 py-3 border-b border-slate-200 bg-white sticky top-0 z-10">
+                        <h3 class="text-balance text-sm sm:text-base font-semibold text-slate-800 truncate">
                             {{ $title }}
                         </h3>
-                        <button type="button" class="text-slate-500 hover:text-red-500 btn-ghost-close"
+                        <button type="button"
+                            class="text-slate-500 hover:text-red-500 btn-ghost-close text-lg sm:text-xl"
                             @click="open = false" aria-label="Close">✕</button>
                     </div>
 
                     {{-- Body (scrollable) --}}
-                    <div class="px-5 py-4 overflow-auto modal-body grow">
+                    <div class="px-3 sm:px-5 py-3 sm:py-4 overflow-auto modal-body grow">
                         {{ $slot }}
                     </div>
 
                     {{-- Footer (optional, sticky) --}}
                     @isset($footer)
-                        <div class="px-5 py-3 border-t border-slate-200 bg-slate-50 sticky bottom-0">
+                        <div class="px-3 sm:px-5 py-3 border-t border-slate-200 bg-slate-50 sticky bottom-0">
                             {{ $footer }}
                         </div>
                     @endisset
@@ -94,12 +88,12 @@
     }
 
     /* .modal { */
-        /* position: fixed;
+    /* position: fixed;
         top: 0;
         left: 0;
         width: 100%;
         height: 100%; */
-        /* z-index: 1050; */
-        
+    /* z-index: 1050; */
+
     /* } */
 </style>
