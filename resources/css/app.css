@@ -366,4 +366,8 @@ body {
     --color-stone-950: oklch(0.147 0.004 49.25);
     --color-black: #000;
     --color-white: #fff;
+
+    --shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    --radius: 16px;
+    --radius-sm: 10px;
 }
