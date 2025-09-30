@@ -3,7 +3,7 @@
 @section('content')
     <div class="max-w-6xl mx-auto space-y-6">
         <h2 class="text-2xl font-bold mb-1">สร้างรายงาน SAR</h2>
-        @if(request('year'))
+        @if (request('year'))
             <div class="text-gray-600 mb-6">ปีการประเมิน: <span class="font-semibold">{{ request('year') }}</span></div>
         @endif
 
@@ -42,7 +42,7 @@
 
                             @foreach ($inds as $ind)
                                 @php
-                                    if (request('year') && (string)$ind->year !== (string)request('year')) {
+                                    if (request('year') && (string) $ind->year !== (string) request('year')) {
                                         continue;
                                     }
                                 @endphp
@@ -220,7 +220,7 @@
                                                     <th class="border px-2 py-1 w-32">การประเมินตนเอง</th>
                                                 </tr>
                                             </thead>
-                                         <tbody>
+                                            <tbody>
                                                 @php
                                                     $lines = [];
                                                     if (!empty($ind->comment)) {
@@ -241,10 +241,22 @@
                                                     @php
                                                         $scoreFromLine = null;
                                                         if (
-                                                            preg_match('/([0-9]+(?:\.[0-9]+)?)\s*คะแนน/u', $line, $mm)
+                                                            preg_match(
+                                                                '/\(\s*(?:([0-9]+(?:\.[0-9]+)?)\s*คะแนน|คะแนน\s*([0-9]+(?:\.[0-9]+)?)|([0-9]+(?:\.[0-9]+)?))\s*\)/u',
+                                                                $line,
+                                                                $mm,
+                                                            )
                                                         ) {
-                                                            $scoreFromLine = (float) $mm[1];
+                                                            $scoreFromLine =
+                                                                (float) (array_values(
+                                                                    array_filter([
+                                                                        $mm[1] ?? null,
+                                                                        $mm[2] ?? null,
+                                                                        $mm[3] ?? null,
+                                                                    ]),
+                                                                )[0] ?? null);
                                                         }
+
                                                         $match =
                                                             $score !== null &&
                                                             $scoreFromLine !== null &&
@@ -287,7 +299,8 @@
 
             {{-- ส่วนที่ 4 --}}
             <div class="bg-white shadow rounded-lg p-6">
-                <h3 class="text-lg font-semibold border-b pb-2 mb-4">ส่วนที่ 4: สรุปผลการประเมินตนเองตามเกณฑ์ของสภาการพยาบาล</h3>
+                <h3 class="text-lg font-semibold border-b pb-2 mb-4">ส่วนที่ 4:
+                    สรุปผลการประเมินตนเองตามเกณฑ์ของสภาการพยาบาล</h3>
                 <textarea name="section4" id="section4" class="trumbowyg-textarea w-full">{{ old('section4') }}</textarea>
             </div>
 

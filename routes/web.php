@@ -365,3 +365,63 @@ Route::middleware('auth')->get('/export/indicators', function () {
 // Route::get('/sar_reports/{report}/export/pdf', [SarReportController::class, 'export'])
 //     ->name('sar_reports.export.pdf')
 //     ->defaults('type', 'pdf');
+
+use Barryvdh\DomPDF\Facade\Pdf;
+
+Route::get('/test', function () {
+    // Ensure Thai-capable fonts are available to Dompdf
+    try {
+        $pub = public_path('fonts');
+        $dst = storage_path('fonts');
+        if (!is_dir($dst)) @mkdir($dst, 0755, true);
+        if (is_dir($pub)) {
+            foreach (glob($pub . DIRECTORY_SEPARATOR . '*.ttf') as $f) {
+                $t = $dst . DIRECTORY_SEPARATOR . basename($f);
+                if (!file_exists($t)) @copy($f, $t);
+            }
+        }
+        $sar = $dst . DIRECTORY_SEPARATOR . 'Sarabun-Regular.ttf';
+        $sarb = $dst . DIRECTORY_SEPARATOR . 'Sarabun-Bold.ttf';
+        if (!file_exists($sar) || filesize($sar) < 200000 || !file_exists($sarb) || filesize($sarb) < 200000) {
+            $winFonts = getenv('WINDIR') ? getenv('WINDIR') . DIRECTORY_SEPARATOR . 'Fonts' : 'C:\\Windows\\Fonts';
+            $tahoma = $winFonts . DIRECTORY_SEPARATOR . 'tahoma.ttf';
+            $tahomab = $winFonts . DIRECTORY_SEPARATOR . 'tahomabd.ttf';
+            if (@is_file($tahoma) && @is_file($tahomab)) {
+                @copy($tahoma, $sar);
+                @copy($tahomab, $sarb);
+            }
+        }
+    } catch (\Throwable $e) {}
+
+    $pdf = Pdf::loadView('pdf_test')
+        ->setPaper('a4', 'portrait')
+        ->setOptions([
+            'isHtml5ParserEnabled' => true,
+            'isRemoteEnabled' => true,
+            'defaultFont' => 'SarabunLocal',
+            'enableFontSubsetting' => false,
+            'fontDir' => storage_path('fonts'),
+            'fontCache' => storage_path('fonts'),
+            'chroot' => base_path(),
+            'log_output_file' => storage_path('logs/dompdf.log'),
+            'logOutputFile' => storage_path('logs/dompdf.log'),
+        ]);
+
+    // Explicitly register the Sarabun font family with Dompdf's font metrics
+    try {
+        $dompdf = $pdf->getDomPDF();
+        $fm = $dompdf->getFontMetrics();
+        $fm->registerFont('SarabunLocal', [
+            'normal' => storage_path('fonts/Sarabun-Regular.ttf'),
+            'bold'   => storage_path('fonts/Sarabun-Bold.ttf'),
+        ]);
+    } catch (\Throwable $e) {
+        // ignore
+    }
+    return $pdf->stream('thai-test.pdf');
+});
+
+// View raw HTML of the same template to verify encoding independent of Dompdf
+Route::get('/test-html', function () {
+    return view('pdf_test');
+});

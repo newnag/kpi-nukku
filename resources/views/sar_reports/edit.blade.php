@@ -235,10 +235,22 @@
                                                     @php
                                                         $scoreFromLine = null;
                                                         if (
-                                                            preg_match('/([0-9]+(?:\.[0-9]+)?)\s*คะแนน/u', $line, $mm)
+                                                            preg_match(
+                                                                '/\(\s*(?:([0-9]+(?:\.[0-9]+)?)\s*คะแนน|คะแนน\s*([0-9]+(?:\.[0-9]+)?)|([0-9]+(?:\.[0-9]+)?))\s*\)/u',
+                                                                $line,
+                                                                $mm,
+                                                            )
                                                         ) {
-                                                            $scoreFromLine = (float) $mm[1];
+                                                            $scoreFromLine =
+                                                                (float) (array_values(
+                                                                    array_filter([
+                                                                        $mm[1] ?? null,
+                                                                        $mm[2] ?? null,
+                                                                        $mm[3] ?? null,
+                                                                    ]),
+                                                                )[0] ?? null);
                                                         }
+
                                                         $match =
                                                             $score !== null &&
                                                             $scoreFromLine !== null &&
@@ -304,10 +316,15 @@
                             class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                             <i data-lucide="file-spreadsheet" class="w-4 h-4 mr-2"></i> Excel
                         </a>
-                        <a type="button" href="{{ route('sar_reports.export.pdf', $report->id) }}"
+                        {{-- <a type="button" href="{{ route('sar_reports.export.pdf', $report->id) }}"
                             class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                             <i data-lucide="file-type" class="w-4 h-4 mr-2"></i> PDF
+                        </a> --}}
+                        <a href="{{ route('sar_reports.export.pdf', $report->id) }}" target="_blank"
+                            class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                            <i data-lucide="file-text" class="w-4 h-4 mr-2"></i> Preview PDF
                         </a>
+
                     </div>
                 </div>
 
