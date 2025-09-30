@@ -156,12 +156,24 @@
                 @endforelse
             </div>
 
-            <div class="card">
-                <h2 class="card-title">วิธีการคำนวน</h2>
-                <div class="criteria-box">
-                    {!! $indicator->condition ?? '-' !!}
+            @php
+                $condition = $indicator->condition ?? '';
+                // ลบช่องว่างรอบ ๆ
+                $trimmed = trim($condition);
+
+                // เช็คว่ามีแท็ก <img> หรือมีข้อความจริง ๆ หลังจากลบแท็ก HTML
+                $hasImage = preg_match('/<img\s[^>]*src=["\']?([^>"\']+)["\']?/i', $trimmed);
+                $hasText = trim(strip_tags($trimmed)) !== '';
+            @endphp
+
+            @if ($hasImage || $hasText)
+                <div class="card">
+                    <h2 class="card-title">วิธีการคำนวน</h2>
+                    <div class="criteria-box">
+                        {!! $indicator->condition !!}
+                    </div>
                 </div>
-            </div>
+            @endif
 
             @if ($indicator->variables->where('type', 'input')->isNotEmpty())
                 <div class="card">
