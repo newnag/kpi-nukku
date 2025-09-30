@@ -504,21 +504,21 @@
                                 @switch($statusCode)
                                     @case(0)
                                         <span class="tooltip" data-tooltip="รอดำเนินการ">
-                                            <i data-lucide="clock" class="w-5 h-5 text-yellow-500"></i>
+                                            <i data-lucide="clock" class="w-5 h-5 text-red-500"></i>
                                             <span class="sr-only">รอดำเนินการ</span>
                                         </span>
                                     @break
 
                                     @case(1)
                                         <span class="tooltip" data-tooltip="รอดำเนินการ / บันทึกฉบับร่าง">
-                                            <i data-lucide="clock" class="w-5 h-5 text-yellow-500"></i>
+                                            <i data-lucide="clock" class="w-5 h-5 text-red-500"></i>
                                             <span class="sr-only">รอดำเนินการ / บันทึกฉบับร่าง</span>
                                         </span>
                                     @break
 
                                     @case(2)
                                         <span class="tooltip" data-tooltip="รอดำเนินการ / บันทึกฉบับจริง">
-                                            <i data-lucide="clock" class="w-5 h-5 text-yellow-500"></i>
+                                            <i data-lucide="clock" class="w-5 h-5 text-red-500"></i>
                                             <span class="sr-only">รอดำเนินการ / บันทึกฉบับจริง</span>
                                         </span>
                                     @break
@@ -532,7 +532,7 @@
 
                                     @case(4)
                                         <span class="tooltip" data-tooltip="ผลการดำเนินงานยังไม่ครบถ้วนตามเกณฑ์">
-                                            <i data-lucide="alert-triangle" class="w-5 h-5 text-red-500"></i>
+                                            <i data-lucide="alert-triangle" class="w-5 h-5 text-yellow-500"></i>
                                             <span class="sr-only">ผลการดำเนินงานยังไม่ครบถ้วนตามเกณฑ์</span>
                                         </span>
                                     @break
