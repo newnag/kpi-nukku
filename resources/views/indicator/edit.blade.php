@@ -41,7 +41,6 @@
     $departments = $info['departments'] ?? [];
     $usersForAssign = $info['usersForAssign'] ?? [];
 
-
     $depSelected = collect($ind['departments'] ?? [])
         ->pluck('id')
         ->map(fn($v) => (string) $v)
@@ -53,13 +52,7 @@
         ->values()
         ->all();
 
-
-    $criterias = collect($ind['criterias'])
-        ->sortBy('sequence')
-        ->values()
-        ->all();
-
-
+    $criterias = collect($ind['criterias'])->sortBy('sequence')->values()->all();
 
     $vf = $ind['variable_formula'] ?? [];
     $vfInitial = [
@@ -68,20 +61,18 @@
         'formula_id' => !empty($vf['formulas']) ? $vf['formulas'][0]['id'] ?? null : null,
     ];
 
-    $checklist = collect($ind['checklistItems'])?? [];
-    
-    function determineScoring($vfInitial, $checklist) {
+    $checklist = collect($ind['checklistItems']) ?? [];
 
-        if($checklist->count() > 0) {
+    function determineScoring($vfInitial, $checklist)
+    {
+        if ($checklist->count() > 0) {
             return 'selected';
-
         } else {
             return 'custom';
         }
     }
 
     $select_scoringMethod = determineScoring($vfInitial, $checklist);
-
 
 @endphp
 
@@ -119,7 +110,11 @@
                                 <x-select name="category_id" :options="$categories" :value="$category" label="ด้านตัวบ่งชี้"
                                     placeholder="กรุณาเลือกด้าน" searchable required />
 
-                                <x-select name="type" :options="['คุณภาพ' => 'คุณภาพ', 'ปริมาณ' => 'ปริมาณ' , 'คุณภาพ/ปริมาณ' => 'คุณภาพ/ปริมาณ' ]" :value="$rawType" label="ประเภทตัวบ่งชี้"
+                                <x-select name="type" :options="[
+                                    'คุณภาพ' => 'คุณภาพ',
+                                    'ปริมาณ' => 'ปริมาณ',
+                                    'คุณภาพ/ปริมาณ' => 'คุณภาพ/ปริมาณ',
+                                ]" :value="$rawType" label="ประเภทตัวบ่งชี้"
                                     placeholder="กรุณาเลือกประเภท" required />
 
                                 <x-input name="deadline" type="date" :value="$deadline" label="วันสิ้นสุดการประเมิน"
@@ -175,26 +170,34 @@
                         <x-card number="4" title="เกณฑ์การพิจารณา" class="space-y-6">
                             <x-card-box title="รายการเกณฑ์การพิจารณา" icon="📋">
                                 <div x-data="{
-                                    items: @js(count($criterias) > 0 ? array_map(function($criteria, $index) {
-                                        return [
-                                            'id' => 'criteria_' . ($criteria['id'] ?? 'new_' . ($index + 1)),
-                                            'dbId' => $criteria['id'] ?? null,
-                                            'name' => $criteria['name'] ?? '',
-                                            'description' => $criteria['description'] ?? '',
-                                            'sequence' => $criteria['sequence'] ?? ($index + 1),
-                                            'data' => $criteria
-                                        ];
-                                    }, $criterias, array_keys($criterias)) : [['id' => 'new_1', 'dbId' => null, 'name' => '', 'description' => '', 'sequence' => 1, 'data' => null]]),
+                                    items: @js(
+    count($criterias) > 0
+        ? array_map(
+            function ($criteria, $index) {
+                return [
+                    'id' => 'criteria_' . ($criteria['id'] ?? 'new_' . ($index + 1)),
+                    'dbId' => $criteria['id'] ?? null,
+                    'name' => $criteria['name'] ?? '',
+                    'description' => $criteria['description'] ?? '',
+                    'sequence' => $criteria['sequence'] ?? $index + 1,
+                    'data' => $criteria,
+                ];
+            },
+            $criterias,
+            array_keys($criterias),
+        )
+        : [['id' => 'new_1', 'dbId' => null, 'name' => '', 'description' => '', 'sequence' => 1, 'data' => null]],
+),
                                     name: [],
                                     add() {
                                         const newIndex = this.items.length + 1;
-                                        this.items = [...this.items, { 
-                                            id: 'new_' + Date.now(), 
-                                            dbId: null, 
-                                            name: '', 
-                                            description: '', 
+                                        this.items = [...this.items, {
+                                            id: 'new_' + Date.now(),
+                                            dbId: null,
+                                            name: '',
+                                            description: '',
                                             sequence: newIndex,
-                                            data: null 
+                                            data: null
                                         }];
                                         this.$nextTick(() => this.broadcast())
                                     },
@@ -202,13 +205,13 @@
                                         const a = [...this.items];
                                         a.splice(i, 1);
                                         // Ensure at least one item exists
-                                        this.items = a.length ? a : [{ 
-                                            id: 'new_' + Date.now(), 
-                                            dbId: null, 
-                                            name: '', 
-                                            description: '', 
+                                        this.items = a.length ? a : [{
+                                            id: 'new_' + Date.now(),
+                                            dbId: null,
+                                            name: '',
+                                            description: '',
                                             sequence: 1,
-                                            data: null 
+                                            data: null
                                         }];
                                         // Update sequences after removal
                                         this.items.forEach((item, index) => {
@@ -275,8 +278,8 @@
                                 "
                                     class="space-y-4">
                                     <template x-for="(it, i) in items" :key="it.id">
-                                        <div x-data="{ 
-                                            sequence: i + 1, 
+                                        <div x-data="{
+                                            sequence: i + 1,
                                             prefix: 'criteria[' + i + ']',
                                             criteriaData: {
                                                 id: it.dbId,
@@ -284,7 +287,8 @@
                                                 description: it.description,
                                                 sequence: it.sequence
                                             }
-                                        }" x-effect="sequence = i + 1; prefix = 'criteria[' + i + ']'; it.sequence = sequence;">
+                                        }"
+                                            x-effect="sequence = i + 1; prefix = 'criteria[' + i + ']'; it.sequence = sequence;">
                                             <x-card-criteria :show-controls="true" />
                                         </div>
                                     </template>
@@ -306,11 +310,37 @@
 
                         {{-- Card 5: Scoring --}}
                         <x-card number="5" title="เกณฑ์การให้คะแนน" class="space-y-6">
-                            <x-card-box title="เกณฑ์ให้คะแนนและคะแนนเต็ม" icon="📋">
+                            <x-card-box icon="📋">
+                                <x-slot name="title">
+                                    <div class="flex items-center space-x-2 font-bold">
+                                        <span>เกณฑ์ให้คะแนนและคะแนนเต็ม</span>
+                                        <div class="group relative">
+                                            <i data-lucide="info" class="w-4 h-4 text-blue-500 cursor-pointer"></i>
+                                            <div
+                                                class="absolute hidden group-hover:block bg-gray-800 text-white text-xs rounded px-3 py-2 
+           bottom-full mb-2 left-1/2 -translate-x-1/2 whitespace-normal z-10 w-72 shadow-lg leading-relaxed">
+                                                <p class="font-semibold mb-1">
+                                                    หมายเหตุ: วิธีกรอกเกณฑ์การให้คะแนน จะต้องมีวงเล็บคะแนน
+                                                </p>
+                                                <p class="mb-1">ตัวอย่างการกรอก:</p>
+                                                <ul class="list-disc list-inside space-y-1">
+                                                    <li>ได้คะแนนเท่ากับ (10)</li>
+                                                    <li>ได้คะแนนเท่ากับ (10 คะแนน)</li>
+                                                    <li>ได้คะแนนเท่ากับ (คะแนน 10)</li>
+                                                    <li>ได้คะแนนเท่ากับ (คะแนน10)</li>
+                                                </ul>
+                                            </div>
+
+
+                                        </div>
+                                    </div>
+                                </x-slot>
+
                                 <div>
                                     <x-richtext name="comment" :value="$comment" placeholder="คำอธิบายเกณฑ์ให้คะแนน" />
                                     <label class="block">
-                                        <span class="text-sm font-medium text-slate-700">คะแนนเต็มทั้งหมดของตัวบ่งชี้</span>
+                                        <span
+                                            class="text-sm font-medium text-slate-700">คะแนนเต็มทั้งหมดของตัวบ่งชี้</span>
                                         <input type="text" :value="score_acc" readonly
                                             class="p-2 mt-1 w-full bg-gray-100 rounded-xl border border-slate-300 text-sm md:text-base cursor-not-allowed"
                                             placeholder="คะแนนจะปรากฏที่นี่">
@@ -344,47 +374,63 @@
                                 <template x-if="scoringMethod === 'selected'">
                                     <x-card-box title="เกณฑ์ให้คะแนนแบบหลายตัวเลือก-คะแนนตามข้อที่เลือก" icon="📋">
                                         <div x-data="{
-                                            items: @js(count($checklist) > 0 ? array_map(function($item, $index) {
-                                                return [
-                                                    'id' => 'checklist_' . ($item['id'] ?? 'new_' . ($index + 1)),
-                                                    'dbId' => $item['id'] ?? null,
-                                                    'required_items' => $item['required_items'] ?? [],
-                                                    'score' => $item['score'] ?? 0,
-                                                    'sequence' => $item['sequence'] ?? null,
-                                                    'data' => $item
-                                                ];
-                                            }, $checklist->sortBy(function($item) {
-                                                return $item['sequence'] ?? -1; // null sequence comes first
-                                            })->values()->all(), array_keys($checklist->sortBy(function($item) {
-                                                return $item['sequence'] ?? -1;
-                                            })->values()->all())) : [['id' => 'new_1', 'dbId' => null, 'required_items' => [], 'score' => 0, 'sequence' => null, 'data' => null]]),
-                                            add() { 
-                                                this.items = [...this.items, { 
-                                                    id: 'new_' + Date.now(), 
-                                                    dbId: null, 
-                                                    required_items: [], 
-                                                    score: 0, 
+                                            items: @js(
+    count($checklist) > 0
+        ? array_map(
+            function ($item, $index) {
+                return [
+                    'id' => 'checklist_' . ($item['id'] ?? 'new_' . ($index + 1)),
+                    'dbId' => $item['id'] ?? null,
+                    'required_items' => $item['required_items'] ?? [],
+                    'score' => $item['score'] ?? 0,
+                    'sequence' => $item['sequence'] ?? null,
+                    'data' => $item,
+                ];
+            },
+            $checklist
+                ->sortBy(function ($item) {
+                    return $item['sequence'] ?? -1; // null sequence comes first
+                })
+                ->values()
+                ->all(),
+            array_keys(
+                $checklist
+                    ->sortBy(function ($item) {
+                        return $item['sequence'] ?? -1;
+                    })
+                    ->values()
+                    ->all(),
+            ),
+        )
+        : [['id' => 'new_1', 'dbId' => null, 'required_items' => [], 'score' => 0, 'sequence' => null, 'data' => null]],
+),
+                                            add() {
+                                                this.items = [...this.items, {
+                                                    id: 'new_' + Date.now(),
+                                                    dbId: null,
+                                                    required_items: [],
+                                                    score: 0,
                                                     sequence: this.items.length + 1,
-                                                    data: null 
-                                                }] 
+                                                    data: null
+                                                }]
                                             },
                                             remove(i) {
                                                 const a = [...this.items];
                                                 a.splice(i, 1);
-                                                this.items = a.length ? a : [{ 
-                                                    id: 'new_' + Date.now(), 
-                                                    dbId: null, 
-                                                    required_items: [], 
-                                                    score: 0, 
+                                                this.items = a.length ? a : [{
+                                                    id: 'new_' + Date.now(),
+                                                    dbId: null,
+                                                    required_items: [],
+                                                    score: 0,
                                                     sequence: 1,
-                                                    data: null 
+                                                    data: null
                                                 }];
                                             }
                                         }" @criteria-remove="remove($event.detail.index - 1)"
                                             class="space-y-4">
                                             <template x-for="(it, i) in items" :key="it.id">
-                                                <div x-data="{ 
-                                                    sequence: i + 1, 
+                                                <div x-data="{
+                                                    sequence: i + 1,
                                                     prefix: 'multiSelected[' + i + ']',
                                                     checklistData: {
                                                         id: it.dbId,
@@ -392,7 +438,8 @@
                                                         score: it.score,
                                                         sequence: it.sequence
                                                     }
-                                                }" x-effect="sequence = i + 1; prefix = 'multiSelected[' + i + ']';">
+                                                }"
+                                                    x-effect="sequence = i + 1; prefix = 'multiSelected[' + i + ']';">
                                                     <x-multichoice-score-selected />
                                                 </div>
                                             </template>
@@ -459,9 +506,9 @@
 @endpush
 
 @push('styles')
-<style>
-    .max-w-1200px {
-        max-width: 1200px;
-    }
-</style>
+    <style>
+        .max-w-1200px {
+            max-width: 1200px;
+        }
+    </style>
 @endpush
