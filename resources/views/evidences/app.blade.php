@@ -262,7 +262,7 @@
 
     <!-- ตารางเอกสารและหลักฐาน -->
     <div class="border border-gray-200 rounded-lg overflow-x-auto ">
-        <table id="evidenceTable" class="w-full min-w-full">
+        <table id="evidenceTable" class="w-full min-w-full ">
             <thead>
                 <tr>
                     <th class="w-fit text-xs sm:text-sm font-medium text-gray-900 cursor-pointer select-none hidden sm:table-cell"
@@ -295,7 +295,7 @@
                     </th> <!-- 6 -->
                     <th class="w-fit text-xs sm:text-sm font-medium text-gray-900 cursor-pointer select-none"
                         title="จัดการ">
-                        <div class="flex items-center justify-center">จัดการ</div>
+                        <div class="flex items-center justify-center max-w-40">จัดการ</div>
                     </th> <!-- 7 -->
 
                     <!-- ✅ hidden columns -->
@@ -312,15 +312,16 @@
                         $indicator = $evidence->criteria->indicator ?? null;
                     @endphp
                     <tr>
-                        <td class="w-fit text-center text-xs sm:text-sm text-gray-700 hidden sm:table-cell">{{ $index + 1 }}
+                        <td class="w-fit text-center text-xs sm:text-sm text-gray-700 hidden sm:table-cell">
+                            {{ $index + 1 }}
                         </td>
-                        <td class="text-xs sm:text-sm align-top max-w-52 truncate">
+                        <td class="text-xs sm:text-sm align-top w-1/4">
                             @php $previewUrl = evidence_preview_url($evidence); @endphp
                             @php $isOffice = in_array($evidence->type, ['doc','docx','xls','xlsx','ppt','pptx']); @endphp
 
                             @if ($previewUrl && !$isOffice)
                                 <a href="{{ $previewUrl }}" target="_blank" rel="noopener noreferrer"
-                                    class="block w-fit text-left ">
+                                    class="block max-w-56 text-left truncate">
                                     <div class="file-info flex space-x-2 items-start text-left h-auto">
                                         <div class="file-icon w-fit h-fit">
                                             @if ($evidence->type === 'pdf')
@@ -427,45 +428,35 @@
                             $rowClass = $is_assigned ? 'assigned-row' : 'unassigned-row';
                         @endphp
 
-                        <td data-search="{{ optional($indicator)->code ?? '' }}" class="relative group  ">
-
+                        <td data-search="{{ optional($indicator)->code ?? '' }}" class="relative group w-1/4">
                             <span onclick="window.location='{{ $rowUrl }}';"
-                                class="text-xs text-balance sm:text-sm text-gray-700 hover:text-red-600 cursor-pointer">{{ $indicator->name ?? '-' }}</span>
-
-                            <!-- Tooltip -->
-                            <div
-                                class="pointer-events-none absolute bottom-full left-1/5 -translate-x-1/2 mb-2
-         bg-gray-800 text-white text-xs rounded px-2 py-1 shadow-lg whitespace-nowrap z-500000 
-         invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-opacity duration-150">
-                                กำลังไปหน้าการกรอกคะแนนตัวชี้วัด {{ $indicator->name ?? '-' }}
-                            </div>
-
-
+                                title="ไปยังตัวบ่งชี้{{ $indicator->name }}"
+                                class="text-xs text-pretty sm:text-sm text-gray-700 hover:text-red-600 cursor-pointer">{{ $indicator->name ?? '-' }}</span>
                         </td>
 
 
                         <td class="text-center w-fit">
-                            <div class="evidence-actions flex justify-center items-center w-fit">
+                            {{-- <div class="evidence-actions"> --}}
                                 @if ($evidence->type === 'url' && !empty($evidence->path['urls'][0]))
-                                    <button type="button" 
-                                        class="inline-flex items-center justify-center gap-1 px-2 py-1.5 sm:px-3 sm:py-2 text-xs sm:text-sm font-medium text-purple-700 bg-purple-100 border border-purple-200 rounded-md hover:bg-purple-200 hover:border-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-1 transition-all duration-200 min-w-[70px] sm:min-w-[90px]"
+                                    <button type="button"
+                                        class="inline-flex items-center justify-center gap-1 px-2 py-1.5 sm:px-3 sm:py-2 text-xs sm:text-sm font-medium text-purple-700 bg-purple-100 border border-purple-200 rounded-md hover:bg-purple-200 hover:border-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-1 transition-all duration-200 "
                                         onclick="window.open('{{ $evidence->path['urls'][0] }}', '_blank')"
                                         title="เปิดลิงก์ในแท็บใหม่">
                                         <i data-lucide="external-link" class="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0"></i>
-                                        <span class="hidden xs:inline sm:inline whitespace-nowrap">เปิดลิงก์</span>
-                                        <span class="xs:hidden sm:hidden">เปิด</span>
+                                        <span class="hidden sm:inline whitespace-nowrap">เปิดลิงก์</span>
+                                        <span class="inline sm:hidden">เปิด</span>
                                     </button>
                                 @else
-                                    <button type="button" 
-                                        class="inline-flex items-center justify-center gap-1 px-2 py-1.5 sm:px-3 sm:py-2 text-xs sm:text-sm font-medium text-blue-700 bg-blue-100 border border-blue-200 rounded-md hover:bg-blue-200 hover:border-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition-all duration-200 min-w-[70px] sm:min-w-[90px]"
+                                    <button type="button"
+                                        class="inline-flex items-center justify-center gap-1 px-2 py-1.5 sm:px-3 sm:py-2 text-xs sm:text-sm font-medium text-blue-700 bg-blue-100 border border-blue-200 rounded-md hover:bg-blue-200 hover:border-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition-all duration-200"
                                         onclick="window.location.href='{{ route('evidences.download', $evidence->id) }}'"
                                         title="ดาวน์โหลดไฟล์">
                                         <i data-lucide="download" class="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0"></i>
                                         <span class="hidden sm:inline whitespace-nowrap">ดาวน์โหลด</span>
-                                        <span class="inline sm:hidden">DL</span>
+                                        <span class="inline sm:hidden">โหลด</span>
                                     </button>
                                 @endif
-                            </div>
+                            {{-- </div> --}}
                         </td>
 
                         <!-- ✅ hidden values for filtering -->
@@ -551,8 +542,9 @@
                     emptyTable: "ไม่พบข้อมูล",
                     zeroRecords: "ไม่พบข้อมูลที่ตรงกับการค้นหา"
                 },
-                    // Adjust the DOM structure for Tailwind CSS compatibility (removed 'f' to disable built-in search)
-                    dom: 't' + '<"flex flex-col md:flex-row justify-between items-center p-3"<"flex-1"i><"flex"p>>',
+                // Adjust the DOM structure for Tailwind CSS compatibility (removed 'f' to disable built-in search)
+                dom: 't' +
+                    '<"flex flex-col md:flex-row justify-between items-center p-3"<"flex-1"i><"flex"p>>',
             });
             table.on('draw', function() {
                 if (window.lucide?.createIcons) lucide.createIcons();
@@ -760,6 +752,21 @@
             border-bottom: 1px solid #e5e7eb;
             font-weight: 600;
         }
+
+        /* Force center alignment for specific headers */
+        table.dataTable thead th.text-center {
+            text-align: center !important;
+        }
+
+        /* Override DataTables default alignment */
+        /* #evidenceTable thead th {
+            text-align: center !important;
+        } */
+
+        /* Keep filename column left-aligned */
+        /* #evidenceTable thead th:nth-child(2) {
+            text-align: left !important;
+        } */
 
         .dataTables_wrapper .dataTables_info {
             color: #4b5563;
@@ -1041,13 +1048,14 @@
         }
 
         /* ================ Action Buttons ================ */
-        .evidence-actions {
+        /* .evidence-actions {
             display: flex;
             gap: 6px;
             flex-wrap: wrap;
             justify-content: center;
             align-items: center;
-        }
+
+        } */
 
         .btn-download,
         .btn-link,
@@ -1115,32 +1123,6 @@
             background-color: #fecaca;
             border-color: #ef4444;
             transform: translateY(-1px);
-        }
-
-        /* Custom breakpoint for extra small screens */
-        @media (max-width: 475px) {
-            .xs\:hidden {
-                display: none !important;
-            }
-        }
-
-        @media (min-width: 476px) {
-            .xs\:inline {
-                display: inline !important;
-            }
-        }
-
-        /* Custom breakpoint for extra small screens */
-        @media (max-width: 475px) {
-            .xs\:hidden {
-                display: none !important;
-            }
-        }
-
-        @media (min-width: 476px) {
-            .xs\:inline {
-                display: inline !important;
-            }
         }
 
         /* Status badges */
@@ -1263,12 +1245,6 @@
                 width: 100%;
             }
 
-            .evidence-actions {
-                flex-direction: row;
-                gap: 4px;
-                justify-content: center;
-            }
-
             .btn-download,
             .btn-link,
             .btn-edit,
@@ -1389,6 +1365,8 @@
             .action-buttons-container button {
                 min-width: 36px;
             }
+
+
         }
 
         /* 1024px–1279px */
