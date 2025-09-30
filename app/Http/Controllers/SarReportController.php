@@ -26,16 +26,16 @@ class SarReportController extends Controller
         $years = SarReport::selectRaw('DISTINCT year')->orderBy('year', 'desc')->pluck('year');
         return view('sar_reports.index', compact('reports', 'years'));
     }
-    public function part3()
-    {
-        $standards = Indicator::with([
-            'category.standard',   // ดึง category + standard
-            'criterias.evidences'  // ดึง criteria + evidences
-        ])->get()
-            ->groupBy(fn($ind) => $ind->category->standard->name ?? 'ไม่ทราบมาตรฐาน');
+    // public function part3()
+    // {
+    //     $standards = Indicator::with([
+    //         'category.standard',   // ดึง category + standard
+    //         'criterias.evidences'  // ดึง criteria + evidences
+    //     ])->get()
+    //         ->groupBy(fn($ind) => $ind->category->standard->name ?? 'ไม่ทราบมาตรฐาน');
 
-        return view('sar_reports.part3', compact('standards'));
-    }
+    //     return view('sar_reports.part3', compact('standards'));
+    // }
     public function create(Request $request)
     {
         $year = $request->input('year');
@@ -426,14 +426,58 @@ class SarReportController extends Controller
 
     public function export(SarReport $report, $type)
     {
+        // Make sure Thai fonts are available for Dompdf
+        $this->ensurePdfFontsInstalled();
         // โหลดความสัมพันธ์ที่จำเป็น
         $report->load([
             'indicator.criterias.evidences',
             'indicator.category.standard',
         ]);
 
+        // Sanitize inline styles that force non-Thai fonts from WYSIWYG/Word paste
+   $stripFonts = function (?string $html) {
+    if (!$html) return $html;
+    // Remove <font> tags
+    $html = preg_replace('/<\/?font[^>]*>/i', '', $html ?? '');
+    // Remove deprecated attributes
+    $html = preg_replace('/\sface=(["\']).*?\1/i', '', $html);
+    $html = preg_replace('/\scolor=(["\']).*?\1/i', '', $html);
+    $html = preg_replace('/\ssize=(["\']).*?\1/i', '', $html);
+    // Remove font-family / font / mso- properties from style attributes
+    $html = preg_replace_callback('/style=(["\'])(.*?)\1/i', function ($m) {
+        $style = $m[2];
+        $style = preg_replace('/\s*(font-family|font|letter-spacing|word-spacing|mso-[^:]+)\s*:[^;]*;?/i', '', $style);
+        $style = trim(trim($style), ';');
+        return $style !== '' ? 'style="' . $style . '"' : '';
+    }, $html);
+    return $html;
+};
+
+
+        // Clone object for rendering and scrub HTML fields
+        $reportToRender = clone $report;
+        $reportToRender->section1 = $stripFonts($reportToRender->section1);
+        $reportToRender->section2 = $stripFonts($reportToRender->section2);
+        $reportToRender->section4 = $stripFonts($reportToRender->section4);
+        if ($reportToRender->indicator && $reportToRender->indicator->criterias) {
+            foreach ($reportToRender->indicator->criterias as $cri) {
+                $cri->report = $stripFonts($cri->report);
+            }
+        }
+
         if ($type === 'pdf') {
-            $pdf = Pdf::loadView('sar_reports.export_pdf', ['report' => $report]);
+            $pdf = Pdf::loadView('sar_reports.export_pdf', ['report' => $reportToRender])
+                ->setPaper('a4', 'portrait')
+                ->setOptions([
+                    'isHtml5ParserEnabled' => true,
+                    'isRemoteEnabled' => true,
+                    'defaultFont' => 'SarabunLocal',
+                    // Avoid Dompdf subsetting issues on Windows paths
+                    'enableFontSubsetting' => false,
+                    'fontDir' => storage_path('fonts'),
+                    'fontCache' => storage_path('fonts'),
+                    'chroot' => base_path(),
+                ]);
             return $pdf->download("sar-report-{$report->year}.pdf");
         }
 
@@ -677,158 +721,48 @@ class SarReportController extends Controller
         return back()->with('error', 'ไม่รองรับรูปแบบไฟล์นี้');
     }
 
+    /**
+     * Ensure Dompdf can find Thai fonts. Copies any .ttf from public/fonts to storage/fonts.
+     */
+    protected function ensurePdfFontsInstalled(): void
+    {
+        try {
+            $source = public_path('fonts');
+            $destination = storage_path('fonts');
 
-    // public function export(SarReport $report, $type)
-    // {
-    //     // โหลดความสัมพันธ์ที่จำเป็น
-    //     $report->load([
-    //         'indicator.criterias.evidences',
-    //         'indicator.category.standard',
-    //     ]);
+            if (!is_dir($source)) {
+                return; // nothing to copy; view may still embed fonts via @font-face if paths exist
+            }
 
-    //     if ($type === 'pdf') {
-    //         $pdf = Pdf::loadView('sar_reports.export_pdf', ['report' => $report]);
-    //         return $pdf->download("sar-report-{$report->year}.pdf");
-    //     }
+            if (!is_dir($destination)) {
+                @mkdir($destination, 0755, true);
+            }
 
-    //     if ($type === 'excel') {
-    //         $spreadsheet = new Spreadsheet();
-    //         $sheet = $spreadsheet->getActiveSheet();
-    //         $sheet->setCellValue('A1', 'SAR Report ' . $report->year);
-    //         $sheet->setCellValue('A2', strip_tags($report->section1));
-    //         $writer = new Xlsx($spreadsheet);
+            // Copy missing TTFs
+            foreach (glob($source . DIRECTORY_SEPARATOR . '*.ttf') as $file) {
+                $target = $destination . DIRECTORY_SEPARATOR . basename($file);
+                if (!file_exists($target)) {
+                    @copy($file, $target);
+                }
+            }
 
-    //         $filename = "sar-report-{$report->year}.xlsx";
-    //         return response()->streamDownload(function () use ($writer) {
-    //             $writer->save('php://output');
-    //         }, $filename);
-    //     }
-
-
-    //     if ($type === 'docx') {
-    //         $phpWord = new PhpWord();
-    //         $section = $phpWord->addSection();
-
-    //         $section->addTitle("รายงานการประเมินตนเอง (SAR) ปี {$report->year}", 1);
-
-    //         // ===== ส่วนที่ 1
-    //         $section->addTitle("ส่วนที่ 1: ข้อมูลทั่วไปคณะพยาบาลศาสตร์", 2);
-    //         if (!empty($report->section1)) {
-    //             Html::addHtml($section, $report->section1, false, false);
-    //         }
-
-
-    //         // ===== ส่วนที่ 2
-    //         $section->addTitle("ส่วนที่ 2: ข้อมูลด้านคุณภาพ", 2);
-    //         Html::addHtml($section, $report->section2 ?? '-', false, false);
-
-    //         // ===== ส่วนที่ 3
-    //         $section->addTitle("ส่วนที่ 3: การประเมินตนเองตามตัวบ่งชี้", 2);
-
-    //         $indicators = Indicator::with([
-    //             'category.standard',
-    //             'criterias' => fn($q) => $q->orderBy('sequence'),
-    //             'criterias.evidences'
-    //         ])
-    //             ->where('year', $report->year)
-    //             ->join('categories', 'categories.id', '=', 'indicators.categorie_id')
-    //             ->join('standards', 'standards.id', '=', 'categories.standard_id')
-    //             ->orderBy('standards.id')   // ✅ เรียงตาม id ของมาตรฐาน
-    //             ->orderBy('categories.id')  // ✅ เรียงตาม id ของด้าน
-    //             ->orderBy('indicators.id')  // ✅ เรียงตาม id ของตัวบ่งชี้
-    //             ->select('indicators.*')
-    //             ->get()
-    //             ->groupBy(fn($ind) => optional(optional($ind->category)->standard)->name ?? 'ไม่ระบุมาตรฐาน');
-
-    //         foreach ($indicators as $stdName => $indsByStd) {
-    //             $section->addTitle("มาตรฐาน: {$stdName}", 3);
-
-    //             foreach ($indsByStd->groupBy(fn($i) => optional($i->category)->name ?? 'ไม่ระบุด้าน') as $catName => $inds) {
-    //                 $section->addTitle("ด้าน: {$catName}", 4);
-
-    //                 foreach ($inds as $ind) {
-    //                     $section->addText("[{$ind->code}] {$ind->name}", ['bold' => true]);
-
-    //                     // ===== ตารางเกณฑ์มาตรฐาน =====
-    //                     $table = $section->addTable(['borderSize' => 6, 'borderColor' => '000000']);
-    //                     $table->addRow();
-    //                     $table->addCell(500)->addText("ข้อ", ['bold' => true]);
-    //                     $table->addCell(3000)->addText("เกณฑ์มาตรฐาน", ['bold' => true]);
-    //                     $table->addCell(1500)->addText("ผลการดำเนินงาน", ['bold' => true]);
-    //                     $table->addCell(2500)->addText("รายงานผล", ['bold' => true]);
-    //                     $table->addCell(2000)->addText("เอกสารหลักฐาน", ['bold' => true]);
-
-    //                     foreach ($ind->criterias as $i => $cri) {
-    //                         $table->addRow();
-    //                         $table->addCell(500)->addText((string)($i + 1));
-    //                         $table->addCell(3000)->addText($cri->name);
-    //                         $table->addCell(1500)->addText($cri->status ? '✓' : '-');
-
-    //                         $cell = $table->addCell(2500);
-    //                         Html::addHtml($cell, $cri->report ?? '-', false, false);
-
-    //                         $evList = $cri->evidences->pluck('name')->implode(", ");
-    //                         $table->addCell(2000)->addText($evList ?: '-');
-    //                     }
-
-    //                     // ===== ตารางเกณฑ์การให้คะแนน =====
-
-    //                     //  Extract lines จาก comment
-    //                     $lines = [];
-    //                     if (!empty($ind->comment)) {
-    //                         $plain = preg_replace('/<\/(p|div|li|br)>/i', "\n", $ind->comment);
-    //                         $plain = strip_tags($plain);
-    //                         $plain = html_entity_decode($plain, ENT_QUOTES, 'UTF-8');
-    //                         $lines = preg_split('/\r\n|\r|\n/', $plain);
-    //                         $lines = array_filter(array_map('trim', $lines));
-    //                     }
-    //                     $score = $ind->self_score ?? ($ind->score_acc ?? null);
-
-    //                     $scoreTable = $section->addTable(['borderSize' => 6, 'borderColor' => '000000']);
-    //                     $scoreTable->addRow();
-    //                     $scoreTable->addCell(6000)->addText("เกณฑ์การให้คะแนน", ['bold' => true]);
-    //                     $scoreTable->addCell(1500)->addText("คะแนน", ['bold' => true]);
-    //                     $scoreTable->addCell(2000)->addText("การประเมินตนเอง", ['bold' => true]);
-
-    //                     if (!empty($lines)) {
-    //                         foreach ($lines as $line) {
-    //                             $scoreFromLine = null;
-    //                             if (preg_match('/([0-9]+(?:\.[0-9]+)?)\s*คะแนน/u', $line, $mm)) {
-    //                                 $scoreFromLine = (float) $mm[1];
-    //                             }
-    //                             $match = $score !== null && $scoreFromLine !== null && abs($scoreFromLine - (float) $score) < 0.001;
-
-    //                             $scoreTable->addRow();
-    //                             $scoreTable->addCell(6000)->addText($line);
-    //                             $scoreTable->addCell(1500)->addText($scoreFromLine !== null ? $scoreFromLine . " คะแนน" : "........ คะแนน");
-    //                             $scoreTable->addCell(2000)->addText($match ? "✓" : "");
-    //                         }
-    //                     } else {
-    //                         $scoreTable->addRow();
-    //                         $scoreTable->addCell(6000)->addText("............................");
-    //                         $scoreTable->addCell(1500)->addText("........ คะแนน");
-    //                         $scoreTable->addCell(2000)->addText("");
-    //                     }
-    //                 }
-    //             }
-    //         }
-
-    //         // ===== ส่วนที่ 4
-    //         $section->addTitle("ส่วนที่ 4: อื่นๆ", 2);
-    //         Html::addHtml($section, $report->section4 ?? '-', false, false);
-
-    //         $filename = "sar-report-{$report->year}.docx";
-    //         $writer = IOFactory::createWriter($phpWord, 'Word2007');
-
-    //         return response()->streamDownload(function () use ($writer) {
-    //             $writer->save("php://output");
-    //         }, $filename);
-    //     }
-
-
-    //     return back()->with('error', 'ไม่รองรับรูปแบบไฟล์นี้');
-    // }
-
+            // Fallback: if bundled Thai fonts look suspiciously small, copy Windows fonts as a substitute
+            $sarabunReg = $destination . DIRECTORY_SEPARATOR . 'Sarabun-Regular.ttf';
+            $sarabunBold = $destination . DIRECTORY_SEPARATOR . 'Sarabun-Bold.ttf';
+            $tooSmall = function ($p) { return !file_exists($p) || filesize($p) < 200000; };
+            if ($tooSmall($sarabunReg) || $tooSmall($sarabunBold)) {
+                $winFonts = getenv('WINDIR') ? getenv('WINDIR') . DIRECTORY_SEPARATOR . 'Fonts' : 'C:\\Windows\\Fonts';
+                $tahomaReg = $winFonts . DIRECTORY_SEPARATOR . 'tahoma.ttf';
+                $tahomaBold = $winFonts . DIRECTORY_SEPARATOR . 'tahomabd.ttf';
+                if (@is_file($tahomaReg) && @is_file($tahomaBold)) {
+                    @copy($tahomaReg, $sarabunReg);
+                    @copy($tahomaBold, $sarabunBold);
+                }
+            }
+        } catch (\Throwable $e) {
+            // Non-fatal: PDF generation may still work if fonts already cached
+        }
+    }
 
 
 }
