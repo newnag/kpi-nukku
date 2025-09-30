@@ -304,9 +304,14 @@
                 <textarea name="section4" id="section4" class="trumbowyg-textarea w-full">{{ old('section4') }}</textarea>
             </div>
 
-            <div class="flex justify-end">
-                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md shadow">
-                    💾 บันทึก
+            <div class="flex justify-end gap-3">
+                <a href="{{ route('sar_reports.index') }}"
+                   class="bg-white text-blue-600 border border-blue-600 px-6 py-2 rounded-md shadow inline-flex items-center hover:bg-blue-50">
+                    <i data-lucide="arrow-left" class="w-4 h-4 mr-2"></i> กลับ
+                </a>
+                <button type="submit"
+                        class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md shadow inline-flex items-center">
+                    <i data-lucide="save" class="w-4 h-4 mr-2"></i> บันทึก
                 </button>
             </div>
         </form>

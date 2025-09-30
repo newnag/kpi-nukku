@@ -24,18 +24,24 @@ class SarReportController extends Controller
     {
         $reports = SarReport::with(['standard', 'indicator', 'criteria'])->paginate(10);
 
-        // Prefer available years from existing SAR reports; if none, fall back to Indicator years
-        $years = SarReport::selectRaw('DISTINCT year')
+        // Collect all distinct years from both SAR reports and Indicators
+        $sarYears = SarReport::whereNotNull('year')
+            ->selectRaw('DISTINCT year')
             ->orderBy('year', 'desc')
-            ->pluck('year')
-            ->filter();
+            ->pluck('year');
 
-        if ($years->isEmpty()) {
-            $years = Indicator::whereNotNull('year')
-                ->selectRaw('DISTINCT year')
-                ->orderBy('year', 'desc')
-                ->pluck('year');
-        }
+        $indicatorYears = Indicator::whereNotNull('year')
+            ->selectRaw('DISTINCT year')
+            ->orderBy('year', 'desc')
+            ->pluck('year');
+
+        // Merge, unique and sort desc so the modal shows every year available in DB
+        $years = $sarYears
+            ->merge($indicatorYears)
+            ->filter()
+            ->unique()
+            ->sortDesc()
+            ->values();
 
         return view('sar_reports.index', compact('reports', 'years'));
     }
@@ -478,93 +484,52 @@ class SarReportController extends Controller
             }
         }
 
-        // if ($type === 'pdf') {
-        //     // For PDF, load all indicators for the report year (like DOCX path)
-        //     $allIndicators = Indicator::with([
-        //         'category.standard',
-        //         'criterias' => fn($q) => $q->orderBy('sequence'),
-        //         'criterias.evidences',
-        //     ])
-        //         ->where('year', $report->year)
-        //         ->join('categories', 'categories.id', '=', 'indicators.categorie_id')
-        //         ->join('standards', 'standards.id', '=', 'categories.standard_id')
-        //         ->orderBy('standards.id')
-        //         ->orderBy('categories.id')
-        //         ->orderBy('indicators.id')
-        //         ->select('indicators.*')
-        //         ->get();
 
-        //     // Attach as a preloaded relation so the Blade template uses it
-        //     $reportToRender->setRelation('indicators', $allIndicators);
+        if ($type === 'pdf') {
+            // โหลด indicators ทั้งหมด
+            $allIndicators = Indicator::with([
+                'category.standard',
+                'criterias' => fn($q) => $q->orderBy('sequence'),
+                'criterias.evidences',
+            ])
+                ->where('year', $report->year)
+                ->join('categories', 'categories.id', '=', 'indicators.categorie_id')
+                ->join('standards', 'standards.id', '=', 'categories.standard_id')
+                ->orderBy('standards.id')
+                ->orderBy('categories.id')
+                ->orderBy('indicators.id')
+                ->select('indicators.*')
+                ->get();
 
-        //     $pdf = Pdf::loadView('sar_reports.export_pdf', ['report' => $reportToRender])
-        //         ->setPaper('a4', 'portrait')
-        //         ->setOptions([
-        //             'isHtml5ParserEnabled'   => true,
-        //             'isRemoteEnabled'        => true,
-        //             'defaultFont'            => 'SarabunLocal',
-        //             'enableFontSubsetting'   => false,
-        //             'fontDir'                => storage_path('fonts'),
-        //             'fontCache'              => storage_path('fonts'),
-        //             'chroot'                 => base_path(),
-        //         ]);
+            $reportToRender->setRelation('indicators', $allIndicators);
 
-        //     return $pdf->download("sar-report-{$report->year}.pdf");
-        // }
-if ($type === 'pdf') {
-    // โหลด indicators ทั้งหมด
-    $allIndicators = Indicator::with([
-        'category.standard',
-        'criterias' => fn($q) => $q->orderBy('sequence'),
-        'criterias.evidences',
-    ])
-        ->where('year', $report->year)
-        ->join('categories', 'categories.id', '=', 'indicators.categorie_id')
-        ->join('standards', 'standards.id', '=', 'categories.standard_id')
-        ->orderBy('standards.id')
-        ->orderBy('categories.id')
-        ->orderBy('indicators.id')
-        ->select('indicators.*')
-        ->get();
+            $pdf = Pdf::loadView('sar_reports.export_pdf', ['report' => $reportToRender])
+                ->setPaper('a4', 'portrait')
+                ->setOptions([
+                    'isHtml5ParserEnabled'   => true,
+                    'isRemoteEnabled'        => true,
+                    'defaultFont'            => 'SarabunLocal',
+                    'enableFontSubsetting'   => false,
+                    'fontDir'                => storage_path('fonts'),
+                    'fontCache'              => storage_path('fonts'),
+                    'chroot'                 => base_path(),
+                ]);
 
-    $reportToRender->setRelation('indicators', $allIndicators);
+            // ✅ เปลี่ยนจาก download() เป็น stream()
+            return $pdf->stream("sar-report-{$report->year}.pdf");
+        }
 
-    $pdf = Pdf::loadView('sar_reports.export_pdf', ['report' => $reportToRender])
-        ->setPaper('a4', 'portrait')
-        ->setOptions([
-            'isHtml5ParserEnabled'   => true,
-            'isRemoteEnabled'        => true,
-            'defaultFont'            => 'SarabunLocal',
-            'enableFontSubsetting'   => false,
-            'fontDir'                => storage_path('fonts'),
-            'fontCache'              => storage_path('fonts'),
-            'chroot'                 => base_path(),
-        ]);
+        if ($type === 'excel') {
+            $spreadsheet = new Spreadsheet();
+            $sheet = $spreadsheet->getActiveSheet();
+            $sheet->setTitle('Indicators');
 
-    // ✅ เปลี่ยนจาก download() เป็น stream()
-    return $pdf->stream("sar-report-{$report->year}.pdf");
-}
-
-        if ($type === 'docx') {
-            $phpWord = new PhpWord();
-            $section = $phpWord->addSection();
-
-            // ===== หัวรายงาน
-            $section->addTitle(
-                $this->sanitizeWordText("รายงานการประเมินตนเองของหน่วยงาน (SAR) ปี {$report->year}"),
-                1
-            );
-
-            // ===== ส่วนที่ 1
-            $section->addTitle("ส่วนที่ 1: ข้อมูลทั่วไปคณะพยาบาลศาสตร์", 2);
-            $this->addHtmlSafe($section, $report->section1 ?? '-');
-
-            // ===== ส่วนที่ 2
-            $section->addTitle("ส่วนที่ 2: ข้อมูลด้านคุณภาพ", 2);
-            $this->addHtmlSafe($section, $report->section2 ?? '-');
-
-            // ===== ส่วนที่ 3: ตัวชี้วัด
-            $section->addTitle("ส่วนที่ 3: การประเมินตนเองตามตัวบ่งชี้", 2);
+            $row = 1;
+            $sheet->mergeCells("A{$row}:F{$row}")
+                ->setCellValue("A{$row}", "SAR Report " . (string)$report->year);
+            $sheet->getStyle("A{$row}")->getFont()->setBold(true)->setSize(14);
+            $sheet->getStyle("A{$row}")->getAlignment()->setHorizontal('center');
+            $row += 2;
 
             $indicators = Indicator::with([
                 'category.standard',
@@ -582,37 +547,56 @@ if ($type === 'pdf') {
                 ->groupBy(fn($ind) => optional(optional($ind->category)->standard)->name ?? 'ไม่ระบุมาตรฐาน');
 
             foreach ($indicators as $stdName => $indsByStd) {
-                $section->addTitle("มาตรฐาน: {$stdName}", 3);
+                // ===== หัวมาตรฐาน =====
+                $sheet->mergeCells("A{$row}:F{$row}")
+                    ->setCellValue("A{$row}", "มาตรฐาน: {$stdName}");
+                $sheet->getStyle("A{$row}")->getFont()->setBold(true);
+                $row++;
 
                 foreach ($indsByStd->groupBy(fn($i) => optional($i->category)->name ?? 'ไม่ระบุด้าน') as $catName => $inds) {
-                    $section->addTitle("ด้าน: {$catName}", 4);
+                    // ===== หัวด้าน =====
+                    $sheet->mergeCells("A{$row}:F{$row}")
+                        ->setCellValue("A{$row}", "ด้าน: {$catName}");
+                    $sheet->getStyle("A{$row}")->getFont()->setBold(true);
+                    $row++;
 
                     foreach ($inds as $ind) {
-                        $section->addText("[{$ind->code}] {$ind->name}", ['bold' => true]);
+                        // ===== หัวตัวบ่งชี้ =====
+                        $title = "[{$ind->code}] {$ind->name}";
+                        $sheet->mergeCells("A{$row}:F{$row}")->setCellValue("A{$row}", $title);
+                        $sheet->getStyle("A{$row}")->getFont()->setBold(true);
+                        $row++;
 
-                        // ตารางเกณฑ์มาตรฐาน
-                        $table = $section->addTable(['borderSize' => 6, 'borderColor' => '000000']);
-                        $table->addRow();
-                        $table->addCell(500)->addText("ข้อ", ['bold' => true]);
-                        $table->addCell(3000)->addText("เกณฑ์มาตรฐาน", ['bold' => true]);
-                        $table->addCell(1500)->addText("ผลการดำเนินงาน", ['bold' => true]);
-                        $table->addCell(2500)->addText("รายงานผล", ['bold' => true]);
-                        $table->addCell(2000)->addText("เอกสารหลักฐาน", ['bold' => true]);
+                        // ===== หัวตารางเกณฑ์มาตรฐาน =====
+                        $sheet->mergeCells("A{$row}:A" . ($row + 1))->setCellValue("A{$row}", 'ข้อ');
+                        $sheet->mergeCells("B{$row}:B" . ($row + 1))->setCellValue("B{$row}", 'เกณฑ์มาตรฐาน');
+                        $sheet->mergeCells("C{$row}:D{$row}")->setCellValue("C{$row}", 'ผลการดำเนินงาน');
+                        $sheet->setCellValue("C" . ($row + 1), 'มี');
+                        $sheet->setCellValue("D" . ($row + 1), 'ไม่มี');
+                        $sheet->mergeCells("E{$row}:E" . ($row + 1))->setCellValue("E{$row}", 'รายงานผลการดำเนินงาน');
+                        $sheet->mergeCells("F{$row}:F" . ($row + 1))->setCellValue("F{$row}", 'เอกสาร/หลักฐาน');
+                        $row += 2;
 
-                        foreach ($ind->criterias as $i => $cri) {
-                            $table->addRow();
-                            $table->addCell(500)->addText((string)($i + 1));
-                            $table->addCell(3000)->addText($cri->name);
-                            $table->addCell(1500)->addText($cri->status ? '✓' : '-');
+                        // ===== loop criterias =====
+                        $ci = 1;
+                        foreach ($ind->criterias as $cri) {
+                            $sheet->setCellValue("A{$row}", $ci++);
+                            $sheet->setCellValue("B{$row}", $cri->name ?? '');
+                            $has = (bool)($cri->status ?? false);
+                            $sheet->setCellValue("C{$row}", $has ? '✓' : '');
+                            $sheet->setCellValue("D{$row}", $has ? '' : '✓');
+                            $sheet->setCellValue("E{$row}", trim(strip_tags((string)($cri->report ?? '-'))));
 
-                            $cell = $table->addCell(2500);
-                            $this->addHtmlSafe($cell, $cri->report ?? '-');
-
-                            $evList = $cri->evidences->pluck('name')->implode(", ");
-                            $table->addCell(2000)->addText($evList ?: '-');
+                            $evList = $cri->evidences->pluck('name')->implode(', ');
+                            $sheet->setCellValue("F{$row}", $evList ?: '-');
+                            $row++;
                         }
 
-                        // ตารางเกณฑ์การให้คะแนน
+                        // ===== ตารางเกณฑ์การให้คะแนน =====
+                        $sheet->mergeCells("A{$row}:D{$row}")->setCellValue("A{$row}", 'เกณฑ์การให้คะแนน');
+                        $sheet->mergeCells("E{$row}:F{$row}")->setCellValue("E{$row}", 'การประเมินตนเอง');
+                        $row++;
+
                         $lines = [];
                         if (!empty($ind->comment)) {
                             $plain = preg_replace('/<\/(p|div|li|br)>/i', "\n", $ind->comment);
@@ -621,79 +605,95 @@ if ($type === 'pdf') {
                             $lines = preg_split('/\r\n|\r|\n/', $plain);
                             $lines = array_filter(array_map('trim', $lines));
                         }
+
                         $score = $ind->self_score ?? ($ind->score_acc ?? null);
 
-                        $scoreTable = $section->addTable(['borderSize' => 6, 'borderColor' => '000000']);
-                        $scoreTable->addRow();
-                        $scoreTable->addCell(6000)->addText("เกณฑ์การให้คะแนน", ['bold' => true]);
-                        $scoreTable->addCell(1500)->addText("คะแนน", ['bold' => true]);
-                        $scoreTable->addCell(2000)->addText("การประเมินตนเอง", ['bold' => true]);
-
-                        if (!empty($lines)) {
+                        if (empty($lines)) {
+                            $sheet->mergeCells("A{$row}:C{$row}")->setCellValue("A{$row}", '............................');
+                            $sheet->setCellValue("D{$row}", '........ คะแนน');
+                            $sheet->mergeCells("E{$row}:F{$row}")->setCellValue("E{$row}", '');
+                            $row++;
+                        } else {
                             foreach ($lines as $line) {
+                                // ดึงคะแนนจากข้อความ
                                 $scoreFromLine = null;
-                                if (preg_match('/([0-9]+(?:\.[0-9]+)?)\s*คะแนน/u', $line, $mm)) {
-                                    $scoreFromLine = (float) $mm[1];
+                                if (preg_match(
+                                    '/\(\s*(?:([0-9]+(?:\.[0-9]+)?)\s*คะแนน|คะแนน\s*([0-9]+(?:\.[0-9]+)?)|([0-9]+(?:\.[0-9]+)?))\s*\)/u',
+                                    $line,
+                                    $mm
+                                )) {
+                                    $scoreFromLine = (float) ($mm[1] ?? $mm[2] ?? $mm[3]);
                                 }
+
+                                // เช็คว่าตรงกับ self_score หรือไม่
                                 $match = $score !== null && $scoreFromLine !== null && abs($scoreFromLine - (float) $score) < 0.001;
 
-                                $scoreTable->addRow();
-                                $scoreTable->addCell(6000)->addText($line);
-                                $scoreTable->addCell(1500)->addText($scoreFromLine !== null ? $scoreFromLine . " คะแนน" : "........ คะแนน");
-                                $scoreTable->addCell(2000)->addText($match ? "✓" : "");
+                                // เขียนแถวลง Excel
+                                $sheet->mergeCells("A{$row}:C{$row}")->setCellValue("A{$row}", $line);
+                                $sheet->setCellValue("D{$row}", $scoreFromLine !== null ? "{$scoreFromLine} คะแนน" : '........ คะแนน');
+                                $sheet->mergeCells("E{$row}:F{$row}")->setCellValue("E{$row}", $match ? '✓' : '');
+                                $row++;
                             }
-                        } else {
-                            $scoreTable->addRow();
-                            $scoreTable->addCell(6000)->addText("............................");
-                            $scoreTable->addCell(1500)->addText("........ คะแนน");
-                            $scoreTable->addCell(2000)->addText("");
                         }
+
+
+                        // ===== ใส่ border + alignment =====
+                        $sheet->getStyle("A1:F{$row}")->applyFromArray([
+                            'borders' => [
+                                'allBorders' => [
+                                    'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                                ],
+                            ],
+                            'alignment' => [
+                                'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+                                'vertical'   => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
+                                'wrapText'   => true,
+                            ],
+                        ]);
+
+                        $row += 2; // เว้นบรรทัดก่อน Indicator ถัดไป
                     }
                 }
             }
 
-            // ===== ส่วนที่ 4
-            $section->addTitle("ส่วนที่ 4: สรุปผลการประเมินตนเองตามเกณฑ์ของสภาการพยาบาล", 2);
-            $this->addHtmlSafe($section, $report->section4 ?? '-');
+            // ปรับความกว้างคอลัมน์
+            $sheet->getColumnDimension('A')->setWidth(5);
+            $sheet->getColumnDimension('B')->setWidth(50);
+            $sheet->getColumnDimension('C')->setWidth(12);
+            $sheet->getColumnDimension('D')->setWidth(12);
+            $sheet->getColumnDimension('E')->setWidth(20);
+            $sheet->getColumnDimension('F')->setWidth(25);
 
-            $filename = "sar-report-{$report->year}.docx";
-            $writer = IOFactory::createWriter($phpWord, 'Word2007');
-
-            return response()->streamDownload(function () use ($writer) {
-                $writer->save("php://output");
-            }, $filename);
-        }
-
-        if ($type === 'excel') {
-            $spreadsheet = new Spreadsheet();
-            $sheet = $spreadsheet->getActiveSheet();
-            $sheet->setCellValue('A1', 'SAR Report ' . $report->year);
-            $sheet->setCellValue('A2', strip_tags($report->section1));
             $writer = new Xlsx($spreadsheet);
-
             $filename = "sar-report-{$report->year}.xlsx";
             return response()->streamDownload(function () use ($writer) {
+                if (ob_get_length()) {
+                    @ob_end_clean();
+                }
                 $writer->save('php://output');
-            }, $filename);
+            }, $filename, [
+                'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                'Cache-Control' => 'max-age=0, no-cache, must-revalidate, proxy-revalidate',
+                'Pragma' => 'public',
+            ]);
         }
+
 
         if ($type === 'docx') {
             $phpWord = new PhpWord();
             $section = $phpWord->addSection();
 
-            // SAFE path: generate sanitized content and return early
-            $section->addTitle($this->sanitizeWordText("รายงานการประเมินตนเองของหน่วยงาน (SAR) ปี {$report->year}"), 1);
-
-            // Section 1
-            $section->addTitle($this->sanitizeWordText('หมวด 1: ประวัติความเป็นมา วิสัยทัศน์ พันธกิจ'), 2);
+            // ===== ส่วนที่ 1 =====
+            $section->addTitle($this->sanitizeWordText('ส่วนที่ 1: ข้อมูลทั่วไปคณะพยาบาลศาสตร์'), 2);
             $this->addHtmlSafe($section, $report->section1 ?? '-');
 
-            // Section 2
-            $section->addTitle($this->sanitizeWordText('หมวด 2: โครงสร้างการบริหาร ภารกิจหลัก'), 2);
+            // ===== ส่วนที่ 2 =====
+            $section->addTitle($this->sanitizeWordText('ส่วนที่ 2: ข้อมูลด้านคุณภาพ'), 2);
             $this->addHtmlSafe($section, $report->section2 ?? '-');
 
-            // Section 3 - Indicators
-            $section->addTitle($this->sanitizeWordText('หมวด 3: ตัวชี้วัดและผลการดำเนินงาน'), 2);
+            // ===== ส่วนที่ 3 =====
+            $section->addTitle($this->sanitizeWordText('ส่วนที่ 3: การประเมินตนเองตามตัวบ่งชี้'), 2);
+
             $indicators = Indicator::with([
                 'category.standard',
                 'criterias' => fn($q) => $q->orderBy('sequence'),
@@ -707,24 +707,25 @@ if ($type === 'pdf') {
                 ->orderBy('indicators.id')
                 ->select('indicators.*')
                 ->get()
-                ->groupBy(fn($ind) => optional(optional($ind->category)->standard)->name ?? '');
+                ->groupBy(fn($ind) => optional(optional($ind->category)->standard)->name ?? 'ไม่ระบุมาตรฐาน');
 
             foreach ($indicators as $stdName => $indsByStd) {
                 $section->addTitle($this->sanitizeWordText("มาตรฐาน: {$stdName}"), 3);
 
-                foreach ($indsByStd->groupBy(fn($i) => optional($i->category)->name ?? '') as $catName => $inds) {
-                    $section->addTitle($this->sanitizeWordText("หมวดหมู่: {$catName}"), 4);
+                foreach ($indsByStd->groupBy(fn($i) => optional($i->category)->name ?? 'ไม่ระบุด้าน') as $catName => $inds) {
+                    $section->addTitle($this->sanitizeWordText("ด้าน: {$catName}"), 4);
 
                     foreach ($inds as $ind) {
                         $section->addText($this->sanitizeWordText("[{$ind->code}] {$ind->name}"), ['bold' => true]);
 
+                        // ===== ตารางเกณฑ์มาตรฐาน =====
                         $table = $section->addTable(['borderSize' => 6, 'borderColor' => '000000']);
                         $table->addRow();
-                        $table->addCell(500)->addText($this->sanitizeWordText('ข้อ'), ['bold' => true]);
-                        $table->addCell(3000)->addText($this->sanitizeWordText('เกณฑ์มาตรฐาน'), ['bold' => true]);
-                        $table->addCell(1500)->addText($this->sanitizeWordText('ผลการดำเนินงาน'), ['bold' => true]);
-                        $table->addCell(2500)->addText($this->sanitizeWordText('รายงานผล'), ['bold' => true]);
-                        $table->addCell(2000)->addText($this->sanitizeWordText('เอกสารหลักฐาน'), ['bold' => true]);
+                        $table->addCell(500)->addText('ข้อ', ['bold' => true]);
+                        $table->addCell(3000)->addText('เกณฑ์มาตรฐาน', ['bold' => true]);
+                        $table->addCell(1500)->addText('ผลการดำเนินงาน', ['bold' => true]);
+                        $table->addCell(2500)->addText('รายงานผล', ['bold' => true]);
+                        $table->addCell(2000)->addText('เอกสารหลักฐาน', ['bold' => true]);
 
                         foreach ($ind->criterias as $i => $cri) {
                             $table->addRow();
@@ -737,116 +738,6 @@ if ($type === 'pdf') {
 
                             $evList = $cri->evidences->pluck('name')->implode(', ');
                             $table->addCell(2000)->addText($this->sanitizeWordText($evList ?: '-'));
-                        }
-
-                        // Self-evaluation table (simplified)
-                        $lines = [];
-                        if (!empty($ind->comment)) {
-                            $plain = preg_replace('/<\/(p|div|li|br)>/i', "\n", $ind->comment);
-                            $plain = strip_tags($plain);
-                            $plain = html_entity_decode($plain, ENT_QUOTES, 'UTF-8');
-                            $lines = preg_split('/\r\n|\r|\n/', $plain);
-                            $lines = array_filter(array_map('trim', $lines));
-                        }
-                        $score = $ind->self_score ?? ($ind->score_acc ?? null);
-
-                        $scoreTable = $section->addTable(['borderSize' => 6, 'borderColor' => '000000']);
-                        $scoreTable->addRow();
-                        $scoreTable->addCell(6000)->addText($this->sanitizeWordText('เกณฑ์การให้คะแนน'), ['bold' => true]);
-                        $scoreTable->addCell(1500)->addText($this->sanitizeWordText('คะแนน'), ['bold' => true]);
-                        $scoreTable->addCell(2000)->addText($this->sanitizeWordText('การประเมินตนเอง'), ['bold' => true]);
-
-                        if (!empty($lines)) {
-                            foreach ($lines as $line) {
-                                $scoreFromLine = null;
-                                if (preg_match('/([0-9]+(?:\.[0-9]+)?)/u', $line, $mm)) {
-                                    $scoreFromLine = (float) $mm[1];
-                                }
-                                $match = $score !== null && $scoreFromLine !== null && abs($scoreFromLine - (float) $score) < 0.001;
-
-                                $scoreTable->addRow();
-                                $scoreTable->addCell(6000)->addText($this->sanitizeWordText($line));
-                                $scoreTable->addCell(1500)->addText($this->sanitizeWordText($scoreFromLine !== null ? ($scoreFromLine . ' คะแนน') : '........ คะแนน'));
-                                $scoreTable->addCell(2000)->addText($match ? '✓' : '');
-                            }
-                        } else {
-                            $scoreTable->addRow();
-                            $scoreTable->addCell(6000)->addText($this->sanitizeWordText('............................'));
-                            $scoreTable->addCell(1500)->addText($this->sanitizeWordText('........ คะแนน'));
-                            $scoreTable->addCell(2000)->addText('');
-                        }
-                    }
-                }
-            }
-
-            // Section 4
-            $section->addTitle($this->sanitizeWordText('หมวด 4: สรุปผลและข้อเสนอแนะ'), 2);
-            $this->addHtmlSafe($section, $report->section4 ?? '-');
-
-            $filename = "sar-report-{$report->year}.docx";
-            $writer = IOFactory::createWriter($phpWord, 'Word2007');
-
-            return response()->streamDownload(function () use ($writer) {
-                $writer->save("php://output");
-            }, $filename);
-
-            $section->addTitle("รายงานการประเมินตนเอง (SAR) ปี {$report->year}", 1);
-
-            // ===== ส่วนที่ 1
-            $section->addTitle("ส่วนที่ 1: ข้อมูลทั่วไปคณะพยาบาลศาสตร์", 2);
-            $this->addHtmlSafe($section, $report->section1 ?? '-');
-
-            // ===== ส่วนที่ 2
-            $section->addTitle("ส่วนที่ 2: ข้อมูลด้านคุณภาพ", 2);
-            $this->addHtmlSafe($section, $report->section2 ?? '-');
-
-            // ===== ส่วนที่ 3
-            $section->addTitle("ส่วนที่ 3: การประเมินตนเองตามตัวบ่งชี้", 2);
-
-            $indicators = Indicator::with([
-                'category.standard',
-                'criterias' => fn($q) => $q->orderBy('sequence'),
-                'criterias.evidences'
-            ])
-                ->where('year', $report->year)
-                ->join('categories', 'categories.id', '=', 'indicators.categorie_id')
-                ->join('standards', 'standards.id', '=', 'categories.standard_id')
-                ->orderBy('standards.id')
-                ->orderBy('categories.id')
-                ->orderBy('indicators.id')
-                ->select('indicators.*')
-                ->get()
-                ->groupBy(fn($ind) => optional(optional($ind->category)->standard)->name ?? 'ไม่ระบุมาตรฐาน');
-
-            foreach ($indicators as $stdName => $indsByStd) {
-                $section->addTitle("มาตรฐาน: {$stdName}", 3);
-
-                foreach ($indsByStd->groupBy(fn($i) => optional($i->category)->name ?? 'ไม่ระบุด้าน') as $catName => $inds) {
-                    $section->addTitle("ด้าน: {$catName}", 4);
-
-                    foreach ($inds as $ind) {
-                        $section->addText("[{$ind->code}] {$ind->name}", ['bold' => true]);
-
-                        // ===== ตารางเกณฑ์มาตรฐาน =====
-                        $table = $section->addTable(['borderSize' => 6, 'borderColor' => '000000']);
-                        $table->addRow();
-                        $table->addCell(500)->addText("ข้อ", ['bold' => true]);
-                        $table->addCell(3000)->addText("เกณฑ์มาตรฐาน", ['bold' => true]);
-                        $table->addCell(1500)->addText("ผลการดำเนินงาน", ['bold' => true]);
-                        $table->addCell(2500)->addText("รายงานผล", ['bold' => true]);
-                        $table->addCell(2000)->addText("เอกสารหลักฐาน", ['bold' => true]);
-
-                        foreach ($ind->criterias as $i => $cri) {
-                            $table->addRow();
-                            $table->addCell(500)->addText((string)($i + 1));
-                            $table->addCell(3000)->addText($cri->name);
-                            $table->addCell(1500)->addText($cri->status ? '✓' : '-');
-
-                            $cell = $table->addCell(2500);
-                            $this->addHtmlSafe($cell, $cri->report ?? '-');
-
-                            $evList = $cri->evidences->pluck('name')->implode(", ");
-                            $table->addCell(2000)->addText($evList ?: '-');
                         }
 
                         // ===== ตารางเกณฑ์การให้คะแนน =====
@@ -862,37 +753,42 @@ if ($type === 'pdf') {
 
                         $scoreTable = $section->addTable(['borderSize' => 6, 'borderColor' => '000000']);
                         $scoreTable->addRow();
-                        $scoreTable->addCell(6000)->addText("เกณฑ์การให้คะแนน", ['bold' => true]);
-                        $scoreTable->addCell(1500)->addText("คะแนน", ['bold' => true]);
-                        $scoreTable->addCell(2000)->addText("การประเมินตนเอง", ['bold' => true]);
+                        $scoreTable->addCell(6000)->addText('เกณฑ์การให้คะแนน', ['bold' => true]);
+                        $scoreTable->addCell(1500)->addText('คะแนน', ['bold' => true]);
+                        $scoreTable->addCell(2000)->addText('การประเมินตนเอง', ['bold' => true]);
 
                         if (!empty($lines)) {
                             foreach ($lines as $line) {
                                 $scoreFromLine = null;
-                                if (preg_match('/([0-9]+(?:\.[0-9]+)?)\s*คะแนน/u', $line, $mm)) {
+                                if (preg_match(
+                                    '/\(\s*(?:([0-9]+(?:\.[0-9]+)?)\s*คะแนน|คะแนน\s*([0-9]+(?:\.[0-9]+)?)|([0-9]+(?:\.[0-9]+)?))\s*\)/u',
+                                    $line,
+                                    $mm,
+                                )) {
                                     $scoreFromLine = (float) $mm[1];
                                 }
-                                $match = $score !== null && $scoreFromLine !== null && abs($scoreFromLine - (float) $score) < 0.001;
+                                $match = $score !== null && $scoreFromLine !== null && abs($scoreFromLine - (float)$score) < 0.001;
 
                                 $scoreTable->addRow();
-                                $scoreTable->addCell(6000)->addText($line);
-                                $scoreTable->addCell(1500)->addText($scoreFromLine !== null ? $scoreFromLine . " คะแนน" : "........ คะแนน");
-                                $scoreTable->addCell(2000)->addText($match ? "✓" : "");
+                                $scoreTable->addCell(6000)->addText($this->sanitizeWordText($line));
+                                $scoreTable->addCell(1500)->addText($scoreFromLine !== null ? "{$scoreFromLine} คะแนน" : '........ คะแนน');
+                                $scoreTable->addCell(2000)->addText($match ? '✓' : '');
                             }
                         } else {
                             $scoreTable->addRow();
-                            $scoreTable->addCell(6000)->addText("............................");
-                            $scoreTable->addCell(1500)->addText("........ คะแนน");
-                            $scoreTable->addCell(2000)->addText("");
+                            $scoreTable->addCell(6000)->addText('............................');
+                            $scoreTable->addCell(1500)->addText('........ คะแนน');
+                            $scoreTable->addCell(2000)->addText('');
                         }
                     }
                 }
             }
 
-            // ===== ส่วนที่ 4
-            $section->addTitle("ส่วนที่ 4: สรุปผลการประเมินตนเองตามเกณฑ์ของสภาการพยาบาล", 2);
+            // ===== ส่วนที่ 4 =====
+            $section->addTitle($this->sanitizeWordText('ส่วนที่ 4: สรุปผลการประเมินตนเองตามเกณฑ์ของสภาการพยาบาล'), 2);
             $this->addHtmlSafe($section, $report->section4 ?? '-');
 
+            // ===== ดาวน์โหลดไฟล์ =====
             $filename = "sar-report-{$report->year}.docx";
             $writer = IOFactory::createWriter($phpWord, 'Word2007');
 
@@ -900,6 +796,7 @@ if ($type === 'pdf') {
                 $writer->save("php://output");
             }, $filename);
         }
+
 
         return back()->with('error', 'ไม่รองรับรูปแบบไฟล์นี้');
     }

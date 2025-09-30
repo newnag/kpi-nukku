@@ -4,70 +4,64 @@
 @section('subheader', 'ระบบบริหารจัดการข้อมูลการรับรองสถาบันจากสภาการพยาบาล')
 
 @section('content')
-<div class="flex flex-col sm:flex-row justify-between gap-4 mb-4">
-            <div class="flex flex-col sm:flex-row flex-wrap gap-2 w-full sm:w-auto">
-                <div class="relative w-full sm:w-auto bg-white rounded-lg shadow-sm min-w-64">
-                    <div class="absolute inset-y-0 left-3 flex items-center pointer-events-none">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24"
-                            stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                        </svg>
-                    </div>
-                    <input type="text" id="custom-search" placeholder="ค้นหารายการตัวบ่งชี้"
-                        class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/40" />
+    <div class="flex flex-col sm:flex-row justify-between gap-4 mb-4">
+        <div class="flex flex-col sm:flex-row flex-wrap gap-2 w-full sm:w-auto">
+            <div class="relative w-full sm:w-auto bg-white rounded-lg shadow-sm min-w-64">
+                <div class="absolute inset-y-0 left-3 flex items-center pointer-events-none">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
                 </div>
+                <input type="text" id="custom-search" placeholder="ค้นหารายการตัวบ่งชี้"
+                    class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/40" />
+            </div>
 
-                <!-- Sort Button with Dropdown -->
-                <div class="relative inline-block text-left" id="sort-dropdown-container">
-                    <button id="sort-button" class="btns">
-                        <span>เรียงลำดับ</span>
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
-                            stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
-                        </svg>
-                    </button>
-                    <div id="sort-dropdown"
-                        class="hidden absolute left-0 mt-2 w-56 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
-                        <div class="py-1" role="menu" aria-orientation="vertical">
-                            <button
-                                class="sort-option text-left block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                                data-column="0" data-order="asc" role="menuitem">ปี (น้อยไปมาก)</button>
-                            <button
-                                class="sort-option text-left block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                                data-column="0" data-order="desc" role="menuitem">ปี (มากไปน้อย)</button>
-                            <button
-                                class="sort-option text-left block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                                data-column="1" data-order="asc" role="menuitem">ชื่อรายงาน (A-Z)</button>
-                            <button
-                                class="sort-option text-left block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                                data-column="1" data-order="desc" role="menuitem">ชื่อรายงาน (Z-A)</button>
-                            <button
-                                class="sort-option text-left block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                                data-column="2" data-order="asc" role="menuitem">วันที่สร้าง (เก่า→ใหม่)</button>
-                            <button
-                                class="sort-option text-left block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                                data-column="2" data-order="desc" role="menuitem">วันที่สร้าง (ใหม่→เก่า)</button>
-                            <button id="clear-sort"
-                                class=" text-left block w-full px-4 py-2 text-sm text-gray-600 hover:bg-gray-100">ล้างตัวเรียงลำดับ</button>
-                        </div>
+            <!-- Sort Button with Dropdown -->
+            <div class="relative inline-block text-left" id="sort-dropdown-container">
+                <button id="sort-button" class="btns">
+                    <span>เรียงลำดับ</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
+                    </svg>
+                </button>
+                <div id="sort-dropdown"
+                    class="hidden absolute left-0 mt-2 w-56 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+                    <div class="py-1" role="menu" aria-orientation="vertical">
+                        <button class="sort-option text-left block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                            data-column="0" data-order="asc" role="menuitem">ปี (น้อยไปมาก)</button>
+                        <button class="sort-option text-left block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                            data-column="0" data-order="desc" role="menuitem">ปี (มากไปน้อย)</button>
+                        <button class="sort-option text-left block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                            data-column="1" data-order="asc" role="menuitem">ชื่อรายงาน (A-Z)</button>
+                        <button class="sort-option text-left block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                            data-column="1" data-order="desc" role="menuitem">ชื่อรายงาน (Z-A)</button>
+                        <button class="sort-option text-left block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                            data-column="2" data-order="asc" role="menuitem">วันที่สร้าง (เก่า→ใหม่)</button>
+                        <button class="sort-option text-left block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                            data-column="2" data-order="desc" role="menuitem">วันที่สร้าง (ใหม่→เก่า)</button>
+                        <button id="clear-sort"
+                            class=" text-left block w-full px-4 py-2 text-sm text-gray-600 hover:bg-gray-100">ล้างตัวเรียงลำดับ</button>
                     </div>
                 </div>
+            </div>
 
 
-            </div>
-            <div>
-                <x-year-export-modal :years="$years" context="year-export"
-                    class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md inline-flex items-center space-x-2 shadow">
-                    <i data-lucide="upload" class="w-4 h-4"></i>
-                    <span>EXPORT</span>
-                </x-year-export-modal>
-            </div>
         </div>
+        <div>
+            <x-year-export-modal :years="$years" context="year-export"
+                class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md inline-flex items-center space-x-2 shadow">
+                <i data-lucide="upload" class="w-4 h-4"></i>
+                <span>EXPORT</span>
+            </x-year-export-modal>
+        </div>
+    </div>
     <div class=" mx-auto bg-white shadow rounded ">
 
-        
+
         <div class="overflow-x-auto border border-gray-200 rounded-lg shadow-sm">
             <table id="myTable" class="w-full min-w-full">
                 <thead>
@@ -81,59 +75,105 @@
                 <tbody class="bg-white">
                     @forelse($reports as $r)
                         <tr>
-                            <td class="text-xs sm:text-sm text-gray-700 text-center">{{ $r->year }}</td>
+                            <td class="text-xs sm:text-sm text-gray-700">{{ $r->year }}</td>
                             <td class="text-xs sm:text-sm text-gray-700">{{ $r->title }}</td>
-                            <td class="text-xs sm:text-sm text-gray-700 text-center">
+                            <td class="text-xs sm:text-sm text-gray-700 ">
                                 {{ $r->created_at ? $r->created_at->format('d/m/Y') : '-' }}
                             </td>
-                            <td class="text-xs sm:text-sm text-gray-700 text-center">
-                                <div x-data="{ open: false }" class="relative inline-block text-left">
-                                    <!-- ปุ่มหลัก -->
-                                    <button type="button" @click="open = !open"
-                                        class="inline-flex items-center px-3 py-2 bg-gray-100 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-200 focus:outline-none">
-                                        ตัวเลือก
-                                        <svg class="-mr-1 ml-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none"
-                                            viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M19 9l-7 7-7-7" />
-                                        </svg>
+                            <td class="text-xs sm:text-sm text-gray-700">
+                                <div x-data="{
+                                    open: false,
+                                    pos: { top: 0, left: 0 },
+                                    menuWidth: 180,
+                                    position() {
+                                        const r = this.$refs.trigger.getBoundingClientRect();
+                                        let left = r.right - this.menuWidth;
+                                        let top = r.bottom + 8;
+                                        const spaceBelow = window.innerHeight - r.bottom;
+                                        const spaceAbove = r.top;
+                                        const mh = this.$refs.menu ? this.$refs.menu.offsetHeight : 160;
+                                        if (spaceBelow < mh + 8 && spaceAbove > spaceBelow) {
+                                            top = r.top - mh - 8;
+                                        }
+                                        this.pos = { top, left };
+                                    }
+                                }" class="relative inline-block text-left"
+                                    @scroll.window="open && position()" @resize.window="open && position()">
+
+                                    <!-- ปุ่มหลัก (3-dot menu) -->
+                                    <button type="button" x-ref="trigger" @click="position(); open = !open"
+                                        @keydown.escape.window="open=false"
+                                        class="inline-flex items-center p-2 bg-gray-100 border border-gray-300 rounded-md shadow-sm 
+                   hover:bg-gray-200 focus:outline-none transition">
+                                        <i data-lucide="more-vertical" class="w-5 h-5 text-gray-700"></i>
                                     </button>
 
-                                    <!-- เมนู Dropdown -->
-                                    <div x-show="open" @click.away="open = false"
-                                        class="absolute right-0 mt-2 w-40 bg-white rounded-md shadow-lg border border-gray-200 z-50">
-                                        <div class="py-1">
-                                            <!-- ปุ่มแก้ไข -->
-                                            <a href="{{ route('sar_reports.edit', $r->id) }}"
-                                                class="flex items-center px-4 py-2 text-sm text-blue-600 hover:bg-blue-50 hover:text-blue-700 transition-colors">
-                                                <i data-lucide="edit-3" class="w-4 h-4"></i>
-                                                <span class="ml-2">แก้ไข</span>
-                                            </a>
+                                    <!-- เมนูหลัก -->
+                                    <template x-teleport="body">
+                                        <div x-show="open" x-ref="menu" @click.away="open = false"
+                                            @keydown.escape.window="open=false" x-transition
+                                            :style="`position: fixed; top: ${pos.top}px; left: ${pos.left}px; width: ${menuWidth}px;`"
+                                            class="mt-2 bg-white rounded-md shadow-lg border border-gray-200 z-[9999]">
 
-                                            <!-- ปุ่มเพิ่ม -->
-                                            {{-- <a href="{{ route('sar_reports.create') }}"
-                                                class="flex items-center px-4 py-2 text-sm text-green-600 hover:bg-green-50 hover:text-green-700 transition-colors">
-                                                <i data-lucide="plus-circle" class="w-4 h-4"></i>
-                                                <span class="ml-2">เพิ่ม</span>
-                                            </a> --}}
+                                            <div class="py-1">
+                                                <!-- ปุ่มแก้ไข -->
+                                                <a href="{{ route('sar_reports.edit', $r->id) }}"
+                                                    class="flex items-center px-4 py-2 text-sm text-blue-600 hover:bg-blue-50 hover:text-blue-700 transition">
+                                                    <i data-lucide="edit-3" class="w-4 h-4 mr-2"></i> แก้ไข
+                                                </a>
 
-                                            <!-- ปุ่มลบ -->
-                                            <form action="{{ route('sar_reports.destroy', $r->id) }}" method="POST"
-                                                onsubmit="return confirm('คุณแน่ใจหรือไม่ว่าต้องการลบรายการนี้?');">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit"
-                                                    class="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 hover:text-red-700 transition-colors">
-                                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
-                                                    <span class="ml-2">ลบ</span>
-                                                </button>
-                                            </form>
+                                                <!-- ปุ่มลบ -->
+                                                <form action="{{ route('sar_reports.destroy', $r->id) }}" method="POST"
+                                                    onsubmit="return confirm('คุณแน่ใจหรือไม่ว่าต้องการลบรายการนี้?');">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit"
+                                                        class="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 hover:text-red-700 transition">
+                                                        <i data-lucide="trash-2" class="w-4 h-4 mr-2"></i> ลบ
+                                                    </button>
+                                                </form>
+
+                                                <!-- ปุ่ม Export (Dropdown ซ้อน) -->
+                                                <div x-data="{ open: false }" class="relative">
+                                                    <button type="button" @click="open = !open"
+                                                        class="flex items-center w-full px-4 py-2 text-sm text-green-600 hover:bg-green-50 hover:text-green-700 transition">
+                                                        <i data-lucide="download" class="w-4 h-4 mr-2"></i> Export
+                                                        <i data-lucide="chevron-right" class="ml-auto w-4 h-4"></i>
+                                                    </button>
+
+
+                                                    <!-- Submenu Export -->
+                                                    <div x-show="open" @click.away="open = false" x-cloak
+                                                        class="absolute left-full top-0 ml-1 w-44 bg-white border border-gray-200 rounded-md shadow-lg z-50">
+
+                                                        <!-- DOCX -->
+                                                        <a href="{{ route('sar_reports.export.docx', $r->id) }}"
+                                                            class="flex items-center px-4 py-2 text-sm text-blue-600 hover:bg-blue-50 hover:text-blue-700 transition">
+                                                            <i data-lucide="file-text" class="w-4 h-4 mr-2"></i> DOCX
+                                                        </a>
+
+                                                        <!-- Excel -->
+                                                        <a href="{{ route('sar_reports.export.xlsx', $r->id) }}"
+                                                            class="flex items-center px-4 py-2 text-sm text-green-600 hover:bg-green-50 hover:text-green-700 transition">
+                                                            <i data-lucide="file-spreadsheet" class="w-4 h-4 mr-2"></i>
+                                                            Excel
+                                                        </a>
+
+                                                        <!-- PDF Preview -->
+                                                        <a href="{{ route('sar_reports.export.pdf', $r->id) }}"
+                                                            target="_blank"
+                                                            class="flex items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 hover:text-red-700 transition">
+                                                            <i data-lucide="file" class="w-4 h-4 mr-2"></i> PDF Preview
+                                                        </a>
+                                                    </div>
+
+                                                </div>
+                                            </div>
                                         </div>
-
-                                    </div>
+                                    </template>
                                 </div>
-
                             </td>
+
                         </tr>
                     @empty
                         <tr>
@@ -274,6 +314,7 @@
 @endpush
 
 @push('scripts')
+   
     <script>
         $(document).ready(function() {
             // Store default label text for each section to support reset

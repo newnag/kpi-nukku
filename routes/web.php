@@ -277,13 +277,14 @@ Route::middleware(['auth'])->group(function () {
     // ===== SAR REPORT ROUTES =====
     Route::prefix('sar_reports')->name('sar_reports.')->middleware('permission:view-sar_report')->group(function () {
         // View
-        Route::get('/', [SarReportController::class, 'index'])->name('index');      
+        Route::get('/', [SarReportController::class, 'index'])->name('index');
         Route::get('/{id}/show', [SarReportController::class, 'show'])->name('show');
         // Export (type-specific routes with implicit model binding)
         Route::get('/{report}/export/docx', [SarReportController::class, 'export'])
             ->name('export.docx')
             ->defaults('type', 'docx')
             ->middleware('permission:export-sar_report');
+        // Excel export should follow the same naming/prefix pattern as others
         Route::get('/{report}/export/xlsx', [SarReportController::class, 'export'])
             ->name('export.xlsx')
             ->defaults('type', 'excel')
@@ -309,12 +310,11 @@ Route::middleware(['auth'])->group(function () {
         // Delete
         Route::delete('/{id}', [SarReportController::class, 'destroy'])
             ->name('destroy')
-            ->middleware('permission:delete-sar_report');       
+            ->middleware('permission:delete-sar_report');
         // Update Report Content for a Criteria
         Route::post('/criterias/{id}/report', [SarReportController::class, 'updateReport'])
             ->name('criterias.updateReport')
             ->middleware('permission:edit-sar_report');
-        
     });
 
     // ===== DASHBOARD KPI ROUTES =====
@@ -391,7 +391,8 @@ Route::get('/test', function () {
                 @copy($tahomab, $sarb);
             }
         }
-    } catch (\Throwable $e) {}
+    } catch (\Throwable $e) {
+    }
 
     $pdf = Pdf::loadView('pdf_test')
         ->setPaper('a4', 'portrait')

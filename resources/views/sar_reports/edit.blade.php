@@ -1,4 +1,4 @@
-﻿@extends('layouts.app')
+@extends('layouts.app')
 
 @section('content')
     <div class="max-w-6xl mx-auto space-y-6">
@@ -300,6 +300,11 @@
 
             <div class="flex justify-end space-x-2">
 
+                <a href="{{ route('sar_reports.index') }}"
+                   class="bg-white text-blue-600 border border-blue-600 px-6 py-2 rounded-md shadow inline-flex items-center hover:bg-blue-50">
+                    <i data-lucide="arrow-left" class="w-4 h-4 mr-2"></i> กลับ
+                </a>
+
                 <div x-data="{ open: false }" class="relative flex justify-end">
                     <button type="button" @click="open = !open"
                         class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-md shadow inline-flex items-center">
@@ -307,25 +312,29 @@
                     </button>
 
                     <div x-show="open" @click.outside="open = false"
-                        class="absolute right-0 mt-2 w-40 bg-white border rounded-md shadow-lg z-50" x-cloak>
-                        <a type="button" href="{{ route('sar_reports.export.docx', $report->id) }}"
-                            class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        class="absolute right-0 mt-2 w-44 bg-white border border-gray-200 rounded-md shadow-lg z-50"
+                        x-cloak>
+
+                        <!-- DOCX -->
+                        <a href="{{ route('sar_reports.export.docx', $report->id) }}"
+                            class="flex items-center px-4 py-2 text-sm text-blue-600 hover:bg-blue-50 hover:text-blue-700 transition">
                             <i data-lucide="file-text" class="w-4 h-4 mr-2"></i> DOCX
                         </a>
-                        <a type="button" href="{{ route('sar_reports.export.xlsx', $report->id) }}"
-                            class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+
+                        <!-- Excel -->
+                        <a id="exportExell" href="{{ route('sar_reports.export.xlsx', $report->id) }}" target="_blank"
+                            class="flex items-center px-4 py-2 text-sm text-green-600 hover:bg-green-50 hover:text-green-700 transition">
                             <i data-lucide="file-spreadsheet" class="w-4 h-4 mr-2"></i> Excel
                         </a>
-                        {{-- <a type="button" href="{{ route('sar_reports.export.pdf', $report->id) }}"
-                            class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                            <i data-lucide="file-type" class="w-4 h-4 mr-2"></i> PDF
-                        </a> --}}
-                        <a href="{{ route('sar_reports.export.pdf', $report->id) }}" target="_blank"
-                            class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                            <i data-lucide="file-text" class="w-4 h-4 mr-2"></i> Preview PDF
-                        </a>
 
+
+                        <!-- PDF Preview -->
+                        <a href="{{ route('sar_reports.export.pdf', $report->id) }}" target="_blank"
+                            class="flex items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 hover:text-red-700 transition">
+                            <i data-lucide="file" class="w-4 h-4 mr-2"></i> PDF Preview
+                        </a>
                     </div>
+
                 </div>
 
                 <!-- ปุ่ม Save -->
