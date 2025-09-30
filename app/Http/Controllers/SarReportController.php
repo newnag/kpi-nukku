@@ -23,7 +23,20 @@ class SarReportController extends Controller
     public function index()
     {
         $reports = SarReport::with(['standard', 'indicator', 'criteria'])->paginate(10);
-        $years = SarReport::selectRaw('DISTINCT year')->orderBy('year', 'desc')->pluck('year');
+
+        // Prefer available years from existing SAR reports; if none, fall back to Indicator years
+        $years = SarReport::selectRaw('DISTINCT year')
+            ->orderBy('year', 'desc')
+            ->pluck('year')
+            ->filter();
+
+        if ($years->isEmpty()) {
+            $years = Indicator::whereNotNull('year')
+                ->selectRaw('DISTINCT year')
+                ->orderBy('year', 'desc')
+                ->pluck('year');
+        }
+
         return view('sar_reports.index', compact('reports', 'years'));
     }
     // public function part3()
