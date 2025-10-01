@@ -301,41 +301,42 @@
             <div class="flex justify-end space-x-2">
 
                 <a href="{{ route('sar_reports.index') }}"
-                   class="bg-white text-blue-600 border border-blue-600 px-6 py-2 rounded-md shadow inline-flex items-center hover:bg-blue-50">
+                    class="bg-white text-blue-600 border border-blue-600 px-6 py-2 rounded-md shadow inline-flex items-center hover:bg-blue-50">
                     <i data-lucide="arrow-left" class="w-4 h-4 mr-2"></i> กลับ
                 </a>
 
                 <div x-data="{ open: false }" class="relative flex justify-end">
+                    <!-- ปุ่มหลัก -->
                     <button type="button" @click="open = !open"
-                        class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-md shadow inline-flex items-center">
-                        <i data-lucide="download" class="w-4 h-4 mr-2"></i> Export
+                        class="bg-green-600 hover:bg-green-900 text-white px-6 py-2 rounded-md shadow inline-flex items-center font-medium">
+                        <i data-lucide="download" class="w-4 h-4 mr-2"></i> ส่งออกเอกสาร
                     </button>
 
+                    <!-- เมนูย่อย -->
                     <div x-show="open" @click.outside="open = false"
-                        class="absolute right-0 mt-2 w-44 bg-white border border-gray-200 rounded-md shadow-lg z-50"
+                        class="absolute right-0 mt-2 w-52 bg-white border border-gray-300 rounded-md shadow-lg z-50"
                         x-cloak>
 
-                        <!-- DOCX -->
+                        <!-- Word DOCX -->
                         <a href="{{ route('sar_reports.export.docx', $report->id) }}"
-                            class="flex items-center px-4 py-2 text-sm text-blue-600 hover:bg-blue-50 hover:text-blue-700 transition">
-                            <i data-lucide="file-text" class="w-4 h-4 mr-2"></i> DOCX
+                            class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition">
+                            <i data-lucide="file-text" class="w-4 h-4 mr-2 text-blue-700"></i> Word (DOCX)
                         </a>
 
                         <!-- Excel -->
                         <a id="exportExell" href="{{ route('sar_reports.export.xlsx', $report->id) }}" target="_blank"
-                            class="flex items-center px-4 py-2 text-sm text-green-600 hover:bg-green-50 hover:text-green-700 transition">
-                            <i data-lucide="file-spreadsheet" class="w-4 h-4 mr-2"></i> Excel
+                            class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition">
+                            <i data-lucide="file-spreadsheet" class="w-4 h-4 mr-2 text-green-700"></i> Excel (XLSX)
                         </a>
 
-
-                        <!-- PDF Preview -->
+                        <!-- PDF -->
                         <a href="{{ route('sar_reports.export.pdf', $report->id) }}" target="_blank"
-                            class="flex items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 hover:text-red-700 transition">
-                            <i data-lucide="file" class="w-4 h-4 mr-2"></i> PDF Preview
+                            class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition">
+                            <i data-lucide="file" class="w-4 h-4 mr-2 text-red-700"></i> PDF (สำหรับพิมพ์)
                         </a>
                     </div>
-
                 </div>
+
 
                 <!-- ปุ่ม Save -->
                 <button type="submit"

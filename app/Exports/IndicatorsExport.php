@@ -262,7 +262,7 @@ class IndicatorsExport implements FromCollection, WithEvents
                                 $s->mergeCells("A{$r}:C{$r}")->setCellValue("A{$r}", $commentText);
                                 $s->setCellValue("D{$r}", '........... คะแนน');
                                 $s->mergeCells("E{$r}:F{$r}")->setCellValue("E{$r}", '');
-                                for ($k = 0; $k < 2; $k++) {
+                                for ($k = 0; $k < 0; $k++) {
                                     $r++;
                                     $s->mergeCells("A{$r}:C{$r}")->setCellValue("A{$r}", '............................');
                                     $s->setCellValue("D{$r}", '........... คะแนน');
@@ -296,6 +296,19 @@ class IndicatorsExport implements FromCollection, WithEvents
                                 if (!empty($liItems)) {
                                     $writeRow = $start2 + 1;
                                     foreach ($liItems as $txt) {
+                                        $scoreText = '';
+                                        if (preg_match('/\(\s*(?:([0-9]+(?:\.[0-9]+)?)\s*คะแนน|คะแนน\s*([0-9]+(?:\.[0-9]+)?)|([0-9]+(?:\.[0-9]+)?))\s*\)/u', $txt, $mm)) {
+                                            $vals = array_values(array_filter([
+                                                $mm[1] ?? null,
+                                                $mm[2] ?? null,
+                                                $mm[3] ?? null,
+                                            ]));
+                                            if (!empty($vals)) {
+                                                $scoreText = rtrim(rtrim(number_format((float)$vals[0], 2, '.', ''), '0'), '.');
+                                            }
+                                        } elseif (preg_match('/([0-9]+(?:\.[0-9]+)?)/', $txt, $mm)) {
+                                            $scoreText = rtrim(rtrim(number_format((float)$mm[1], 2, '.', ''), '0'), '.');
+                                        }
                                         if ($writeRow > $r) {
                                             $s->mergeCells("A{$writeRow}:C{$writeRow}")->setCellValue("A{$writeRow}", $txt);
                                             $s->setCellValue("D{$writeRow}", '........... คะแนน');
@@ -306,6 +319,10 @@ class IndicatorsExport implements FromCollection, WithEvents
                                             $s->setCellValue("D{$writeRow}", '........... คะแนน');
                                             $s->mergeCells("E{$writeRow}:F{$writeRow}")->setCellValue("E{$writeRow}", '');
                                         }
+                                        // override placeholder score with parsed value if available
+                                        try {
+                                            $s->setCellValue("D{$writeRow}", ($scoreText === '' ? '...........' : $scoreText) . ' คะแนน');
+                                        } catch (\Throwable $ex) {}
                                         $writeRow++;
                                     }
                                 }
@@ -317,10 +334,22 @@ class IndicatorsExport implements FromCollection, WithEvents
                                     $rowPtr = $start2 + 1;
                                     foreach ($liItems as $txt) {
                                         $liScore = null;
+                                        if (preg_match('/\(\s*(?:([0-9]+(?:\.[0-9]+)?)\s*คะแนน|คะแนน\s*([0-9]+(?:\.[0-9]+)?)|([0-9]+(?:\.[0-9]+)?))\s*\)/u', $txt, $mm)) {
+                                            $vals = array_values(array_filter([
+                                                $mm[1] ?? null,
+                                                $mm[2] ?? null,
+                                                $mm[3] ?? null,
+                                            ]));
+                                            if (!empty($vals)) {
+                                                $liScore = (float) $vals[0];
+                                            }
+                                        }
+                                        if ($liScore === null) {
                                         if (preg_match('/\(?\s*([0-9]+(?:\.[0-9]+)?)\s*\)?\s*คะแนน/u', $txt, $mm)) {
                                             $liScore = (float) $mm[1];
                                         } elseif (preg_match('/([0-9]+(?:\.[0-9]+)?)/', $txt, $mm)) {
                                             $liScore = (float) $mm[1];
+                                        }
                                         }
                                         $match = ($liScore !== null) && (abs($liScore - $scoreClean) < 0.001);
                                         if ($match) {
@@ -406,7 +435,7 @@ class IndicatorsExport implements FromCollection, WithEvents
                                     }
                                 }
                                 if (empty($criteriaTexts)) {
-                                    $criteriaTexts = ['............................'];
+                                    $criteriaTexts = [];
                                 }
 
                                 foreach ($criteriaTexts as $txt) {
@@ -468,7 +497,7 @@ class IndicatorsExport implements FromCollection, WithEvents
                             }
                         }
                         if (empty($criteriaTexts)) {
-                            $criteriaTexts = ['............................'];
+                            $criteriaTexts = [];
                         }
                         foreach ($criteriaTexts as $txt) {
                             $row++;
