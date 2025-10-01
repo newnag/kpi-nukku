@@ -13,9 +13,16 @@
     font-weight: 500;
     text-decoration: none;
     cursor: pointer;
-    transition: all 0.2s ease-in-out;
+    /* transition: all 0.2s ease-in-out; */
+    transition: box-shadow 0.15s ease, transform 0.06s ease,
+        background 0.2s ease, color 0.2s ease;
     white-space: nowrap;
     user-select: none;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
 }
 
 .btn:focus-visible {
@@ -195,19 +202,80 @@
 }
 
 /* Button Sizes */
+.btn-xs {
+    padding: 0.25rem 0.5rem !important; 
+    font-size: 0.625rem !important;
+    border-radius: 6px !important;
+}
+
 .btn-sm {
-    padding: 0.375rem 0.75rem;
-    font-size: 0.75rem;
+    padding: 0.375rem 0.75rem !important;
+    font-size: 0.75rem !important;
+    border-radius: 6px !important;
+}
+
+.btn-md {
+    padding: 0.5rem 1rem !important;
+    font-size: 0.875rem !important;
+    border-radius: 8px !important;
 }
 
 .btn-lg {
-    padding: 0.75rem 1.5rem;
-    font-size: 1rem;
+    padding: 0.75rem 1.5rem !important;
+    font-size: 1rem !important;
+    border-radius: 10px !important;
 }
 
 .btn-xl {
-    padding: 1rem 2rem;
-    font-size: 1.125rem;
+    padding: 1rem 2rem !important;
+    font-size: 1.125rem !important;
+    border-radius: 12px !important;
+}
+
+.btn-2xl {
+    padding: 1.25rem 2.5rem !important;
+    font-size: 1.25rem !important;
+    border-radius: 14px !important;
+}
+
+/* Button Width Variants */
+.btn-full {
+    width: 100%;
+}
+
+.btn-auto {
+    width: auto;
+}
+
+.btn-fit {
+    width: fit-content;
+}
+
+/* Button Icon Spacing */
+.btn-icon-only {
+    padding: 0.5rem;
+    aspect-ratio: 1;
+    min-width: auto;
+}
+
+.btn-icon-only.btn-xs {
+    padding: 0.25rem;
+}
+
+.btn-icon-only.btn-sm {
+    padding: 0.375rem;
+}
+
+.btn-icon-only.btn-lg {
+    padding: 0.75rem;
+}
+
+.btn-icon-only.btn-xl {
+    padding: 1rem;
+}
+
+.btn-icon-only.btn-2xl {
+    padding: 1.25rem;
 }
 
 /* ===== FORM ELEMENTS ===== */
@@ -682,7 +750,6 @@
     visibility: visible;
     transform: translateX(-50%) translateY(-4px);
 }
-
 
 /* Optional: nicer touch targets on small screens */
 @media (max-width: 640px) {
