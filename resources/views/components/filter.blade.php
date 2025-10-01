@@ -29,7 +29,7 @@
             @if ($showFields['year'])
                 <!-- ปีการประเมิน -->
                 <div class="field">
-                    <label>ปีการประเมิน</label>
+                    <label for="filter-year">ปีการประเมิน</label>
                     <select id="filter-year" name="year">
                         <option value="">ทั้งหมด</option>
                         @foreach ($years as $y)
@@ -45,7 +45,7 @@
             @if ($showFields['codes'])
                 <!-- Codes -->
                 <div class="field">
-                    <label>รหัสตัวบ่งชี้</label>
+                    <label for="filter-codes">รหัสตัวบ่งชี้</label>
                     <select id="filter-codes" name="codes">
                         <option value="">ทั้งหมด</option>
                         @foreach ($filters['codes'] ?? [] as $code)
@@ -62,7 +62,7 @@
                 @endif @if ($showFields['standard'])
                     <!-- มาตรฐานตัวบ่งชี้ -->
                     <div class="field">
-                        <label>มาตรฐานตัวบ่งชี้</label>
+                        <label for="filter-standard">มาตรฐานตัวบ่งชี้</label>
                         <select id="filter-standard" name="standard_id">
                             <option value="">ทั้งหมด</option>
                             @foreach ($standards as $std)
@@ -89,7 +89,7 @@
                 @if ($showFields['dimension'])
                     <!-- ด้านตัวบ่งชี้ -->
                     <div class="field">
-                        <label>ด้านตัวบ่งชี้</label>
+                        <label for="filter-dimension">ด้านตัวบ่งชี้</label>
                         <select id="filter-dimension" name="category_id">
                             <option value="">ทั้งหมด</option>
                             @foreach ($dimensions as $dim)
@@ -116,7 +116,7 @@
                 @if ($showFields['department'])
                     <!-- หน่วยงานที่รับผิดชอบ -->
                     <div class="field">
-                        <label>หน่วยงานที่รับผิดชอบ</label>
+                        <label for="filter-dept">หน่วยงานที่รับผิดชอบ</label>
                         <select id="filter-dept" name="dept_id">
                             <option value="">ทั้งหมด</option>
                             @foreach ($departments as $dept)
@@ -143,7 +143,7 @@
                 @if ($showFields['collector'])
                     <!-- ผู้รับผิดชอบในการรวบรวมข้อมูล -->
                     <div class="field">
-                        <label>ผู้รับผิดชอบในการรวบรวมข้อมูล</label>
+                        <label for="filter-collector">ผู้รับผิดชอบในการรวบรวมข้อมูล</label>
                         <select id="filter-collector" name="collector">
                             <option value="">ทั้งหมด</option>
                             @foreach ($collectors as $col)
@@ -170,7 +170,7 @@
                 @if ($showFields['type'])
                     <!-- ประเภทตัวบ่งชี้ (new UI field; client-side filter) -->
                     <div class="field">
-                        <label>ประเภทตัวบ่งชี้</label>
+                        <label for="filter-type">ประเภทตัวบ่งชี้</label>
                         <select id="filter-type" name="type">
                             <option value="">ทั้งหมด</option>
                             @foreach ($filters['types'] ?? [] as $type)
