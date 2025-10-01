@@ -18,7 +18,7 @@ class ChecklistItemsTableSeeder extends Seeder
 
         \DB::table('checklist_items')->delete();
         
-        \DB::table('checklist_items')->insert(array (
+        $rows = array (
             0 => 
             array (
                 'id' => 271,
@@ -2557,7 +2557,12 @@ class ChecklistItemsTableSeeder extends Seeder
                 'indicator_id' => 1,
                 'description' => NULL,
             ),
-        ));
+        );
+        // Filter out entries for indicator 57 and 58 (keep 8)
+        $rows = array_values(array_filter($rows, function($r){
+            return !isset($r['indicator_id']) || !in_array($r['indicator_id'], [57, 58]);
+        }));
+        \DB::table('checklist_items')->insert($rows);
         
         
     }

@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', "(Read-Only) " . $indicator->code." : ".$indicator->name)
+@section('title', '(Read-Only) ' . $indicator->code . ' : ' . $indicator->name)
 
 @section('content')
 
@@ -195,16 +195,23 @@
                     @empty
                         <p class="text-gray-500">ยังไม่มีตัวแปรที่ต้องกรอก</p>
                     @endforelse
-
+                    <div class="card annotation-card">
+                        <h2 class="card-title">หมายเหตุ</h2>
+                        <div class="description-box">
+                            {!! $indicator->annotation ?? '-' !!}
+                        </div>
+                    </div>
                     <div class="action-bts">
-                        <button type="button" class="btns-secondary" onclick="location.href='{{ route('dashboardkpi.index') }}'">
+                        <button type="button" class="btns-secondary"
+                            onclick="location.href='{{ route('dashboardkpi.index') }}'">
                             <i class="fa fa-undo"></i> กลับ
                         </button>
                     </div>
                 </div>
             @else
                 <div class="action-bts">
-                    <button type="button" class="btns-secondary" onclick="location.href='{{ route('dashboardkpi.index') }}'">
+                    <button type="button" class="btns-secondary"
+                        onclick="location.href='{{ route('dashboardkpi.index') }}'">
                         <i class="fa fa-undo"></i> กลับ
                     </button>
                 </div>
@@ -367,6 +374,18 @@
             margin: 24px 0;
         }
 
+        .annotation-card {
+            margin-top: 20px;
+            padding: 16px 20px;
+            background: #fffbea;
+            /* เหลืองอ่อน */
+            border: 1px solid #fffbea;
+            /* เส้นกรอบเหลือง */
+            border-radius: 12px;
+            color: #92400e;
+            /* น้ำตาลเข้ม */
+        }
+
         .description-box {
             background: #f9fafb;
             /* gray-50 */
@@ -412,7 +431,7 @@
 
         .criteria-status {
             /* font-weight: 600;
-                                                                                                font-size: 14px; */
+                                                                                                        font-size: 14px; */
             color: #1f2937;
         }
 

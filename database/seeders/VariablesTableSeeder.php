@@ -18,7 +18,7 @@ class VariablesTableSeeder extends Seeder
 
         \DB::table('variables')->delete();
         
-        \DB::table('variables')->insert(array (
+        $rows = array (
             0 => 
             array (
                 'id' => 212,
@@ -525,7 +525,12 @@ class VariablesTableSeeder extends Seeder
                 'created_at' => '2025-09-30 03:23:18',
                 'updated_at' => '2025-09-30 03:23:40',
             ),
-        ));
+        );
+        // Filter out entries for indicator 57 and 58 (keep 8)
+        $rows = array_values(array_filter($rows, function($r){
+            return !isset($r['indicator_id']) || !in_array($r['indicator_id'], [57, 58]);
+        }));
+        \DB::table('variables')->insert($rows);
         
         
     }

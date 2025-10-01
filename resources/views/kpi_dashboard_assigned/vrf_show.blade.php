@@ -327,7 +327,12 @@
                 <!-- ✅ hidden status -->
                 <input type="hidden" name="status" id="status-input" value="{{ $indicator->status ?? 2 }}">
             </form>
-
+            <div class="card annotation-card">
+                <h2 class="card-title">หมายเหตุ</h2>
+                <div class="description-box">
+                    {!! $indicator->annotation ?? '-' !!}
+                </div>
+            </div>
             <div class="card">
                 <h2 class="card-title">คะแนนที่ได้</h2>
                 <div class="score-display-container">
@@ -345,18 +350,7 @@
                         </div>
                     </div>
                 </div>
-                {{-- <div class="score-percentage">
-                    @php
-                        $percentage = 0;
-                        if (($indicator->max_score ?? 0) > 0) {
-                            $percentage = (($indicator->score_acc ?? 0) / $indicator->max_score) * 100;
-                        }
-                    @endphp
-                    <div class="percentage-bar">
-                        <div class="percentage-fill" style="width: {{ min($percentage, 100) }}%"></div>
-                    </div>
-                    <div class="percentage-text">{{ number_format($percentage, 1) }}%</div>
-                </div> --}}
+
             </div>
 
             <div class="action-bts">
@@ -1189,7 +1183,7 @@
 
         .criteria-status {
             /* font-weight: 600;
-                                                                                                        font-size: 14px; */
+                                                                                                                font-size: 14px; */
             color: #1f2937;
         }
 
@@ -1320,7 +1314,7 @@
             padding: 16px 20px;
             background: #fffbea;
             /* เหลืองอ่อน */
-            border: 1px solid #fde68a;
+            border: 1px solid #fffbea;
             /* เส้นกรอบเหลือง */
             border-radius: 12px;
             color: #92400e;
@@ -1632,38 +1626,38 @@
         }
 
         /* .score-percentage {
-                                        margin-top: 16px;
-                                        text-align: center;
-                                    }
+                                                margin-top: 16px;
+                                                text-align: center;
+                                            }
 
-                                    .percentage-bar {
-                                        width: 100%;
-                                        height: 12px;
-                                        background: #e2e8f0;
-                                        border-radius: 6px;
-                                        overflow: hidden;
-                                        margin-bottom: 8px;
-                                        position: relative;
-                                    }
+                                            .percentage-bar {
+                                                width: 100%;
+                                                height: 12px;
+                                                background: #e2e8f0;
+                                                border-radius: 6px;
+                                                overflow: hidden;
+                                                margin-bottom: 8px;
+                                                position: relative;
+                                            }
 
-                                    .percentage-fill {
-                                        height: 100%;
-                                        background: linear-gradient(90deg, #3b82f6 0%, #10b981 50%, #22c55e 100%);
-                                        border-radius: 6px;
-                                        transition: width 0.3s ease;
-                                        position: relative;
-                                    }
+                                            .percentage-fill {
+                                                height: 100%;
+                                                background: linear-gradient(90deg, #3b82f6 0%, #10b981 50%, #22c55e 100%);
+                                                border-radius: 6px;
+                                                transition: width 0.3s ease;
+                                                position: relative;
+                                            }
 
-                                    .percentage-fill::after {
-                                        content: '';
-                                        position: absolute;
-                                        top: 0;
-                                        left: 0;
-                                        right: 0;
-                                        bottom: 0;
-                                        background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.3) 50%, transparent 100%);
-                                        animation: shimmer 2s infinite;
-                                    } */
+                                            .percentage-fill::after {
+                                                content: '';
+                                                position: absolute;
+                                                top: 0;
+                                                left: 0;
+                                                right: 0;
+                                                bottom: 0;
+                                                background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.3) 50%, transparent 100%);
+                                                animation: shimmer 2s infinite;
+                                            } */
 
         @keyframes shimmer {
             0% {

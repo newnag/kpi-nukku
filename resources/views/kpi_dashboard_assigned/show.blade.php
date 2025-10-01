@@ -200,7 +200,7 @@
                 @endforelse
             </div>
 
-                @php
+            @php
                 $condition = $indicator->condition ?? '';
                 // ลบช่องว่างรอบ ๆ
                 $trimmed = trim($condition);
@@ -248,6 +248,12 @@
                         @endforelse
                     </div>
                 @endif
+                <div class="card annotation-card">
+                    <h2 class="card-title">หมายเหตุ</h2>
+                    <div class="description-box">
+                        {!! $indicator->annotation ?? '-' !!}
+                    </div>
+                </div>
                 @if (in_array($indicator->status, [3, 4]))
                     <div class="card">
                         <h2 class="card-title">คะแนนที่ได้</h2>
@@ -758,7 +764,7 @@
 
         .criteria-status {
             /* font-weight: 600;
-                font-size: 14px; */
+                        font-size: 14px; */
             color: #1f2937;
         }
 
@@ -778,6 +784,18 @@
             padding: 10px;
             display: flex;
             justify-content: center;
+        }
+
+        .annotation-card {
+            margin-top: 20px;
+            padding: 16px 20px;
+            background: #fffbea;
+            /* เหลืองอ่อน */
+            border: 1px solid #fffbea;
+            /* เส้นกรอบเหลือง */
+            border-radius: 12px;
+            color: #92400e;
+            /* น้ำตาลเข้ม */
         }
 
         .btn-adds {
@@ -1214,38 +1232,38 @@
         }
 
         /* .score-percentage {
-                        margin-top: 16px;
-                        text-align: center;
-                    }
+                                margin-top: 16px;
+                                text-align: center;
+                            }
 
-                    .percentage-bar {
-                        width: 100%;
-                        height: 12px;
-                        background: #e2e8f0;
-                        border-radius: 6px;
-                        overflow: hidden;
-                        margin-bottom: 8px;
-                        position: relative;
-                    }
+                            .percentage-bar {
+                                width: 100%;
+                                height: 12px;
+                                background: #e2e8f0;
+                                border-radius: 6px;
+                                overflow: hidden;
+                                margin-bottom: 8px;
+                                position: relative;
+                            }
 
-                    .percentage-fill {
-                        height: 100%;
-                        background: linear-gradient(90deg, #3b82f6 0%, #10b981 50%, #22c55e 100%);
-                        border-radius: 6px;
-                        transition: width 0.3s ease;
-                        position: relative;
-                    }
+                            .percentage-fill {
+                                height: 100%;
+                                background: linear-gradient(90deg, #3b82f6 0%, #10b981 50%, #22c55e 100%);
+                                border-radius: 6px;
+                                transition: width 0.3s ease;
+                                position: relative;
+                            }
 
-                    .percentage-fill::after {
-                        content: '';
-                        position: absolute;
-                        top: 0;
-                        left: 0;
-                        right: 0;
-                        bottom: 0;
-                        background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.3) 50%, transparent 100%);
-                        animation: shimmer 2s infinite;
-                    } */
+                            .percentage-fill::after {
+                                content: '';
+                                position: absolute;
+                                top: 0;
+                                left: 0;
+                                right: 0;
+                                bottom: 0;
+                                background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.3) 50%, transparent 100%);
+                                animation: shimmer 2s infinite;
+                            } */
 
         @keyframes shimmer {
             0% {
