@@ -176,7 +176,7 @@ class CriteriasTableSeeder extends Seeder
             'description' => NULL,
             'sequence' => 1,
             'indicator_id' => 12,
-            'status' => 1,
+            'status' => 0,
             'report' => NULL,
         ),
         16 => 
@@ -186,7 +186,7 @@ class CriteriasTableSeeder extends Seeder
             'description' => NULL,
             'sequence' => 3,
             'indicator_id' => 12,
-            'status' => 1,
+            'status' => 0,
             'report' => NULL,
         ),
         17 => 
@@ -1356,7 +1356,7 @@ class CriteriasTableSeeder extends Seeder
             'description' => NULL,
             'sequence' => 2,
             'indicator_id' => 12,
-            'status' => 1,
+            'status' => 0,
             'report' => NULL,
         ),
         134 => 

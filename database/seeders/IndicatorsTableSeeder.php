@@ -1083,6 +1083,8 @@ class IndicatorsTableSeeder extends Seeder
         'updated_at' => '2025-10-01 03:35:19',
         'categorie_id' => 2,
     ),
-        ));
+));
+        
+        
     }
 }

@@ -18,7 +18,7 @@ class VariablesTableSeeder extends Seeder
 
         \DB::table('variables')->delete();
         
-        $rows = array (
+        \DB::table('variables')->insert(array (
             0 => 
             array (
                 'id' => 212,
@@ -307,39 +307,6 @@ class VariablesTableSeeder extends Seeder
             ),
             26 => 
             array (
-                'id' => 155,
-                'variable_name' => 'input_1',
-                'label_name' => 'ร้อยละของอาจารย์ประจำที่มีคุณวุฒิปริญญาเอก',
-                'type' => 'input',
-                'value' => 60.0,
-                'indicator_id' => 58,
-                'created_at' => '2025-09-26 07:38:08',
-                'updated_at' => '2025-09-26 07:38:08',
-            ),
-            27 => 
-            array (
-                'id' => 156,
-                'variable_name' => 'defined_1',
-                'label_name' => 'ตัวหาร',
-                'type' => 'defined',
-                'value' => 40.0,
-                'indicator_id' => 58,
-                'created_at' => '2025-09-26 07:38:08',
-                'updated_at' => '2025-09-26 07:38:08',
-            ),
-            28 => 
-            array (
-                'id' => 157,
-                'variable_name' => 'defined_2',
-                'label_name' => 'ตัวคูณ',
-                'type' => 'defined',
-                'value' => 10.0,
-                'indicator_id' => 58,
-                'created_at' => '2025-09-26 07:38:08',
-                'updated_at' => '2025-09-26 07:38:08',
-            ),
-            29 => 
-            array (
                 'id' => 182,
                 'variable_name' => 'defined_1',
                 'label_name' => 'ตัวคูณ',
@@ -349,7 +316,7 @@ class VariablesTableSeeder extends Seeder
                 'created_at' => '2025-09-29 09:39:31',
                 'updated_at' => '2025-09-29 09:39:31',
             ),
-            30 => 
+            27 => 
             array (
                 'id' => 183,
                 'variable_name' => 'input_2',
@@ -360,7 +327,7 @@ class VariablesTableSeeder extends Seeder
                 'created_at' => '2025-09-29 09:39:31',
                 'updated_at' => '2025-09-29 09:39:31',
             ),
-            31 => 
+            28 => 
             array (
                 'id' => 184,
                 'variable_name' => 'input_1',
@@ -371,7 +338,7 @@ class VariablesTableSeeder extends Seeder
                 'created_at' => '2025-09-29 09:39:31',
                 'updated_at' => '2025-09-29 09:39:31',
             ),
-            32 => 
+            29 => 
             array (
                 'id' => 189,
                 'variable_name' => 'input_1',
@@ -382,7 +349,7 @@ class VariablesTableSeeder extends Seeder
                 'created_at' => '2025-09-30 02:37:59',
                 'updated_at' => '2025-09-30 02:42:40',
             ),
-            33 => 
+            30 => 
             array (
                 'id' => 190,
                 'variable_name' => 'input_2',
@@ -393,7 +360,7 @@ class VariablesTableSeeder extends Seeder
                 'created_at' => '2025-09-30 02:37:59',
                 'updated_at' => '2025-09-30 02:42:40',
             ),
-            34 => 
+            31 => 
             array (
                 'id' => 191,
                 'variable_name' => 'input_1',
@@ -404,7 +371,7 @@ class VariablesTableSeeder extends Seeder
                 'created_at' => '2025-09-30 02:51:41',
                 'updated_at' => '2025-09-30 02:51:41',
             ),
-            35 => 
+            32 => 
             array (
                 'id' => 192,
                 'variable_name' => 'input_2',
@@ -415,7 +382,7 @@ class VariablesTableSeeder extends Seeder
                 'created_at' => '2025-09-30 02:51:41',
                 'updated_at' => '2025-09-30 02:51:41',
             ),
-            36 => 
+            33 => 
             array (
                 'id' => 193,
                 'variable_name' => 'defined_1',
@@ -426,7 +393,7 @@ class VariablesTableSeeder extends Seeder
                 'created_at' => '2025-09-30 02:51:41',
                 'updated_at' => '2025-09-30 02:51:41',
             ),
-            37 => 
+            34 => 
             array (
                 'id' => 195,
                 'variable_name' => 'input_1',
@@ -437,7 +404,7 @@ class VariablesTableSeeder extends Seeder
                 'created_at' => '2025-09-30 03:00:07',
                 'updated_at' => '2025-09-30 03:00:07',
             ),
-            38 => 
+            35 => 
             array (
                 'id' => 196,
                 'variable_name' => 'input_1',
@@ -448,7 +415,7 @@ class VariablesTableSeeder extends Seeder
                 'created_at' => '2025-09-30 03:02:00',
                 'updated_at' => '2025-09-30 03:02:00',
             ),
-            39 => 
+            36 => 
             array (
                 'id' => 197,
                 'variable_name' => 'input_2',
@@ -459,7 +426,7 @@ class VariablesTableSeeder extends Seeder
                 'created_at' => '2025-09-30 03:02:00',
                 'updated_at' => '2025-09-30 03:02:00',
             ),
-            40 => 
+            37 => 
             array (
                 'id' => 198,
                 'variable_name' => 'defined_1',
@@ -470,7 +437,7 @@ class VariablesTableSeeder extends Seeder
                 'created_at' => '2025-09-30 03:02:00',
                 'updated_at' => '2025-09-30 03:02:00',
             ),
-            41 => 
+            38 => 
             array (
                 'id' => 199,
                 'variable_name' => 'input_1',
@@ -481,7 +448,7 @@ class VariablesTableSeeder extends Seeder
                 'created_at' => '2025-09-30 03:03:01',
                 'updated_at' => '2025-09-30 03:03:01',
             ),
-            42 => 
+            39 => 
             array (
                 'id' => 200,
                 'variable_name' => 'input_2',
@@ -492,7 +459,7 @@ class VariablesTableSeeder extends Seeder
                 'created_at' => '2025-09-30 03:03:01',
                 'updated_at' => '2025-09-30 03:03:01',
             ),
-            43 => 
+            40 => 
             array (
                 'id' => 201,
                 'variable_name' => 'defined_1',
@@ -503,7 +470,7 @@ class VariablesTableSeeder extends Seeder
                 'created_at' => '2025-09-30 03:03:01',
                 'updated_at' => '2025-09-30 03:03:01',
             ),
-            44 => 
+            41 => 
             array (
                 'id' => 204,
                 'variable_name' => 'input_2',
@@ -514,7 +481,7 @@ class VariablesTableSeeder extends Seeder
                 'created_at' => '2025-09-30 03:23:18',
                 'updated_at' => '2025-09-30 03:23:40',
             ),
-            45 => 
+            42 => 
             array (
                 'id' => 205,
                 'variable_name' => 'input_1',
@@ -525,12 +492,7 @@ class VariablesTableSeeder extends Seeder
                 'created_at' => '2025-09-30 03:23:18',
                 'updated_at' => '2025-09-30 03:23:40',
             ),
-        );
-        // Filter out entries for indicator 57 and 58 (keep 8)
-        $rows = array_values(array_filter($rows, function($r){
-            return !isset($r['indicator_id']) || !in_array($r['indicator_id'], [57, 58]);
-        }));
-        \DB::table('variables')->insert($rows);
+        ));
         
         
     }
