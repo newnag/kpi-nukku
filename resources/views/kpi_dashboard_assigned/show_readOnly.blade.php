@@ -386,6 +386,24 @@
             /* น้ำตาลเข้ม */
         }
 
+        .description-box ul {
+            list-style-type: disc;
+            /* จุดกลม */
+            padding-left: 1.5rem;
+            margin: 0.5rem 0;
+        }
+
+        .description-box ol {
+            list-style-type: decimal;
+            /* ตัวเลข */
+            padding-left: 1.5rem;
+            margin: 0.5rem 0;
+        }
+
+        .description-box li {
+            margin: 0.25rem 0;
+        }
+
         .description-box {
             background: #f9fafb;
             /* gray-50 */
@@ -431,7 +449,7 @@
 
         .criteria-status {
             /* font-weight: 600;
-                                                                                                        font-size: 14px; */
+                                                                                                            font-size: 14px; */
             color: #1f2937;
         }
 

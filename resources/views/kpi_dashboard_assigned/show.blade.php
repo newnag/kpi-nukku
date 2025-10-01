@@ -764,7 +764,7 @@
 
         .criteria-status {
             /* font-weight: 600;
-                        font-size: 14px; */
+                            font-size: 14px; */
             color: #1f2937;
         }
 
@@ -913,6 +913,23 @@
             color: #78350f;
         }
 
+        .description-box ul {
+            list-style-type: disc;
+            /* จุดกลม */
+            padding-left: 1.5rem;
+            margin: 0.5rem 0;
+        }
+
+        .description-box ol {
+            list-style-type: decimal;
+            /* ตัวเลข */
+            padding-left: 1.5rem;
+            margin: 0.5rem 0;
+        }
+
+        .description-box li {
+            margin: 0.25rem 0;
+        }
 
         .total-score-card {
             margin-top: 20px;
@@ -1232,38 +1249,38 @@
         }
 
         /* .score-percentage {
-                                margin-top: 16px;
-                                text-align: center;
-                            }
+                                    margin-top: 16px;
+                                    text-align: center;
+                                }
 
-                            .percentage-bar {
-                                width: 100%;
-                                height: 12px;
-                                background: #e2e8f0;
-                                border-radius: 6px;
-                                overflow: hidden;
-                                margin-bottom: 8px;
-                                position: relative;
-                            }
+                                .percentage-bar {
+                                    width: 100%;
+                                    height: 12px;
+                                    background: #e2e8f0;
+                                    border-radius: 6px;
+                                    overflow: hidden;
+                                    margin-bottom: 8px;
+                                    position: relative;
+                                }
 
-                            .percentage-fill {
-                                height: 100%;
-                                background: linear-gradient(90deg, #3b82f6 0%, #10b981 50%, #22c55e 100%);
-                                border-radius: 6px;
-                                transition: width 0.3s ease;
-                                position: relative;
-                            }
+                                .percentage-fill {
+                                    height: 100%;
+                                    background: linear-gradient(90deg, #3b82f6 0%, #10b981 50%, #22c55e 100%);
+                                    border-radius: 6px;
+                                    transition: width 0.3s ease;
+                                    position: relative;
+                                }
 
-                            .percentage-fill::after {
-                                content: '';
-                                position: absolute;
-                                top: 0;
-                                left: 0;
-                                right: 0;
-                                bottom: 0;
-                                background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.3) 50%, transparent 100%);
-                                animation: shimmer 2s infinite;
-                            } */
+                                .percentage-fill::after {
+                                    content: '';
+                                    position: absolute;
+                                    top: 0;
+                                    left: 0;
+                                    right: 0;
+                                    bottom: 0;
+                                    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.3) 50%, transparent 100%);
+                                    animation: shimmer 2s infinite;
+                                } */
 
         @keyframes shimmer {
             0% {
