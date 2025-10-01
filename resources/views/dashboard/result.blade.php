@@ -106,47 +106,57 @@
         <span>กรองข้อมูล</span>
     </div>
 
-    <!-- ฟิลเตอร์ -->
-    <div class="filter-card card" id="filter-panel" style="display:none;">
-        <h2 class="card-title">กรองข้อมูลการประเมิน</h2>
-        <div class="form-grid">
-            <div class="field">
-                <label>ปีการประเมิน</label>
-                <select id="filter-year">
-                    <option value="">ทั้งหมด</option>
-                </select>
-            </div>
-            <div class="field">
-                <label>รหัสตัวบ่งชี้</label>
-                <select id="filter-code">
-                    <option value="">ทั้งหมด</option>
-                </select>
-            </div>
-            <div class="field">
-                <label>มาตรฐานตัวบ่งชี้</label>
-                <select id="filter-standard">
-                    <option value="">ทั้งหมด</option>
-                </select>
-            </div>
-            <div class="field">
-                <label>ด้านตัวบ่งชี้</label>
-                <select id="filter-dimension">
-                    <option value="">ทั้งหมด</option>
-                </select>
-            </div>
-            <div class="field">
-                <label>ประเภทตัวบ่งชี้</label>
-                <select id="filter-type">
-                    <option value="">ทั้งหมด</option>
-                </select>
-            </div>
-        </div>
-
-        <div class="card-actions">
-            <button type="button" id="reset-filters" class="btn btn-outline">ล้างค่า</button>
-            <button type="button" id="apply-filters" class="btn btn-primary">กรองข้อมูล</button>
-        </div>
-    </div>
+    <!-- Filter Component -->
+    <x-filter 
+        :years="$filters['years'] ?? []" 
+        :standards="$filters['standards'] ?? []" 
+        :departments="[]" 
+        :collectors="[]"
+        :dimensions="$filters['dimensions'] ?? []"
+        :filters="$filters"
+        :action="route('dashboard.getData')"
+        title="กรองข้อมูลการประเมิน"
+        filterId="filter-panel"
+        formId="result-filter-form"
+                :showFields="[
+            'year' => true,
+            'codes' => true,
+            'standard' => true,
+            'dimension' => true,
+            'department' => false,
+            'collector' => false,
+            'type' => true
+        ]"
+    >
+        <script>
+            // Custom JavaScript สำหรับหน้า result
+            document.addEventListener('DOMContentLoaded', function() {
+                // รอให้ FilterComponent โหลดเสร็จ
+                setTimeout(function() {
+                    if (typeof window.FilterComponent !== 'undefined') {
+                        window.FilterComponent.init({
+                            filterId: 'filter-panel',
+                            formId: 'result-filter-form',
+                            onApply: function() {
+                                console.log('Filter applied in result page');
+                                // เรียกใช้ฟังก์ชัน applyFilters ของหน้า result
+                                if (typeof window.applyResultFilters === 'function') {
+                                    window.applyResultFilters();
+                                }
+                            },
+                            onReset: function() {
+                                console.log('Filter reset in result page');
+                                // เรียกใช้ฟังก์ชัน resetFilters ของหน้า result
+                                if (typeof window.resetResultFilters === 'function') {
+                                    window.resetResultFilters();
+                                }
+                            }
+                        });
+                    }
+                }, 100);
+            });
+        </script>
+    </x-filter>
 
     <div class="chart-card ">
 
@@ -612,10 +622,124 @@
                 card.style.display = title.includes(q) ? '' : 'none';
             });
         });
+        
+        // ==== เก็บ instance ของ ApexCharts (ย้ายออกมาข้างนอก) ====
+        window.chartInstances = window.chartInstances || {};
+        window.chartOriginals = window.chartOriginals || {};
+
+        // ==== init ApexCharts (ย้ายออกมาข้างนอก) ====
+        window.initChartsFromInlineJSON = function() {
+            document.querySelectorAll('div[id^="chart-"]').forEach(container => {
+                const key = container.id.replace(/^chart-/, '');
+                const dataEl = document.getElementById('data-' + key);
+                if (!dataEl) return;
+
+                let payload = {
+                    years: [],
+                    values: [],
+                    max_values: []
+                };
+                try {
+                    payload = JSON.parse(dataEl.textContent || '{}');
+                } catch {}
+
+                const years = (payload.years || []).map(y => String(y));
+                const values = (payload.values || []).map(v => Number(v));
+                const maxValues = (payload.max_values || []).map(v => Number(v));
+
+                // 🔥 เก็บข้อมูลต้นฉบับ
+                window.chartOriginals[container.id] = {
+                    years,
+                    values,
+                    maxValues
+                };
+
+                const options = {
+                    series: [{
+                            name: "คะแนนที่ได้",
+                            data: years.map((x, i) => ({
+                                x,
+                                y: values[i] ?? null
+                            }))
+                        },
+                        {
+                            name: "คะแนนเต็ม",
+                            data: years.map((x, i) => ({
+                                x,
+                                y: maxValues[i] ?? null
+                            }))
+                        }
+                    ],
+                    chart: {
+                        type: 'area',
+                        height: 220,
+                        toolbar: {
+                            show: false
+                        }
+                    },
+                    plotOptions: {
+                        bar: {
+                            borderRadius: 6,
+                            columnWidth: '40%'
+                        }
+                    },
+                    dataLabels: {
+                        enabled: true
+                    },
+                    xaxis: {
+                        categories: years
+                    },
+                    yaxis: {
+                        title: {
+                            text: 'คะแนน'
+                        }
+                    }
+                };
+
+                const chart = new ApexCharts(container, options);
+                chart.render();
+
+                // 🔥 เก็บ instance ของ chart
+                window.chartInstances[container.id] = chart;
+            });
+        };
+
+        // ==== ฟังก์ชัน Show More (ย้ายออกมาข้างนอก) ====
+        window.bindShowMore = function() {
+            document.querySelectorAll('.btn-show-more').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const sid = this.dataset.standardId;
+                    const container = document.querySelector(
+                        `.charts-of-standard[data-standard-id="${sid}"]`);
+                    if (!container) return;
+                    const cards = container.querySelectorAll('.chart-card[data-index]');
+                    const isExpanded = this.classList.contains('expanded');
+                    if (!isExpanded) {
+                        cards.forEach(c => c.style.display = '');
+                        this.textContent = 'แสดงน้อยลง';
+                        this.classList.add('expanded');
+                    } else {
+                        cards.forEach(c => {
+                            const idx = parseInt(c.dataset.index, 10);
+                            c.style.display = idx < 5 ? '' : 'none';
+                        });
+                        this.textContent = 'แสดงเพิ่มเติม';
+                        this.classList.remove('expanded');
+                    }
+                });
+            });
+        };
+        
         (function() {
+            // หยุดการทำงานถ้า FilterComponent มีอยู่แล้ว
+            if (typeof window.FilterComponent !== 'undefined') {
+                console.log('FilterComponent detected, skipping legacy filter initialization');
+                return;
+            }
+            
             const FILTERS = @json($filters, JSON_UNESCAPED_UNICODE);
             const $year = document.getElementById('filter-year');
-            const $code = document.getElementById('filter-code');
+            const $code = document.getElementById('filter-codes');
             const $std = document.getElementById('filter-standard');
             const $dim = document.getElementById('filter-dimension');
             const $type = document.getElementById('filter-type');
@@ -655,7 +779,7 @@
                 });
             }
             fillSelect($year, (FILTERS.years || []).slice().sort());
-            fillSelect($code, sortCodes(FILTERS.codes));
+            fillSelect($code, sortCodes(FILTERS.codes || []));
             fillSelect($std, (FILTERS.standards || []).slice().sort((a, b) => a.name.localeCompare(b.name, 'th')), it =>
                 ({
                     value: String(it.id),
@@ -663,114 +787,6 @@
                 }));
             fillSelect($dim, (FILTERS.dimensions || []).slice().sort());
             fillSelect($type, (FILTERS.types || []).slice().sort());
-
-            // ==== เก็บ instance ของ ApexCharts ====
-            const chartInstances = {};
-            const chartOriginals = {};
-
-            // ==== init ApexCharts ====
-            function initChartsFromInlineJSON() {
-                document.querySelectorAll('div[id^="chart-"]').forEach(container => {
-                    const key = container.id.replace(/^chart-/, '');
-                    const dataEl = document.getElementById('data-' + key);
-                    if (!dataEl) return;
-
-                    let payload = {
-                        years: [],
-                        values: [],
-                        max_values: []
-                    };
-                    try {
-                        payload = JSON.parse(dataEl.textContent || '{}');
-                    } catch {}
-
-                    const years = (payload.years || []).map(y => String(y));
-                    const values = (payload.values || []).map(v => Number(v));
-                    const maxValues = (payload.max_values || []).map(v => Number(v));
-
-                    // 🔥 เก็บข้อมูลต้นฉบับ
-                    chartOriginals[container.id] = {
-                        years,
-                        values,
-                        maxValues
-                    };
-
-                    const options = {
-                        series: [{
-                                name: "คะแนนที่ได้",
-                                data: years.map((x, i) => ({
-                                    x,
-                                    y: values[i] ?? null
-                                }))
-                            },
-                            {
-                                name: "คะแนนเต็ม",
-                                data: years.map((x, i) => ({
-                                    x,
-                                    y: maxValues[i] ?? null
-                                }))
-                            }
-                        ],
-                        chart: {
-                            type: 'area',
-                            height: 220,
-                            toolbar: {
-                                show: false
-                            }
-                        },
-                        plotOptions: {
-                            bar: {
-                                borderRadius: 6,
-                                columnWidth: '40%'
-                            }
-                        },
-                        dataLabels: {
-                            enabled: true
-                        },
-                        xaxis: {
-                            categories: years
-                        },
-                        yaxis: {
-                            title: {
-                                text: 'คะแนน'
-                            }
-                        }
-                    };
-
-                    const chart = new ApexCharts(container, options);
-                    chart.render();
-
-                    // 🔥 เก็บ instance ของ chart
-                    chartInstances[container.id] = chart;
-                });
-            }
-
-
-            // ==== ฟังก์ชัน Show More ====
-            function bindShowMore() {
-                document.querySelectorAll('.btn-show-more').forEach(btn => {
-                    btn.addEventListener('click', function() {
-                        const sid = this.dataset.standardId;
-                        const container = document.querySelector(
-                            `.charts-of-standard[data-standard-id="${sid}"]`);
-                        if (!container) return;
-                        const cards = container.querySelectorAll('.chart-card[data-index]');
-                        const isExpanded = this.classList.contains('expanded');
-                        if (!isExpanded) {
-                            cards.forEach(c => c.style.display = '');
-                            this.textContent = 'แสดงน้อยลง';
-                            this.classList.add('expanded');
-                        } else {
-                            cards.forEach(c => {
-                                const idx = parseInt(c.dataset.index, 10);
-                                c.style.display = idx < 5 ? '' : 'none';
-                            });
-                            this.textContent = 'แสดงเพิ่มเติม';
-                            this.classList.remove('expanded');
-                        }
-                    });
-                });
-            }
 
             // ==== ฟิลเตอร์ ====
             async function applyFilters() {
@@ -821,8 +837,8 @@
                 });
 
                 // === update charts ตาม year filter ===
-                Object.entries(chartInstances).forEach(([id, chart]) => {
-                    const orig = chartOriginals[id];
+                Object.entries(window.chartInstances).forEach(([id, chart]) => {
+                    const orig = window.chartOriginals[id];
                     if (!orig) return;
 
                     let newYears = orig.years.slice();
@@ -878,8 +894,8 @@
                 });
 
                 // รีเซ็ต chart กลับเป็นข้อมูลต้นฉบับ
-                Object.entries(chartInstances).forEach(([id, chart]) => {
-                    const orig = chartOriginals[id];
+                Object.entries(window.chartInstances).forEach(([id, chart]) => {
+                    const orig = window.chartOriginals[id];
                     chart.updateOptions({
                         xaxis: {
                             categories: orig.years
@@ -909,16 +925,57 @@
                 });
             }
 
-            document.getElementById('apply-filters').addEventListener('click', applyFilters);
-            document.getElementById('reset-filters').addEventListener('click', () => {
+            // สร้าง global functions สำหรับ FilterComponent
+            window.applyResultFilters = applyFilters;
+            window.resetResultFilters = function() {
+                resetFilters();
+                applyFilters();
+            };
+
+            // Fallback event listeners
+            document.getElementById('apply-filters')?.addEventListener('click', applyFilters);
+            document.getElementById('reset-filters')?.addEventListener('click', () => {
                 resetFilters();
                 applyFilters();
             });
 
             // ==== init ====
-            initChartsFromInlineJSON();
-            bindShowMore();
+            if (typeof window.FilterComponent === 'undefined') {
+                // เฉพาะเมื่อไม่มี FilterComponent เท่านั้น
+                window.initChartsFromInlineJSON();
+                window.bindShowMore();
+            }
         })();
+
+        // ==== เริ่มต้น FilterComponent (ย้ายออกมาข้างนอก) ====
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof window.FilterComponent !== 'undefined') {
+                window.FilterComponent.init({
+                    filterId: 'filter-panel',
+                    formId: 'result-filter-form',
+                    onApply: function() {
+                        if (typeof window.applyResultFilters === 'function') {
+                            window.applyResultFilters();
+                        }
+                    },
+                    onReset: function() {
+                        if (typeof window.resetResultFilters === 'function') {
+                            window.resetResultFilters();
+                        }
+                    }
+                });
+                
+                // Initialize charts เมื่อใช้ FilterComponent
+                setTimeout(function() {
+                    if (typeof window.initChartsFromInlineJSON === 'function') {
+                        window.initChartsFromInlineJSON();
+                    }
+                    if (typeof window.bindShowMore === 'function') {
+                        window.bindShowMore();
+                    }
+                }, 100);
+            }
+        });
     </script>
 
 
@@ -1172,169 +1229,32 @@
     </style>
 
     <style>
-        /* ---- Base ---- */
+        /* ---- Base Variables ---- */
         :root {
             --blue: #398ECA;
             --blue-600: #2f7db2;
             --text: #1f2937;
-            /* gray-800 */
             --muted: #6b7280;
-            /* gray-500 */
             --border: #e5e7eb;
-            /* gray-200 */
             --bg: #ffffff;
             --shadow: 0 8px 24px rgba(0, 0, 0, .08);
             --radius: 16px;
             --radius-sm: 10px;
+            
+            /* CSS Variables for FilterComponent */
+            --color-blue-500: #3b82f6;
+            --color-blue-600: #2563eb;
+            --color-blue-700: #1d4ed8;
+            --color-blue-50: #eff6ff;
+            --color-white: #ffffff;
+            --color-gray-200: #e5e7eb;
+            --color-gray-400: #9ca3af;
+            --color-gray-500: #6b7280;
+            --color-gray-700: #374151;
+            --color-gray-50: #f9fafb;
         }
 
-        .card {
-            background: var(--bg);
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            padding: 24px;
-            /* max-width: 920px; */
-            /* ปรับตามหน้า */
-            margin: 16px auto;
-            border: 1px solid #f3f4f6;
-        }
-
-        .card-title {
-            font-size: 18px;
-            font-weight: 700;
-            color: var(--blue);
-            margin: 0 0 16px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            position: relative;
-            padding-left: 10px;
-        }
-
-        .card-title::before {
-            content: "";
-            width: 4px;
-            height: 20px;
-            border-radius: 8px;
-            background: var(--blue);
-            position: absolute;
-            left: 0;
-            top: 2px;
-            opacity: .25;
-        }
-
-        /* ---- Grid ---- */
-        .form-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 14px 16px;
-        }
-
-        @media (min-width: 768px) {
-            .form-grid {
-                grid-template-columns: 1fr 1fr;
-            }
-        }
-
-        /* ---- Fields ---- */
-        .field {
-            margin-bottom: 16px;
-        }
-
-        .field label {
-            display: block;
-            font-size: 13px;
-            color: var(--text);
-            margin-bottom: 6px;
-            font-weight: 600;
-        }
-
-        .field select {
-            width: 100%;
-            height: 40px;
-            border: 1px solid var(--border);
-            border-radius: var(--radius-sm);
-            padding: 0 36px 0 12px;
-            /* padding ขวาเยอะขึ้น กันทับลูกศร */
-            font-size: 14px;
-            color: var(--text);
-            background: #fff;
-            outline: none;
-            transition: box-shadow .2s, border-color .2s;
-            appearance: none;
-            cursor: pointer;
-
-            /* ลูกศร custom */
-            background-image:
-                linear-gradient(45deg, transparent 50%, var(--muted) 50%),
-                linear-gradient(135deg, var(--muted) 50%, transparent 50%);
-            background-position:
-                calc(100% - 18px) 16px,
-                calc(100% - 12px) 16px;
-            background-size: 6px 6px, 6px 6px;
-            background-repeat: no-repeat;
-        }
-
-        .field select:hover {
-            border-color: var(--blue);
-
-
-        }
-
-        .field select:focus {
-            border-color: var(--blue);
-            box-shadow: 0 0 0 3px rgba(80, 162, 221, 0.15);
-        }
-
-        .field select:disabled {
-            background: #f9fafb;
-            color: #9ca3af;
-            cursor: not-allowed;
-        }
-
-
-
-        /* ---- Actions ---- */
-        .card-actions {
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-            margin-top: 18px;
-        }
-
-        .btn {
-            height: 40px;
-            padding: 0 16px;
-            border-radius: 12px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            border: 1px solid transparent;
-            transition: transform .05s ease, background .2s, border-color .2s, color .2s;
-        }
-
-        .btn:active {
-            transform: translateY(1px);
-        }
-
-        .btn-outline {
-            background: #fff;
-            color: var(--blue);
-            border-color: var(--blue);
-        }
-
-        .btn-outline:hover {
-            background: #f0f7fc;
-        }
-
-        .btn-primary {
-            background: var(--blue);
-            color: #fff;
-        }
-
-        .btn-primary:hover {
-            background: var(--blue-600);
-        }
+        /* Note: Form, Field, Button styles are now handled by FilterComponent */
 
         .divider-btn {
             display: flex;
@@ -1347,7 +1267,6 @@
             flex: 1;
             height: 1px;
             background-color: #3b82f6;
-            /* สีฟ้า */
             margin: 0 8px;
         }
 
@@ -1355,7 +1274,6 @@
             background: none;
             border: none;
             color: #3b82f6;
-            /* ฟ้า */
             font-size: 14px;
             font-weight: 600;
             cursor: pointer;
@@ -1365,19 +1283,33 @@
 
         .btn-show-more:hover {
             color: #2563eb;
-            /* ฟ้าเข้ม */
         }
     </style>
 
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            const toggle = document.getElementById('toggle-filter');
-            const panel = document.getElementById('filter-panel');
-            if (toggle && panel) {
-                toggle.addEventListener('change', function() {
-                    panel.style.display = this.checked ? '' : 'none';
-                });
+            // Initialize FilterComponent toggle if available
+            if (typeof window.FilterComponent !== 'undefined') {
+                // FilterComponent จะจัดการ toggle เอง
+                const toggle = document.getElementById('toggle-filter');
+                if (toggle) {
+                    toggle.addEventListener('change', function() {
+                        const panel = document.getElementById('filter-panel');
+                        if (panel) {
+                            panel.style.display = this.checked ? 'block' : 'none';
+                        }
+                    });
+                }
+            } else {
+                // Fallback for legacy toggle
+                const toggle = document.getElementById('toggle-filter');
+                const panel = document.getElementById('filter-panel');
+                if (toggle && panel) {
+                    toggle.addEventListener('change', function() {
+                        panel.style.display = this.checked ? '' : 'none';
+                    });
+                }
             }
         });
     </script>
