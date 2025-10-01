@@ -8,7 +8,7 @@
 
     <!-- Toggle Switch -->
     <div style="align-items:center;gap:8px;margin-bottom:12px;text-align: right;margin-top: 20px;">
-        <label class="switch">
+        <label for="toggle-filter" class="switch">
             <input type="checkbox" id="toggle-filter">
             <span class="slider round"></span>
         </label>
@@ -668,41 +668,6 @@
                     updateLegend(counts);
                 }
 
-                // Filter form bindings - ใช้ FilterComponent แทน
-                // $('#filter-form').on('submit', function(e) {
-                //     e.preventDefault();
-                // });
-                // $('#apply-filters').on('click', function(e) {
-                //     e.preventDefault();
-                //     applyFilters();
-                // });
-
-                // $(document).off('click.reset', '#reset-filters').on('click.reset', '#reset-filters', function(
-                // e) {
-                //     e.preventDefault();
-                //     e.stopPropagation();
-                //     $('.filter-card select').each(function() {
-                //         $(this).prop('selectedIndex', 0).val('').trigger('change');
-                //     });
-                //     const latestYear = getLatestYear();
-                //     if (latestYear) $('#filter-year').val(latestYear).trigger('change');
-
-                //     $('#custom-search').val('');
-                //     table.search('');
-                //     table.columns().every(function() {
-                //         this.search('');
-                //     });
-
-                //     window.selectedStatusFilter = null;
-
-                //     table.page('first').draw(false);
-                //     table.one('draw', function() {
-                //         updateSummary();
-                //         updateDonutAndLegend();
-                //         updateIndicatorTotal();
-                //     });
-                // });
-
                 // เพิ่มฟังก์ชัน applyFilters สำหรับ FilterComponent
                 window.applyFilters = function() {
                     table.page('first').draw(false);
@@ -817,7 +782,7 @@
             width: 100%;
             outline: 0;
             border: 1px solid var(--color-gray-300);
-            border-radius: 8px;
+            border-radius: 16px;
         }
 
         .search-input:focus {
