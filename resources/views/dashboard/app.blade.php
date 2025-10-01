@@ -795,37 +795,6 @@
             transform: translateX(22px);
         }
 
-        /* ===== Filter Card styles (from your snippet) ===== */
-        .card {
-            background: var(--color-white);
-            border-radius: 8px;
-            ;
-            box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-            padding: 24px;
-            border: 1px solid var(--color-gray-100);
-            margin: 16px 0;
-        }
-
-        .form-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 14px 16px;
-        }
-
-        @media (max-width: 767px) {
-            .form-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-
-        .card-actions {
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-            margin-top: 18px;
-        }
-
         /* ===== Search / Stats / Chart / Table (kept from your page) ===== */
         .search-box {
             position: relative;
