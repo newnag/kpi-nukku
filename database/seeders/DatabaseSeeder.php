@@ -58,5 +58,6 @@ class DatabaseSeeder extends Seeder
         ]);
         $this->call(FormulasTableSeeder::class);
         $this->call(EvidenceTableSeeder::class);
+        $this->call(IndicatorsTableSeeder::class);
     }
 }
