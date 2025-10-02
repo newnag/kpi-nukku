@@ -49,7 +49,7 @@
                             {{ $title }}
                         </h3>
                         <button type="button"
-                            class="hover:!text-red-500 btn btn-xs hover:!shadow-none"
+                            class="!w-fit hover:!text-red-500 btn btn-xs hover:!shadow-none"
                             @click="open = false" aria-label="ปิด"><i data-lucide="x"></i></button>
                     </div>
 
