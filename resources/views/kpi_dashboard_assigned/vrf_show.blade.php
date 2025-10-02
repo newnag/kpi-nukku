@@ -241,15 +241,31 @@
                     <p class="text-gray-500">ยังไม่มีเกณฑ์การพิจารณา</p>
                 @endforelse
             </div>
+            @php
+                $condition = $indicator->condition ?? '';
+                // ลบช่องว่างรอบ ๆ
+                $trimmed = trim($condition);
+
+                // เช็คว่ามีแท็ก <img> หรือมีข้อความจริง ๆ หลังจากลบแท็ก HTML
+                $hasImage = preg_match('/<img\s[^>]*src=["\']?([^>"\']+)["\']?/i', $trimmed);
+                $hasText = trim(strip_tags($trimmed)) !== '';
+            @endphp
+
+            @if ($hasImage || $hasText)
+                <div class="card">
+                    <h2 class="card-title">วิธีการคำนวน</h2>
+                    <div class="criteria-box">
+                        {!! $indicator->condition !!}
+                    </div>
+                </div>
+            @endif
+
             <div class="card">
                 <h2 class="card-title">เกณฑ์การให้คะแนน</h2>
                 <div class="criteria-box list-disc list-inside">
                     {!! $indicator->comment ?? '-' !!}
                 </div>
-                <div class="ml-4 mb-1 text-sm font-bold">วิธีการคำนวน</div>
-                <div class="criteria-box">
-                    {!! $indicator->condition ?? '-' !!}
-                </div>
+
             </div>
 
 
@@ -282,7 +298,12 @@
                 <!-- ✅ hidden status -->
                 <input type="hidden" name="status" id="status-input" value="{{ $indicator->status ?? 2 }}">
             </form>
-
+            <div class="card annotation-card">
+                <h2 class="card-title">หมายเหตุ</h2>
+                <div class="description-box">
+                    {!! $indicator->annotation ?? '-' !!}
+                </div>
+            </div>
             <div class="card">
                 <h2 class="card-title">คะแนนที่ได้</h2>
                 <div class="score-display-container">
@@ -300,18 +321,7 @@
                         </div>
                     </div>
                 </div>
-                {{-- <div class="score-percentage">
-                    @php
-                        $percentage = 0;
-                        if (($indicator->max_score ?? 0) > 0) {
-                            $percentage = (($indicator->score_acc ?? 0) / $indicator->max_score) * 100;
-                        }
-                    @endphp
-                    <div class="percentage-bar">
-                        <div class="percentage-fill" style="width: {{ min($percentage, 100) }}%"></div>
-                    </div>
-                    <div class="percentage-text">{{ number_format($percentage, 1) }}%</div>
-                </div> --}}
+
             </div>
 
             <div class="action-bts">
@@ -723,11 +733,13 @@
             @endforeach
         });
     </script>
-    <script>
-        function getCsrfToken() {
-            const meta = document.querySelector('meta[name="csrf-token"]');
-            return meta && meta.content ? meta.content : '';
-        }
+@endpush
+@push('scripts')
+<script>
+    function getCsrfToken() {
+        const meta = document.querySelector('meta[name="csrf-token"]');
+        return meta && meta.content ? meta.content : '';
+    }
 
         function startEditEvidenceName(id) {
             const linkSpan = document.getElementById('evidence-link-' + id);
@@ -900,6 +912,8 @@
         }
 
         .criteria-status {
+            /* font-weight: 600;
+                                                                                                    font-size: 14px; */
             color: #1f2937;
         }
 
@@ -947,6 +961,8 @@
         .criteria-box ul {
             list-style-type: disc;
             list-style-position: outside;
+            
+            /* ขยับเข้า */
             padding-left: 1.5rem;
         }
 
@@ -980,7 +996,9 @@
             margin-top: 20px;
             padding: 16px 20px;
             background: #fffbea;
+            /* เหลืองอ่อน */
             border: 1px solid #fde68a;
+            /* เส้นกรอบเหลือง */
             border-radius: 12px;
             color: #92400e;
         }
@@ -1000,6 +1018,23 @@
             color: #78350f;
         }
 
+        .description-box ul {
+            list-style-type: disc;
+            /* จุดกลม */
+            padding-left: 1.5rem;
+            margin: 0.5rem 0;
+        }
+
+        .description-box ol {
+            list-style-type: decimal;
+            /* ตัวเลข */
+            padding-left: 1.5rem;
+            margin: 0.5rem 0;
+        }
+
+        .description-box li {
+            margin: 0.25rem 0;
+        }
 
         .total-score-card {
             margin-top: 20px;
@@ -1232,6 +1267,40 @@
             color: #94a3b8;
             margin: 0 10px;
         }
+
+        /* .score-percentage {
+                                    margin-top: 16px;
+                                    text-align: center;
+                                }
+
+                                .percentage-bar {
+                                    width: 100%;
+                                    height: 12px;
+                                    background: #e2e8f0;
+                                    border-radius: 6px;
+                                    overflow: hidden;
+                                    margin-bottom: 8px;
+                                    position: relative;
+                                }
+
+                                .percentage-fill {
+                                    height: 100%;
+                                    background: linear-gradient(90deg, #3b82f6 0%, #10b981 50%, #22c55e 100%);
+                                    border-radius: 6px;
+                                    transition: width 0.3s ease;
+                                    position: relative;
+                                }
+
+                                .percentage-fill::after {
+                                    content: '';
+                                    position: absolute;
+                                    top: 0;
+                                    left: 0;
+                                    right: 0;
+                                    bottom: 0;
+                                    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.3) 50%, transparent 100%);
+                                    animation: shimmer 2s infinite;
+                                } */
 
         @keyframes shimmer {
             0% {

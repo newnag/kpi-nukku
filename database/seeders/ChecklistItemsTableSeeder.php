@@ -957,897 +957,6 @@ class ChecklistItemsTableSeeder extends Seeder
             ),
             104 => 
             array (
-                'id' => 172,
-                'required_items' => '["1","2","3","4","5","6","7"]',
-                'score' => 15.0,
-                'sequence' => NULL,
-                'indicator_id' => 8,
-                'description' => NULL,
-            ),
-            105 => 
-            array (
-                'id' => 173,
-                'required_items' => '["1","2","3","4","5","6"]',
-                'score' => 12.0,
-                'sequence' => NULL,
-                'indicator_id' => 8,
-                'description' => NULL,
-            ),
-            106 => 
-            array (
-                'id' => 174,
-                'required_items' => '["1","2","3","4","5","7"]',
-                'score' => 12.0,
-                'sequence' => NULL,
-                'indicator_id' => 8,
-                'description' => NULL,
-            ),
-            107 => 
-            array (
-                'id' => 175,
-                'required_items' => '["1","2","3","4","6","7"]',
-                'score' => 12.0,
-                'sequence' => NULL,
-                'indicator_id' => 8,
-                'description' => NULL,
-            ),
-            108 => 
-            array (
-                'id' => 176,
-                'required_items' => '["1","2","3","5","6","7"]',
-                'score' => 12.0,
-                'sequence' => NULL,
-                'indicator_id' => 8,
-                'description' => NULL,
-            ),
-            109 => 
-            array (
-                'id' => 177,
-                'required_items' => '["1","2","4","5","6","7"]',
-                'score' => 12.0,
-                'sequence' => NULL,
-                'indicator_id' => 8,
-                'description' => NULL,
-            ),
-            110 => 
-            array (
-                'id' => 178,
-                'required_items' => '["1","3","4","5","6","7"]',
-                'score' => 12.0,
-                'sequence' => NULL,
-                'indicator_id' => 8,
-                'description' => NULL,
-            ),
-            111 => 
-            array (
-                'id' => 179,
-                'required_items' => '["2","3","4","5","6","7"]',
-                'score' => 12.0,
-                'sequence' => NULL,
-                'indicator_id' => 8,
-                'description' => NULL,
-            ),
-            112 => 
-            array (
-                'id' => 180,
-                'required_items' => '["1","2","3","4","5"]',
-                'score' => 9.0,
-                'sequence' => NULL,
-                'indicator_id' => 8,
-                'description' => NULL,
-            ),
-            113 => 
-            array (
-                'id' => 181,
-                'required_items' => '["1","2","3","4","6"]',
-                'score' => 9.0,
-                'sequence' => NULL,
-                'indicator_id' => 8,
-                'description' => NULL,
-            ),
-            114 => 
-            array (
-                'id' => 182,
-                'required_items' => '["1","2","3","4","7"]',
-                'score' => 9.0,
-                'sequence' => NULL,
-                'indicator_id' => 8,
-                'description' => NULL,
-            ),
-            115 => 
-            array (
-                'id' => 183,
-                'required_items' => '["1","2","3","5","6"]',
-                'score' => 9.0,
-                'sequence' => NULL,
-                'indicator_id' => 8,
-                'description' => NULL,
-            ),
-            116 => 
-            array (
-                'id' => 184,
-                'required_items' => '["1","2","3","5","7"]',
-                'score' => 9.0,
-                'sequence' => NULL,
-                'indicator_id' => 8,
-                'description' => NULL,
-            ),
-            117 => 
-            array (
-                'id' => 185,
-                'required_items' => '["1","2","3","6","7"]',
-                'score' => 9.0,
-                'sequence' => NULL,
-                'indicator_id' => 8,
-                'description' => NULL,
-            ),
-            118 => 
-            array (
-                'id' => 186,
-                'required_items' => '["1","2","4","5","6"]',
-                'score' => 9.0,
-                'sequence' => NULL,
-                'indicator_id' => 8,
-                'description' => NULL,
-            ),
-            119 => 
-            array (
-                'id' => 187,
-                'required_items' => '["1","2","4","5","7"]',
-                'score' => 9.0,
-                'sequence' => NULL,
-                'indicator_id' => 8,
-                'description' => NULL,
-            ),
-            120 => 
-            array (
-                'id' => 188,
-                'required_items' => '["1","2","4","6","7"]',
-                'score' => 9.0,
-                'sequence' => NULL,
-                'indicator_id' => 8,
-                'description' => NULL,
-            ),
-            121 => 
-            array (
-                'id' => 189,
-                'required_items' => '["1","2","5","6","7"]',
-                'score' => 9.0,
-                'sequence' => NULL,
-                'indicator_id' => 8,
-                'description' => NULL,
-            ),
-            122 => 
-            array (
-                'id' => 190,
-                'required_items' => '["1","3","4","5","6"]',
-                'score' => 9.0,
-                'sequence' => NULL,
-                'indicator_id' => 8,
-                'description' => NULL,
-            ),
-            123 => 
-            array (
-                'id' => 191,
-                'required_items' => '["1","3","4","5","7"]',
-                'score' => 9.0,
-                'sequence' => NULL,
-                'indicator_id' => 8,
-                'description' => NULL,
-            ),
-            124 => 
-            array (
-                'id' => 192,
-                'required_items' => '["1","3","4","6","7"]',
-                'score' => 9.0,
-                'sequence' => NULL,
-                'indicator_id' => 8,
-                'description' => NULL,
-            ),
-            125 => 
-            array (
-                'id' => 193,
-                'required_items' => '["1","3","5","6","7"]',
-                'score' => 9.0,
-                'sequence' => NULL,
-                'indicator_id' => 8,
-                'description' => NULL,
-            ),
-            126 => 
-            array (
-                'id' => 194,
-                'required_items' => '["1","4","5","6","7"]',
-                'score' => 9.0,
-                'sequence' => NULL,
-                'indicator_id' => 8,
-                'description' => NULL,
-            ),
-            127 => 
-            array (
-                'id' => 195,
-                'required_items' => '["2","3","4","5","6"]',
-                'score' => 9.0,
-                'sequence' => NULL,
-                'indicator_id' => 8,
-                'description' => NULL,
-            ),
-            128 => 
-            array (
-                'id' => 196,
-                'required_items' => '["2","3","4","5","7"]',
-                'score' => 9.0,
-                'sequence' => NULL,
-                'indicator_id' => 8,
-                'description' => NULL,
-            ),
-            129 => 
-            array (
-                'id' => 197,
-                'required_items' => '["2","3","4","6","7"]',
-                'score' => 9.0,
-                'sequence' => NULL,
-                'indicator_id' => 8,
-                'description' => NULL,
-            ),
-            130 => 
-            array (
-                'id' => 198,
-                'required_items' => '["2","3","5","6","7"]',
-                'score' => 9.0,
-                'sequence' => NULL,
-                'indicator_id' => 8,
-                'description' => NULL,
-            ),
-            131 => 
-            array (
-                'id' => 199,
-                'required_items' => '["2","4","5","6","7"]',
-                'score' => 9.0,
-                'sequence' => NULL,
-                'indicator_id' => 8,
-                'description' => NULL,
-            ),
-            132 => 
-            array (
-                'id' => 200,
-                'required_items' => '["3","4","5","6","7"]',
-                'score' => 9.0,
-                'sequence' => NULL,
-                'indicator_id' => 8,
-                'description' => NULL,
-            ),
-            133 => 
-            array (
-                'id' => 201,
-                'required_items' => '["1","2","3","4"]',
-                'score' => 6.0,
-                'sequence' => NULL,
-                'indicator_id' => 8,
-                'description' => NULL,
-            ),
-            134 => 
-            array (
-                'id' => 202,
-                'required_items' => '["1","2","3","5"]',
-                'score' => 6.0,
-                'sequence' => NULL,
-                'indicator_id' => 8,
-                'description' => NULL,
-            ),
-            135 => 
-            array (
-                'id' => 203,
-                'required_items' => '["1","2","3","6"]',
-                'score' => 6.0,
-                'sequence' => NULL,
-                'indicator_id' => 8,
-                'description' => NULL,
-            ),
-            136 => 
-            array (
-                'id' => 204,
-                'required_items' => '["1","2","3","7"]',
-                'score' => 6.0,
-                'sequence' => NULL,
-                'indicator_id' => 8,
-                'description' => NULL,
-            ),
-            137 => 
-            array (
-                'id' => 205,
-                'required_items' => '["1","2","4","5"]',
-                'score' => 6.0,
-                'sequence' => NULL,
-                'indicator_id' => 8,
-                'description' => NULL,
-            ),
-            138 => 
-            array (
-                'id' => 206,
-                'required_items' => '["1","2","4","6"]',
-                'score' => 6.0,
-                'sequence' => NULL,
-                'indicator_id' => 8,
-                'description' => NULL,
-            ),
-            139 => 
-            array (
-                'id' => 207,
-                'required_items' => '["1","2","4","7"]',
-                'score' => 6.0,
-                'sequence' => NULL,
-                'indicator_id' => 8,
-                'description' => NULL,
-            ),
-            140 => 
-            array (
-                'id' => 208,
-                'required_items' => '["1","2","5","6"]',
-                'score' => 6.0,
-                'sequence' => NULL,
-                'indicator_id' => 8,
-                'description' => NULL,
-            ),
-            141 => 
-            array (
-                'id' => 209,
-                'required_items' => '["1","2","5","7"]',
-                'score' => 6.0,
-                'sequence' => NULL,
-                'indicator_id' => 8,
-                'description' => NULL,
-            ),
-            142 => 
-            array (
-                'id' => 210,
-                'required_items' => '["1","2","6","7"]',
-                'score' => 6.0,
-                'sequence' => NULL,
-                'indicator_id' => 8,
-                'description' => NULL,
-            ),
-            143 => 
-            array (
-                'id' => 211,
-                'required_items' => '["1","3","4","5"]',
-                'score' => 6.0,
-                'sequence' => NULL,
-                'indicator_id' => 8,
-                'description' => NULL,
-            ),
-            144 => 
-            array (
-                'id' => 212,
-                'required_items' => '["1","3","4","6"]',
-                'score' => 6.0,
-                'sequence' => NULL,
-                'indicator_id' => 8,
-                'description' => NULL,
-            ),
-            145 => 
-            array (
-                'id' => 213,
-                'required_items' => '["1","3","4","7"]',
-                'score' => 6.0,
-                'sequence' => NULL,
-                'indicator_id' => 8,
-                'description' => NULL,
-            ),
-            146 => 
-            array (
-                'id' => 214,
-                'required_items' => '["1","3","5","6"]',
-                'score' => 6.0,
-                'sequence' => NULL,
-                'indicator_id' => 8,
-                'description' => NULL,
-            ),
-            147 => 
-            array (
-                'id' => 215,
-                'required_items' => '["1","3","5","7"]',
-                'score' => 6.0,
-                'sequence' => NULL,
-                'indicator_id' => 8,
-                'description' => NULL,
-            ),
-            148 => 
-            array (
-                'id' => 216,
-                'required_items' => '["1","3","6","7"]',
-                'score' => 6.0,
-                'sequence' => NULL,
-                'indicator_id' => 8,
-                'description' => NULL,
-            ),
-            149 => 
-            array (
-                'id' => 217,
-                'required_items' => '["1","4","5","6"]',
-                'score' => 6.0,
-                'sequence' => NULL,
-                'indicator_id' => 8,
-                'description' => NULL,
-            ),
-            150 => 
-            array (
-                'id' => 218,
-                'required_items' => '["1","4","5","7"]',
-                'score' => 6.0,
-                'sequence' => NULL,
-                'indicator_id' => 8,
-                'description' => NULL,
-            ),
-            151 => 
-            array (
-                'id' => 219,
-                'required_items' => '["1","4","6","7"]',
-                'score' => 6.0,
-                'sequence' => NULL,
-                'indicator_id' => 8,
-                'description' => NULL,
-            ),
-            152 => 
-            array (
-                'id' => 220,
-                'required_items' => '["1","5","6","7"]',
-                'score' => 6.0,
-                'sequence' => NULL,
-                'indicator_id' => 8,
-                'description' => NULL,
-            ),
-            153 => 
-            array (
-                'id' => 221,
-                'required_items' => '["2","3","4","5"]',
-                'score' => 6.0,
-                'sequence' => NULL,
-                'indicator_id' => 8,
-                'description' => NULL,
-            ),
-            154 => 
-            array (
-                'id' => 222,
-                'required_items' => '["2","3","4","6"]',
-                'score' => 6.0,
-                'sequence' => NULL,
-                'indicator_id' => 8,
-                'description' => NULL,
-            ),
-            155 => 
-            array (
-                'id' => 223,
-                'required_items' => '["2","3","4","7"]',
-                'score' => 6.0,
-                'sequence' => NULL,
-                'indicator_id' => 8,
-                'description' => NULL,
-            ),
-            156 => 
-            array (
-                'id' => 224,
-                'required_items' => '["2","3","5","6"]',
-                'score' => 6.0,
-                'sequence' => NULL,
-                'indicator_id' => 8,
-                'description' => NULL,
-            ),
-            157 => 
-            array (
-                'id' => 225,
-                'required_items' => '["2","3","5","7"]',
-                'score' => 6.0,
-                'sequence' => NULL,
-                'indicator_id' => 8,
-                'description' => NULL,
-            ),
-            158 => 
-            array (
-                'id' => 226,
-                'required_items' => '["2","3","6","7"]',
-                'score' => 6.0,
-                'sequence' => NULL,
-                'indicator_id' => 8,
-                'description' => NULL,
-            ),
-            159 => 
-            array (
-                'id' => 227,
-                'required_items' => '["2","4","5","6"]',
-                'score' => 6.0,
-                'sequence' => NULL,
-                'indicator_id' => 8,
-                'description' => NULL,
-            ),
-            160 => 
-            array (
-                'id' => 228,
-                'required_items' => '["2","4","5","7"]',
-                'score' => 6.0,
-                'sequence' => NULL,
-                'indicator_id' => 8,
-                'description' => NULL,
-            ),
-            161 => 
-            array (
-                'id' => 229,
-                'required_items' => '["2","4","6","7"]',
-                'score' => 6.0,
-                'sequence' => NULL,
-                'indicator_id' => 8,
-                'description' => NULL,
-            ),
-            162 => 
-            array (
-                'id' => 230,
-                'required_items' => '["2","5","6","7"]',
-                'score' => 6.0,
-                'sequence' => NULL,
-                'indicator_id' => 8,
-                'description' => NULL,
-            ),
-            163 => 
-            array (
-                'id' => 231,
-                'required_items' => '["3","4","5","6"]',
-                'score' => 6.0,
-                'sequence' => NULL,
-                'indicator_id' => 8,
-                'description' => NULL,
-            ),
-            164 => 
-            array (
-                'id' => 232,
-                'required_items' => '["3","4","5","7"]',
-                'score' => 6.0,
-                'sequence' => NULL,
-                'indicator_id' => 8,
-                'description' => NULL,
-            ),
-            165 => 
-            array (
-                'id' => 233,
-                'required_items' => '["3","4","6","7"]',
-                'score' => 6.0,
-                'sequence' => NULL,
-                'indicator_id' => 8,
-                'description' => NULL,
-            ),
-            166 => 
-            array (
-                'id' => 234,
-                'required_items' => '["3","5","6","7"]',
-                'score' => 6.0,
-                'sequence' => NULL,
-                'indicator_id' => 8,
-                'description' => NULL,
-            ),
-            167 => 
-            array (
-                'id' => 235,
-                'required_items' => '["4","5","6","7"]',
-                'score' => 6.0,
-                'sequence' => NULL,
-                'indicator_id' => 8,
-                'description' => NULL,
-            ),
-            168 => 
-            array (
-                'id' => 236,
-                'required_items' => '["1","2","3"]',
-                'score' => 6.0,
-                'sequence' => NULL,
-                'indicator_id' => 8,
-                'description' => NULL,
-            ),
-            169 => 
-            array (
-                'id' => 237,
-                'required_items' => '["1","2","4"]',
-                'score' => 6.0,
-                'sequence' => NULL,
-                'indicator_id' => 8,
-                'description' => NULL,
-            ),
-            170 => 
-            array (
-                'id' => 238,
-                'required_items' => '["1","2","5"]',
-                'score' => 6.0,
-                'sequence' => NULL,
-                'indicator_id' => 8,
-                'description' => NULL,
-            ),
-            171 => 
-            array (
-                'id' => 239,
-                'required_items' => '["1","2","6"]',
-                'score' => 6.0,
-                'sequence' => NULL,
-                'indicator_id' => 8,
-                'description' => NULL,
-            ),
-            172 => 
-            array (
-                'id' => 240,
-                'required_items' => '["1","2","7"]',
-                'score' => 6.0,
-                'sequence' => NULL,
-                'indicator_id' => 8,
-                'description' => NULL,
-            ),
-            173 => 
-            array (
-                'id' => 241,
-                'required_items' => '["1","3","4"]',
-                'score' => 6.0,
-                'sequence' => NULL,
-                'indicator_id' => 8,
-                'description' => NULL,
-            ),
-            174 => 
-            array (
-                'id' => 242,
-                'required_items' => '["1","3","5"]',
-                'score' => 6.0,
-                'sequence' => NULL,
-                'indicator_id' => 8,
-                'description' => NULL,
-            ),
-            175 => 
-            array (
-                'id' => 243,
-                'required_items' => '["1","3","6"]',
-                'score' => 6.0,
-                'sequence' => NULL,
-                'indicator_id' => 8,
-                'description' => NULL,
-            ),
-            176 => 
-            array (
-                'id' => 244,
-                'required_items' => '["1","3","7"]',
-                'score' => 6.0,
-                'sequence' => NULL,
-                'indicator_id' => 8,
-                'description' => NULL,
-            ),
-            177 => 
-            array (
-                'id' => 245,
-                'required_items' => '["1","4","5"]',
-                'score' => 6.0,
-                'sequence' => NULL,
-                'indicator_id' => 8,
-                'description' => NULL,
-            ),
-            178 => 
-            array (
-                'id' => 246,
-                'required_items' => '["1","4","6"]',
-                'score' => 6.0,
-                'sequence' => NULL,
-                'indicator_id' => 8,
-                'description' => NULL,
-            ),
-            179 => 
-            array (
-                'id' => 247,
-                'required_items' => '["1","4","7"]',
-                'score' => 6.0,
-                'sequence' => NULL,
-                'indicator_id' => 8,
-                'description' => NULL,
-            ),
-            180 => 
-            array (
-                'id' => 248,
-                'required_items' => '["1","5","6"]',
-                'score' => 6.0,
-                'sequence' => NULL,
-                'indicator_id' => 8,
-                'description' => NULL,
-            ),
-            181 => 
-            array (
-                'id' => 249,
-                'required_items' => '["1","5","7"]',
-                'score' => 6.0,
-                'sequence' => NULL,
-                'indicator_id' => 8,
-                'description' => NULL,
-            ),
-            182 => 
-            array (
-                'id' => 250,
-                'required_items' => '["1","6","7"]',
-                'score' => 6.0,
-                'sequence' => NULL,
-                'indicator_id' => 8,
-                'description' => NULL,
-            ),
-            183 => 
-            array (
-                'id' => 251,
-                'required_items' => '["2","3","4"]',
-                'score' => 6.0,
-                'sequence' => NULL,
-                'indicator_id' => 8,
-                'description' => NULL,
-            ),
-            184 => 
-            array (
-                'id' => 252,
-                'required_items' => '["2","3","5"]',
-                'score' => 6.0,
-                'sequence' => NULL,
-                'indicator_id' => 8,
-                'description' => NULL,
-            ),
-            185 => 
-            array (
-                'id' => 253,
-                'required_items' => '["2","3","6"]',
-                'score' => 6.0,
-                'sequence' => NULL,
-                'indicator_id' => 8,
-                'description' => NULL,
-            ),
-            186 => 
-            array (
-                'id' => 254,
-                'required_items' => '["2","3","7"]',
-                'score' => 6.0,
-                'sequence' => NULL,
-                'indicator_id' => 8,
-                'description' => NULL,
-            ),
-            187 => 
-            array (
-                'id' => 255,
-                'required_items' => '["2","4","5"]',
-                'score' => 6.0,
-                'sequence' => NULL,
-                'indicator_id' => 8,
-                'description' => NULL,
-            ),
-            188 => 
-            array (
-                'id' => 256,
-                'required_items' => '["2","4","6"]',
-                'score' => 6.0,
-                'sequence' => NULL,
-                'indicator_id' => 8,
-                'description' => NULL,
-            ),
-            189 => 
-            array (
-                'id' => 257,
-                'required_items' => '["2","4","7"]',
-                'score' => 6.0,
-                'sequence' => NULL,
-                'indicator_id' => 8,
-                'description' => NULL,
-            ),
-            190 => 
-            array (
-                'id' => 258,
-                'required_items' => '["2","5","6"]',
-                'score' => 6.0,
-                'sequence' => NULL,
-                'indicator_id' => 8,
-                'description' => NULL,
-            ),
-            191 => 
-            array (
-                'id' => 259,
-                'required_items' => '["2","5","7"]',
-                'score' => 6.0,
-                'sequence' => NULL,
-                'indicator_id' => 8,
-                'description' => NULL,
-            ),
-            192 => 
-            array (
-                'id' => 260,
-                'required_items' => '["2","6","7"]',
-                'score' => 6.0,
-                'sequence' => NULL,
-                'indicator_id' => 8,
-                'description' => NULL,
-            ),
-            193 => 
-            array (
-                'id' => 261,
-                'required_items' => '["3","4","5"]',
-                'score' => 6.0,
-                'sequence' => NULL,
-                'indicator_id' => 8,
-                'description' => NULL,
-            ),
-            194 => 
-            array (
-                'id' => 262,
-                'required_items' => '["3","4","6"]',
-                'score' => 6.0,
-                'sequence' => NULL,
-                'indicator_id' => 8,
-                'description' => NULL,
-            ),
-            195 => 
-            array (
-                'id' => 263,
-                'required_items' => '["3","4","7"]',
-                'score' => 6.0,
-                'sequence' => NULL,
-                'indicator_id' => 8,
-                'description' => NULL,
-            ),
-            196 => 
-            array (
-                'id' => 264,
-                'required_items' => '["3","5","6"]',
-                'score' => 6.0,
-                'sequence' => NULL,
-                'indicator_id' => 8,
-                'description' => NULL,
-            ),
-            197 => 
-            array (
-                'id' => 265,
-                'required_items' => '["3","5","7"]',
-                'score' => 6.0,
-                'sequence' => NULL,
-                'indicator_id' => 8,
-                'description' => NULL,
-            ),
-            198 => 
-            array (
-                'id' => 266,
-                'required_items' => '["3","6","7"]',
-                'score' => 6.0,
-                'sequence' => NULL,
-                'indicator_id' => 8,
-                'description' => NULL,
-            ),
-            199 => 
-            array (
-                'id' => 267,
-                'required_items' => '["4","5","6"]',
-                'score' => 6.0,
-                'sequence' => NULL,
-                'indicator_id' => 8,
-                'description' => NULL,
-            ),
-            200 => 
-            array (
-                'id' => 268,
-                'required_items' => '["4","5","7"]',
-                'score' => 6.0,
-                'sequence' => NULL,
-                'indicator_id' => 8,
-                'description' => NULL,
-            ),
-            201 => 
-            array (
-                'id' => 269,
-                'required_items' => '["4","6","7"]',
-                'score' => 6.0,
-                'sequence' => NULL,
-                'indicator_id' => 8,
-                'description' => NULL,
-            ),
-            202 => 
-            array (
-                'id' => 270,
-                'required_items' => '["5","6","7"]',
-                'score' => 6.0,
-                'sequence' => NULL,
-                'indicator_id' => 8,
-                'description' => NULL,
-            ),
-            203 => 
-            array (
                 'id' => 316,
                 'required_items' => '["1","2","3"]',
                 'score' => 5.0,
@@ -1855,7 +964,7 @@ class ChecklistItemsTableSeeder extends Seeder
                 'indicator_id' => 13,
                 'description' => NULL,
             ),
-            204 => 
+            105 => 
             array (
                 'id' => 317,
                 'required_items' => '["1","2"]',
@@ -1864,7 +973,7 @@ class ChecklistItemsTableSeeder extends Seeder
                 'indicator_id' => 13,
                 'description' => NULL,
             ),
-            205 => 
+            106 => 
             array (
                 'id' => 318,
                 'required_items' => '["1"]',
@@ -1873,7 +982,7 @@ class ChecklistItemsTableSeeder extends Seeder
                 'indicator_id' => 13,
                 'description' => NULL,
             ),
-            206 => 
+            107 => 
             array (
                 'id' => 325,
                 'required_items' => '["1","2","3","4"]',
@@ -1882,7 +991,7 @@ class ChecklistItemsTableSeeder extends Seeder
                 'indicator_id' => 16,
                 'description' => NULL,
             ),
-            207 => 
+            108 => 
             array (
                 'id' => 326,
                 'required_items' => '["1","2","3"]',
@@ -1891,7 +1000,7 @@ class ChecklistItemsTableSeeder extends Seeder
                 'indicator_id' => 16,
                 'description' => NULL,
             ),
-            208 => 
+            109 => 
             array (
                 'id' => 327,
                 'required_items' => '["1","2"]',
@@ -1900,7 +1009,7 @@ class ChecklistItemsTableSeeder extends Seeder
                 'indicator_id' => 16,
                 'description' => NULL,
             ),
-            209 => 
+            110 => 
             array (
                 'id' => 328,
                 'required_items' => '["1"]',
@@ -1909,7 +1018,7 @@ class ChecklistItemsTableSeeder extends Seeder
                 'indicator_id' => 16,
                 'description' => NULL,
             ),
-            210 => 
+            111 => 
             array (
                 'id' => 341,
                 'required_items' => '["1","2","3","4","5"]',
@@ -1918,7 +1027,7 @@ class ChecklistItemsTableSeeder extends Seeder
                 'indicator_id' => 20,
                 'description' => NULL,
             ),
-            211 => 
+            112 => 
             array (
                 'id' => 342,
                 'required_items' => '["1","2","3"]',
@@ -1927,7 +1036,7 @@ class ChecklistItemsTableSeeder extends Seeder
                 'indicator_id' => 20,
                 'description' => NULL,
             ),
-            212 => 
+            113 => 
             array (
                 'id' => 343,
                 'required_items' => '["1","2"]',
@@ -1936,7 +1045,7 @@ class ChecklistItemsTableSeeder extends Seeder
                 'indicator_id' => 20,
                 'description' => NULL,
             ),
-            213 => 
+            114 => 
             array (
                 'id' => 344,
                 'required_items' => '["1"]',
@@ -1945,7 +1054,7 @@ class ChecklistItemsTableSeeder extends Seeder
                 'indicator_id' => 20,
                 'description' => NULL,
             ),
-            214 => 
+            115 => 
             array (
                 'id' => 354,
                 'required_items' => '["1","2","3","4","5"]',
@@ -1954,7 +1063,7 @@ class ChecklistItemsTableSeeder extends Seeder
                 'indicator_id' => 23,
                 'description' => NULL,
             ),
-            215 => 
+            116 => 
             array (
                 'id' => 355,
                 'required_items' => '["1","2","3","4"]',
@@ -1963,7 +1072,7 @@ class ChecklistItemsTableSeeder extends Seeder
                 'indicator_id' => 23,
                 'description' => NULL,
             ),
-            216 => 
+            117 => 
             array (
                 'id' => 356,
                 'required_items' => '["1","2","3"]',
@@ -1972,7 +1081,7 @@ class ChecklistItemsTableSeeder extends Seeder
                 'indicator_id' => 23,
                 'description' => NULL,
             ),
-            217 => 
+            118 => 
             array (
                 'id' => 357,
                 'required_items' => '["1","2"]',
@@ -1981,7 +1090,7 @@ class ChecklistItemsTableSeeder extends Seeder
                 'indicator_id' => 23,
                 'description' => NULL,
             ),
-            218 => 
+            119 => 
             array (
                 'id' => 367,
                 'required_items' => '["1","2","3","4","5"]',
@@ -1990,7 +1099,7 @@ class ChecklistItemsTableSeeder extends Seeder
                 'indicator_id' => 26,
                 'description' => NULL,
             ),
-            219 => 
+            120 => 
             array (
                 'id' => 368,
                 'required_items' => '["1","2","3","4"]',
@@ -1999,7 +1108,7 @@ class ChecklistItemsTableSeeder extends Seeder
                 'indicator_id' => 26,
                 'description' => NULL,
             ),
-            220 => 
+            121 => 
             array (
                 'id' => 369,
                 'required_items' => '["1","2","3"]',
@@ -2008,7 +1117,7 @@ class ChecklistItemsTableSeeder extends Seeder
                 'indicator_id' => 26,
                 'description' => NULL,
             ),
-            221 => 
+            122 => 
             array (
                 'id' => 370,
                 'required_items' => '["1","2"]',
@@ -2017,7 +1126,7 @@ class ChecklistItemsTableSeeder extends Seeder
                 'indicator_id' => 26,
                 'description' => NULL,
             ),
-            222 => 
+            123 => 
             array (
                 'id' => 379,
                 'required_items' => '["1","2","3"]',
@@ -2026,7 +1135,7 @@ class ChecklistItemsTableSeeder extends Seeder
                 'indicator_id' => 29,
                 'description' => NULL,
             ),
-            223 => 
+            124 => 
             array (
                 'id' => 380,
                 'required_items' => '["1","2"]',
@@ -2035,7 +1144,7 @@ class ChecklistItemsTableSeeder extends Seeder
                 'indicator_id' => 29,
                 'description' => NULL,
             ),
-            224 => 
+            125 => 
             array (
                 'id' => 381,
                 'required_items' => '["1"]',
@@ -2044,7 +1153,7 @@ class ChecklistItemsTableSeeder extends Seeder
                 'indicator_id' => 29,
                 'description' => NULL,
             ),
-            225 => 
+            126 => 
             array (
                 'id' => 389,
                 'required_items' => '["1","2","3"]',
@@ -2053,7 +1162,7 @@ class ChecklistItemsTableSeeder extends Seeder
                 'indicator_id' => 31,
                 'description' => NULL,
             ),
-            226 => 
+            127 => 
             array (
                 'id' => 390,
                 'required_items' => '["1","2"]',
@@ -2062,7 +1171,7 @@ class ChecklistItemsTableSeeder extends Seeder
                 'indicator_id' => 31,
                 'description' => NULL,
             ),
-            227 => 
+            128 => 
             array (
                 'id' => 391,
                 'required_items' => '["1"]',
@@ -2071,7 +1180,7 @@ class ChecklistItemsTableSeeder extends Seeder
                 'indicator_id' => 31,
                 'description' => NULL,
             ),
-            228 => 
+            129 => 
             array (
                 'id' => 398,
                 'required_items' => '["1","2","3"]',
@@ -2080,7 +1189,7 @@ class ChecklistItemsTableSeeder extends Seeder
                 'indicator_id' => 34,
                 'description' => NULL,
             ),
-            229 => 
+            130 => 
             array (
                 'id' => 399,
                 'required_items' => '["1","2"]',
@@ -2089,7 +1198,7 @@ class ChecklistItemsTableSeeder extends Seeder
                 'indicator_id' => 34,
                 'description' => NULL,
             ),
-            230 => 
+            131 => 
             array (
                 'id' => 400,
                 'required_items' => '["1"]',
@@ -2098,7 +1207,7 @@ class ChecklistItemsTableSeeder extends Seeder
                 'indicator_id' => 34,
                 'description' => NULL,
             ),
-            231 => 
+            132 => 
             array (
                 'id' => 407,
                 'required_items' => '["1","2"]',
@@ -2107,7 +1216,7 @@ class ChecklistItemsTableSeeder extends Seeder
                 'indicator_id' => 38,
                 'description' => NULL,
             ),
-            232 => 
+            133 => 
             array (
                 'id' => 408,
                 'required_items' => '["1"]',
@@ -2116,7 +1225,7 @@ class ChecklistItemsTableSeeder extends Seeder
                 'indicator_id' => 38,
                 'description' => NULL,
             ),
-            233 => 
+            134 => 
             array (
                 'id' => 413,
                 'required_items' => '[1]',
@@ -2125,7 +1234,7 @@ class ChecklistItemsTableSeeder extends Seeder
                 'indicator_id' => 48,
                 'description' => NULL,
             ),
-            234 => 
+            135 => 
             array (
                 'id' => 414,
                 'required_items' => '[2]',
@@ -2134,7 +1243,7 @@ class ChecklistItemsTableSeeder extends Seeder
                 'indicator_id' => 48,
                 'description' => NULL,
             ),
-            235 => 
+            136 => 
             array (
                 'id' => 415,
                 'required_items' => '[3]',
@@ -2143,7 +1252,7 @@ class ChecklistItemsTableSeeder extends Seeder
                 'indicator_id' => 48,
                 'description' => NULL,
             ),
-            236 => 
+            137 => 
             array (
                 'id' => 416,
                 'required_items' => '[4]',
@@ -2152,7 +1261,7 @@ class ChecklistItemsTableSeeder extends Seeder
                 'indicator_id' => 48,
                 'description' => NULL,
             ),
-            237 => 
+            138 => 
             array (
                 'id' => 417,
                 'required_items' => '[5]',
@@ -2161,7 +1270,7 @@ class ChecklistItemsTableSeeder extends Seeder
                 'indicator_id' => 48,
                 'description' => NULL,
             ),
-            238 => 
+            139 => 
             array (
                 'id' => 418,
                 'required_items' => '[1,2]',
@@ -2170,7 +1279,7 @@ class ChecklistItemsTableSeeder extends Seeder
                 'indicator_id' => 48,
                 'description' => NULL,
             ),
-            239 => 
+            140 => 
             array (
                 'id' => 419,
                 'required_items' => '[1,3]',
@@ -2179,7 +1288,7 @@ class ChecklistItemsTableSeeder extends Seeder
                 'indicator_id' => 48,
                 'description' => NULL,
             ),
-            240 => 
+            141 => 
             array (
                 'id' => 420,
                 'required_items' => '[1,4]',
@@ -2188,7 +1297,7 @@ class ChecklistItemsTableSeeder extends Seeder
                 'indicator_id' => 48,
                 'description' => NULL,
             ),
-            241 => 
+            142 => 
             array (
                 'id' => 421,
                 'required_items' => '[1,5]',
@@ -2197,7 +1306,7 @@ class ChecklistItemsTableSeeder extends Seeder
                 'indicator_id' => 48,
                 'description' => NULL,
             ),
-            242 => 
+            143 => 
             array (
                 'id' => 422,
                 'required_items' => '[2,3]',
@@ -2206,7 +1315,7 @@ class ChecklistItemsTableSeeder extends Seeder
                 'indicator_id' => 48,
                 'description' => NULL,
             ),
-            243 => 
+            144 => 
             array (
                 'id' => 423,
                 'required_items' => '[2,4]',
@@ -2215,7 +1324,7 @@ class ChecklistItemsTableSeeder extends Seeder
                 'indicator_id' => 48,
                 'description' => NULL,
             ),
-            244 => 
+            145 => 
             array (
                 'id' => 424,
                 'required_items' => '[2,5]',
@@ -2224,7 +1333,7 @@ class ChecklistItemsTableSeeder extends Seeder
                 'indicator_id' => 48,
                 'description' => NULL,
             ),
-            245 => 
+            146 => 
             array (
                 'id' => 425,
                 'required_items' => '[3,4]',
@@ -2233,7 +1342,7 @@ class ChecklistItemsTableSeeder extends Seeder
                 'indicator_id' => 48,
                 'description' => NULL,
             ),
-            246 => 
+            147 => 
             array (
                 'id' => 426,
                 'required_items' => '[3,5]',
@@ -2242,7 +1351,7 @@ class ChecklistItemsTableSeeder extends Seeder
                 'indicator_id' => 48,
                 'description' => NULL,
             ),
-            247 => 
+            148 => 
             array (
                 'id' => 427,
                 'required_items' => '[4,5]',
@@ -2251,7 +1360,7 @@ class ChecklistItemsTableSeeder extends Seeder
                 'indicator_id' => 48,
                 'description' => NULL,
             ),
-            248 => 
+            149 => 
             array (
                 'id' => 428,
                 'required_items' => '[1,2,3]',
@@ -2260,7 +1369,7 @@ class ChecklistItemsTableSeeder extends Seeder
                 'indicator_id' => 48,
                 'description' => NULL,
             ),
-            249 => 
+            150 => 
             array (
                 'id' => 429,
                 'required_items' => '[1,2,4]',
@@ -2269,7 +1378,7 @@ class ChecklistItemsTableSeeder extends Seeder
                 'indicator_id' => 48,
                 'description' => NULL,
             ),
-            250 => 
+            151 => 
             array (
                 'id' => 430,
                 'required_items' => '[1,2,5]',
@@ -2278,7 +1387,7 @@ class ChecklistItemsTableSeeder extends Seeder
                 'indicator_id' => 48,
                 'description' => NULL,
             ),
-            251 => 
+            152 => 
             array (
                 'id' => 431,
                 'required_items' => '[1,3,4]',
@@ -2287,7 +1396,7 @@ class ChecklistItemsTableSeeder extends Seeder
                 'indicator_id' => 48,
                 'description' => NULL,
             ),
-            252 => 
+            153 => 
             array (
                 'id' => 432,
                 'required_items' => '[1,3,5]',
@@ -2296,7 +1405,7 @@ class ChecklistItemsTableSeeder extends Seeder
                 'indicator_id' => 48,
                 'description' => NULL,
             ),
-            253 => 
+            154 => 
             array (
                 'id' => 433,
                 'required_items' => '[1,4,5]',
@@ -2305,7 +1414,7 @@ class ChecklistItemsTableSeeder extends Seeder
                 'indicator_id' => 48,
                 'description' => NULL,
             ),
-            254 => 
+            155 => 
             array (
                 'id' => 434,
                 'required_items' => '[2,3,4]',
@@ -2314,7 +1423,7 @@ class ChecklistItemsTableSeeder extends Seeder
                 'indicator_id' => 48,
                 'description' => NULL,
             ),
-            255 => 
+            156 => 
             array (
                 'id' => 435,
                 'required_items' => '[2,3,5]',
@@ -2323,7 +1432,7 @@ class ChecklistItemsTableSeeder extends Seeder
                 'indicator_id' => 48,
                 'description' => NULL,
             ),
-            256 => 
+            157 => 
             array (
                 'id' => 436,
                 'required_items' => '[2,4,5]',
@@ -2332,7 +1441,7 @@ class ChecklistItemsTableSeeder extends Seeder
                 'indicator_id' => 48,
                 'description' => NULL,
             ),
-            257 => 
+            158 => 
             array (
                 'id' => 437,
                 'required_items' => '[3,4,5]',
@@ -2341,7 +1450,7 @@ class ChecklistItemsTableSeeder extends Seeder
                 'indicator_id' => 48,
                 'description' => NULL,
             ),
-            258 => 
+            159 => 
             array (
                 'id' => 438,
                 'required_items' => '[1,2,3,4]',
@@ -2350,7 +1459,7 @@ class ChecklistItemsTableSeeder extends Seeder
                 'indicator_id' => 48,
                 'description' => NULL,
             ),
-            259 => 
+            160 => 
             array (
                 'id' => 439,
                 'required_items' => '[1,2,3,5]',
@@ -2359,7 +1468,7 @@ class ChecklistItemsTableSeeder extends Seeder
                 'indicator_id' => 48,
                 'description' => NULL,
             ),
-            260 => 
+            161 => 
             array (
                 'id' => 440,
                 'required_items' => '[1,2,4,5]',
@@ -2368,7 +1477,7 @@ class ChecklistItemsTableSeeder extends Seeder
                 'indicator_id' => 48,
                 'description' => NULL,
             ),
-            261 => 
+            162 => 
             array (
                 'id' => 441,
                 'required_items' => '[1,3,4,5]',
@@ -2377,7 +1486,7 @@ class ChecklistItemsTableSeeder extends Seeder
                 'indicator_id' => 48,
                 'description' => NULL,
             ),
-            262 => 
+            163 => 
             array (
                 'id' => 442,
                 'required_items' => '[2,3,4,5]',
@@ -2386,7 +1495,7 @@ class ChecklistItemsTableSeeder extends Seeder
                 'indicator_id' => 48,
                 'description' => NULL,
             ),
-            263 => 
+            164 => 
             array (
                 'id' => 443,
                 'required_items' => '[1,2,3,4,5]',
@@ -2395,7 +1504,7 @@ class ChecklistItemsTableSeeder extends Seeder
                 'indicator_id' => 48,
                 'description' => NULL,
             ),
-            264 => 
+            165 => 
             array (
                 'id' => 448,
                 'required_items' => '["3"]',
@@ -2404,7 +1513,7 @@ class ChecklistItemsTableSeeder extends Seeder
                 'indicator_id' => 54,
                 'description' => NULL,
             ),
-            265 => 
+            166 => 
             array (
                 'id' => 449,
                 'required_items' => '["2"]',
@@ -2413,7 +1522,7 @@ class ChecklistItemsTableSeeder extends Seeder
                 'indicator_id' => 54,
                 'description' => NULL,
             ),
-            266 => 
+            167 => 
             array (
                 'id' => 450,
                 'required_items' => '["1"]',
@@ -2422,25 +1531,7 @@ class ChecklistItemsTableSeeder extends Seeder
                 'indicator_id' => 54,
                 'description' => NULL,
             ),
-            267 => 
-            array (
-                'id' => 454,
-                'required_items' => '["1","2","3","4","5"]',
-                'score' => 10.0,
-                'sequence' => NULL,
-                'indicator_id' => 57,
-                'description' => NULL,
-            ),
-            268 => 
-            array (
-                'id' => 455,
-                'required_items' => '["1","2","3","4"]',
-                'score' => 5.0,
-                'sequence' => NULL,
-                'indicator_id' => 57,
-                'description' => NULL,
-            ),
-            269 => 
+            168 => 
             array (
                 'id' => 456,
                 'required_items' => '["1"]',
@@ -2449,7 +1540,7 @@ class ChecklistItemsTableSeeder extends Seeder
                 'indicator_id' => 4,
                 'description' => NULL,
             ),
-            270 => 
+            169 => 
             array (
                 'id' => 462,
                 'required_items' => '["1","2","3","4","5"]',
@@ -2458,7 +1549,7 @@ class ChecklistItemsTableSeeder extends Seeder
                 'indicator_id' => 10,
                 'description' => NULL,
             ),
-            271 => 
+            170 => 
             array (
                 'id' => 463,
                 'required_items' => '["1","2","3","4"]',
@@ -2467,7 +1558,7 @@ class ChecklistItemsTableSeeder extends Seeder
                 'indicator_id' => 10,
                 'description' => NULL,
             ),
-            272 => 
+            171 => 
             array (
                 'id' => 464,
                 'required_items' => '["1","2","3"]',
@@ -2476,7 +1567,7 @@ class ChecklistItemsTableSeeder extends Seeder
                 'indicator_id' => 10,
                 'description' => NULL,
             ),
-            273 => 
+            172 => 
             array (
                 'id' => 465,
                 'required_items' => '["1","2"]',
@@ -2485,7 +1576,7 @@ class ChecklistItemsTableSeeder extends Seeder
                 'indicator_id' => 10,
                 'description' => NULL,
             ),
-            274 => 
+            173 => 
             array (
                 'id' => 466,
                 'required_items' => '["1"]',
@@ -2494,7 +1585,7 @@ class ChecklistItemsTableSeeder extends Seeder
                 'indicator_id' => 10,
                 'description' => NULL,
             ),
-            275 => 
+            174 => 
             array (
                 'id' => 467,
                 'required_items' => '["1","2","3","4","5"]',
@@ -2503,7 +1594,7 @@ class ChecklistItemsTableSeeder extends Seeder
                 'indicator_id' => 22,
                 'description' => NULL,
             ),
-            276 => 
+            175 => 
             array (
                 'id' => 468,
                 'required_items' => '["1","2","3","4"]',
@@ -2512,7 +1603,7 @@ class ChecklistItemsTableSeeder extends Seeder
                 'indicator_id' => 22,
                 'description' => NULL,
             ),
-            277 => 
+            176 => 
             array (
                 'id' => 469,
                 'required_items' => '["1","2","3"]',
@@ -2521,7 +1612,7 @@ class ChecklistItemsTableSeeder extends Seeder
                 'indicator_id' => 22,
                 'description' => NULL,
             ),
-            278 => 
+            177 => 
             array (
                 'id' => 470,
                 'required_items' => '["1","2"]',
@@ -2530,7 +1621,7 @@ class ChecklistItemsTableSeeder extends Seeder
                 'indicator_id' => 22,
                 'description' => NULL,
             ),
-            279 => 
+            178 => 
             array (
                 'id' => 471,
                 'required_items' => '["1"]',
@@ -2539,7 +1630,7 @@ class ChecklistItemsTableSeeder extends Seeder
                 'indicator_id' => 22,
                 'description' => NULL,
             ),
-            280 => 
+            179 => 
             array (
                 'id' => 472,
                 'required_items' => '["1","2","3","4","5"]',
@@ -2548,7 +1639,7 @@ class ChecklistItemsTableSeeder extends Seeder
                 'indicator_id' => 1,
                 'description' => NULL,
             ),
-            281 => 
+            180 => 
             array (
                 'id' => 473,
                 'required_items' => '["1","2","3","4"]',

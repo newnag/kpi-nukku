@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', "(Read-Only) " . $indicator->code." : ".$indicator->name)
+@section('title', '(Read-Only) ' . $indicator->code . ' : ' . $indicator->name)
 
 @section('content')
 
@@ -156,12 +156,24 @@
                 @endforelse
             </div>
 
-            <div class="card">
-                <h2 class="card-title">วิธีการคำนวน</h2>
-                <div class="criteria-box">
-                    {!! $indicator->condition ?? '-' !!}
+            @php
+                $condition = $indicator->condition ?? '';
+                // ลบช่องว่างรอบ ๆ
+                $trimmed = trim($condition);
+
+                // เช็คว่ามีแท็ก <img> หรือมีข้อความจริง ๆ หลังจากลบแท็ก HTML
+                $hasImage = preg_match('/<img\s[^>]*src=["\']?([^>"\']+)["\']?/i', $trimmed);
+                $hasText = trim(strip_tags($trimmed)) !== '';
+            @endphp
+
+            @if ($hasImage || $hasText)
+                <div class="card">
+                    <h2 class="card-title">วิธีการคำนวน</h2>
+                    <div class="criteria-box">
+                        {!! $indicator->condition !!}
+                    </div>
                 </div>
-            </div>
+            @endif
 
             @if ($indicator->variables->where('type', 'input')->isNotEmpty())
                 <div class="card">
@@ -183,16 +195,23 @@
                     @empty
                         <p class="text-gray-500">ยังไม่มีตัวแปรที่ต้องกรอก</p>
                     @endforelse
-
+                    <div class="card annotation-card">
+                        <h2 class="card-title">หมายเหตุ</h2>
+                        <div class="description-box">
+                            {!! $indicator->annotation ?? '-' !!}
+                        </div>
+                    </div>
                     <div class="action-bts">
-                        <button type="button" class="btns-secondary" onclick="location.href='{{ route('dashboardkpi.index') }}'">
+                        <button type="button" class="btns-secondary"
+                            onclick="location.href='{{ route('dashboardkpi.index') }}'">
                             <i class="fa fa-undo"></i> กลับ
                         </button>
                     </div>
                 </div>
             @else
                 <div class="action-bts">
-                    <button type="button" class="btns-secondary" onclick="location.href='{{ route('dashboardkpi.index') }}'">
+                    <button type="button" class="btns-secondary"
+                        onclick="location.href='{{ route('dashboardkpi.index') }}'">
                         <i class="fa fa-undo"></i> กลับ
                     </button>
                 </div>
@@ -355,6 +374,36 @@
             margin: 24px 0;
         }
 
+        .annotation-card {
+            margin-top: 20px;
+            padding: 16px 20px;
+            background: #fffbea;
+            /* เหลืองอ่อน */
+            border: 1px solid #fffbea;
+            /* เส้นกรอบเหลือง */
+            border-radius: 12px;
+            color: #92400e;
+            /* น้ำตาลเข้ม */
+        }
+
+        .description-box ul {
+            list-style-type: disc;
+            /* จุดกลม */
+            padding-left: 1.5rem;
+            margin: 0.5rem 0;
+        }
+
+        .description-box ol {
+            list-style-type: decimal;
+            /* ตัวเลข */
+            padding-left: 1.5rem;
+            margin: 0.5rem 0;
+        }
+
+        .description-box li {
+            margin: 0.25rem 0;
+        }
+
         .description-box {
             background: #f9fafb;
             /* gray-50 */
@@ -400,7 +449,7 @@
 
         .criteria-status {
             /* font-weight: 600;
-                                                                                                font-size: 14px; */
+                                                                                                            font-size: 14px; */
             color: #1f2937;
         }
 

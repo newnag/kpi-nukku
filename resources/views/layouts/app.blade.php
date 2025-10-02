@@ -7,6 +7,11 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'ระบบบริหารจัดการข้อมูลการรับรองสถาบันจากสภาการพยาบาล')</title>
 
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('uploads/logonuthaiS-2.png') }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('uploads/logonuthaiS-2.png') }}">
+    <link rel="shortcut icon" href="{{ asset('uploads/logonuthaiS-2.png') }}">
+
     <!-- Vite Assets -->
     @vite(['resources/css/app.css', 'resources/css/layout.css', 'resources/css/components.css', 'resources/js/app.js'])
 

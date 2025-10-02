@@ -113,72 +113,79 @@
                                         <div x-show="open" x-ref="menu" @click.away="open = false"
                                             @keydown.escape.window="open=false" x-transition
                                             :style="`position: fixed; top: ${pos.top}px; left: ${pos.left}px; width: ${menuWidth}px;`"
-                                            class="mt-2 bg-white rounded-md shadow-lg border border-gray-200 z-[9999]">
+                                            class="mt-2 bg-white rounded-md shadow-lg border border-gray-300 z-[9999]">
 
-                                            <div class="py-1">
+                                            <div class="py-1 text-gray-800 text-sm font-medium">
                                                 <!-- ปุ่มแก้ไข -->
                                                 <a href="{{ route('sar_reports.edit', $r->id) }}"
-                                                    class="flex items-center px-4 py-2 text-sm text-blue-600 hover:bg-blue-50 hover:text-blue-700 transition">
-                                                    <i data-lucide="edit-3" class="w-4 h-4 mr-2"></i> แก้ไข
+                                                    class="flex items-center px-4 py-2 hover:bg-gray-100 transition">
+                                                    <i data-lucide="edit-3" class="w-4 h-4 mr-2 text-gray-600"></i>
+                                                    แก้ไขข้อมูล
                                                 </a>
+
+                                                <!-- เส้นคั่น -->
+                                                <div class="border-t border-gray-200 my-1"></div>
 
                                                 <!-- ปุ่มลบ -->
                                                 <form action="{{ route('sar_reports.destroy', $r->id) }}" method="POST"
-                                                    onsubmit="return confirm('คุณแน่ใจหรือไม่ว่าต้องการลบรายการนี้?');">
+                                                    onsubmit="return confirm('คุณแน่ใจหรือไม่ว่าต้องการลบข้อมูลนี้?');">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit"
-                                                        class="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 hover:text-red-700 transition">
-                                                        <i data-lucide="trash-2" class="w-4 h-4 mr-2"></i> ลบ
+                                                        class="flex items-center w-full px-4 py-2 text-red-700 hover:bg-red-50 transition">
+                                                        <i data-lucide="trash-2" class="w-4 h-4 mr-2"></i> ลบข้อมูล
                                                     </button>
                                                 </form>
+
+                                                <!-- เส้นคั่น -->
+                                                <div class="border-t border-gray-200 my-1"></div>
 
                                                 <!-- ปุ่ม Export (Dropdown ซ้อน) -->
                                                 <div x-data="{ open: false }" class="relative">
                                                     <button type="button" @click="open = !open"
-                                                        class="flex items-center w-full px-4 py-2 text-sm text-green-600 hover:bg-green-50 hover:text-green-700 transition">
-                                                        <i data-lucide="download" class="w-4 h-4 mr-2"></i> Export
-                                                        <i data-lucide="chevron-right" class="ml-auto w-4 h-4"></i>
+                                                        class="flex items-center w-full px-4 py-2 hover:bg-gray-100 transition">
+                                                        <i data-lucide="download" class="w-4 h-4 mr-2 text-gray-600"></i>
+                                                        ส่งออกเอกสาร
+                                                        <i data-lucide="chevron-right"
+                                                            class="ml-auto w-4 h-4 text-gray-500"></i>
                                                     </button>
-
 
                                                     <!-- Submenu Export -->
                                                     <div x-show="open" @click.away="open = false" x-cloak
-                                                        class="absolute left-full top-0 ml-1 w-44 bg-white border border-gray-200 rounded-md shadow-lg z-50">
+                                                        class="absolute left-full top-0 ml-1 w-48 bg-white border border-gray-300 rounded-md shadow-lg z-50">
 
                                                         <!-- DOCX -->
                                                         <a href="{{ route('sar_reports.export.docx', $r->id) }}"
-                                                            class="flex items-center px-4 py-2 text-sm text-blue-600 hover:bg-blue-50 hover:text-blue-700 transition">
-                                                            <i data-lucide="file-text" class="w-4 h-4 mr-2"></i> DOCX
+                                                            class="flex items-center px-4 py-2 hover:bg-gray-100 transition">
+                                                            <i data-lucide="file-text"
+                                                                class="w-4 h-4 mr-2 text-blue-700"></i> Word (DOCX)
                                                         </a>
 
                                                         <!-- Excel -->
                                                         <a href="{{ route('sar_reports.export.xlsx', $r->id) }}"
-                                                            class="flex items-center px-4 py-2 text-sm text-green-600 hover:bg-green-50 hover:text-green-700 transition">
-                                                            <i data-lucide="file-spreadsheet" class="w-4 h-4 mr-2"></i>
-                                                            Excel
+                                                            class="flex items-center px-4 py-2 hover:bg-gray-100 transition">
+                                                            <i data-lucide="file-spreadsheet"
+                                                                class="w-4 h-4 mr-2 text-green-700"></i> Excel
                                                         </a>
 
                                                         <!-- PDF Preview -->
                                                         <a href="{{ route('sar_reports.export.pdf', $r->id) }}"
                                                             target="_blank"
-                                                            class="flex items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 hover:text-red-700 transition">
-                                                            <i data-lucide="file" class="w-4 h-4 mr-2"></i> PDF Preview
+                                                            class="flex items-center px-4 py-2 hover:bg-gray-100 transition">
+                                                            <i data-lucide="file" class="w-4 h-4 mr-2 text-red-700"></i>
+                                                            PDF Preview
                                                         </a>
                                                     </div>
-
                                                 </div>
                                             </div>
                                         </div>
                                     </template>
+
                                 </div>
                             </td>
 
                         </tr>
                     @empty
-                        <tr>
-                            <td colspan="4" class="px-4 py-8 text-center text-gray-500">ยังไม่มีข้อมูล</td>
-                        </tr>
                     @endforelse
                 </tbody>
             </table>
@@ -314,7 +321,6 @@
 @endpush
 
 @push('scripts')
-   
     <script>
         $(document).ready(function() {
             // Store default label text for each section to support reset
@@ -325,8 +331,9 @@
                 sectionDefaults[id] = $label.text().trim();
             });
 
-            // Toggle inner section dropdown (used by inline onclick)
-            window.toggleDropdown = function(sectionId) {
+            // Toggle inner section dropdown (scoped; avoid clobbering global navbar toggle)
+            window.toggleFilterDropdown = function(sectionId) {
+                if (!sectionId || typeof sectionId !== 'string') return;
                 $('.dropdown-multiselect').not('#' + sectionId).removeClass('open');
                 $('#' + sectionId).toggleClass('open');
             };

@@ -56,6 +56,12 @@ class DatabaseSeeder extends Seeder
             ChecklistItemsTableSeeder::class,
             SettingsTableSeeder::class,
         ]);
-        $this->call(FormulasTableSeeder::class);
+
+        // Cleanup: remove all data related to indicators 57 and 58 (cascades will clean children)
+        DB::table('indicators')->whereIn('id', [57, 58])->delete();
+        $this->call(IndicatorsTableSeeder::class);
+        $this->call(VariablesTableSeeder::class);
+        $this->call(CriteriasTableSeeder::class);
+        $this->call(ChecklistItemsTableSeeder::class);
     }
 }
