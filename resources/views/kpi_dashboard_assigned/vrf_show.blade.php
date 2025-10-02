@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', $indicator->code." : ".$indicator->name)
+@section('title', $indicator->code . ' : ' . $indicator->name)
 
 @section('content')
 
@@ -128,24 +128,6 @@
                                                     <i data-lucide="file" style="color:#6b7280;"></i>
                                                 @endif
                                             </span>
-
-                                            {{-- <span class="evidence-name">
-                                                @if ($evidence->type === 'url')
-                                                    @php
-                                                        // ถ้า path เก็บเป็น JSON หรือ array
-                                                        $urls = is_array($evidence->path)
-                                                            ? $evidence->path
-                                                            : json_decode($evidence->path, true);
-                                                        $firstUrl = $urls['urls'][0] ?? '#';
-                                                    @endphp
-                                                    <a href="{{ $firstUrl }}" target="_blank"
-                                                        class="text-blue-600 underline hover:text-blue-800">
-                                                        {{ $evidence->name }}
-                                                    </a>
-                                                @else
-                                                    {{ $evidence->name }}
-                                                @endif
-                                            </span> --}}
                                             <span class="evidence-name">
                                                 @php
                                                     $ext = strtolower(pathinfo($evidence->name, PATHINFO_EXTENSION));
@@ -167,8 +149,10 @@
                                                     {{-- PDF & Image → เปิดในแท็บใหม่ --}}
                                                     <span id="evidence-link-{{ $evidence->id }}">
                                                         <a href="{{ route('evidences.download', $evidence->id) }}"
-                                                            target="_blank" rel="noopener noreferrer" class="text-blue-600 underline hover:text-blue-800">
-                                                            <span id="evidence-name-text-{{ $evidence->id }}">{{ $evidence->name }}</span>
+                                                            target="_blank" rel="noopener noreferrer"
+                                                            class="text-blue-600 underline hover:text-blue-800">
+                                                            <span
+                                                                id="evidence-name-text-{{ $evidence->id }}">{{ $evidence->name }}</span>
                                                         </a>
                                                     </span>
                                                 @else
@@ -176,19 +160,23 @@
                                                     <span id="evidence-link-{{ $evidence->id }}">
                                                         <a href="{{ route('evidences.download', $evidence->id) }}" download
                                                             class="text-blue-600 underline hover:text-blue-800">
-                                                            <span id="evidence-name-text-{{ $evidence->id }}">{{ $evidence->name }}</span>
+                                                            <span
+                                                                id="evidence-name-text-{{ $evidence->id }}">{{ $evidence->name }}</span>
                                                         </a>
                                                     </span>
                                                 @endif
 
                                                 @if (!$locked)
                                                     <button type="button" class="ml-2 text-slate-500 hover:text-slate-700"
-                                                        title="แก้ไขชื่อไฟล์" onclick="startEditEvidenceName({{ $evidence->id }})">
+                                                        title="แก้ไขชื่อไฟล์"
+                                                        onclick="startEditEvidenceName({{ $evidence->id }})">
                                                         ✏️
                                                     </button>
-                                                    <span id="evidence-edit-{{ $evidence->id }}" class="inline-flex items-center gap-1 hidden" style="display:none"
+                                                    <span id="evidence-edit-{{ $evidence->id }}"
+                                                        class="inline-flex items-center gap-1 hidden" style="display:none"
                                                         data-update-url="{{ route('evidences.update', $evidence->id) }}">
-                                                        <input type="text" id="evidence-input-{{ $evidence->id }}" value="{{ $evidence->name }}"
+                                                        <input type="text" id="evidence-input-{{ $evidence->id }}"
+                                                            value="{{ $evidence->name }}"
                                                             class="border rounded px-2 py-0.5 text-sm" />
                                                         <button type="button" class="text-green-600 hover:text-green-700"
                                                             onclick="saveEvidenceName({{ $evidence->id }})">บันทึก</button>
@@ -200,18 +188,7 @@
 
                                         </div>
 
-                                        <div class="space-x-3 flex items-center justify-center">
-                                            {{-- <select name="evidences[{{ $evidence->id }}][status]"
-                                                @if ($locked) disabled @endif
-                                                id="evidence-{{ $evidence->id }}" data-criteria-id="{{ $criteria->id }}"
-                                                form="variables-form" class="text-center ">
-                                                <option value="false" {{ $evidence->status ? '' : 'selected' }}>
-                                                    รอดำเนินการ</option>
-                                                <option value="true" {{ $evidence->status ? 'selected' : '' }}>
-                                                    รับรองหลักฐาน
-                                                </option>
-                                            </select> --}}
-
+                                        <div class="flex items-center justify-center">
                                             <x-modal title="ยืนยันการลบหลักฐาน" size="sm" :context="'delete-evidence-' . $evidence->id">
                                                 <x-slot:trigger>
                                                     <button type="button" class="btn-delete" title="ลบหลักฐาน"
@@ -238,12 +215,12 @@
                                                 </div>
 
                                                 <x-slot:footer>
-                                                    <div class="flex justify-end gap-2">
-                                                        <button type="button" class="btns-secondary"
+                                                    <div class="flex justify-between">
+                                                        <button type="button" class="btn btn-outline"
                                                             @click="$dispatch('modal:close')">
                                                             ยกเลิก
                                                         </button>
-                                                        <button type="button" class="btns-primary"
+                                                        <button type="button" class="btn btn-danger"
                                                             @click="$refs.delForm.submit()">
                                                             ยืนยันการลบ
                                                         </button>
@@ -253,7 +230,8 @@
                                         </div>
                                     </div>
                                 @empty
-                                    <div class="text-sm text-center text-gray-500 opacity-75">----- ยังไม่มีหลักฐานแนบ -----
+                                    <div class="text-sm text-center text-gray-500 opacity-75">----- ยังไม่มีหลักฐานแนบ
+                                        -----
                                     </div>
                                 @endforelse
                             </div>
@@ -337,19 +315,19 @@
             </div>
 
             <div class="action-bts">
-                <button type="button" class="btns-secondary"
+                <button type="button" class="btn btn-outline" id="back-btn"
                     onclick="location.href='{{ route('dashboardkpi.index') }}'">
                     <i class="fa fa-undo"></i> กลับ
                 </button>
 
-                <button type="button" class="save-btn btns-primary" id="save-results-btn"
+                <button type="button" class="save-btn btn btn-primary" id="save-results-btn"
                     @if ($locked) hidden @endif>
                     <i class="fa fa-save"></i> บันทึกผลลัพธ์
                 </button>
 
                 <x-modal title="เปลี่ยนสถานะตัวบ่งชี้" size="sm" :context="'status'">
                     <x-slot:trigger>
-                        <button type="button" class=" btn-outlines" data-allow-when-locked="true">
+                        <button type="button" class="btn btn-secondary" data-allow-when-locked="true">
                             <i class="fa-solid fa-gear"></i>เปลี่ยนสถานะตัวบ่งชี้
                         </button>
                     </x-slot:trigger>
@@ -375,8 +353,8 @@
                     </div>
 
                     <x-slot:footer>
-                        <div class="flex justify-end gap-2">
-                            <button type="button" class="btns-secondary" @click="$dispatch('modal:close')">
+                        <div class="flex justify-end">
+                            <button type="button" class="btn btn-ghost" @click="$dispatch('modal:close')">
                                 ปิด
                             </button>
                         </div>
@@ -445,67 +423,6 @@
         if (window.lucide && typeof lucide.createIcons === 'function') {
             lucide.createIcons();
         }
-        // ================= ปุ่มบันทึกตัวแปร =================
-        // document.querySelectorAll('.save-btn').forEach(btn => {
-        //     btn.addEventListener('click', function() {
-        //         const status = this.dataset.status;
-        //         const form = document.getElementById('variables-form');
-        //         const formData = new FormData(form);
-        //         formData.set('status', status); // อัปเดทค่า status
-
-        //         fetch(form.action, {
-        //                 method: "POST",
-        //                 body: formData,
-        //                 headers: {
-        //                     "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content,
-        //                     "Accept": "application/json"
-        //                 }
-        //             })
-        //             .then(async res => {
-        //                 const text = await res.text();
-        //                 try {
-        //                     return JSON.parse(text);
-        //                 } catch (err) {
-        //                     console.error("Response is not JSON:", text);
-        //                     throw err;
-        //                 }
-        //             })
-        //             .then(data => {
-        //                 if (data.success) {
-        //                     Swal.fire({
-        //                         toast: true,
-        //                         position: 'top-end',
-        //                         icon: 'success',
-        //                         title: data.message || 'บันทึกสำเร็จ',
-        //                         showConfirmButton: false,
-        //                         timer: 2000
-        //                     });
-        //                 } else {
-        //                     Swal.fire({
-        //                         toast: true,
-        //                         position: 'top-end',
-        //                         icon: 'error',
-        //                         title: data.message || 'เกิดข้อผิดพลาด',
-        //                         showConfirmButton: false,
-        //                         timer: 2000
-        //                     });
-        //                 }
-        //             })
-        //             .catch(err => {
-        //                 console.error("Fetch error:", err);
-        //                 Swal.fire({
-        //                     toast: true,
-        //                     position: 'top-end',
-        //                     icon: 'error',
-        //                     title: 'ไม่สามารถบันทึกได้',
-        //                     showConfirmButton: false,
-        //                     timer: 2000
-        //                 });
-        //             });
-        //     });
-        // });
-
-
 
         // ✅ Template render หลักฐานใหม่ ให้เหมือน Blade
         function renderEvidenceItem(ev) {
@@ -548,98 +465,6 @@
             const fileHandlers = {};
             const editorInitialized = {};
             const form = document.getElementById("evidence-form-{{ $criteria->id }}");
-
-            // form.addEventListener("submit", function(e) {
-            //     e.preventDefault();
-
-            //     let formData = new FormData(form);
-
-            //     fetch(form.action, {
-            //             method: "POST",
-            //             body: formData,
-            //             headers: {
-            //                 "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content,
-            //                 "Accept": "application/json" // ✅ บังคับ Laravel ส่ง JSON
-            //             }
-            //         })
-            //         .then(async res => {
-            //             const text = await res.text();
-            //             try {
-            //                 return JSON.parse(text);
-            //             } catch (err) {
-            //                 console.error("Response is not JSON:", text);
-            //                 throw err;
-            //             }
-            //         })
-            //         .then(data => {
-            //             if (data.success) {
-            //                 Swal.fire({
-            //                     toast: true,
-            //                     position: 'top-end',
-            //                     icon: 'success',
-            //                     title: data.message || 'บันทึกสำเร็จ',
-            //                     showConfirmButton: false,
-            //                     timer: 2000
-            //                 });
-
-            //                 const list = document.querySelector(
-            //                     `.evidence-list-${form.querySelector('[name="criteria_id"]').value}`
-            //                 );
-            //                 if (list && data.evidences && Array.isArray(data.evidences)) {
-            //                     data.evidences.forEach(ev => {
-            //                         list.insertAdjacentHTML("beforeend", renderEvidenceItem(
-            //                             ev));
-
-            //                         // bind ปุ่มลบทันที
-            //                         const deleteBtn = list.querySelector(
-            //                             `#evidence-${ev.id} .btn-delete`);
-            //                         deleteBtn.addEventListener("click", () => handleDelete(ev
-            //                             .id));
-            //                     });
-            //                     if (window.lucide?.createIcons) lucide.createIcons();
-            //                 }
-
-
-
-            //                 // ✅ ปิด popup หลัง Toast
-            //                 setTimeout(() => {
-            //                     // ถ้าใช้ Alpine variable เช่น open{{ $criteria->id }}
-            //                     window[`open{{ $criteria->id }}`] = false;
-
-            //                     // fallback force ปิด DOM
-            //                     const popup = form.closest('[x-show]');
-            //                     if (popup) {
-            //                         popup.style.display = 'none';
-            //                     }
-            //                 }, 800);
-
-            //                 // ✅ reset form หลังบันทึกเสร็จ
-            //                 form.reset();
-            //             } else {
-            //                 Swal.fire({
-            //                     toast: true,
-            //                     position: 'top-end',
-            //                     icon: 'error',
-            //                     title: data.message || 'เกิดข้อผิดพลาด ⚠️',
-            //                     showConfirmButton: false,
-            //                     timer: 2000
-            //                 });
-            //             }
-            //         })
-            //         .catch(err => {
-            //             console.error("Fetch error:", err);
-            //             Swal.fire({
-            //                 toast: true,
-            //                 position: 'top-end',
-            //                 icon: 'error',
-            //                 title: 'ไม่สามารถบันทึกได้',
-            //                 showConfirmButton: false,
-            //                 timer: 2000
-            //             });
-            //         });
-            // });
-
-
             /*** ---------- File Upload Handler Class ---------- ***/
             class FileUploadHandler {
                 constructor(criteriaId) {
@@ -898,96 +723,86 @@
             @endforeach
         });
     </script>
-@endpush
-@push('scripts')
-<script>
-    function getCsrfToken() {
-        const meta = document.querySelector('meta[name="csrf-token"]');
-        return meta && meta.content ? meta.content : '';
-    }
+    <script>
+        function getCsrfToken() {
+            const meta = document.querySelector('meta[name="csrf-token"]');
+            return meta && meta.content ? meta.content : '';
+        }
 
-    function startEditEvidenceName(id) {
-        const linkSpan = document.getElementById('evidence-link-' + id);
-        const editSpan = document.getElementById('evidence-edit-' + id);
-        if (linkSpan && editSpan) {
-            // Hide link, show input row
-            linkSpan.style.display = 'none';
-            editSpan.style.display = 'inline-flex';
+        function startEditEvidenceName(id) {
+            const linkSpan = document.getElementById('evidence-link-' + id);
+            const editSpan = document.getElementById('evidence-edit-' + id);
+            if (linkSpan && editSpan) {
+                // Hide link, show input row
+                linkSpan.style.display = 'none';
+                editSpan.style.display = 'inline-flex';
+                const input = document.getElementById('evidence-input-' + id);
+                if (input) {
+                    input.focus();
+                    input.select();
+                }
+            }
+        }
+
+        function cancelEditEvidenceName(id) {
+            const linkSpan = document.getElementById('evidence-link-' + id);
+            const editSpan = document.getElementById('evidence-edit-' + id);
+            if (linkSpan && editSpan) {
+                editSpan.style.display = 'none';
+                linkSpan.style.display = '';
+            }
+        }
+
+        async function saveEvidenceName(id) {
+            const editSpan = document.getElementById('evidence-edit-' + id);
             const input = document.getElementById('evidence-input-' + id);
-            if (input) { input.focus(); input.select(); }
-        }
-    }
+            const linkSpan = document.getElementById('evidence-link-' + id);
+            const textSpan = document.getElementById('evidence-name-text-' + id);
+            if (!editSpan || !input || !linkSpan || !textSpan) return;
 
-    function cancelEditEvidenceName(id) {
-        const linkSpan = document.getElementById('evidence-link-' + id);
-        const editSpan = document.getElementById('evidence-edit-' + id);
-        if (linkSpan && editSpan) {
-            editSpan.style.display = 'none';
-            linkSpan.style.display = '';
-        }
-    }
-
-    async function saveEvidenceName(id) {
-        const editSpan = document.getElementById('evidence-edit-' + id);
-        const input = document.getElementById('evidence-input-' + id);
-        const linkSpan = document.getElementById('evidence-link-' + id);
-        const textSpan = document.getElementById('evidence-name-text-' + id);
-        if (!editSpan || !input || !linkSpan || !textSpan) return;
-
-        const url = editSpan.dataset.updateUrl;
-        const name = input.value.trim();
-        if (!name) {
-            alert('กรุณากรอกชื่อไฟล์');
-            input.focus();
-            return;
-        }
-
-        try {
-            const res = await fetch(url, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                    'X-CSRF-TOKEN': getCsrfToken(),
-                },
-                body: JSON.stringify({ name })
-            });
-
-            if (!res.ok) {
-                let msg = 'บันทึกไม่สำเร็จ';
-                try { const data = await res.json(); if (data && data.message) msg = data.message; } catch (_) {}
-                alert(msg);
+            const url = editSpan.dataset.updateUrl;
+            const name = input.value.trim();
+            if (!name) {
+                alert('กรุณากรอกชื่อไฟล์');
+                input.focus();
                 return;
             }
 
-            textSpan.textContent = name;
-            editSpan.style.display = 'none';
-            linkSpan.style.display = '';
-        } catch (e) {
-            alert('เกิดข้อผิดพลาดในการเชื่อมต่อ');
+            try {
+                const res = await fetch(url, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': getCsrfToken(),
+                    },
+                    body: JSON.stringify({
+                        name
+                    })
+                });
+
+                if (!res.ok) {
+                    let msg = 'บันทึกไม่สำเร็จ';
+                    try {
+                        const data = await res.json();
+                        if (data && data.message) msg = data.message;
+                    } catch (_) {}
+                    alert(msg);
+                    return;
+                }
+
+                textSpan.textContent = name;
+                editSpan.style.display = 'none';
+                linkSpan.style.display = '';
+            } catch (e) {
+                alert('เกิดข้อผิดพลาดในการเชื่อมต่อ');
+            }
         }
-    }
-</script>
+    </script>
 @endpush
 
 @push('styles')
     <style>
-        /* ---- Base ---- */
-        :root {
-            --blue: #398ECA;
-            --blue-600: #2f7db2;
-            --text: #1f2937;
-            /* gray-800 */
-            --muted: #6b7280;
-            /* gray-500 */
-            --border: #e5e7eb;
-            /* gray-200 */
-            --bg: #ffffff;
-            --shadow: 0 8px 24px rgba(0, 0, 0, .08);
-            --radius: 16px;
-            --radius-sm: 10px;
-        }
-
         .action-bts {
             display: flex;
             justify-content: center;
@@ -995,75 +810,11 @@
             margin-top: 20px;
         }
 
-        .btns-primary,
-        .btns-secondary,
-        .btn-outlines,
-        .btn-info {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            /* ลดระยะ icon กับข้อความ */
-            padding: 6px 12px;
-            /* ปรับ padding ให้น้อยลง */
-            font-size: 13px;
-            /* ตัวหนังสือเล็กลง */
-            font-weight: 500;
-            border-radius: 6px;
-            /* มุมมนเล็กลง */
-            cursor: pointer;
-            transition: 0.2s;
-            border: none;
-            height: 32px;
-            /* ความสูงปุ่มลดลง */
-            line-height: 1.2;
-        }
-
-        .btns-primary {
-            background: #398ECA;
-            color: #fff;
-        }
-
-        .btns-primary:hover {
-            background: #2f7db2;
-        }
-
-        .btns-secondary {
-            background: #fff;
-            border: 1.5px solid #398ECA;
-            color: #398ECA;
-        }
-
-        .btns-secondary:hover {
-            background: #EBF7FF;
-        }
-
-        .btn-outlines {
-            background: #ffffff;
-            border: 1.5px solid #398ECA;
-            color: #398ECA;
-        }
-
-        .btn-outlines:hover {
-            background: #dbeafe;
-        }
-
-        .btn-info {
-            background: #06b6d4;
-            color: #fff;
-        }
-
-        .btn-info:hover {
-            background: #0891b2;
-        }
-
         .card {
             background: var(--bg);
             border-radius: var(--radius);
             box-shadow: var(--shadow);
             padding: 24px;
-            /* max-width: 920px; */
-            /* ปรับตามหน้า */
-            margin: 16px;
             border: 1px solid #f3f4f6;
         }
 
@@ -1072,15 +823,12 @@
             border-radius: var(--radius);
             box-shadow: var(--shadow);
             padding: 24px;
-            /* max-width: 920px; */
-            /* ปรับตามหน้า */
             margin: 16px;
             border: 1px solid #f3f4f6;
         }
 
         .card-title {
             font-size: 18px;
-            /* font-weight: 700; */
             color: var(--blue);
             margin: 0 0 16px;
             display: flex;
@@ -1106,24 +854,19 @@
             position: relative;
             left: -29px;
             width: calc(100% + 57px);
-            /* right: 30px; */
             border: none;
             border-bottom: 3px solid #C3D8E8;
-            /* เทาอ่อน */
             margin: 24px 0;
         }
 
         .description-box {
             background: #f9fafb;
-            /* gray-50 */
             border: 1px solid #e5e7eb;
-            /* gray-200 */
             border-radius: 12px;
             padding: 16px 20px;
             font-size: 14px;
             line-height: 1.7;
             color: #374151;
-            /* gray-800 */
         }
 
         .description-box p {
@@ -1157,8 +900,6 @@
         }
 
         .criteria-status {
-            /* font-weight: 600;
-                                                                                                    font-size: 14px; */
             color: #1f2937;
         }
 
@@ -1180,36 +921,6 @@
             justify-content: center;
         }
 
-        .btn-adds {
-            background: #EBF7FF;
-            border: 1px solid #398ECA;
-            border-radius: 20px;
-            font-size: 12px;
-            padding: 6px 12px;
-            cursor: pointer;
-            color: #398ECA;
-            text-decoration: none;
-            /* กันไม่ให้มีขีดเส้นใต้ */
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            /* จัดกลางแนวนอนด้วย */
-            gap: 6px;
-            transition: background 0.2s;
-
-            /* ✅ เพิ่มส่วนนี้ให้ปุ่มเท่ากัน */
-            width: 140px;
-            /* กำหนดความกว้างตายตัว */
-            height: 36px;
-            /* กำหนดความสูงตายตัว */
-            box-sizing: border-box;
-        }
-
-        .btn-adds:hover {
-            background: #dbeafe;
-        }
-
-
         .btn-delete {
             background: none;
             border: none;
@@ -1219,13 +930,11 @@
             align-items: center;
             justify-content: center;
             color: #dc2626;
-            /* แดงอ่อน */
             transition: color 0.2s, transform 0.1s;
         }
 
         .btn-delete:hover {
             color: #b91c1c;
-            /* แดงเข้ม */
             transform: scale(1.1);
         }
 
@@ -1237,17 +946,12 @@
 
         .criteria-box ul {
             list-style-type: disc;
-            /* แสดง bullet วงกลม */
             list-style-position: outside;
-            
-            /* ขยับเข้า */
             padding-left: 1.5rem;
-            /* เผื่อกรณี framework reset */
         }
 
         .criteria-box ol {
             list-style-type: decimal;
-            /* ถ้ามี ordered list */
             margin-left: 1.5rem;
             padding-left: 1.5rem;
         }
@@ -1272,28 +976,13 @@
             flex-shrink: 0;
         }
 
-        :root {
-            --blue: #398ECA;
-            --green: #22c55e;
-            --orange: #fbbf24;
-            --gray-50: #f9fafb;
-            --gray-100: #f3f4f6;
-            --gray-600: #4b5563;
-            --gray-800: #1f2937;
-            --radius: 14px;
-            --shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-        }
-
         .annotation-card {
             margin-top: 20px;
             padding: 16px 20px;
             background: #fffbea;
-            /* เหลืองอ่อน */
             border: 1px solid #fde68a;
-            /* เส้นกรอบเหลือง */
             border-radius: 12px;
             color: #92400e;
-            /* น้ำตาลเข้ม */
         }
 
         .annotation-header {
@@ -1303,7 +992,6 @@
             align-items: center;
             gap: 6px;
             color: #b45309;
-            /* เหลือง-น้ำตาล */
         }
 
         .annotation-body {
@@ -1318,8 +1006,6 @@
             padding: 20px;
             background: #deedfb;
             border-radius: 16px;
-            /* box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); */
-            /* border: 1px solid #e5e7eb; */
             text-align: center;
         }
 
@@ -1353,7 +1039,6 @@
             align-items: center;
             justify-content: space-between;
             background: #f9f9f9;
-            /* เทาอ่อน */
             padding: 10px 16px;
             border-radius: 8px;
             margin-bottom: 10px;
@@ -1363,12 +1048,10 @@
             font-weight: 600;
             font-size: 14px;
             color: #374151;
-            /* gray-700 */
         }
 
         .variable-input {
             border: 1px solid #e5e7eb;
-            /* gray-200 */
             border-radius: 6px;
             padding: 6px 10px;
             width: 300px;
@@ -1381,15 +1064,12 @@
         .dashboard-container {
             max-width: 960px;
             margin: 0 auto;
-            /* padding: 24px; */
         }
 
-        /* Card */
         .card.indicator-card {
             background: #fff;
             border-radius: var(--radius);
             box-shadow: var(--shadow);
-            /* padding: 28px; */
             border: 1px solid var(--gray-100);
         }
 
@@ -1411,16 +1091,12 @@
         }
 
         .tab {
-            color: #6b7280;
-            /* gray-500 */
+            color: var(--color-gray-500);
             cursor: default;
         }
 
-
-
         .tab-divider {
-            color: #d1d5db;
-            /* gray-300 */
+            color: var(--color-gray-300);
         }
 
         hr.tab-divider {
@@ -1463,50 +1139,9 @@
         .chip {
             display: inline-block;
             background: #EBF7FF;
-
             border-radius: 16px;
             padding: 4px 12px;
             font-size: 13px;
-            color: #858e95;
-        }
-
-        /* Status Chips */
-        .status-chip {
-            display: inline-block;
-            border-radius: 16px;
-            padding: 4px 12px;
-            font-size: 13px;
-            color: #fff;
-        }
-
-        /* โทนส้มพาสเทล */
-        .status-chip.orange {
-            background: #FFD1A8;
-            color: #1f2937;
-        }
-
-        /* โทนเขียวพาสเทล */
-        .status-chip.green {
-            background: #A8FFBD;
-            color: #1f2937;
-        }
-
-        /* โทนน้ำเงินพาสเทล */
-        .status-chip.blue {
-            background: #A8D4FF;
-            color: #1f2937;
-        }
-
-        /* โทนเทาพาสเทล */
-        .status-chip.gray {
-            background: #E5E7EB;
-            /* gray-200 */
-            color: #1f2937;
-        }
-
-        .status-chip.red {
-            background: #FFA8A8;
-            /* red-500 */
             color: #858e95;
         }
 
@@ -1519,9 +1154,7 @@
         .trumbowyg-editor ol,
         .trumbowyg-editor ul {
             list-style-position: inside;
-            /* สำคัญ */
             padding-left: 0;
-            /* ตัดระยะเว้นซ้ายของลิสต์เดิม */
         }
 
         /* ให้กล่อง Trumbowyg กลมกลืนกับธีมเดิม */
@@ -1600,40 +1233,6 @@
             margin: 0 10px;
         }
 
-        /* .score-percentage {
-                                    margin-top: 16px;
-                                    text-align: center;
-                                }
-
-                                .percentage-bar {
-                                    width: 100%;
-                                    height: 12px;
-                                    background: #e2e8f0;
-                                    border-radius: 6px;
-                                    overflow: hidden;
-                                    margin-bottom: 8px;
-                                    position: relative;
-                                }
-
-                                .percentage-fill {
-                                    height: 100%;
-                                    background: linear-gradient(90deg, #3b82f6 0%, #10b981 50%, #22c55e 100%);
-                                    border-radius: 6px;
-                                    transition: width 0.3s ease;
-                                    position: relative;
-                                }
-
-                                .percentage-fill::after {
-                                    content: '';
-                                    position: absolute;
-                                    top: 0;
-                                    left: 0;
-                                    right: 0;
-                                    bottom: 0;
-                                    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.3) 50%, transparent 100%);
-                                    animation: shimmer 2s infinite;
-                                } */
-
         @keyframes shimmer {
             0% {
                 transform: translateX(-100%);
@@ -1672,15 +1271,10 @@
 
         .evidence-containers {
             width: 85%;
-            /* ไม่เต็มจอ */
             max-width: 600px;
-            /* กว้างสุด 600px */
             max-height: 80vh;
-            /* สูงสุด 80% ของหน้าจอ */
             overflow-y: auto;
-            /* ถ้าเนื้อหาเกิน ให้ scroll */
             margin: 40px auto;
-            /* จัดให้อยู่ตรงกลาง */
             background: #fff;
             border-radius: 10px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
@@ -1691,10 +1285,8 @@
             justify-content: center;
             align-items: center;
             font-size: 18px;
-            /* เล็กลงอีก */
             padding: 10px 14px;
             font-weight: 700;
-
             background: linear-gradient(90deg, #a9c6ff 0%, #fff3d4 100%);
             color: #222;
         }
@@ -1763,25 +1355,25 @@
             flex-shrink: 0;
         }
 
-        .remove-file {
-            background: none;
-            border: none;
-            cursor: pointer;
-            color: #6b7280;
-            padding: 4px;
-            border-radius: 4px;
-            flex-shrink: 0;
-        }
+        /* .remove-file {
+                background: none;
+                border: none;
+                cursor: pointer;
+                color: #6b7280;
+                padding: 4px;
+                border-radius: 4px;
+                flex-shrink: 0;
+            }
 
-        .remove-file:hover {
-            background: #e5e7eb;
-            color: #ef4444;
-        }
+            .remove-file:hover {
+                background: #e5e7eb;
+                color: #ef4444;
+            } */
 
         /* URL */
-        .url-section {
-            margin-bottom: 30px;
-        }
+        /* .url-section {
+                margin-bottom: 30px;
+            } */
 
         .section-divider {
             position: relative;
@@ -1832,52 +1424,52 @@
             box-shadow: 0 0 0 3px rgba(59, 130, 246, .1);
         }
 
-        .url-input {
-            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1'/%3E%3C/svg%3E") no-repeat 16px center;
-            background-size: 20px;
-            padding-left: 48px;
-        }
+        /* .url-input {
+                background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1'/%3E%3C/svg%3E") no-repeat 16px center;
+                background-size: 20px;
+                padding-left: 48px;
+            } */
 
-        .url-row {
-            display: flex;
-            gap: 8px;
-            align-items: stretch;
-            flex-wrap: nowrap;
-        }
+        /* .url-row {
+                display: flex;
+                gap: 8px;
+                align-items: stretch;
+                flex-wrap: nowrap;
+            }
 
-        .url-row .form-input {
-            flex: 1;
-            min-width: 0;
-        }
+            .url-row .form-input {
+                flex: 1;
+                min-width: 0;
+            } */
 
-        .add-url-btn,
-        .remove-url-btn {
-            width: 44px;
-            min-width: 44px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 2px solid #d1d5db;
-            border-radius: 8px;
-            background: #f3f4f6;
-            cursor: pointer;
-            transition: .2s;
-        }
+        /* .add-url-btn,
+            .remove-url-btn {
+                width: 44px;
+                min-width: 44px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border: 2px solid #d1d5db;
+                border-radius: 8px;
+                background: #f3f4f6;
+                cursor: pointer;
+                transition: .2s;
+            }
 
-        .add-url-btn:hover {
-            background: #e5e7eb;
-            border-color: #9ca3af;
-        }
+            .add-url-btn:hover {
+                background: #e5e7eb;
+                border-color: #9ca3af;
+            }
 
-        .remove-url-btn {
-            background: #fef2f2;
-            border-color: #fecaca;
-        }
+            .remove-url-btn {
+                background: #fef2f2;
+                border-color: #fecaca;
+            }
 
-        .remove-url-btn:hover {
-            background: #fee2e2;
-            border-color: #fca5a5;
-        }
+            .remove-url-btn:hover {
+                background: #fee2e2;
+                border-color: #fca5a5;
+            } */
 
         .form-input.locked {
             background: #f3f4f6;
@@ -1959,39 +1551,39 @@
             margin-top: 30px;
         }
 
-        .btn-primary,
-        .btn-secondary {
-            padding: 12px 24px;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: .3s;
-            border: none;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
+        /* .btn-primary,
+            .btn-secondary {
+                padding: 12px 24px;
+                border-radius: 8px;
+                font-size: 16px;
+                font-weight: 500;
+                cursor: pointer;
+                transition: .3s;
+                border: none;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
 
-        .btn-primary {
-            background: #3b82f6;
-            color: #fff;
-        }
+            .btn-primary {
+                background: #3b82f6;
+                color: #fff;
+            }
 
-        .btn-primary:hover {
-            background: #2563eb;
-        }
+            .btn-primary:hover {
+                background: #2563eb;
+            }
 
-        .btn-secondary {
-            background: #fff;
-            color: #374151;
-            border: 2px solid #d1d5db;
-        }
+            .btn-secondary {
+                background: #fff;
+                color: #374151;
+                border: 2px solid #d1d5db;
+            }
 
-        .btn-secondary:hover {
-            background: #f9fafb;
-            border-color: #9ca3af;
-        }
+            .btn-secondary:hover {
+                background: #f9fafb;
+                border-color: #9ca3af;
+            } */
 
         @media (max-width:768px) {
             .evidence-form {
