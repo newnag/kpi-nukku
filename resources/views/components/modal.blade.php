@@ -49,8 +49,8 @@
                             {{ $title }}
                         </h3>
                         <button type="button"
-                            class="text-slate-500 hover:text-red-500 btn-ghost-close text-lg sm:text-xl"
-                            @click="open = false" aria-label="Close">✕</button>
+                            class="!w-fit hover:!text-red-500 btn btn-xs hover:!shadow-none"
+                            @click="open = false" aria-label="ปิด"><i data-lucide="x"></i></button>
                     </div>
 
                     {{-- Body (scrollable) --}}

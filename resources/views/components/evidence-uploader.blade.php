@@ -8,9 +8,9 @@
 
 <div class="criteria-evidence" x-data="eUploader{{ $cid }}()" x-init="init()">
     <!-- Open button -->
-    <button type="button" class="eu-btn btn-adds" :disabled="{{ $isLocked ? 'true' : 'false' }}" @click="openModal()"
-        @if ($isLocked) hidden @endif>
-        เพิ่มหลักฐาน <i class="fa fa-upload"></i>
+    <button type="button" class="btn btn-outline btn-md " :disabled="{{ $isLocked ? 'true' : 'false' }}"
+        @click="openModal()" @if ($isLocked) hidden @endif>
+        <i class="fa fa-upload"></i> เพิ่มหลักฐาน
     </button>
 
     <!-- Backdrop + Modal -->
@@ -23,135 +23,116 @@
             <!-- Header -->
             <header class="eu-modal-header">
                 <h2 id="eu-title-{{ $cid }}">เพิ่มหลักฐานใหม่</h2>
-                <button type="button" class="eu-icon-btn" @click="closeModal()" aria-label="ปิด">
+                <button type="button" class="hover:!text-red-500 btn btn-xs hover:!shadow-none" @click="closeModal()"
+                    aria-label="ปิด">
                     <i data-lucide="x"></i>
                 </button>
             </header>
+            <div class="p-1 md:p-2 lg:p-3 overflow-y-auto max-w-auto min-h-[160px] sm:min-h-[200px] max-h-[70vh] sm:max-h-[75vh] md:max-h-[80vh]">
+                <form action="{{ $storeRoute ?? route('evidences.store') }}" method="POST"
+                    enctype="multipart/form-data" id="evidence-form-{{ $cid }}" class="eu-form"
+                    @submit="beforeSubmit">
+                    @csrf
+                    <input type="hidden" name="criteria_id" value="{{ $cid }}">
 
-            <form action="{{ $storeRoute ?? route('evidences.store') }}" method="POST" enctype="multipart/form-data"
-                id="evidence-form-{{ $cid }}" class="eu-form" @submit="beforeSubmit">
-                @csrf
-                <input type="hidden" name="criteria_id" value="{{ $cid }}">
-
-                <!-- Single column content -->
-                <div class="eu-stack">
-                    <!-- Upload -->
-                    <div class="eu-block">
-                        <div class="eu-dropzone" :class="{ 'is-dragover': dragging }"
-                            @dragenter.prevent="dragging = true" @dragover.prevent="dragging = true"
-                            @dragleave.prevent="dragging = false" @drop.prevent="handleDrop($event)"
-                            @click="pickFiles()">
-                            <div class="eu-dropzone-icon">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="52" height="52" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1"
-                                        d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                                </svg>
+                    <!-- Single column content -->
+                    <div class="eu-stack">
+                        <!-- Upload -->
+                        <div class="eu-block">
+                            <div class="eu-dropzone" :class="{ 'is-dragover': dragging }"
+                                @dragenter.prevent="dragging = true" @dragover.prevent="dragging = true"
+                                @dragleave.prevent="dragging = false" @drop.prevent="handleDrop($event)"
+                                @click="pickFiles()">
+                                <div class="eu-dropzone-icon">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="52" height="52" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1"
+                                            d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                                    </svg>
+                                </div>
+                                <p class="eu-dropzone-text">
+                                    วางไฟล์ที่นี่ หรือ <span class="eu-link">คลิกเพื่อเลือกไฟล์</span>
+                                </p>
+                                <input type="file" id="fileInput-{{ $cid }}" name="files[]" multiple
+                                    accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" class="eu-file-input"
+                                    @change="handleFileInput($event)">
                             </div>
-                            <p class="eu-dropzone-text">
-                                วางไฟล์ที่นี่ หรือ <span class="eu-link">คลิกเพื่อเลือกไฟล์</span>
-                            </p>
-                            <input type="file" id="fileInput-{{ $cid }}" name="files[]" multiple
-                                accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" class="eu-file-input"
-                                @change="handleFileInput($event)">
-                        </div>
-                        <div class="eu-files" x-show="files.length">
-                            <template x-for="(f, idx) in files" :key="f._id">
-                                <div class="eu-file">
-                                    <div class="eu-file-preview" x-show="f._isImage">
-                                        <img :src="f._objectURL" :alt="f.name">
-                                    </div>
-                                    <div class="eu-file-info">
-                                        <!-- input สำหรับแก้ชื่อไฟล์ -->
-                                        <input type="text" class="eu-input eu-file-rename" :name="`file_names[]`"
-                                            x-model="f._customName" :placeholder="f.name">
-
-                                        <div class="eu-file-meta">
-                                            <span x-text="humanSize(f.size)"></span>
+                            <div class="eu-files" x-show="files.length">
+                                <template x-for="(f, idx) in files" :key="f._id">
+                                    <div class="eu-file">
+                                        <div class="eu-file-preview" x-show="f._isImage">
+                                            <img :src="f._objectURL" :alt="f.name">
                                         </div>
+                                        <div class="eu-file-info">
+                                            <!-- input สำหรับแก้ชื่อไฟล์ -->
+                                            <input type="text" class="eu-input eu-file-rename" :name="`file_names[]`"
+                                                x-model="f._customName" :placeholder="f.name">
+
+                                            <div class="eu-file-meta pl-2">
+                                                ขนาดไฟล์ : <span x-text="humanSize(f.size)"></span>
+                                            </div>
+                                        </div>
+                                        <button type="button" class="eu-icon-btn danger cursor-pointer"
+                                            @click="removeFile(idx)" aria-label="ลบไฟล์">
+                                            <i data-lucide="x"></i>
+                                        </button>
                                     </div>
-                                    <button type="button" class="eu-icon-btn danger" @click="removeFile(idx)"
-                                        aria-label="ลบไฟล์">
-                                        <i data-lucide="trash-2"></i>
+                                </template>
+                            </div>
+                        </div>
+
+                        <!-- URLs -->
+                        <div class="eu-block">
+                            <div class="eu-section-title ">แนบลิงก์หลักฐาน</div>
+
+                            @foreach (collect(old('additional_urls', [])) as $u)
+                                @if ($u !== null && $u !== '')
+                                    <div class="eu-url-row is-locked">
+                                        <input type="text" class="eu-input" value="{{ $u }}" readonly
+                                            tabindex="-1">
+                                        <button type="button" class="eu-icon-btn" disabled aria-label="ลบ URL">
+                                            <i data-lucide="lock"></i>
+                                        </button>
+                                    </div>
+                                @endif
+                            @endforeach
+
+                            <template x-for="(row, i) in urlRows" :key="row._id">
+                                <div class="eu-url-row">
+                                    <input type="text" class="eu-input" :name="`url_names[]`"
+                                        placeholder="ชื่อหลักฐาน URL" x-model="row.name">
+                                    <input type="url" class="eu-input" :name="`additional_urls[]`"
+                                        placeholder="วาง URL เพิ่มเติม" x-model="row.url">
+                                    <button type="button" class="eu-icon-btn danger cursor-pointer"
+                                        @click="removeUrl(i)" aria-label="ลบ URL">
+                                        <i data-lucide="x"></i>
                                     </button>
                                 </div>
                             </template>
-                        </div>
 
-                        {{-- 
-                        <div class="eu-files" x-show="files.length">
-                            <template x-for="(f, idx) in files" :key="f._id">
-                                <div class="eu-file">
-                                    <div class="eu-file-preview" x-show="f._isImage">
-                                        <img :src="f._objectURL" :alt="f.name">
-                                    </div>
-                                    <div class="eu-file-info">
-                                        <div class="eu-file-name" x-text="f.name"></div>
-                                        <div class="eu-file-meta">
-                                            <span x-text="humanSize(f.size)"></span>
-                                        </div>
-                                    </div>
-                                    <button type="button" class="eu-icon-btn danger" @click="removeFile(idx)"
-                                        aria-label="ลบไฟล์">
-                                        <i data-lucide="trash-2"></i>
-                                    </button>
-                                </div>
-                            </template>
-                        </div> --}}
-                    </div>
-
-                    <!-- URLs -->
-                    <div class="eu-block">
-                        <div class="eu-section-title ">แนบลิงก์หลักฐาน</div>
-
-                        @foreach (collect(old('additional_urls', [])) as $u)
-                            @if ($u !== null && $u !== '')
-                                <div class="eu-url-row is-locked">
-                                    <input type="text" class="eu-input" value="{{ $u }}" readonly
-                                        tabindex="-1">
-                                    <button type="button" class="eu-icon-btn" disabled aria-label="ลบ URL">
-                                        <i data-lucide="lock"></i>
-                                    </button>
-                                </div>
-                            @endif
-                        @endforeach
-
-                        <template x-for="(row, i) in urlRows" :key="row._id">
-                            <div class="eu-url-row">
-                                <input type="text" class="eu-input" :name="`url_names[]`"
-                                    placeholder="ชื่อหลักฐาน URL" x-model="row.name">
-                                <input type="url" class="eu-input" :name="`additional_urls[]`"
-                                    placeholder="วาง URL เพิ่มเติม" x-model="row.url">
-                                <button type="button" class="eu-icon-btn danger" @click="removeUrl(i)"
-                                    aria-label="ลบ URL">
-                                    <i data-lucide="x"></i>
-                                </button>
+                            <div class="eu-url-actions">
+                                <button type="button" class="btn outline text-[14px] text-gray-500 !px-2 !py-1 !gap-0.5 hover:bg-gray-100" @click="addUrl()">
+                                    <i data-lucide="plus" class="text-[14px]"></i> เพิ่ม URL </button>
                             </div>
-                        </template>
+                        </div>
 
-                        <div class="eu-url-actions">
-                            <button type="button" class="eu-btn outline" @click="addUrl()">
-                                <i data-lucide="plus"></i> เพิ่ม URL
-                            </button>
+                        <!-- Details -->
+                        <div class="eu-block">
+                            <div class="eu-section-title">รายละเอียดเพิ่มเติม</div>
+                            <textarea id="detailEditor-{{ $cid }}" name="detail" class="eu-editor" rows="6">{!! old('detail') !!}</textarea>
                         </div>
                     </div>
+            </div>
 
-                    <!-- Details -->
-                    <div class="eu-block">
-                        <div class="eu-section-title">รายละเอียดเพิ่มเติม</div>
-                        <textarea id="detailEditor-{{ $cid }}" name="detail" class="eu-editor" rows="6">{!! old('detail') !!}</textarea>
-                    </div>
-                </div>
-
-                <!-- Sticky Actions -->
-                <footer class="eu-actions">
-                    <button type="button" class="eu-btn ghost" @click="closeModal()">
-                        <i data-lucide="undo-2"></i> กลับ
-                    </button>
-                    <button type="submit" class="eu-btn primary">
-                        <i data-lucide="save"></i> บันทึก
-                    </button>
-                </footer>
+            <!-- Sticky Actions -->
+            <footer class="eu-actions">
+                <button type="button" class="btn btn-outline" @click="closeModal()">
+                    <i data-lucide="undo-2"></i> กลับ
+                </button>
+                <button type="submit" class="btn btn-primary">
+                    <i data-lucide="save"></i> บันทึก
+                </button>
+            </footer>
             </form>
         </section>
     </div>
@@ -165,54 +146,6 @@
     <style>
         [x-cloak] {
             display: none !important
-        }
-
-        /* Buttons (minimal) */
-        .eu-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: .5rem;
-            font-weight: 600;
-            border-radius: 10px;
-            padding: .55rem .9rem;
-            border: 1px solid transparent;
-            cursor: pointer;
-            background: #111827;
-            color: white;
-            transition: box-shadow .15s ease, transform .06s ease, background .2s ease, color .2s ease;
-            font-size: 14px;
-        }
-
-        .eu-btn:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, .12)
-        }
-
-        .eu-btn:disabled {
-            opacity: .45;
-            cursor: not-allowed;
-            box-shadow: none
-        }
-
-        .eu-btn.primary {
-            background: #398ECA;
-            color: #fff;
-        }
-
-        .eu-btn.ghost {
-            background: #f3f4f6;
-            color: #398ECA;
-            border-color: #e5e7eb
-        }
-
-        .eu-btn.outline {
-            background: #fff;
-            color: #398ECA;
-            border-color: #d1d5db
-        }
-
-        .eu-btn.outline:hover {
-            background: #f9fafb
         }
 
         .eu-icon-btn {
@@ -261,21 +194,17 @@
 
         .eu-modal {
             position: fixed;
-            /* Change to fixed to center on screen */
             top: 50%;
-            /* Center vertically */
             left: 50%;
-            /* Center horizontally */
             transform: translate(-50%, -50%);
-            /* Adjust for element's own size */
             z-index: 61;
             background: #fff;
             border-radius: 16px;
             width: 100%;
             max-width: 720px;
             max-height: 92vh;
-            overflow: auto;
-            padding: .75rem .75rem 0.5rem;
+            overflow: hidden;
+            /* padding: .75rem .75rem 0.5rem; */
             box-shadow: 0 20px 55px rgba(0, 0, 0, .18);
         }
 
@@ -317,7 +246,6 @@
         }
 
         .eu-section-title {
-            /* font-weight: 700; */
             color: black;
             margin: 0 0 .6rem;
             font-size: 14px;
@@ -334,6 +262,11 @@
             cursor: pointer;
             background: #fafafa;
             transition: background .2s ease, border-color .2s ease;
+        }
+
+        .eu-dropzone:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.12);
         }
 
         .eu-dropzone.is-dragover {
@@ -408,8 +341,8 @@
         }
 
         .eu-file-meta {
-            font-size: .85rem;
-            color: #6b7280
+            font-size: 13px;
+            color: #6b7280;
         }
 
         /* URL rows (single column with inline delete) */
@@ -421,16 +354,6 @@
             margin-bottom: .5rem;
         }
 
-        @media (max-width:560px) {
-            .eu-url-row {
-                grid-template-columns: 1fr
-            }
-
-            .eu-url-row .eu-icon-btn {
-                width: 100%
-            }
-        }
-
         .eu-url-row.is-locked input {
             background: #f9fafb;
             color: #6b7280
@@ -438,7 +361,7 @@
 
         .eu-url-actions {
             display: flex;
-            justify-content: flex-end
+            justify-content: flex-end;
         }
 
         /* Inputs */
@@ -446,11 +369,12 @@
             width: 100%;
             border: 1px solid #e5e7eb;
             border-radius: 10px;
-            padding: .55rem .7rem;
+            padding: .5rem .75rem;
             color: #111827;
             background: #fff;
             transition: border-color .2s ease, box-shadow .2s ease;
             font-size: 14px;
+            cursor: pointer;
         }
 
         .eu-input:focus {
@@ -459,8 +383,16 @@
             box-shadow: 0 0 0 3px rgba(99, 102, 241, .15)
         }
 
+        .eu-input:hover {
+            outline: 0;
+            border-color: #c7d2fe;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, .15);
+            background: var(--color-gray-50);
+        }
+
         .eu-editor {
-            width: 100%
+            width: 100%;
+            height: fit-content;
         }
 
         /* Footer actions */
@@ -472,13 +404,32 @@
             display: flex;
             justify-content: flex-end;
             gap: .5rem;
-            padding: .6rem .25rem .8rem;
-            margin-top: .25rem;
+            padding: 10px 20px;
             z-index: 12;
         }
 
-        .btn-adds.eu-btn {
-            border-radius: 10px
+        .eu-modal-header {
+            position: sticky;
+            top: 0;
+            background: #fff;
+            border-top: 1px solid #f3f4f6;
+            display: flex;
+            justify-content: space-between;
+            gap: .5rem;
+            padding: 10px 10px;
+            z-index: 12;
+        }
+
+        @media (max-width:560px) {
+            .eu-url-row {
+                grid-template-columns: 1fr;
+                gap: .5rem;
+                margin-bottom: 1rem;
+            }
+
+             .eu-icon-btn {
+                width: 100%
+            }
         }
     </style>
 @endpush
