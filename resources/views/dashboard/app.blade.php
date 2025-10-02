@@ -111,7 +111,7 @@
                 </button>
             </div>
 
-            <div style="margin: 20px">
+            <div style="margin: 10px">
                 <table class="table" id="dashboardTable">
                     <thead>
                         <tr>
