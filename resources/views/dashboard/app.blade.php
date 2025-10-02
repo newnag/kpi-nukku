@@ -7,7 +7,7 @@
 @section('content')
 
     <!-- Toggle Switch -->
-    <div style="align-items:center;gap:8px;margin-bottom:12px;text-align: right;margin-top: 20px;">
+    <div class="text-right">
         <label for="toggle-filter" class="switch">
             <input type="checkbox" id="toggle-filter">
             <span class="slider round"></span>
