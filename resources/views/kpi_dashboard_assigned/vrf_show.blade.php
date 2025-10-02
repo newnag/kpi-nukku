@@ -993,12 +993,9 @@
         }
 
         .annotation-card {
-            margin-top: 20px;
             padding: 16px 20px;
             background: #fffbea;
-            /* เหลืองอ่อน */
             border: 1px solid #fde68a;
-            /* เส้นกรอบเหลือง */
             border-radius: 12px;
             color: #92400e;
         }
