@@ -1,4 +1,4 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 
 @section('content')
     <div class="sar-container">
@@ -6,7 +6,7 @@
             <div class="header-contatainers">
                 สร้างรายงาน SAR
             </div>
-            <div class="max-w-6xl mx-auto space-y-6 px-6 m-6">
+            <div class="max-w-6xl mx-auto space-y-6 px-6 m-6 pb-6">
                 {{-- <h2 class="text-2xl font-bold mb-1">สร้างรายงาน SAR</h2> --}}
                 @if (request('year'))
                     <div class="text-gray-600 mb-6">ปีการประเมิน: <span class="font-semibold">{{ request('year') }}</span>
@@ -340,11 +340,14 @@
 
 
 @push('styles')
-    <!-- Trumbowyg core CSS -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Trumbowyg/2.27.3/ui/trumbowyg.min.css">
+    <!-- Trumbowyg core CSS (v2.31.0 to match working pages) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/trumbowyg@2.31.0/dist/ui/trumbowyg.min.css">
+    <!-- Trumbowyg table plugin CSS (needed for grid UI and clicks) -->
+    <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/trumbowyg@2.31.0/dist/plugins/table/ui/trumbowyg.table.min.css">
     <!-- Trumbowyg colors plugin CSS -->
     <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/Trumbowyg/2.27.3/plugins/colors/ui/trumbowyg.colors.min.css">
+        href="https://cdn.jsdelivr.net/npm/trumbowyg@2.31.0/dist/plugins/colors/ui/trumbowyg.colors.min.css">
     <!-- Webfont (TH Sarabun via Google Fonts) -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap">
 
@@ -363,7 +366,7 @@
             background: white;
             border-radius: 10px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
+            /* overflow hidden clips Trumbowyg dropdowns (e.g., table grid) */ `r`n            overflow: visible; 
             /* ทำให้มุมมนทำงานดีขึ้น */
         }
 
@@ -421,23 +424,20 @@
 @endpush
 
 @push('scripts')
-    <!-- jQuery + Trumbowyg core -->
-    {{-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script> --}}
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Trumbowyg/2.27.3/trumbowyg.min.js"></script>
+    <!-- Trumbowyg core (v2.31.0) -->
+    <script src="https://cdn.jsdelivr.net/npm/trumbowyg@2.31.0/dist/trumbowyg.min.js"></script>
 
     <!-- Plugins -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Trumbowyg/2.27.3/plugins/fontsize/trumbowyg.fontsize.min.js">
-    </script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Trumbowyg/2.27.3/plugins/colors/trumbowyg.colors.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Trumbowyg/2.27.3/plugins/table/trumbowyg.table.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Trumbowyg/2.27.3/plugins/fontfamily/trumbowyg.fontfamily.min.js">
-    </script>
+    <script src="https://cdn.jsdelivr.net/npm/trumbowyg@2.31.0/dist/plugins/fontsize/trumbowyg.fontsize.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/trumbowyg@2.31.0/dist/plugins/colors/trumbowyg.colors.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/trumbowyg@2.31.0/dist/plugins/table/trumbowyg.table.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/trumbowyg@2.31.0/dist/plugins/fontfamily/trumbowyg.fontfamily.min.js"></script>
 
     <!-- Init Editor -->
     <script>
         $(function() {
             $('#section1, #section2, #section4').trumbowyg({
-                svgPath: 'https://cdnjs.cloudflare.com/ajax/libs/Trumbowyg/2.27.3/ui/icons.svg',
+                svgPath: 'https://cdn.jsdelivr.net/npm/trumbowyg@2.31.0/dist/ui/icons.svg',
                 btns: [
                     ['viewHTML'],
                     ['undo', 'redo'],
@@ -445,10 +445,10 @@
                     ['fontsize', 'fontfamily'],
                     ['foreColor', 'backColor'],
                     ['strong', 'em', 'underline', 'del'],
+                    ['table'],
                     ['superscript', 'subscript'],
                     ['link'],
                     ['insertImage'],
-                    ['table'],
                     ['unorderedList', 'orderedList'],
                     ['justifyLeft', 'justifyCenter', 'justifyRight', 'justifyFull'],
                     ['horizontalRule'],
