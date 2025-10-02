@@ -44,7 +44,7 @@
                 class="px-3 py-1 bg-gray-300 rounded text-xs sm:text-sm font-medium order-2 sm:order-1"
                 @click="open = false">ยกเลิก</button>
             <button type="button"
-                class="px-3 py-1 bg-green-500 text-white rounded text-xs sm:text-sm font-medium order-1 sm:order-2"
+                class="px-3 py-1 bg-blue-500 text-white rounded text-xs sm:text-sm font-medium order-1 sm:order-2"
                 @click="const y = $refs.year.value; if (!y) { alert('กรุณาเลือกปี'); return; } open = false; window.location.href = '{{ $targetUrl }}' + ({{ Str::contains($targetUrl, '?') ? 'true' : 'false' }} ? '&' : '?') + 'year=' + y;">
                 ยืนยัน
             </button>
