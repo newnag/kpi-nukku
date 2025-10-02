@@ -23,6 +23,11 @@ class SettingController extends Controller
             'message'      => ['nullable', 'string', 'max:500'],
         ]);
 
+        // Normalize empty string to null for nullable fields
+        if (array_key_exists('title', $validated) && $validated['title'] === '') {
+            $validated['title'] = null;
+        }
+
         // อัปเดตหรือสร้างแถวเดียว (id = 1)
         $setting = Setting::updateOrCreate(
             ['id' => 1],
@@ -40,6 +45,11 @@ class SettingController extends Controller
             'notify_date2' => ['nullable', 'date'],
             'message'      => ['nullable', 'string', 'max:500'],
         ]);
+
+        // Normalize empty string to null for nullable fields
+        if (array_key_exists('title', $validated) && $validated['title'] === '') {
+            $validated['title'] = null;
+        }
 
         $setting = Setting::findOrFail($id);
         $setting->update($validated);

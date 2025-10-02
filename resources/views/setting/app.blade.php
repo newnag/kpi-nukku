@@ -18,7 +18,7 @@
                     <!-- Title -->
                     <div class="form-group">
                         <label class="form-label">หัวข้อการแจ้งเตือน <span class="required">*</span></label>
-                        <input type="text" name="title" class="form-input" required
+                        <input type="text" name="title" class="form-input"
                             value="{{ old('title', $setting->title ?? '') }}">
                     </div>
 
@@ -61,6 +61,21 @@
             });
         </script>
     @endif
+    @push('styles')
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Trumbowyg/2.27.3/ui/trumbowyg.min.css" />
+    @endpush
+    @push('scripts')
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Trumbowyg/2.27.3/trumbowyg.min.js"></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                if (window.jQuery && typeof $.fn.trumbowyg === 'function') {
+                    $('textarea[name="message"]').trumbowyg({
+                        svgPath: 'https://cdnjs.cloudflare.com/ajax/libs/Trumbowyg/2.27.3/ui/icons.svg',
+                    });
+                }
+            });
+        </script>
+    @endpush
     <style>
         .Setting-container {
             max-width: 1200px;
