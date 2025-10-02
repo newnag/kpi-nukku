@@ -386,7 +386,7 @@
             @can('view-dashboard')
                 <a href="{{ route('dashboard.index') }}"
                     class="{{ request()->routeIs('dashboard.index') ? 'active' : '' }} buttonNav">
-                    <i class="fa-solid fa-gauge-high"></i> Dashboard
+                    <i class="fa-solid fa-house"></i> หน้าหลัก
                 </a>
                 <a href="{{ route('dashboard.getData') }}"
                     class="{{ request()->routeIs('dashboard.getData') ? 'active' : '' }} buttonNav">
@@ -397,8 +397,9 @@
             @hasanyrole('user')
                 <a href="{{ route('dashboardkpi.index') }}"
                     class="{{ request()->is('dashboardkpi*') ? 'active' : '' }} buttonNav">
-                    <i class="fa-solid fa-gauge-high"></i> Dashboard ผู้ใช้งาน
+                    <i class="fa-solid fa-house"></i> หน้าหลัก
                 </a>
+
                 <a href="{{ route('evidences.index') }}" class="{{ request()->is('evidences*') ? 'active' : '' }} buttonNav">
                     <i class="fa-solid fa-file"></i> หลักฐานของฉัน
                 </a>

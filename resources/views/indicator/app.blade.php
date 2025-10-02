@@ -343,7 +343,9 @@
                 @endif
 
                 <!-- Global Year Export Modal (reusable) -->
-                <x-year-export-modal :years="$years" context="year-export" />
+                @if (!auth()->user()->hasRole('administration_admin'))
+                    <x-year-export-modal :years="$years" context="year-export" />
+                @endif
 
                 <button id="add_indicator_button"
                     class="h-fit bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-4 py-2 flex items-center gap-2">
@@ -357,8 +359,7 @@
         </div>
 
         <!-- ตารางรายการตัวบ่งชี้ -->
-        <div
-            class=" border border-gray-200 rounded-lg shadow-sm overflow-x-hidden">
+        <div class=" border border-gray-200 rounded-lg shadow-sm overflow-x-hidden">
             <table id="myTable" class="w-full min-w-full ">
                 <thead>
                     <tr>
@@ -1493,5 +1494,4 @@
                 });
             });
         </script>
-
     @endpush
