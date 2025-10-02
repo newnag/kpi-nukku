@@ -79,26 +79,6 @@
                                     </div>
                                 </template>
                             </div>
-
-                            {{-- <div class="eu-files" x-show="files.length">
-                            <template x-for="(f, idx) in files" :key="f._id">
-                                <div class="eu-file">
-                                    <div class="eu-file-preview" x-show="f._isImage">
-                                        <img :src="f._objectURL" :alt="f.name">
-                                    </div>
-                                    <div class="eu-file-info">
-                                        <div class="eu-file-name" x-text="f.name"></div>
-                                        <div class="eu-file-meta">
-                                            <span x-text="humanSize(f.size)"></span>
-                                        </div>
-                                    </div>
-                                    <button type="button" class="eu-icon-btn danger" @click="removeFile(idx)"
-                                        aria-label="ลบไฟล์">
-                                        <i data-lucide="trash-2"></i>
-                                    </button>
-                                </div>
-                            </template>
-                        </div> --}}
                         </div>
 
                         <!-- URLs -->
@@ -424,8 +404,7 @@
             display: flex;
             justify-content: flex-end;
             gap: .5rem;
-            padding: .6rem .25rem .8rem;
-            margin-top: .25rem;
+            padding: 10px 20px;
             z-index: 12;
         }
 
@@ -438,7 +417,6 @@
             justify-content: space-between;
             gap: .5rem;
             padding: 10px 10px;
-            /* margin-top: .25rem; */
             z-index: 12;
         }
 
