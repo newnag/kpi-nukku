@@ -717,6 +717,29 @@
 
 @push('styles')
     <style>
+        .card-title {
+            font-size: 18px;
+            color: var(--blue-default);
+            margin: 0 0 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            position: relative;
+            padding-left: 10px;
+        }
+
+        .card-title::before {
+            content: "";
+            width: 4px;
+            height: 20px;
+            border-radius: 8px;
+            background: var(--blue-default);
+            position: absolute;
+            left: 0;
+            top: 2px;
+            opacity: .25;
+        }
+
         /* ===== Switch ===== */
         .switch {
             position: relative;
