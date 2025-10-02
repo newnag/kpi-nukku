@@ -136,7 +136,7 @@
                         if (el && el.parentNode) {
                             el.parentNode.removeChild(el);
                         }
-                    }, 500);
+                    }, 100);
                 }
             };
             // Hide when everything loaded
