@@ -111,7 +111,7 @@
                 </button>
             </div>
 
-            <div class="overflow-x-auto">
+            <div style="margin: 20px">
                 <table class="table" id="dashboardTable">
                     <thead>
                         <tr>
