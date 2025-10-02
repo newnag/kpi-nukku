@@ -10,20 +10,15 @@
 
     <div class="dashboard-container">
         <div class="card indicator-card">
-            <!-- ชื่อหัวข้อ -->
             <h1 class="indicator-title">
                 {{ $indicator->name }} ({{ $indicator->code }})
             </h1>
-
-            <!-- Tabs -->
             <div class="indicator-tabs">
                 <span class="tab ">{{ $indicator->category->standard->name ?? '-' }}</span>
                 <span class="tab-divider">|</span>
                 <span class="tab">{{ $indicator->category->name ?? '-' }}</span>
             </div>
             <hr class="tab-divider">
-
-            <!-- ข้อมูล -->
             <div class="info-block">
                 <div class="info-row">
                     <span class="label">หน่วยงานที่รับผิดชอบ:</span>
@@ -73,7 +68,6 @@
 
                 @forelse($indicator->criterias as $criteria)
                     <div class="criteria-box" id="criteria-{{ $criteria->id }}">
-                        <!-- ชื่อเกณฑ์ -->
                         <div class="criteria-header gap-x-2">
                             <div class="criteria-title">
                                 {{ $criteria->sequence }}. {!! $criteria->name !!}
@@ -89,18 +83,14 @@
                                 {{ $statuscriteria }}
                             </label>
                         </div>
-
+                        {{-- คำอธิบายเกณฑ์ --}}
                         <div class="criteria-content">
-                            {{-- Read-only: ไม่มีอัปโหลด/แก้ไข --}}
-
-                            {{-- คำอธิบายเกณฑ์ --}}
                             @if ($criteria->description)
                                 <div class="criteria-description">
                                     {!! $criteria->description !!}
                                 </div>
                             @endif
-
-                            {{-- หลักฐาน (แสดงอย่างเดียว) --}}
+                            {{-- หลักฐาน --}}
                             <div class="evidence-list evidence-list-{{ $criteria->id }}">
                                 @forelse($criteria->evidences as $evidence)
                                     <div class="evidence-item" id="evidence-{{ $evidence->id }}">
@@ -175,6 +165,14 @@
                 </div>
             @endif
 
+            <div class="card">
+                <h2 class="card-title">เกณฑ์การให้คะแนน</h2>
+                <div class="criteria-box list-disc list-inside">
+                    {!! $indicator->comment ?? '-' !!}
+                </div>
+
+            </div>
+
             @if ($indicator->variables->where('type', 'input')->isNotEmpty())
                 <div class="card">
                     <h2 class="card-title">ค่าตัวแปร</h2>
@@ -233,22 +231,6 @@
 
 @push('styles')
     <style>
-        /* ---- Base ---- */
-        :root {
-            --blue: #398ECA;
-            --blue-600: #2f7db2;
-            --text: #1f2937;
-            /* gray-800 */
-            --muted: #6b7280;
-            /* gray-500 */
-            --border: #e5e7eb;
-            /* gray-200 */
-            --bg: #ffffff;
-            --shadow: 0 8px 24px rgba(0, 0, 0, .08);
-            --radius: 16px;
-            --radius-sm: 10px;
-        }
-
         .action-bts {
             display: flex;
             justify-content: center;
@@ -263,58 +245,15 @@
             display: inline-flex;
             align-items: center;
             gap: 4px;
-            /* ลดระยะ icon กับข้อความ */
             padding: 6px 12px;
-            /* ปรับ padding ให้น้อยลง */
             font-size: 13px;
-            /* ตัวหนังสือเล็กลง */
             font-weight: 500;
             border-radius: 6px;
-            /* มุมมนเล็กลง */
             cursor: pointer;
             transition: 0.2s;
             border: none;
             height: 32px;
-            /* ความสูงปุ่มลดลง */
             line-height: 1.2;
-        }
-
-        .btns-primary {
-            background: #398ECA;
-            color: #fff;
-        }
-
-        .btns-primary:hover {
-            background: #2f7db2;
-        }
-
-        .btns-secondary {
-            background: #fff;
-            border: 1.5px solid #398ECA;
-            color: #398ECA;
-        }
-
-        .btns-secondary:hover {
-            background: #EBF7FF;
-        }
-
-        .btn-outlines {
-            background: #ffffff;
-            border: 1.5px solid #398ECA;
-            color: #398ECA;
-        }
-
-        .btn-outlines:hover {
-            background: #dbeafe;
-        }
-
-        .btn-info {
-            background: #06b6d4;
-            color: #fff;
-        }
-
-        .btn-info:hover {
-            background: #0891b2;
         }
 
         .card {
@@ -322,8 +261,6 @@
             border-radius: var(--radius);
             box-shadow: var(--shadow);
             padding: 24px;
-            /* max-width: 920px; */
-            /* ปรับตามหน้า */
             margin: 16px;
             border: 1px solid #f3f4f6;
         }
@@ -333,15 +270,12 @@
             border-radius: var(--radius);
             box-shadow: var(--shadow);
             padding: 24px;
-            /* max-width: 920px; */
-            /* ปรับตามหน้า */
             margin: 16px;
             border: 1px solid #f3f4f6;
         }
 
         .card-title {
             font-size: 18px;
-            /* font-weight: 700; */
             color: var(--blue);
             margin: 0 0 16px;
             display: flex;
@@ -367,10 +301,8 @@
             position: relative;
             left: -29px;
             width: calc(100% + 57px);
-            /* right: 30px; */
             border: none;
             border-bottom: 3px solid #C3D8E8;
-            /* เทาอ่อน */
             margin: 24px 0;
         }
 
@@ -378,24 +310,19 @@
             margin-top: 20px;
             padding: 16px 20px;
             background: #fffbea;
-            /* เหลืองอ่อน */
             border: 1px solid #fffbea;
-            /* เส้นกรอบเหลือง */
             border-radius: 12px;
             color: #92400e;
-            /* น้ำตาลเข้ม */
         }
 
         .description-box ul {
             list-style-type: disc;
-            /* จุดกลม */
             padding-left: 1.5rem;
             margin: 0.5rem 0;
         }
 
         .description-box ol {
             list-style-type: decimal;
-            /* ตัวเลข */
             padding-left: 1.5rem;
             margin: 0.5rem 0;
         }
@@ -406,15 +333,12 @@
 
         .description-box {
             background: #f9fafb;
-            /* gray-50 */
             border: 1px solid #e5e7eb;
-            /* gray-200 */
             border-radius: 12px;
             padding: 16px 20px;
             font-size: 14px;
             line-height: 1.7;
             color: #374151;
-            /* gray-800 */
         }
 
         .description-box p {
@@ -448,8 +372,6 @@
         }
 
         .criteria-status {
-            /* font-weight: 600;
-                                                                                                            font-size: 14px; */
             color: #1f2937;
         }
 
@@ -480,19 +402,13 @@
             cursor: pointer;
             color: #398ECA;
             text-decoration: none;
-            /* กันไม่ให้มีขีดเส้นใต้ */
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            /* จัดกลางแนวนอนด้วย */
             gap: 6px;
             transition: background 0.2s;
-
-            /* ✅ เพิ่มส่วนนี้ให้ปุ่มเท่ากัน */
             width: 140px;
-            /* กำหนดความกว้างตายตัว */
             height: 36px;
-            /* กำหนดความสูงตายตัว */
             box-sizing: border-box;
         }
 
@@ -510,13 +426,11 @@
             align-items: center;
             justify-content: center;
             color: #dc2626;
-            /* แดงอ่อน */
             transition: color 0.2s, transform 0.1s;
         }
 
         .btn-delete:hover {
             color: #b91c1c;
-            /* แดงเข้ม */
             transform: scale(1.1);
         }
 
@@ -546,17 +460,17 @@
             flex-shrink: 0;
         }
 
-        :root {
-            --blue: #398ECA;
-            --green: #22c55e;
-            --orange: #fbbf24;
-            --gray-50: #f9fafb;
-            --gray-100: #f3f4f6;
-            --gray-600: #4b5563;
-            --gray-800: #1f2937;
-            --radius: 14px;
-            --shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-        }
+        /* :root {
+                --blue: #398ECA;
+                --green: #22c55e;
+                --orange: #fbbf24;
+                --gray-50: #f9fafb;
+                --gray-100: #f3f4f6;
+                --gray-600: #4b5563;
+                --gray-800: #1f2937;
+                --radius: 14px;
+                --shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+            } */
 
         .annotation-card {
             margin-top: 20px;
@@ -819,15 +733,10 @@
 
         .evidence-containers {
             width: 85%;
-            /* ไม่เต็มจอ */
             max-width: 600px;
-            /* กว้างสุด 600px */
             max-height: 80vh;
-            /* สูงสุด 80% ของหน้าจอ */
             overflow-y: auto;
-            /* ถ้าเนื้อหาเกิน ให้ scroll */
             margin: 40px auto;
-            /* จัดให้อยู่ตรงกลาง */
             background: #fff;
             border-radius: 10px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
@@ -838,7 +747,6 @@
             justify-content: center;
             align-items: center;
             font-size: 18px;
-            /* เล็กลงอีก */
             padding: 10px 14px;
             font-weight: 700;
 
@@ -983,18 +891,6 @@
             background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1'/%3E%3C/svg%3E") no-repeat 16px center;
             background-size: 20px;
             padding-left: 48px;
-        }
-
-        .url-row {
-            display: flex;
-            gap: 8px;
-            align-items: stretch;
-            flex-wrap: nowrap;
-        }
-
-        .url-row .form-input {
-            flex: 1;
-            min-width: 0;
         }
 
         .add-url-btn,
