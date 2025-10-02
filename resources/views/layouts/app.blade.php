@@ -24,10 +24,22 @@
     @stack('styles')
 
     <!-- Prevent Alpine.js flash of unstyled content -->
-    <style>[x-cloak]{ display: none !important; }</style>
+    <style>
+        [x-cloak] {
+            display: none !important;
+        }
+    </style>
 </head>
 
 <body>
+    <!-- Splash Loader -->
+    <div id="splash-loader" aria-busy="true" aria-live="polite">
+        <div class="splash-inner">
+            <img src="{{ asset('uploads/logonuthaiS-2.png') }}" alt="กำลังโหลดระบบ" class="splash-logo">
+            <div class="splash-spinner" aria-hidden="true"></div>
+            <p class="splash-text">กำลังโหลด...</p>
+        </div>
+    </div>
     <x-navbar />
     <!-- Main Content Area -->
     <main class="main-content">
@@ -109,6 +121,29 @@
                 lucide.createIcons();
             }
         });
+    </script>
+
+    <!-- Splash Loader Hide -->
+    <script>
+        (function() {
+            const el = document.getElementById('splash-loader');
+            if (!el) return;
+            const hide = () => {
+                if (!el.classList.contains('splash-hidden')) {
+                    el.classList.add('splash-hidden');
+                    // Remove from DOM after transition
+                    setTimeout(() => {
+                        if (el && el.parentNode) {
+                            el.parentNode.removeChild(el);
+                        }
+                    }, 500);
+                }
+            };
+            // Hide when everything loaded
+            window.addEventListener('load', hide);
+            // Fallback in case load delays
+            setTimeout(hide, 3000);
+        })();
     </script>
 
     {{-- @yield('scripts') --}}
