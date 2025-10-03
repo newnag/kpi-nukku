@@ -1101,6 +1101,7 @@
         }
 
         .modal-btn {
+            display: flex;
             padding: 10px 20px;
             border: none;
             border-radius: 5px;
