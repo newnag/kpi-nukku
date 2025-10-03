@@ -25,7 +25,7 @@
                             <div class="form-group half-width">
                                 <label class="form-label">ชื่อจริง <span class="required">*</span></label>
                                 <input id="first_name" type="text" name="first_name" class="form-input"
-                                    value="{{ old('first_name') }}" placeholder="เช่น กิตติพันธ์" required>
+                                    value="{{ old('first_name') }}" placeholder="กรุณากรอกชื่อจริง" required>
                                 @error('first_name')
                                     <div class="error-message">{{ $message }}</div>
                                 @enderror
@@ -33,7 +33,7 @@
                             <div class="form-group half-width">
                                 <label class="form-label">นามสกุล <span class="required">*</span></label>
                                 <input id="last_name" type="text" name="last_name" class="form-input"
-                                    value="{{ old('last_name') }}" placeholder="เช่น ศรศักดา" required>
+                                    value="{{ old('last_name') }}" placeholder="กรุณากรอกนามสกุลจริง" required>
                                 @error('last_name')
                                     <div class="error-message">{{ $message }}</div>
                                 @enderror

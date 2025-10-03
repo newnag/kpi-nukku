@@ -166,14 +166,35 @@
                                     <i data-lucide="edit-3" style="margin-right:4px;"></i> แก้ไข
                                 </a>
 
-                                <form action="{{ route('users.destroy', ['id' => $item->id]) }}" method="POST"
+                                <form id="del-user-{{ $item->id }}" action="{{ route('users.destroy', ['id' => $item->id]) }}" method="POST"
                                     style="display:inline;">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="btn-delete"
-                                        onclick="return confirm('ต้องการลบผู้ใช้งาน {{ $item->display_name }} หรือไม่?')">
-                                        <i data-lucide="trash-2" style="margin-right:4px;"></i> ลบ
-                                    </button>
+                                    <x-modal title="ยืนยันการลบผู้ใช้งาน" size="sm">
+                                        <x-slot:trigger>
+                                            <button type="button" class="btn-delete">
+                                                <i data-lucide="trash-2" style="margin-right:4px;"></i> ลบ
+                                            </button>
+                                        </x-slot:trigger>
+
+                                        <div class="space-y-2">
+                                            <p class="text-slate-700">
+                                                ต้องการลบผู้ใช้งาน <span class="font-semibold">{{ $item->display_name }}</span> หรือไม่?
+                                            </p>
+                                        </div>
+
+                                        <x-slot:footer>
+                                            <div class="flex justify-between gap-5">
+                                                <button type="button" class="btn btn-outline" @click="$dispatch('modal:close')">
+                                                    ยกเลิก
+                                                </button>
+                                                <button type="button" class="btn btn-danger"
+                                                    onclick="document.getElementById('del-user-{{ $item->id }}').submit()">
+                                                    ยืนยันการลบ
+                                                </button>
+                                            </div>
+                                        </x-slot:footer>
+                                    </x-modal>
                                 </form>
 
 
