@@ -367,9 +367,7 @@ body {
     --color-black: #000;
     --color-white: #fff;
 
-    --blue: #398ECA; /* easy for read with title*/
-
-    --shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-    --radius: 16px;
-    --radius-sm: 10px;
+    --blue-default: #398ECA; /* easy for read with title*/
+    --radius-default: 16px; /* Default border radius */
+    --shadow-default: 0 8px 24px rgba(0, 0, 0, 0.08); /* Default box shadow */
 }

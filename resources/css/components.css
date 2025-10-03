@@ -187,6 +187,7 @@
 .btn-ghost:hover {
     background: var(--color-slate-100);
     color: var(--color-slate-600);
+    /* border-color: var(--color-slate-500); */
 }
 
 .btn-ghost:focus {

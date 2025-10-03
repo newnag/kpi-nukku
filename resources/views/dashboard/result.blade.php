@@ -11,7 +11,7 @@
 
 @section('content')
     <div class="space-y-6">
-        <div class="card-container summary-card">
+        <div class="card-container">
             <h2 class="card-title">คะแนนรวมตามปี</h2>
             <!-- ✅ Checkbox เลือกปี -->
             <div id="year-filters" style="margin-bottom:10px;margin-left: 20px;">
@@ -28,7 +28,7 @@
                 <div id="scoreLineChart"></div>
             </div>
         </div>
-        <div class="card-container summary-card">
+        <div class="card-container">
             <h2 class="card-title">คะแนนรวมมาตรฐานตามปี</h2>
 
             <!-- ✅ Checkbox ปี -->
@@ -58,7 +58,7 @@
                 @endforeach
             </div>
         </div>
-        <div class="card-container summary-card">
+        <div class="card-container">
             <h2 class="card-title">คะแนนรวมตามด้าน</h2>
             <!-- ✅ Checkbox ปี -->
             <div id="year-filters-dim" style="margin-bottom:10px;margin-left: 20px;">
@@ -151,7 +151,7 @@
             </div>
             <div class="charts-grid">
                 @foreach ($standards as $standard)
-                    <div class="stat-title" style="margin:12px 0 8px;">
+                    <div class="text-center border-y border-gray-400 border-dashed py-1 mt-3">
                         <h3>กราฟผลลัพธ์ {{ $standard->name }}</h3>
                     </div>
                     @php $bucket = $chartsByStandard[$standard->id] ?? null; @endphp
@@ -1132,7 +1132,10 @@
                         let newValues = orig.values.slice();
                         let newMax = orig.maxValues.slice();
                         if (vYear) {
-                            const idxs = orig.years.map((y, i) => ({y, i}))
+                            const idxs = orig.years.map((y, i) => ({
+                                    y,
+                                    i
+                                }))
                                 .filter(o => String(o.y) === vYear)
                                 .map(o => o.i);
                             newYears = idxs.map(i => orig.years[i]);
@@ -1146,11 +1149,17 @@
                             },
                             series: [{
                                     name: 'คะแนนที่ได้',
-                                    data: newYears.map((x, i) => ({x, y: newValues[i]}))
+                                    data: newYears.map((x, i) => ({
+                                        x,
+                                        y: newValues[i]
+                                    }))
                                 },
                                 {
                                     name: 'คะแนนเต็ม',
-                                    data: newYears.map((x, i) => ({x, y: newMax[i]}))
+                                    data: newYears.map((x, i) => ({
+                                        x,
+                                        y: newMax[i]
+                                    }))
                                 }
                             ]
                         }, false, true);
@@ -1187,11 +1196,17 @@
                             },
                             series: [{
                                     name: 'คะแนนที่ได้',
-                                    data: orig.years.map((x, i) => ({x, y: orig.values[i]}))
+                                    data: orig.years.map((x, i) => ({
+                                        x,
+                                        y: orig.values[i]
+                                    }))
                                 },
                                 {
                                     name: 'คะแนนเต็ม',
-                                    data: orig.years.map((x, i) => ({x, y: orig.maxValues[i]}))
+                                    data: orig.years.map((x, i) => ({
+                                        x,
+                                        y: orig.maxValues[i]
+                                    }))
                                 }
                             ]
                         }, false, true);
@@ -1584,10 +1599,33 @@
 
         .card-container {
             flex: 0 0 320px;
-            background: #fff;
+            background: var(--color-white);
             border-radius: 16px;
             padding: 16px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, .06);
+        }
+
+        .card-title {
+            font-size: 18px;
+            color: var(--blue-default);
+            margin: 0 0 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            position: relative;
+            padding-left: 10px;
+        }
+
+        .card-title::before {
+            content: "";
+            width: 4px;
+            height: 20px;
+            border-radius: 8px;
+            background: var(--blue-default);
+            position: absolute;
+            left: 0;
+            top: 2px;
+            opacity: .25;
         }
 
         .chart-content {
@@ -1641,7 +1679,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 16px 0;
+            /* margin: 16px 0; */
         }
 
         .divider-line {
