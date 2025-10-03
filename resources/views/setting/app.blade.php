@@ -51,9 +51,7 @@
 
 
 
-    <script>
-        lucide.createIcons();
-    </script>
+
     @if ($errors->any())
         <script>
             document.addEventListener('DOMContentLoaded', function() {
