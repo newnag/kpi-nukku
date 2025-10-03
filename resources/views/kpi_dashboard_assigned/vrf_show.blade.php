@@ -7,6 +7,7 @@
     @php
         $locked = in_array($indicator->status, [3, 4]);
     @endphp
+    <div class="w-full h-full flex text-center justify-center">
         <div class="indicator-card">
             <div class="indicator-header-container">
                 <h1 class="indicator-title">
@@ -22,19 +23,16 @@
                 <div class="info-container">
                     <div class="info-row">
                         <span class="label">หน่วยงานที่รับผิดชอบ:</span>
-                        <span class="value">
-                            @forelse($indicator->assignments as $assignment)
-                                @if ($assignment->collectorUser)
-                                    <span class="chip">
-                                        {{ $assignment->collectorUser->department->name }}
-                                    </span>
-                                @endif
-                            @empty
-                                <span class="value">-</span>
-                            @endforelse
-                        </span>
+                        @forelse($indicator->assignments as $assignment)
+                            @if ($assignment->collectorUser)
+                                <span class="chip">
+                                    {{ $assignment->collectorUser->department->name }}
+                                </span>
+                            @endif
+                        @empty
+                            <span class="value">-</span>
+                        @endforelse
                     </div>
-
                     <div class="info-row">
                         <span class="label">ผู้รับผิดชอบในการรวบรวม:</span>
                         @forelse($indicator->assignments as $assignment)
@@ -47,12 +45,10 @@
                             <span class="value">-</span>
                         @endforelse
                     </div>
-
                     <div class="info-row">
                         <span class="label">สถานะตัวบ่งชี้:</span>
                         <x-status-badge :status="$indicator->status" size="sm" />
                     </div>
-
                 </div>
             </div>
             <hr class="tab-divider">
@@ -62,10 +58,8 @@
                     {!! $indicator->description ?? '-' !!}
                 </div>
             </div>
-
             <div class="card">
                 <h2 class="card-title">เกณฑ์การพิจารณา</h2>
-
                 @forelse($indicator->criterias as $criteriaIndex => $criteria)
                     <div class="criteria-box" id="criteria-{{ $criteria->id }}">
                         <div class="criteria-header">
@@ -160,26 +154,28 @@
                                                         </a>
                                                     </span>
                                                 @endif
-
-                                                @if (!$locked)
-                                                    <button type="button" class="ml-2 text-slate-500 hover:text-slate-700"
-                                                        title="แก้ไขชื่อไฟล์"
-                                                        onclick="startEditEvidenceName({{ $evidence->id }})">
-                                                        ✏️
-                                                    </button>
-                                                    <span id="evidence-edit-{{ $evidence->id }}"
-                                                        class="inline-flex items-center gap-1 hidden" style="display:none"
-                                                        data-update-url="{{ route('evidences.update', $evidence->id) }}">
-                                                        <input type="text" id="evidence-input-{{ $evidence->id }}"
-                                                            value="{{ $evidence->name }}"
-                                                            class="border rounded px-2 py-0.5 text-sm" />
-                                                        <button type="button" class="text-green-600 hover:text-green-700"
-                                                            onclick="saveEvidenceName({{ $evidence->id }})">บันทึก</button>
-                                                        <button type="button" class="text-slate-600 hover:text-slate-800"
-                                                            onclick="cancelEditEvidenceName({{ $evidence->id }})">ยกเลิก</button>
-                                                    </span>
-                                                @endif
                                             </span>
+                                            @if (!$locked)
+                                                <button type="button"
+                                                    class=" text-slate-500 hover:text-slate-700 cursor-pointer"
+                                                    title="แก้ไขชื่อไฟล์"
+                                                    onclick="startEditEvidenceName({{ $evidence->id }})">
+                                                    ✏️
+                                                </button>
+                                                <span id="evidence-edit-{{ $evidence->id }}"
+                                                    class="inline-flex items-center gap-2 w-fit" style="display:none"
+                                                    data-update-url="{{ route('evidences.update', $evidence->id) }}">
+                                                    <input type="text" id="evidence-input-{{ $evidence->id }}"
+                                                        value="{{ $evidence->name }}"
+                                                        class="border rounded px-2 py-0.5 text-[13px] w-[550px]" />
+                                                    <button type="button"
+                                                        class="text-green-600 hover:text-green-700 cursor-pointer"
+                                                        onclick="saveEvidenceName({{ $evidence->id }})">บันทึก</button>
+                                                    <button type="button"
+                                                        class="text-slate-600 hover:text-slate-800 cursor-pointer"
+                                                        onclick="cancelEditEvidenceName({{ $evidence->id }})">ยกเลิก</button>
+                                                </span>
+                                            @endif
 
                                         </div>
 
@@ -234,7 +230,7 @@
                         </div>
                     </div>
                 @empty
-                    <p class="text-gray-500">ยังไม่มีเกณฑ์การพิจารณา</p>
+                    <p class="text-gray-500">----- ยังไม่มีเกณฑ์การพิจารณา -----</p>
                 @endforelse
             </div>
             @php
@@ -264,42 +260,35 @@
 
             </div>
 
+            @if ($indicator->variables->where('type', 'input')->isNotEmpty())
+                <div class="card">
+                    <h2 class="card-title">กรอกค่าตัวแปร</h2>
+                    @php
+                        $inputVariables = $indicator->variables->filter(fn($v) => trim($v->type) === 'input');
+                    @endphp
+                    @forelse($inputVariables as $variable)
+                        <div class="variable-row">
+                            <label class="variable-label">
+                                {{ $variable->label_name ?? $variable->variable_name }}
+                            </label>
+                            <input type="number" name="variables[{{ $variable->id }}]"
+                                value="{{ old('variables.' . $variable->id, $variable->value) }}"
+                                placeholder="กรุณากรอกร้อยละเป็นตัวเลข" class="variable-input" form="variables-form"
+                                @if ($locked) readonly @endif>
+                        </div>
+                    @empty
+                        <p class="text-gray-500">ยังไม่มีตัวแปรที่ต้องกรอก</p>
+                    @endforelse
+                </div>
+            @endif
 
-            <form id="variables-form" action="{{ route('dashboardkpi.admin.saveVariables', $indicator->id) }}"
-                method="POST">
-                @csrf
-                @method('PUT')
-
-                @if ($indicator->variables->where('type', 'input')->isNotEmpty())
-                    <div class="card">
-                        <h2 class="card-title">กรอกค่าตัวแปร</h2>
-                        @php
-                            $inputVariables = $indicator->variables->filter(fn($v) => trim($v->type) === 'input');
-                        @endphp
-                        @forelse($inputVariables as $variable)
-                            <div class="variable-row">
-                                <label class="variable-label">
-                                    {{ $variable->label_name ?? $variable->variable_name }}
-                                </label>
-                                <input type="number" name="variables[{{ $variable->id }}]"
-                                    value="{{ old('variables.' . $variable->id, $variable->value) }}"
-                                    placeholder="กรุณากรอกร้อยละเป็นตัวเลข" class="variable-input"
-                                    @if ($locked) readonly @endif>
-                            </div>
-                        @empty
-                            <p class="text-gray-500">ยังไม่มีตัวแปรที่ต้องกรอก</p>
-                        @endforelse
-                    </div>
-                @endif
-                <!-- ✅ hidden status -->
-                <input type="hidden" name="status" id="status-input" value="{{ $indicator->status ?? 2 }}">
-            </form>
-            <div class="card annotation-card">
+            <div class="card">
                 <h2 class="card-title">หมายเหตุ</h2>
-                <div class="description-box">
+                <div class="annotation-box">
                     {!! $indicator->annotation ?? '-' !!}
                 </div>
             </div>
+
             <div class="card">
                 <h2 class="card-title">คะแนนที่ได้</h2>
                 <div class="score-display-container">
@@ -319,13 +308,21 @@
                 </div>
             </div>
 
+            <form id="variables-form" action="{{ route('dashboardkpi.admin.saveVariables', $indicator->id) }}"
+                method="POST" class="hidden">
+                @csrf
+                @method('PUT')
+                <!-- ✅ hidden status -->
+                <input type="hidden" name="status" id="status-input" value="{{ $indicator->status ?? 2 }}">
+            </form>
+
             <div class="action-bts">
                 <button type="button" class="btn btn-outline" id="back-btn"
                     onclick="location.href='{{ route('dashboardkpi.index') }}'">
                     <i class="fa fa-undo"></i> กลับ
                 </button>
 
-                <button type="button" class="save-btn btn btn-primary" id="save-results-btn"
+                <button type="submit" class="btn btn-primary" form="variables-form"
                     @if ($locked) hidden @endif>
                     <i class="fa fa-save"></i> บันทึกผลลัพธ์
                 </button>
@@ -367,6 +364,7 @@
                 </x-modal>
             </div>
         </div>
+    </div>
 @endsection
 
 @push('scripts')
@@ -393,8 +391,8 @@
             const form = document.getElementById("variables-form");
             const statusInput = document.getElementById("status-input");
 
-            // Add event listeners to all buttons with the class .save-btn
-            document.querySelectorAll(".save-btn").forEach(btn => {
+            // Add event listeners to all buttons with the class #save-results-btn
+            document.querySelectorAll("#save-results-btn").forEach(btn => {
                 btn.addEventListener("click", function() {
                     // Get the status from the button's data-status attribute
                     const status = this.getAttribute("data-status") || statusInput.value;
@@ -812,7 +810,6 @@
             margin-top: 20px;
         }
 
-        
         .indicator-header-container {
             background: var(--color-white);
             padding: 0 16px;
@@ -873,12 +870,13 @@
             border-radius: 12px;
             padding: 16px 20px;
             font-size: 14px;
-            line-height: 1.7;
+            /* line-height: 1.7; */
             color: #374151;
+            text-align: left;
         }
 
         .description-box p {
-            margin-bottom: 12px;
+            margin-bottom: 6px;
         }
 
         .description-box ul {
@@ -886,12 +884,70 @@
             list-style: disc;
         }
 
+        .description-box ul {
+            list-style-type: disc;
+            padding-left: 1.5rem;
+            margin: 0.5rem 0;
+        }
+
+        .description-box ol {
+            list-style-type: decimal;
+            padding-left: 1.5rem;
+            margin: 0.5rem 0;
+        }
+
+        .description-box li {
+            margin: 0.25rem 0;
+        }
+
+        .annotation-card {
+            background: var(--color-white);
+            color: #92400e;
+        }
+
+        .annotation-header {
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #b45309;
+        }
+
+        .annotation-body {
+            font-size: 14px;
+            /* line-height: 1.6; */
+            color: #78350f;
+        }
+
+        .annotation-box {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 16px 20px;
+            font-size: 14px;
+            /* line-height: 1.7; */
+            color: #374151;
+            text-align: left;
+        }
+
+        .annotation-box p {
+            margin-bottom: 6px;
+        }
+
+        .annotation-box ul {
+            margin: 8px 0 8px 20px;
+            list-style: disc;
+        }
+
+
         .criteria-box {
             background: var(--color-white);
             border: 1px solid #e5e7eb;
             border-radius: 12px;
             padding: 16px;
             margin-bottom: 16px;
+            text-align: left;
         }
 
         .criteria-header {
@@ -974,50 +1030,22 @@
             column-gap: 10px;
             font-size: 13px;
             color: #374151;
+            overflow: hidden;
+        }
+
+        .evidence-name {
+            max-width: 550px;
+            word-break: break-word;
+            text-align: left;
+
         }
 
         .evidence-icon {
-            margin-right: 6px;
+            /* margin-right: 6px; */
         }
 
         .file-icon {
             flex-shrink: 0;
-        }
-
-        .annotation-card {
-            background: var(--color-white)bea;
-            color: #92400e;
-        }
-
-        .annotation-header {
-            font-weight: 600;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            color: #b45309;
-        }
-
-        .annotation-body {
-            font-size: 14px;
-            line-height: 1.6;
-            color: #78350f;
-        }
-
-        .description-box ul {
-            list-style-type: disc;
-            padding-left: 1.5rem;
-            margin: 0.5rem 0;
-        }
-
-        .description-box ol {
-            list-style-type: decimal;
-            padding-left: 1.5rem;
-            margin: 0.5rem 0;
-        }
-
-        .description-box li {
-            margin: 0.25rem 0;
         }
 
         .total-score-card {
@@ -1104,6 +1132,7 @@
         .indicator-tabs {
             display: flex;
             align-items: center;
+            justify-content: center;
             gap: 8px;
             font-size: 14px;
         }
@@ -1140,14 +1169,6 @@
             font-weight: 600;
             color: var(--color-gray-600);
             margin-right: 6px;
-        }
-
-        .info-row .value {
-            color: var(--color-gray-600);
-            display: inline-block;
-            background: #EBF7FF;
-            border-radius: 16px;
-            font-size: 13px;
         }
 
         /* Chips */
@@ -1444,7 +1465,7 @@
         .score-value-display {
             font-size: 36px;
             font-weight: 700;
-            line-height: 1;
+            /* line-height: 1; */
             padding: 12px 20px;
             border-radius: 12px;
             min-width: 80px;
@@ -1492,7 +1513,7 @@
 
             .indicator-title {
                 font-size: 20px;
-                line-height: 1.3;
+                /* line-height: 1.3; */
             }
 
             .indicator-tabs {
