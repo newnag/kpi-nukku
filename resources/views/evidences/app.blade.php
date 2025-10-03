@@ -409,8 +409,8 @@
                             {{ $evidence->created_at?->format('M d, Y') ?? '-' }}
                         </td>
                         <td class="text-xs sm:text-sm text-gray-700 hidden lg:table-cell"
-                            data-search="{{ optional($evidence->user)->name ?? '' }}">
-                            {{ $evidence->user->name ?? '-' }}
+                            data-search="{{ optional($evidence->user)->display_name ?? '' }}">
+                            {{ $evidence->user->display_name ?? '-' }}
                         </td>
                         @php
                             $is_assigned = (bool) ($indicator['is_assigned'] ?? false);

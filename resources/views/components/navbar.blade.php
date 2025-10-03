@@ -463,12 +463,12 @@
             <div class="dropdown">
                 <div class="dropdown-toggle" role="button" tabindex="0" onclick="toggleDropdown(this)">
                     <i class="fa-solid fa-user-circle"></i>
-                    <span class="dropdown-toggle-span">{{ auth()->user()->name ?? 'ผู้ใช้' }}</span>
+                    <span class="dropdown-toggle-span">{{ auth()->user()->display_name ?? 'ผู้ใช้' }}</span>
                     <i class="fa-solid fa-caret-down"></i>
                 </div>
                 <div class="dropdown-menu-navbar">
                     <div class="user-info">
-                        <div class="user-name">{{ auth()->user()->name ?? 'ผู้ใช้' }}</div>
+                        <div class="user-name">{{ auth()->user()->display_name ?? 'ผู้ใช้' }}</div>
                         @if (auth()->user()->roles->isNotEmpty())
                             <div class="user-role">บทบาท: {{ auth()->user()->roles->pluck('name')->join(', ') }}</div>
                         @endif

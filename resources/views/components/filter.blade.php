@@ -149,8 +149,8 @@
                             @foreach ($collectors as $col)
                                 @php
                                     if (is_object($col)) {
-                                        $value = $col->name ?? ($col->email ?? '');
-                                        $label = $col->name ?? ($col->email ?? '-');
+                                        $value = $col->display_name ?? ($col->email ?? '');
+                                        $label = $col->display_name ?? ($col->email ?? '-');
                                     } elseif (is_array($col)) {
                                         $value = $col['name'] ?? ($col['email'] ?? '');
                                         $label = $col['name'] ?? ($col['email'] ?? '-');

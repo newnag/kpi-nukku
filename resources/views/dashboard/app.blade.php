@@ -138,7 +138,7 @@
 
                                 $standardName = $indicator->category->standard->name ?? '';
                                 $dimensionName = $indicator->category->name ?? '';
-                                $collectorName = $indicator->assignments->first()->collectorUser->name ?? '';
+                                $collectorName = $indicator->assignments->first()->collectorUser->display_name ?? '';
                                 $deptName = '';
                                 foreach ($indicator->assignments as $assignment) {
                                     $deptName = optional($assignment->collectorUser?->department)->name ?? '';

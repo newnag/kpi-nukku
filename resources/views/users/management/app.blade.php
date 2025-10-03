@@ -153,7 +153,7 @@
                 @foreach ($users as $index => $item)
                     <tr>
                         <td>{{ $index + 1 }}</td>
-                        <td>{{ $item->name }}</td>
+                        <td>{{ $item->display_name }}</td>
                         <td>{{ $item->email }}</td>
                         <td>{{ $item->department->name ?? '-' }}</td>
                         <td>{{ $item->phone }}</td>
@@ -171,7 +171,7 @@
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="btn-delete"
-                                        onclick="return confirm('ต้องการลบผู้ใช้งาน {{ $item->name }} หรือไม่?')">
+                                        onclick="return confirm('ต้องการลบผู้ใช้งาน {{ $item->display_name }} หรือไม่?')">
                                         <i data-lucide="trash-2" style="margin-right:4px;"></i> ลบ
                                     </button>
                                 </form>
