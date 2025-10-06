@@ -23,12 +23,13 @@
             <!-- Header -->
             <header class="eu-modal-header">
                 <h2 id="eu-title-{{ $cid }}">เพิ่มหลักฐานใหม่</h2>
-                <button type="button" class="!w-fit hover:!text-red-500 btn btn-xs hover:!shadow-none" @click="closeModal()"
-                    aria-label="ปิด">
+                <button type="button" class="!w-fit hover:!text-red-500 btn btn-xs hover:!shadow-none"
+                    @click="closeModal()" aria-label="ปิด">
                     <i data-lucide="x"></i>
                 </button>
             </header>
-            <div class="p-1 md:p-2 lg:p-3 overflow-y-auto max-w-auto min-h-[160px] sm:min-h-[200px] max-h-[70vh] sm:max-h-[75vh] md:max-h-[80vh]">
+            <div
+                class="p-1 md:p-2 lg:p-3 overflow-y-auto max-w-auto min-h-[160px] sm:min-h-[200px] max-h-[70vh] sm:max-h-[75vh] md:max-h-[80vh]">
                 <form action="{{ $storeRoute ?? route('evidences.store') }}" method="POST"
                     enctype="multipart/form-data" id="evidence-form-{{ $cid }}" class="eu-form"
                     @submit="beforeSubmit">
@@ -72,7 +73,7 @@
                                                 ขนาดไฟล์ : <span x-text="humanSize(f.size)"></span>
                                             </div>
                                         </div>
-                                        <button type="button" class="eu-icon-btn danger cursor-pointer"
+                                        <button type="button" class="eu-icon-btn danger cursor-pointer !w-[34px]"
                                             @click="removeFile(idx)" aria-label="ลบไฟล์">
                                             <i data-lucide="x"></i>
                                         </button>
@@ -111,7 +112,9 @@
                             </template>
 
                             <div class="eu-url-actions">
-                                <button type="button" class="btn outline text-[14px] text-gray-500 !px-2 !py-1 !gap-0.5 hover:bg-gray-100" @click="addUrl()">
+                                <button type="button"
+                                    class="btn outline text-[14px] text-gray-500 !px-2 !py-1 !gap-0.5 hover:bg-gray-100"
+                                    @click="addUrl()">
                                     <i data-lucide="plus" class="text-[14px]"></i> เพิ่ม URL </button>
                             </div>
                         </div>
@@ -304,7 +307,8 @@
 
         .eu-file {
             display: flex;
-            align-items: center;
+            align-items: top;
+            /* justify-content: space-between; */
             gap: .7rem;
             border: 1px solid #e5e7eb;
             border-radius: 10px;
@@ -378,16 +382,13 @@
         }
 
         .eu-input:focus {
-            outline: 0;
-            border-color: #c7d2fe;
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, .15)
+            transform: translateY(-1px);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.12);
         }
 
         .eu-input:hover {
-            outline: 0;
-            border-color: #c7d2fe;
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, .15);
-            background: var(--color-gray-50);
+            transform: translateY(-1px);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.12);
         }
 
         .eu-editor {
@@ -427,7 +428,7 @@
                 margin-bottom: 1rem;
             }
 
-             .eu-icon-btn {
+            .eu-icon-btn {
                 width: 100%
             }
         }
