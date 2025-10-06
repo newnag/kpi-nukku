@@ -66,20 +66,21 @@
                             <div class="criteria-title">
                                 {{ $criteria->sequence }}. {!! $criteria->name !!}
                             </div>
-                            <div class="criteria-status">
-                                <select name="criterias[{{ $criteria->id }}][status]" class="text-sm text-center"
-                                    @if ($locked) disabled @endif form="variables-form"
-                                    data-criteria-id="{{ $criteria->id }}">
-                                    <option value="0" {{ ($criteria->status ?? 0) == 0 ? 'selected' : '' }}>
-                                        รอดำเนินการ</option>
-                                    <option value="1" {{ ($criteria->status ?? 0) == 1 ? 'selected' : '' }}>
-                                        เอกสารครบถ้วน
-                                    </option>
-                                    <option value="2" {{ ($criteria->status ?? 0) == 2 ? 'selected' : '' }}>
-                                        เอกสารไม่ครบถ้วน
-                                    </option>
-                                </select>
-                            </div>
+                            {{-- <div class="criteria-status"> --}}
+                            <select name="criterias[{{ $criteria->id }}][status]"
+                                class="criteria-status text-sm text-center"
+                                @if ($locked) disabled @endif form="variables-form"
+                                data-criteria-id="{{ $criteria->id }}">
+                                <option value="0" {{ ($criteria->status ?? 0) == 0 ? 'selected' : '' }}>
+                                    รอดำเนินการ</option>
+                                <option value="1" {{ ($criteria->status ?? 0) == 1 ? 'selected' : '' }}>
+                                    เอกสารครบถ้วน
+                                </option>
+                                <option value="2" {{ ($criteria->status ?? 0) == 2 ? 'selected' : '' }}>
+                                    เอกสารไม่ครบถ้วน
+                                </option>
+                            </select>
+                            {{-- </div> --}}
                         </div>
                         <div class="criteria-content">
                             {{-- อัปโหลดหลักฐาน --}}
@@ -167,7 +168,7 @@
                                                     data-update-url="{{ route('evidences.update', $evidence->id) }}">
                                                     <input type="text" id="evidence-input-{{ $evidence->id }}"
                                                         value="{{ $evidence->name }}"
-                                                        class="border rounded px-2 py-0.5 text-[13px] w-[550px]" />
+                                                        class="border rounded px-2 py-0.5 text-[13px]" />
                                                     <button type="button"
                                                         class="text-green-600 hover:text-green-700 cursor-pointer"
                                                         onclick="saveEvidenceName({{ $evidence->id }})">บันทึก</button>
@@ -416,6 +417,35 @@
                     // Submit the form
                     form.submit();
                 });
+            });
+
+            // จัดการการเปลี่ยนสีของ criteria status
+            function updateCriteriaStatusStyle() {
+                document.querySelectorAll('.criteria-status').forEach(select => {
+                    const value = select.value;
+
+                    // ลบ class เดิมทั้งหมด
+                    select.classList.remove('status-pending', 'status-completed', 'status-rejected');
+
+                    // เพิ่ม class ใหม่ตามค่าที่เลือก
+                    if (value === '0') {
+                        select.classList.add('status-pending');
+                    } else if (value === '1') {
+                        select.classList.add('status-completed');
+                    } else if (value === '2') {
+                        select.classList.add('status-rejected');
+                    }
+                });
+            }
+
+            // เรียกใช้เมื่อโหลดหน้าเว็บ
+            updateCriteriaStatusStyle();
+
+            // เพิ่ม event listener สำหรับการเปลี่ยนค่า
+            document.addEventListener('change', function(e) {
+                if (e.target.classList.contains('criteria-status')) {
+                    updateCriteriaStatusStyle();
+                }
             });
         });
     </script>
@@ -940,7 +970,6 @@
             list-style: disc;
         }
 
-
         .criteria-box {
             background: var(--color-white);
             border: 1px solid #e5e7eb;
@@ -953,7 +982,8 @@
         .criteria-header {
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            align-items: flex-start;
+            gap: 12px;
             margin-bottom: 8px;
         }
 
@@ -964,7 +994,65 @@
         }
 
         .criteria-status {
-            color: #1f2937;
+            border: 1px solid #e5e7eb;
+            padding: 3px 0px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .criteria-status:hover {
+            border-color: #cbd5e1;
+            color: #1e293b;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+        }
+
+        .criteria-status:focus {
+            outline: none;
+            border-color: #3b82f6;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+        }
+
+        /* สไตล์สำหรับ options ภายใน dropdown */
+        .criteria-status option {
+            padding: 8px 12px;
+            font-weight: 500;
+            font-size: 12px;
+        }
+
+        /* สีตามสถานะของแต่ละ option */
+        .criteria-status option[value="0"] {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+
+        .criteria-status option[value="1"] {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+
+        .criteria-status option[value="2"] {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+
+        /* สไตล์เมื่อ select ถูกเลือกตามค่า */
+        .criteria-status.status-pending {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+
+        .criteria-status.status-completed {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+
+        .criteria-status.status-rejected {
+            background-color: #fee2e2;
+            color: #991b1b;
         }
 
         .criteria-description {
@@ -1210,8 +1298,6 @@
             border-color: #3b82f6;
         }
 
-
-
         .percentage-text {
             font-size: 18px;
             font-weight: 600;
@@ -1341,7 +1427,7 @@
         .form-input {
             flex: 1;
             padding: 12px 16px;
-            border: 2px solid #d1d5db;
+            border: 1.5px dashed #d1d5db;
             border-radius: 8px;
             font-size: 16px;
             transition: border-color .3s;
@@ -1621,6 +1707,7 @@
 
             .criteria-header {
                 flex-wrap: wrap;
+                flex-direction: column;
                 gap: 8px;
             }
 
