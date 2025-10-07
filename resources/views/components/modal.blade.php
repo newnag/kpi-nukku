@@ -3,6 +3,7 @@
     'size' => 'md', // sm | md | lg | xl | 2xl
     'closeOnBg' => true, // click backdrop to close
     'context' => null, // string to identify which modal opened
+    'align' => 'center', // center | top
 ])
 
 @php
@@ -15,6 +16,10 @@
             '2xl' => 'max-w-sm sm:max-w-md md:max-w-lg lg:max-w-2xl xl:max-w-4xl 2xl:max-w-6xl',
         ][$size] ?? 'max-w-sm sm:max-w-md md:max-w-lg';
     $panelFrame = 'bg-white border border-slate-200 shadow-xl flex flex-col overflow-hidden modal-panel';
+    $containerAlign = match ($align) {
+        'top' => 'items-start pt-6 sm:pt-10',
+        default => 'items-center',
+    };
 @endphp
 
 <div x-data="{ open: false }" x-init="$watch('open', v => {
@@ -32,7 +37,7 @@
 
     {{-- Teleport to body to avoid parent overflow clipping --}}
     <template x-teleport="body">
-        <div x-show="open" x-cloak class="fixed inset-0 flex items-center justify-center p-3 sm:p-6"
+        <div x-show="open" x-cloak class="fixed inset-0 z-[10050] flex {{ $containerAlign }} justify-center p-3 sm:p-6"
             @keydown.escape.window="open = false" role="dialog" aria-modal="true" aria-label="{{ $title ?? 'Modal' }}">
             {{-- Backdrop --}}
             <div class="absolute inset-0 bg-black/10 opacity-50"
