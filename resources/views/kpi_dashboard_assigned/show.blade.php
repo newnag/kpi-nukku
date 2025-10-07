@@ -7,27 +7,22 @@
     @php
         $locked = in_array($indicator->status, [2, 3, 4]);
     @endphp
+    <div class="w-full h-full flex text-center justify-center">
+        <div class="indicator-card">
+            <div class="indicator-header-container">
+                <h1 class="indicator-title">
+                    {{ $indicator->name }} ({{ $indicator->code }})
+                </h1>
+                <div class="indicator-tabs">
+                    <span class="tab ">{{ $indicator->category->standard->name ?? '-' }}</span>
+                    <span class="tab-for-divider">|</span>
+                    <span class="tab">{{ $indicator->category->name ?? '-' }}</span>
+                </div>
 
-    <div class="dashboard-container">
-        <div class="card indicator-card">
-            <!-- ชื่อหัวข้อ -->
-            <h1 class="indicator-title">
-                {{ $indicator->name }} ({{ $indicator->code }})
-            </h1>
-
-            <!-- Tabs -->
-            <div class="indicator-tabs">
-                <span class="tab ">{{ $indicator->category->standard->name ?? '-' }}</span>
-                <span class="tab-divider">|</span>
-                <span class="tab">{{ $indicator->category->name ?? '-' }}</span>
-            </div>
-            <hr class="tab-divider">
-
-            <!-- ข้อมูล -->
-            <div class="info-block">
-                <div class="info-row">
-                    <span class="label">หน่วยงานที่รับผิดชอบ:</span>
-                    <span class="value">
+                <hr class="tab-divider">
+                <div class="info-container">
+                    <div class="info-row">
+                        <span class="label">หน่วยงานที่รับผิดชอบ:</span>
                         @forelse($indicator->assignments as $assignment)
                             @if ($assignment->collectorUser)
                                 <span class="chip">
@@ -37,122 +32,165 @@
                         @empty
                             <span class="value">-</span>
                         @endforelse
-                    </span>
-                </div>
+                    </div>
 
-                <div class="info-row">
-                    <span class="label">ผู้รับผิดชอบในการรวบรวม:</span>
-                    @forelse($indicator->assignments as $assignment)
-                        @if ($assignment->collectorUser)
-                            <span class="chip">
-                                {{ $assignment->collectorUser->name }}
-                            </span>
-                        @endif
-                    @empty
-                        <span class="value">-</span>
-                    @endforelse
-                </div>
+                    <div class="info-row">
+                        <span class="label">ผู้รับผิดชอบในการรวบรวม:</span>
+                        @forelse($indicator->assignments as $assignment)
+                            @if ($assignment->collectorUser)
+                                <span class="chip">
+                                    {{ $assignment->collectorUser->name }}
+                                </span>
+                            @endif
+                        @empty
+                            <span class="value">-</span>
+                        @endforelse
+                    </div>
 
-                <div class="info-row">
-                    <span class="label">สถานะตัวบ่งชี้:</span>
-                    <x-status-badge :status="$indicator->status" size="sm" />
-                </div>
+                    <div class="info-row">
+                        <span class="label">สถานะตัวบ่งชี้:</span>
+                        <x-status-badge :status="$indicator->status" size="sm" />
+                    </div>
 
+                </div>
             </div>
-            <hr class="section-divider">
-
+            <hr class="tab-divider">
             <div class="card ">
                 <h2 class="card-title">คำอธิบายตัวบ่งชี้</h2>
                 <div class="description-box">
                     {!! $indicator->description ?? '-' !!}
                 </div>
             </div>
-
             <div class="card">
                 <h2 class="card-title">เกณฑ์การพิจารณา</h2>
-
-                @forelse($indicator->criterias as $criteria)
+                @forelse($indicator->criterias as $criteriaIndex => $criteria)
                     <div class="criteria-box" id="criteria-{{ $criteria->id }}">
-                        <!-- ชื่อเกณฑ์ -->
-                        <div class="criteria-header gap-x-2">
+                        <div class="criteria-header">
                             <div class="criteria-title">
                                 {{ $criteria->sequence }}. {!! $criteria->name !!}
                             </div>
                             @php
                                 $statuscriteria = match ($criteria->status) {
-                                    1 => 'ผ่านเกณฑ์การพิจารณา',
-                                    2 => 'ไม่ผ่านเกณฑ์การพิจารณา',
+                                    1 => 'เอกสารครบถ้วน',
+                                    2 => 'เอกสารไม่ครบถ้วน',
                                     default => 'รอดำเนินการ',
                                 };
-                            @endphp
-                            <label class="text-sm text-nowrap text-gray-700">
-                                {{ $statuscriteria }}
-                            </label>
-                        </div>
 
+                                $statusColor = match ($criteria->status) {
+                                    1 => 'bg-[#d1fae5] text-[#065f46]',
+                                    2 => 'bg-[#fee2e2] text-[#991b1b]',
+                                    default => 'bg-[#fef3c7] text-[#92400e]',
+                                };
+
+                            @endphp
+                            <div class="criteria-status {{ $statusColor }}">
+                                <label>
+                                    {{ $statuscriteria }}
+                                </label>
+                            </div>
+                        </div>
                         <div class="criteria-content">
                             {{-- อัปโหลดหลักฐาน --}}
                             <x-evidence-uploader :criteria="$criteria" :store-route="route('evidences.store')" :locked-statuses="$locked" />
-
                             {{-- คำอธิบายเกณฑ์ --}}
                             @if ($criteria->description)
                                 <div class="criteria-description">
                                     {!! $criteria->description !!}
                                 </div>
                             @endif
-
-                            {{-- หลักฐาน --}}
                             <div class="evidence-list evidence-list-{{ $criteria->id }}">
                                 @forelse($criteria->evidences as $evidence)
+                                    @php
+                                        $type = strtolower($evidence->type ?? '');
+                                        $name = strtolower($evidence->name ?? '');
+                                    @endphp
                                     <div class="evidence-item" id="evidence-{{ $evidence->id }}">
                                         <div class="flex items-center space-x-2">
                                             <span class="evidence-icon">
-                                                @if (Str::endsWith(strtolower($evidence->type ?? ''), 'pdf'))
+                                                @if (Str::endsWith($type, 'pdf'))
                                                     <i data-lucide="file-text" style="color:#dc2626;"></i>
-                                                @elseif (Str::endsWith($evidence->type, 'doc') || Str::endsWith($evidence->type, 'docx'))
+                                                @elseif (Str::endsWith($type, 'doc') || Str::endsWith($type, 'docx') || Str::endsWith($name, '.docx'))
                                                     <i data-lucide="file-text" style="color:#2563eb;"></i>
-                                                @elseif (Str::endsWith($evidence->type, 'ppt') || Str::endsWith($evidence->type, 'pptx'))
+                                                @elseif (Str::endsWith($type, 'ppt') || Str::endsWith($type, 'pptx') || Str::endsWith($name, '.pptx'))
                                                     <i data-lucide="presentation" style="color:#eb7e25;"></i>
-                                                @elseif (in_array($evidence->type, ['jpg', 'jpeg', 'png', 'gif', 'image']))
+                                                @elseif (in_array($type, ['jpg', 'jpeg', 'png', 'gif', 'image']))
                                                     <i data-lucide="image" style="color:#16a34a;"></i>
-                                                @elseif (Str::endsWith($evidence->type, 'xls') || Str::endsWith($evidence->type, 'xlsx'))
+                                                @elseif (Str::endsWith($type, 'xls') || Str::endsWith($type, 'xlsx') || Str::contains($name, '.xls'))
                                                     <i data-lucide="file-spreadsheet" style="color:#059669;"></i>
-                                                @elseif ($evidence->type === 'url')
+                                                @elseif ($type === 'url')
                                                     <i data-lucide="link" style="color:#9333ea;"></i>
-                                                @elseif ($evidence->type === 'note')
+                                                @elseif ($type === 'note')
                                                     <i data-lucide="sticky-note" style="color:#f59e0b;"></i>
                                                 @else
                                                     <i data-lucide="file" style="color:#6b7280;"></i>
                                                 @endif
                                             </span>
-
                                             <span class="evidence-name">
-                                                @if ($evidence->type === 'url')
-                                                    @php
-                                                        $urls = is_array($evidence->path)
-                                                            ? $evidence->path
-                                                            : json_decode($evidence->path, true);
-                                                        $firstUrl = $urls['urls'][0] ?? '#';
-                                                    @endphp
-                                                    <a href="{{ $firstUrl }}" target="_blank"
-                                                        class="text-blue-600 underline hover:text-blue-800">
-                                                        {{ $evidence->name }}
-                                                    </a>
+                                                @php
+                                                    $ext = strtolower(pathinfo($evidence->name, PATHINFO_EXTENSION));
+                                                    $openInNewTab = in_array($ext, [
+                                                        'pdf',
+                                                        'jpg',
+                                                        'jpeg',
+                                                        'png',
+                                                        'gif',
+                                                        'svg',
+                                                        'txt',
+                                                        'csv',
+                                                        'htm',
+                                                        'html',
+                                                    ]);
+                                                @endphp
+
+                                                @if ($openInNewTab)
+                                                    {{-- PDF & Image → เปิดในแท็บใหม่ --}}
+                                                    <span id="evidence-link-{{ $evidence->id }}">
+                                                        <a href="{{ route('evidences.download', $evidence->id) }}"
+                                                            target="_blank" rel="noopener noreferrer"
+                                                            class="text-blue-600 underline hover:text-blue-800">
+                                                            <span
+                                                                id="evidence-name-text-{{ $evidence->id }}">{{ $evidence->name }}</span>
+                                                        </a>
+                                                    </span>
                                                 @else
-                                                    {{ $evidence->name }}
+                                                    {{-- Word, Excel, PPT → ดาวน์โหลด --}}
+                                                    <span id="evidence-link-{{ $evidence->id }}">
+                                                        <a href="{{ route('evidences.download', $evidence->id) }}" download
+                                                            class="text-blue-600 underline hover:text-blue-800">
+                                                            <span
+                                                                id="evidence-name-text-{{ $evidence->id }}">{{ $evidence->name }}</span>
+                                                        </a>
+                                                    </span>
                                                 @endif
                                             </span>
+                                            @if (!$locked)
+                                                <button type="button"
+                                                    class=" text-slate-500 hover:text-slate-700 cursor-pointer"
+                                                    title="แก้ไขชื่อไฟล์"
+                                                    onclick="startEditEvidenceName({{ $evidence->id }})">
+                                                    ✏️
+                                                </button>
+                                                <span id="evidence-edit-{{ $evidence->id }}"
+                                                    class="evidence-edit flex flex-wrap sm:flex-nowrap items-center gap-2 w-full sm:w-auto"
+                                                    style="display:none"
+                                                    data-update-url="{{ route('evidences.update', $evidence->id) }}">
+                                                    <input type="text" id="evidence-input-{{ $evidence->id }}"
+                                                        value="{{ $evidence->name }}"
+                                                        class="border rounded px-2 py-1 text-[13px] min-w-0 w-full sm:w-60" />
+                                                    <div class="button-group flex space-x-2">
+                                                        <button type="button"
+                                                            class="text-green-600 hover:text-green-700 cursor-pointer "
+                                                            onclick="saveEvidenceName({{ $evidence->id }})">บันทึก</button>
+                                                        <button type="button"
+                                                            class="text-slate-600 hover:text-slate-800 cursor-pointer"
+                                                            onclick="cancelEditEvidenceName({{ $evidence->id }})">ยกเลิก</button>
+                                                    </div>
+                                                </span>
+                                            @endif
+
                                         </div>
 
-                                        <div class="space-x-3 flex items-center justify-center">
-                                            {{-- @php
-                                                $statusClass =
-                                                    $evidence->status === 'true' ? 'รับรองหลักฐาน' : 'รอดำเนินการ';
-                                            @endphp
-                                            <label class="text-nowrap text-gray-700">
-                                                {{ $statusClass }}
-                                            </label> --}}
-
+                                        <div class="flex items-center justify-center">
                                             {{-- Modal ลบหลักฐาน --}}
                                             <x-modal title="ยืนยันการลบหลักฐาน" size="sm" :context="'delete-evidence-' . $evidence->id">
                                                 <x-slot:trigger>
@@ -167,45 +205,47 @@
                                                         ต้องการลบหลักฐาน <span
                                                             class="font-semibold">{{ $evidence->name }}</span> ใช่หรือไม่?
                                                     </p>
+
+                                                    {{-- ฟอร์มลบ (DELETE) --}}
                                                     <form x-ref="delForm" method="POST"
                                                         action="{{ route('evidences.destroy', $evidence->id) }}">
                                                         @csrf
                                                         @method('DELETE')
+                                                        {{-- ถ้าต้องการกลับมาหน้าปัจจุบันหลังลบ --}}
                                                         <input type="hidden" name="redirect"
                                                             value="{{ url()->current() }}">
                                                     </form>
                                                 </div>
 
                                                 <x-slot:footer>
-                                                    <div class="flex justify-end gap-2">
-                                                        <button type="button" class="btns-secondary"
-                                                            @click="$dispatch('modal:close')">ยกเลิก</button>
-                                                        <button type="button" class="btns-primary"
-                                                            @click="$refs.delForm.submit()">ยืนยันการลบ</button>
+                                                    <div class="flex justify-between gap-5">
+                                                        <button type="button" class="btn btn-outline"
+                                                            @click="$dispatch('modal:close')">
+                                                            ยกเลิก
+                                                        </button>
+                                                        <button type="button" class="btn btn-danger"
+                                                            @click="$refs.delForm.submit()">
+                                                            ยืนยันการลบ
+                                                        </button>
                                                     </div>
                                                 </x-slot:footer>
                                             </x-modal>
                                         </div>
                                     </div>
                                 @empty
-                                    <div class="text-sm text-center text-gray-500 opacity-75">
-                                        ----- ยังไม่มีหลักฐานแนบ -----
-                                    </div>
+                                    <div class="text-sm text-center text-gray-500 opacity-75">----- ยังไม่มีหลักฐานแนบ
+                                        -----</div>
                                 @endforelse
                             </div>
                         </div>
                     </div>
                 @empty
-                    <p class="text-gray-500">ยังไม่มีเกณฑ์การพิจารณา</p>
+                    <p class="text-gray-500">----- ยังไม่มีเกณฑ์การพิจารณา -----</p>
                 @endforelse
             </div>
-
             @php
                 $condition = $indicator->condition ?? '';
-                // ลบช่องว่างรอบ ๆ
                 $trimmed = trim($condition);
-
-                // เช็คว่ามีแท็ก <img> หรือมีข้อความจริง ๆ หลังจากลบแท็ก HTML
                 $hasImage = preg_match('/<img\s[^>]*src=["\']?([^>"\']+)["\']?/i', $trimmed);
                 $hasText = trim(strip_tags($trimmed)) !== '';
             @endphp
@@ -219,112 +259,135 @@
                 </div>
             @endif
 
+            <div class="card">
+                <h2 class="card-title">เกณฑ์การให้คะแนน</h2>
+                <div class="criteria-box list-disc list-inside">
+                    {!! $indicator->comment ?? '-' !!}
+                </div>
+            </div>
+
+            @if ($indicator->variables->where('type', 'input')->isNotEmpty())
+                <div class="card">
+                    <h2 class="card-title">กรอกค่าตัวแปร</h2>
+                    @php
+                        $inputVariables = $indicator->variables->filter(fn($v) => trim($v->type) === 'input');
+                    @endphp
+                    @forelse($inputVariables as $variable)
+                        <div class="variable-row">
+                            <label class="variable-label">
+                                {{ $variable->label_name ?? $variable->variable_name }}
+                            </label>
+                            <input type="number" name="variables[{{ $variable->id }}]"
+                                value="{{ old('variables.' . $variable->id, $variable->value) }}"
+                                placeholder="กรุณากรอกร้อยละเป็นตัวเลข" class="variable-input" form="variables-form"
+                                {{ $indicator->status == 2 ? 'readonly' : '' }}>
+                        </div>
+                    @empty
+                        <p class="text-gray-500">ยังไม่มีตัวแปรที่ต้องกรอก</p>
+                    @endforelse
+                </div>
+            @endif
+
+            <div class="card">
+                <h2 class="card-title">หมายเหตุ</h2>
+                <div class="annotation-box">
+                    {!! $indicator->annotation ?? '-' !!}
+                </div>
+            </div>
+
+            @if (in_array($indicator->status, [3, 4]))
+                <div class="card">
+                    <h2 class="card-title">คะแนนที่ได้</h2>
+                    <div class="score-display-container">
+                        <div class="score-item">
+                            <div class="score-label">คะแนนที่ได้</div>
+                            <div class="score-value-display current-score">
+                                {{ $indicator->score_acc ?? '0' }}
+                            </div>
+                        </div>
+                        <div class="score-separator">/</div>
+                        <div class="score-item">
+                            <div class="score-label">คะแนนเต็ม</div>
+                            <div class="score-value-display max-score">
+                                {{ $indicator->max_score ?? '0' }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @endif
 
             <form id="variables-form" action="{{ route('dashboardkpi.user.saveVariables', $indicator->id) }}"
                 method="POST">
                 @csrf
                 @method('PUT')
-
-                @if ($indicator->variables->where('type', 'input')->isNotEmpty())
-                    <div class="card">
-                        <h2 class="card-title">กรอกค่าตัวแปร</h2>
-
-                        @php
-                            $inputVariables = $indicator->variables->filter(fn($v) => trim($v->type) === 'input');
-                        @endphp
-
-                        @forelse($inputVariables as $variable)
-                            <div class="variable-row">
-                                <label class="variable-label">
-                                    {{ $variable->label_name ?? $variable->variable_name }}
-                                </label>
-                                <input type="number" name="variables[{{ $variable->id }}]"
-                                    value="{{ old('variables.' . $variable->id, $variable->value) }}"
-                                    placeholder="กรุณากรอกร้อยละเป็นตัวเลข" class="variable-input"
-                                    {{ $indicator->status == 2 ? 'readonly' : '' }}>
-                            </div>
-                        @empty
-                            <p class="text-gray-500">ยังไม่มีตัวแปรที่ต้องกรอก</p>
-                        @endforelse
-                    </div>
-                @endif
-                <div class="card annotation-card">
-                    <h2 class="card-title">หมายเหตุ</h2>
-                    <div class="description-box">
-                        {!! $indicator->annotation ?? '-' !!}
-                    </div>
-                </div>
-                @if (in_array($indicator->status, [3, 4]))
-                    <div class="card">
-                        <h2 class="card-title">คะแนนที่ได้</h2>
-                        <div class="score-display-container">
-                            <div class="score-item">
-                                <div class="score-label">คะแนนที่ได้</div>
-                                <div class="score-value-display current-score">
-                                    {{ $indicator->score_acc ?? '0' }}
-                                </div>
-                            </div>
-                            <div class="score-separator">/</div>
-                            <div class="score-item">
-                                <div class="score-label">คะแนนเต็ม</div>
-                                <div class="score-value-display max-score">
-                                    {{ $indicator->max_score ?? '0' }}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                @endif
-
-
                 <!-- ✅ hidden status -->
-                <input type="hidden" name="status" id="status-input">
+                <input type="hidden" name="status" id="status-input" value="{{ $indicator->status ?? 2 }}">
+            </form>
 
-                <div class="action-bts">
-                    <button type="button" class="btns-secondary"
-                        onclick="location.href='{{ route('dashboardkpi.index') }}'">
-                        <i class="fa fa-undo"></i> กลับ
+            <div class="action-bts">
+                <button type="button" class="btn btn-outline" id="back-btn"
+                    onclick="location.href='{{ route('dashboardkpi.index') }}'">
+                    <i class="fa fa-undo"></i> กลับ
+                </button>
+
+                @if (!$locked)
+                    <!-- ปุ่มบันทึกฉบับร่าง (แก้ไขแล้ว: submit ฟอร์มเดียวกัน + data-status=1) -->
+                    <button id="btn-save-draft" class="btn btn-primary" type="submit" form="variables-form"
+                        data-status="1">
+                        <i class="fa fa-save"></i> บันทึกเป็นฉบับร่าง
                     </button>
 
-                    @if (!$locked)
-                        <!-- ปุ่มบันทึกฉบับร่าง -->
-                        <button type="submit" class="btn-outlines save-btn" data-status="1">
-                            <i class="fa fa-save"></i> บันทึกเป็นฉบับร่าง
-                        </button>
+                    <!-- บันทึกเป็นฉบับจริง (ยืนยันด้วย Modal) -->
+                    <x-modal title="⚠️ โปรดยืนยันการบันทึกเป็นฉบับจริง ⚠️" size="lg" :context="'confirm-final-save'">
+                        <x-slot:trigger>
+                            <!-- เพิ่ม id เพื่อรีเซ็ตก่อนเปิด -->
+                            <button id="final-save-trigger" type="button" class="btn btn-success">
+                                <i class="fa fa-save"></i> บันทึกเป็นฉบับจริง
+                            </button>
+                        </x-slot:trigger>
 
-                        <!-- บันทึกเป็นฉบับจริง (ยืนยันด้วย Modal) -->
-                        <x-modal title="ยืนยันการบันทึกเป็นฉบับจริง" size="sm" :context="'confirm-final-save'">
-                            <x-slot:trigger>
-                                <button type="button" class="btns-primary">
-                                    <i class="fa fa-save"></i> บันทึกเป็นฉบับจริง
-                                </button>
-                            </x-slot:trigger>
-
-                            <div class="space-y-2">
-                                <p class="text-slate-700">
-                                    ต้องการบันทึกเป็นฉบับจริง ใช่หรือไม่?
+                        <div class="space-y-3">
+                            <div class="rounded-md border border-amber-300 bg-amber-50 p-3">
+                                <p class="font-semibold text-amber-800">
+                                    การดำเนินการนี้มีผลถาวรจนกว่าจะได้รับอนุมัติให้เปลี่ยนสถานะกลับเป็นฉบับร่าง
                                 </p>
-                                <p class="text-sm text-slate-500">
-                                    หลังจากยืนยัน ระบบจะบันทึกข้อมูลเป็นฉบับจริงตามสถานะที่กำหนด
-                                </p>
+                                <ul class="mt-2 list-disc pl-5 text-sm text-amber-900">
+                                    <li>ระบบจะบันทึกเป็น <strong>ฉบับจริงทันที</strong></li>
+                                    <li><strong>ไม่สามารถแก้ไขได้</strong> หลังยืนยัน</li>
+                                </ul>
                             </div>
 
-                            <x-slot:footer>
-                                <div class="flex justify-end gap-2">
-                                    <button type="button" class="btns-secondary"
-                                        @click="$dispatch('modal:close')">ยกเลิก</button>
-                                    <button type="button" class="btns-primary"
-                                        onclick="(function(){var form=document.getElementById('variables-form');var statusInput=document.getElementById('status-input');if(statusInput){statusInput.value='2';}if(form){form.submit();}})()">
-                                        ยืนยันการบันทึก
-                                    </button>
-                                </div>
-                            </x-slot:footer>
-                        </x-modal>
-                    @endif
-                </div>
-            </form>
+                            <p class="text-sm text-slate-600">
+                                โปรดยืนยันว่าคุณเข้าใจผลกระทบจากการบันทึกเป็นฉบับจริง:
+                            </p>
+                            <label class="flex items-start gap-2 text-sm text-slate-700">
+                                <input id="confirm-understand" type="checkbox" class="mt-0.5">
+                                <span>ฉันเข้าใจว่าหลังยืนยันแล้วจะไม่สามารถแก้ไขได้
+                                    จนกว่าจะได้รับอนุมัติให้เปลี่ยนสถานะกลับเป็นฉบับร่าง</span>
+                            </label>
+                        </div>
+
+                        <x-slot:footer>
+                            <div class="flex justify-between gap-5">
+                                <button type="button" class="btn btn-outline"
+                                    @click="$dispatch('modal:close', { context: 'confirm-final-save' })">
+                                    ยกเลิก
+                                </button>
+
+                                {{-- ปุ่มยืนยันฉบับจริง (แก้ไขแล้ว: ไม่มี inline onclick, ใช้ submit + data-status=2) --}}
+                                <button id="btn-final-submit" class="btn btn-success disabled:opacity-50" type="submit"
+                                    form="variables-form" data-status="2" disabled>
+                                    ยืนยันการบันทึกเป็นฉบับจริง
+                                </button>
+                            </div>
+                        </x-slot:footer>
+                    </x-modal>
+                @endif
+            </div>
         </div>
     </div>
 @endsection
+
 @push('scripts')
     <link
         href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;600&family=Kanit:wght@400;600&family=Sarabun:wght@400;600&display=swap"
@@ -343,68 +406,54 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Trumbowyg/2.27.3/plugins/fontfamily/trumbowyg.fontfamily.min.js">
     </script>
 
-    {{-- <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> --}}
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            const form = document.getElementById("variables-form");
-            const statusInput = document.getElementById("status-input");
+        // กัน error ถ้าไม่ได้โหลด lucide
+        if (window.lucide && typeof lucide.create() === 'function') {
+            lucide.create();
+        } else if (window.lucide && typeof lucide.createIcons === 'function') {
+            lucide.createIcons();
+        }
 
-            // ดักทุกปุ่มที่มี class .save-btn
-            document.querySelectorAll(".save-btn").forEach(btn => {
-                btn.addEventListener("click", function() {
-                    const status = this.getAttribute("data-status");
-
-                    // ใส่ค่า status ลง hidden input
-                    statusInput.value = status;
-
-                    // ส่ง form
-                    form.submit();
-                });
-            });
-        });
-    </script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // ✅ กัน error lucide
-            if (window.lucide && typeof lucide.createIcons === 'function') {
-                lucide.createIcons();
+        // ✅ Template render หลักฐานใหม่ ให้เหมือน Blade
+        function renderEvidenceItem(ev) {
+            let icon = '<i data-lucide="file" style="color:#6b7280;"></i>'; // default
+            if (ev.type === 'pdf') {
+                icon = '<i data-lucide="file-text" style="color:#dc2626;"></i>';
+            } else if (['doc', 'docx'].includes(ev.type)) {
+                icon = '<i data-lucide="file-text" style="color:#2563eb;"></i>';
+            } else if (['ppt', 'pptx'].includes(ev.type)) {
+                icon = '<i data-lucide="presentation" style="color:#eb7e25;"></i>';
+            } else if (['jpg', 'jpeg', 'png', 'gif', 'image'].includes(ev.type)) {
+                icon = '<i data-lucide="image" style="color:#16a34a;"></i>';
+            } else if (ev.type === 'xls' || ev.type === 'xlsx') {
+                icon = '<i data-lucide="file-spreadsheet" style="color:#059669;"></i>';
+            } else if (ev.type === 'url') {
+                icon = '<i data-lucide="link" style="color:#9333ea;"></i>';
+            } else if (ev.type === 'note') {
+                icon = '<i data-lucide="sticky-note" style="color:#f59e0b;"></i>';
             }
 
+            let nameHtml = ev.name;
+            if (ev.type === 'url' && ev.path?.urls?.[0]) {
+                nameHtml = `<a href="${ev.path.urls[0]}" target="_blank"
+                      class="text-blue-600 underline hover:text-blue-800">
+                        ${ev.name}
+                    </a>`;
+            }
+
+            return `
+        <div class="evidence-item" id="evidence-${ev.id}">
+            <span class="evidence-icon">${icon}</span>
+            <span class="evidence-name">${nameHtml}</span>
+            <button class="btn-delete" data-id="${ev.id}" title="ลบหลักฐาน">x</button>
+        </div>`;
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
             const fileHandlers = {};
             const editorInitialized = {};
-            const csrfTokenMeta = document.querySelector('meta[name="csrf-token"]');
-            const csrfToken = csrfTokenMeta ? csrfTokenMeta.getAttribute("content") : "";
 
-            // ✅ Template render หลักฐานใหม่
-            function renderEvidenceItem(ev) {
-                let icon = '<i data-lucide="file" style="color:#6b7280;"></i>';
-                if (ev.type === 'pdf') icon = '<i data-lucide="file-text" style="color:#dc2626;"></i>';
-                else if (['doc', 'docx'].includes(ev.type)) icon =
-                    '<i data-lucide="file-text" style="color:#2563eb;"></i>';
-                else if (['ppt', 'pptx'].includes(ev.type)) icon =
-                    '<i data-lucide="presentation" style="color:#eb7e25;"></i>';
-                else if (['jpg', 'jpeg', 'png', 'gif', 'image'].includes(ev.type)) icon =
-                    '<i data-lucide="image" style="color:#16a34a;"></i>';
-                else if (['xls', 'xlsx'].includes(ev.type)) icon =
-                    '<i data-lucide="file-spreadsheet" style="color:#059669;"></i>';
-                else if (ev.type === 'url') icon = '<i data-lucide="link" style="color:#9333ea;"></i>';
-                else if (ev.type === 'note') icon = '<i data-lucide="sticky-note" style="color:#f59e0b;"></i>';
-
-                let nameHtml = ev.name;
-                if (ev.type === 'url' && ev.path?.urls?.[0]) {
-                    nameHtml = `<a href="${ev.path.urls[0]}" target="_blank"
-                           class="text-blue-600 underline hover:text-blue-800">${ev.name}</a>`;
-                }
-
-                return `
-            <div class="evidence-item" id="evidence-${ev.id}">
-                <span class="evidence-icon">${icon}</span>
-                <span class="evidence-name">${nameHtml}</span>
-                <button class="btn-delete" data-id="${ev.id}" title="ลบหลักฐาน">x</button>
-            </div>`;
-            }
-
-            /*** ---------- File Upload Handler ---------- ***/
+            /*** ---------- File Upload Handler Class ---------- ***/
             class FileUploadHandler {
                 constructor(criteriaId) {
                     this.criteriaId = criteriaId;
@@ -456,23 +505,30 @@
                     const el = document.createElement('div');
                     el.className = 'file-item';
                     el.innerHTML = `
-                <div class="file-icon"><i data-lucide="file-text"></i></div>
-                <span class="file-name" title="${file.name}">${file.name}</span>
-                <span class="file-size">${this.formatFileSize(file.size)}</span>
-                <button type="button" class="remove-file" 
-                    data-name="${encodeURIComponent(file.name)}" 
-                    data-size="${file.size}" 
-                    data-criteria="${this.criteriaId}">
-                    <i data-lucide="x"></i>
-                </button>`;
+                    <div class="file-icon">
+                        <i data-lucide="file-text" style="width:20px;height:20px;color:#ef4444;"></i>
+                    </div>
+                    <span class="file-name" title="${file.name}">${file.name}</span>
+                    <span class="file-size">${this.formatFileSize(file.size)}</span>
+                    <button type="button" class="remove-file" aria-label="ลบไฟล์"
+                        data-name="${encodeURIComponent(file.name)}" 
+                        data-size="${file.size}"
+                        data-criteria="${this.criteriaId}">
+                        <i data-lucide="x" style="width:16px;height:16px;"></i>
+                    </button>`;
                     this.filesList.appendChild(el);
                     el.querySelector('.remove-file').addEventListener('click', e => {
                         const btn = e.currentTarget;
                         const name = decodeURIComponent(btn.getAttribute('data-name') || '');
                         const size = Number(btn.getAttribute('data-size') || 0);
-                        this.selectedFiles = this.selectedFiles.filter(f => !(f.name === name && f
-                            .size === size));
-                        this.syncInputFiles();
+                        const criteriaId = btn.getAttribute('data-criteria');
+                        const handler = fileHandlers[criteriaId];
+                        if (handler) {
+                            handler.selectedFiles = handler.selectedFiles.filter(f =>
+                                !(f.name === name && f.size === size)
+                            );
+                            handler.syncInputFiles();
+                        }
                         el.remove();
                     });
                     if (window.lucide?.createIcons) lucide.createIcons();
@@ -492,116 +548,363 @@
                 }
             }
 
+            /*** ---------- URL Handler Class ---------- ***/
+            class URLHandler {
+                constructor(criteriaId) {
+                    this.criteriaId = criteriaId;
+                    this.urlSection = document.querySelector(`.url-section-${criteriaId}`);
+                    this.init();
+                }
+                init() {
+                    if (!this.urlSection) return;
+                    if (!this.urlSection.querySelector('input[type="url"]:not([readonly])')) {
+                        this.appendNewEditableRow();
+                    }
+                    this.urlSection.addEventListener('click', e => this.handleClick(e));
+                    this.urlSection.addEventListener('keydown', e => this.handleKeydown(e));
+                }
+                handleClick(e) {
+                    const addBtn = e.target.closest(`.add-url-btn-${this.criteriaId}`);
+                    if (addBtn) {
+                        const row = addBtn.closest('.url-row');
+                        this.lockRowAndSwapButton(row);
+                        this.appendNewEditableRow();
+                        return;
+                    }
+                    const removeBtn = e.target.closest('.remove-url-btn');
+                    if (removeBtn && removeBtn.closest(`.url-section-${this.criteriaId}`)) {
+                        const row = removeBtn.closest('.url-row');
+                        row?.remove();
+                        if (!this.urlSection.querySelector('input[type="url"]:not([readonly])')) {
+                            this.appendNewEditableRow();
+                        }
+                    }
+                }
+                handleKeydown(e) {
+                    if (e.key === 'Enter' && e.target.matches(`.url-input-${this.criteriaId}`)) {
+                        e.preventDefault();
+                        const row = e.target.closest('.url-row');
+                        this.lockRowAndSwapButton(row);
+                        this.appendNewEditableRow();
+                    }
+                }
+                appendNewEditableRow() {
+                    const row = document.createElement('div');
+                    row.className = `form-group url-row`;
+                    row.innerHTML = `
+                    <input type="text" name="url_names[]" 
+                        class="form-input url-name url-name-${this.criteriaId}" 
+                        placeholder="ชื่อหลักฐาน URL">
+                    <input type="url" name="additional_urls[]" 
+                        class="form-input url-input url-input-${this.criteriaId}" 
+                        placeholder="วาง URL เพิ่มเติม">
+                    <button type="button" 
+                        class="add-url-btn add-url-btn-${this.criteriaId}" 
+                        aria-label="เพิ่ม URL">
+                        <i data-lucide="plus" style="width:16px;height:16px;"></i>
+                    </button>`;
+                    this.urlSection.appendChild(row);
+                    if (window.lucide?.createIcons) lucide.createIcons();
+                    row.querySelector(`input.url-input-${this.criteriaId}`)?.focus();
+                }
+                lockRowAndSwapButton(row) {
+                    if (!row) return;
+                    const input = row.querySelector(`input.url-input-${this.criteriaId}`);
+                    if (!input || !input.value.trim()) return;
+                    input.readOnly = true;
+                    input.classList.add('locked');
+                    input.setAttribute('tabindex', '-1');
+                    const addBtn = row.querySelector(`.add-url-btn-${this.criteriaId}`);
+                    if (addBtn) {
+                        addBtn.classList.remove(`add-url-btn-${this.criteriaId}`);
+                        addBtn.classList.add('remove-url-btn');
+                        addBtn.setAttribute('aria-label', 'ลบ URL');
+                        addBtn.innerHTML = `<i data-lucide="x" style="width:16px;height:16px;"></i>`;
+                        if (window.lucide?.createIcons) lucide.createIcons();
+                    }
+                }
+            }
+
             /*** ---------- Trumbowyg Editor ---------- ***/
             function initTrumbowyg(criteriaId) {
                 if (typeof $ === 'undefined' || typeof $.fn.trumbowyg === 'undefined') return false;
                 if (editorInitialized[criteriaId]) return true;
-                const $editor = $(`#detailEditor-${criteriaId}`);
+                const selector = `#detailEditor-${criteriaId}`;
+                const $editor = $(selector);
                 if ($editor.length === 0) return false;
                 try {
                     if ($editor.data('trumbowyg')) $editor.trumbowyg('destroy');
                     $editor.trumbowyg({
                         lang: 'th',
+                        btns: [
+                            ['viewHTML'],
+                            ['undo', 'redo'],
+                            ['formatting'],
+                            ['fontfamily'],
+                            ['fontsize'],
+                            ['foreColor', 'backColor'],
+                            ['strong', 'em', 'del', 'underline'],
+                            ['link'],
+                            ['justifyLeft', 'justifyCenter', 'justifyRight', 'justifyFull'],
+                            ['unorderedList', 'orderedList'],
+                            ['horizontalRule'],
+                            ['removeformat'],
+                            ['fullscreen']
+                        ],
+                        plugins: {
+                            fontfamily: {
+                                fonts: [
+                                    'Prompt, sans-serif', 'Kanit, sans-serif',
+                                    'Sarabun, sans-serif', 'Arial, sans-serif',
+                                    'Times New Roman, serif'
+                                ]
+                            },
+                            fontsize: {
+                                allowCustomSize: true,
+                                sizeList: ['12px', '14px', '16px', '18px', '20px', '24px', '28px', '32px']
+                            }
+                        },
                         autogrow: true
                     });
                     editorInitialized[criteriaId] = true;
                     return true;
                 } catch (error) {
-                    console.error("❌ Error init Trumbowyg:", error);
+                    console.error(`❌ Error initializing Trumbowyg:`, error);
                     return false;
                 }
             }
 
-            /*** ---------- Delete Evidence ---------- ***/
-            document.querySelectorAll(".btn-delete").forEach(btn => {
-                btn.addEventListener("click", function() {
-                    const id = this.getAttribute("data-id");
-                    Swal.fire({
-                        title: 'คุณแน่ใจหรือไม่?',
-                        text: "ต้องการลบหลักฐานนี้",
-                        icon: 'warning',
-                        showCancelButton: true,
-                        confirmButtonColor: '#d33',
-                        cancelButtonColor: '#6b7280',
-                        confirmButtonText: 'ลบ',
-                        cancelButtonText: 'ยกเลิก'
-                    }).then((result) => {
-                        if (!result.isConfirmed) return;
-                        fetch(`/evidences/${id}`, {
-                                method: "DELETE",
-                                headers: {
-                                    "X-CSRF-TOKEN": csrfToken,
-                                    "Content-Type": "application/json",
-                                    "Accept": "application/json"
-                                }
-                            })
-                            .then(res => res.json())
-                            .then(data => {
-                                if (data.success) {
-                                    document.getElementById(`evidence-${id}`)?.remove();
-                                    Swal.fire({
-                                        toast: true,
-                                        position: 'top-end',
-                                        icon: 'success',
-                                        title: 'ลบหลักฐานเรียบร้อยแล้ว',
-                                        showConfirmButton: false,
-                                        timer: 2000
-                                    });
-                                } else {
-                                    Swal.fire({
-                                        toast: true,
-                                        position: 'top-end',
-                                        icon: 'error',
-                                        title: 'เกิดข้อผิดพลาดในการลบ',
-                                        showConfirmButton: false,
-                                        timer: 2000
-                                    });
-                                }
-                            })
-                            .catch(err => {
-                                console.error("Error:", err);
-                                Swal.fire({
-                                    toast: true,
-                                    position: 'top-end',
-                                    icon: 'error',
-                                    title: 'เกิดข้อผิดพลาดในการลบ',
-                                    showConfirmButton: false,
-                                    timer: 2000
-                                });
-                            });
-                    });
-                });
-            });
+            function setupPopupTriggers() {
+                @foreach ($indicator->criterias as $criteria)
+                    const btn{{ $criteria->id }} = document.querySelector(
+                        '[\\@click="open{{ $criteria->id }} = true"]');
+                    if (btn{{ $criteria->id }}) {
+                        btn{{ $criteria->id }}.addEventListener("click", () => {
+                            setTimeout(() => initTrumbowyg({{ $criteria->id }}), 600);
+                        });
+                    }
+                @endforeach
+            }
+            setupPopupTriggers();
 
-            /*** ---------- Init per-criteria ---------- ***/
+            function observePopupVisibility(criteriaId) {
+                const popup = document.querySelector(`[x-show="open${criteriaId}"]`);
+                if (!popup) return;
+                const observer = new MutationObserver(() => {
+                    const isVisible = !popup.hasAttribute('x-cloak') &&
+                        popup.style.display !== 'none' &&
+                        popup.offsetParent !== null;
+                    if (isVisible && !editorInitialized[criteriaId]) {
+                        setTimeout(() => initTrumbowyg(criteriaId), 100);
+                    }
+                });
+                observer.observe(popup, {
+                    attributes: true,
+                    attributeFilter: ['style', 'class', 'x-cloak']
+                });
+            }
+
             @foreach ($indicator->criterias as $criteria)
                 new FileUploadHandler({{ $criteria->id }});
-                setTimeout(() => initTrumbowyg({{ $criteria->id }}), 600);
+                new URLHandler({{ $criteria->id }});
+                observePopupVisibility({{ $criteria->id }});
             @endforeach
-
         });
+
+        function getCsrfToken() {
+            const meta = document.querySelector('meta[name="csrf-token"]');
+            return meta && meta.content ? meta.content : '';
+        }
+
+        function startEditEvidenceName(id) {
+            const linkSpan = document.getElementById('evidence-link-' + id);
+            const editSpan = document.getElementById('evidence-edit-' + id);
+            if (linkSpan && editSpan) {
+                linkSpan.style.display = 'none';
+                editSpan.style.display = 'flex';
+                const input = document.getElementById('evidence-input-' + id);
+                if (input) {
+                    input.focus();
+                    input.select();
+                }
+            }
+        }
+
+        function cancelEditEvidenceName(id) {
+            const linkSpan = document.getElementById('evidence-link-' + id);
+            const editSpan = document.getElementById('evidence-edit-' + id);
+            if (linkSpan && editSpan) {
+                editSpan.style.display = 'none';
+                linkSpan.style.display = '';
+            }
+        }
+
+        async function saveEvidenceName(id) {
+            const editSpan = document.getElementById('evidence-edit-' + id);
+            const input = document.getElementById('evidence-input-' + id);
+            const linkSpan = document.getElementById('evidence-link-' + id);
+            const textSpan = document.getElementById('evidence-name-text-' + id);
+            if (!editSpan || !input || !linkSpan || !textSpan) return;
+
+            const url = editSpan.dataset.updateUrl;
+            const name = input.value.trim();
+            if (!name) {
+                alert('กรุณากรอกชื่อไฟล์');
+                input.focus();
+                return;
+            }
+
+            try {
+                const res = await fetch(url, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': getCsrfToken(),
+                    },
+                    body: JSON.stringify({
+                        name
+                    })
+                });
+
+                if (!res.ok) {
+                    let msg = 'บันทึกไม่สำเร็จ';
+                    try {
+                        const data = await res.json();
+                        if (data && data.message) msg = data.message;
+                    } catch (_) {}
+                    alert(msg);
+                    return;
+                }
+
+                textSpan.textContent = name;
+                editSpan.style.display = 'none';
+                linkSpan.style.display = '';
+            } catch (e) {
+                alert('เกิดข้อผิดพลาดในการเชื่อมต่อ');
+            }
+        }
+    </script>
+    <script>
+        (function() {
+            function $id(id) {
+                return document.getElementById(id);
+            }
+
+            var form = $id('variables-form');
+            var statusInput = $id('status-input');
+            var btnDraft = $id('btn-save-draft');
+            var finalTrigger = $id('final-save-trigger');
+
+            if (!form || !statusInput) return;
+
+            function getFinalCheckbox() {
+                return document.getElementById('confirm-understand');
+            }
+
+            function getFinalButton() {
+                return document.getElementById('btn-final-submit');
+            }
+
+            function handleFinalUnderstandChange(e) {
+                var btn = getFinalButton();
+                if (btn) btn.disabled = !e.target.checked;
+            }
+
+            function bindFinalConfirmHandlers() {
+                var cb = getFinalCheckbox();
+                var btn = getFinalButton();
+
+                if (cb && cb.dataset.boundFinalConfirm !== '1') {
+                    cb.addEventListener('change', handleFinalUnderstandChange);
+                    cb.dataset.boundFinalConfirm = '1';
+                }
+
+                if (btn && btn.dataset.boundFinalConfirm !== '1') {
+                    btn.addEventListener('click', setStatusBeforeSubmit);
+                    btn.dataset.boundFinalConfirm = '1';
+                }
+            }
+
+            function resetConfirmFinalSave() {
+                var cb = getFinalCheckbox();
+                var btn = getFinalButton();
+                if (cb) cb.checked = false;
+                if (btn) btn.disabled = true;
+            }
+
+            bindFinalConfirmHandlers();
+
+            if (finalTrigger) {
+                finalTrigger.addEventListener('click', function() {
+                    resetConfirmFinalSave();
+                    bindFinalConfirmHandlers();
+                }, {
+                    passive: true
+                });
+            }
+
+            window.addEventListener('modal:opened', function(e) {
+                if (!e.detail || e.detail.context !== 'confirm-final-save') return;
+                bindFinalConfirmHandlers();
+                resetConfirmFinalSave();
+            });
+
+            window.addEventListener('modal:closed', function(e) {
+                if (!e.detail || e.detail.context !== 'confirm-final-save') return;
+                resetConfirmFinalSave();
+            });
+            window.addEventListener('modal:close', function(e) {
+                if (e.detail && e.detail.context && e.detail.context !== 'confirm-final-save') return;
+                resetConfirmFinalSave();
+            });
+
+            var modalSelector = '[role="dialog"][aria-label="⚠️ โปรดยืนยันการบันทึกเป็นฉบับจริง ⚠️"]';
+            var observer = new MutationObserver(function() {
+                var modal = document.querySelector(modalSelector);
+                var isClosed = !modal || modal.hasAttribute('x-cloak') || modal.style.display === 'none' || (
+                    modal.offsetParent === null);
+                if (isClosed) resetConfirmFinalSave();
+            });
+            observer.observe(document.body, {
+                childList: true,
+                subtree: true
+            });
+
+            function setStatusBeforeSubmit(ev) {
+                var btn = ev.currentTarget;
+                var st = btn.getAttribute('data-status');
+                if (st && statusInput) statusInput.value = st;
+            }
+            if (btnDraft) btnDraft.addEventListener('click', setStatusBeforeSubmit);
+
+            var submitting = false;
+            form.addEventListener('submit', function(e) {
+                if (submitting) {
+                    e.preventDefault();
+                    return;
+                }
+
+                var submitter = e.submitter || document.activeElement;
+                var newStatus = submitter && submitter.getAttribute ? submitter.getAttribute('data-status') :
+                    null;
+                if (newStatus) {
+                    statusInput.value = newStatus;
+                }
+
+                var buttons = form.querySelectorAll('button[type="submit"]');
+                buttons.forEach(function(b) {
+                    b.disabled = true;
+                });
+
+                submitting = true;
+            });
+        })();
     </script>
 @endpush
 
-
 @push('styles')
     <style>
-        /* ---- Base ---- */
-        :root {
-            --blue: #398ECA;
-            --blue-600: #2f7db2;
-            --text: #1f2937;
-            /* gray-800 */
-            --muted: #6b7280;
-            /* gray-500 */
-            --border: #e5e7eb;
-            /* gray-200 */
-            --bg: #ffffff;
-            --shadow: 0 8px 24px rgba(0, 0, 0, .08);
-            --radius: 16px;
-            --radius-sm: 10px;
-        }
-
         .action-bts {
             display: flex;
             justify-content: center;
@@ -609,90 +912,31 @@
             margin-top: 20px;
         }
 
-        .btns-primary,
-        .btns-secondary,
-        .btn-outlines,
-        .btn-info {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            /* ลดระยะ icon กับข้อความ */
-            padding: 6px 12px;
-            /* ปรับ padding ให้น้อยลง */
-            font-size: 13px;
-            /* ตัวหนังสือเล็กลง */
-            font-weight: 500;
-            border-radius: 6px;
-            /* มุมมนเล็กลง */
-            cursor: pointer;
-            transition: 0.2s;
-            border: none;
-            height: 32px;
-            /* ความสูงปุ่มลดลง */
-            line-height: 1.2;
-        }
-
-        .btns-primary {
-            background: #398ECA;
-            color: #fff;
-        }
-
-        .btns-primary:hover {
-            background: #2f7db2;
-        }
-
-        .btns-secondary {
-            background: #fff;
-            border: 1.5px solid #398ECA;
-            color: #398ECA;
-        }
-
-        .btns-secondary:hover {
-            background: #EBF7FF;
-        }
-
-        .btn-outlines {
-            background: #ffffff;
-            border: 1.5px solid #398ECA;
-            color: #398ECA;
-        }
-
-        .btn-outlines:hover {
-            background: #dbeafe;
-        }
-
-        .btn-info {
-            background: #06b6d4;
-            color: #fff;
-        }
-
-        .btn-info:hover {
-            background: #0891b2;
+        .indicator-header-container {
+            background: var(--color-white);
+            padding: 0 16px;
         }
 
         .card {
-            background: var(--bg);
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
+            background: var(--color-white);
+            border-radius: var(--radius-default);
+            box-shadow: var(--shadow-default);
             padding: 24px;
-            /* ปรับตามหน้า */
-            margin: 16px;
             border: 1px solid #f3f4f6;
         }
 
         .card_total {
-            background: var(--bg);
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
+            background: var(--color-white);
+            border-radius: var(--radius-default);
+            box-shadow: var(--shadow-default);
             padding: 24px;
-            /* ปรับตามหน้า */
             margin: 16px;
             border: 1px solid #f3f4f6;
         }
 
         .card-title {
             font-size: 18px;
-            color: var(--blue);
+            color: var(--blue-default);
             margin: 0 0 16px;
             display: flex;
             align-items: center;
@@ -706,7 +950,7 @@
             width: 4px;
             height: 20px;
             border-radius: 8px;
-            background: var(--blue);
+            background: var(--blue-default);
             position: absolute;
             left: 0;
             top: 2px;
@@ -728,12 +972,13 @@
             border-radius: 12px;
             padding: 16px 20px;
             font-size: 14px;
-            line-height: 1.7;
+            /* line-height: 1.7; */
             color: #374151;
+            text-align: left;
         }
 
         .description-box p {
-            margin-bottom: 12px;
+            margin-bottom: 6px;
         }
 
         .description-box ul {
@@ -741,18 +986,77 @@
             list-style: disc;
         }
 
+        .description-box ul {
+            list-style-type: disc;
+            padding-left: 1.5rem;
+            margin: 0.5rem 0;
+        }
+
+        .description-box ol {
+            list-style-type: decimal;
+            padding-left: 1.5rem;
+            margin: 0.5rem 0;
+        }
+
+        .description-box li {
+            margin: 0.25rem 0;
+        }
+
+        .annotation-card {
+            background: var(--color-white);
+            color: #92400e;
+        }
+
+        .annotation-header {
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #b45309;
+        }
+
+        .annotation-body {
+            font-size: 14px;
+            /* line-height: 1.6; */
+            color: #78350f;
+        }
+
+        .annotation-box {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 16px 20px;
+            font-size: 14px;
+            /* line-height: 1.7; */
+            color: #374151;
+            text-align: left;
+        }
+
+        .annotation-box p {
+            margin-bottom: 6px;
+        }
+
+        .annotation-box ul {
+            margin: 8px 0 8px 20px;
+            list-style: disc;
+        }
+
+
         .criteria-box {
-            background: #fff;
+            background: var(--color-white);
             border: 1px solid #e5e7eb;
             border-radius: 12px;
             padding: 16px;
             margin-bottom: 16px;
+            text-align: left;
         }
 
         .criteria-header {
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            align-items: flex-start;
+            gap: 12px;
             margin-bottom: 8px;
         }
 
@@ -763,9 +1067,12 @@
         }
 
         .criteria-status {
-            /* font-weight: 600;
-                            font-size: 14px; */
-            color: #1f2937;
+            border: 1px solid #e5e7eb;
+            padding: 3px 0px;
+            font-size: 12px;
+            font-weight: 500;
+            min-width: 130px;
+            text-align: center;
         }
 
         .criteria-description {
@@ -786,47 +1093,17 @@
             justify-content: center;
         }
 
-        .annotation-card {
-            margin-top: 20px;
-            padding: 16px 20px;
-            background: #fffbea;
-            /* เหลืองอ่อน */
-            border: 1px solid #fffbea;
-            /* เส้นกรอบเหลือง */
-            border-radius: 12px;
-            color: #92400e;
-            /* น้ำตาลเข้ม */
+        .criteria-box ul {
+            list-style-type: disc;
+            list-style-position: outside;
+            padding-left: 1.5rem;
         }
 
-        .btn-adds {
-            background: #EBF7FF;
-            border: 1px solid #398ECA;
-            border-radius: 20px;
-            font-size: 12px;
-            padding: 6px 12px;
-            cursor: pointer;
-            color: #398ECA;
-            text-decoration: none;
-            /* กันไม่ให้มีขีดเส้นใต้ */
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            /* จัดกลางแนวนอนด้วย */
-            gap: 6px;
-            transition: background 0.2s;
-
-            /* ✅ เพิ่มส่วนนี้ให้ปุ่มเท่ากัน */
-            width: 140px;
-            /* กำหนดความกว้างตายตัว */
-            height: 36px;
-            /* กำหนดความสูงตายตัว */
-            box-sizing: border-box;
+        .criteria-box ol {
+            list-style-type: decimal;
+            margin-left: 1.5rem;
+            padding-left: 1.5rem;
         }
-
-        .btn-adds:hover {
-            background: #dbeafe;
-        }
-
 
         .btn-delete {
             background: none;
@@ -837,13 +1114,11 @@
             align-items: center;
             justify-content: center;
             color: #dc2626;
-            /* แดงอ่อน */
             transition: color 0.2s, transform 0.1s;
         }
 
         .btn-delete:hover {
             color: #b91c1c;
-            /* แดงเข้ม */
             transform: scale(1.1);
         }
 
@@ -863,72 +1138,22 @@
             column-gap: 10px;
             font-size: 13px;
             color: #374151;
+            overflow: hidden;
+        }
+
+        .evidence-name {
+            max-width: 550px;
+            word-break: break-word;
+            text-align: left;
+
         }
 
         .evidence-icon {
-            margin-right: 6px;
+            /* margin-right: 6px; */
         }
 
         .file-icon {
             flex-shrink: 0;
-        }
-
-        :root {
-            --blue: #398ECA;
-            --green: #22c55e;
-            --orange: #fbbf24;
-            --gray-50: #f9fafb;
-            --gray-100: #f3f4f6;
-            --gray-600: #4b5563;
-            --gray-800: #1f2937;
-            --radius: 14px;
-            --shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-        }
-
-        .annotation-card {
-            margin-top: 20px;
-            padding: 16px 20px;
-            background: #fffbea;
-            /* เหลืองอ่อน */
-            border: 1px solid #fde68a;
-            /* เส้นกรอบเหลือง */
-            border-radius: 12px;
-            color: #92400e;
-            /* น้ำตาลเข้ม */
-        }
-
-        .annotation-header {
-            font-weight: 600;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            color: #b45309;
-            /* เหลือง-น้ำตาล */
-        }
-
-        .annotation-body {
-            font-size: 14px;
-            line-height: 1.6;
-            color: #78350f;
-        }
-
-        .description-box ul {
-            list-style-type: disc;
-            /* จุดกลม */
-            padding-left: 1.5rem;
-            margin: 0.5rem 0;
-        }
-
-        .description-box ol {
-            list-style-type: decimal;
-            /* ตัวเลข */
-            padding-left: 1.5rem;
-            margin: 0.5rem 0;
-        }
-
-        .description-box li {
-            margin: 0.25rem 0;
         }
 
         .total-score-card {
@@ -936,8 +1161,6 @@
             padding: 20px;
             background: #deedfb;
             border-radius: 16px;
-            /* box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); */
-            /* border: 1px solid #e5e7eb; */
             text-align: center;
         }
 
@@ -971,7 +1194,6 @@
             align-items: center;
             justify-content: space-between;
             background: #f9f9f9;
-            /* เทาอ่อน */
             padding: 10px 16px;
             border-radius: 8px;
             margin-bottom: 10px;
@@ -980,42 +1202,37 @@
         .variable-label {
             font-weight: 600;
             font-size: 14px;
-            color: #374151;
-            /* gray-700 */
+            color: var(--color-gray-700);
         }
 
         .variable-input {
-            border: 1px solid #e5e7eb;
-            /* gray-200 */
+            border: 1px solid var(--color-gray-200);
             border-radius: 6px;
             padding: 6px 10px;
             width: 300px;
             text-align: center;
             font-size: 14px;
-            background: #fff;
+            background: var(--color-white);
         }
 
-
-        .dashboard-container {
+        /* Indicator Card */
+        .indicator-card {
+            display: flex;
+            flex-direction: column;
+            background: var(--color-white);
+            border-radius: var(--radius-default);
+            box-shadow: var(--shadow-default);
+            border: 1px solid var(--color-gray-100);
+            padding: 24px;
+            gap: 24px;
             max-width: 960px;
-            margin: 0 auto;
-            /* padding: 24px; */
-        }
-
-        /* Card */
-        .card.indicator-card {
-            background: #fff;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            /* padding: 28px; */
-            border: 1px solid var(--gray-100);
         }
 
         /* Title */
         .indicator-title {
             font-size: 26px;
             font-weight: 700;
-            color: var(--gray-800);
+            color: var(--color-gray-800);
             margin-bottom: 16px;
         }
 
@@ -1023,33 +1240,26 @@
         .indicator-tabs {
             display: flex;
             align-items: center;
-            gap: 12px;
-            margin-bottom: 8px;
+            justify-content: center;
+            gap: 8px;
             font-size: 14px;
         }
 
         .tab {
-            color: #6b7280;
-            /* gray-500 */
+            color: var(--color-gray-500);
             cursor: default;
-        }
-
-
-
-        .tab-divider {
-            color: #d1d5db;
-            /* gray-300 */
         }
 
         hr.tab-divider {
             border: none;
-            border-bottom: 2px solid #bbc8e0;
-            margin: 0 0 16px 0;
+            color: var(--color-gray-300);
+            border-bottom: 2px solid var(--color-gray-300);
+            margin: 16px 0;
         }
 
 
-        /* Info block */
-        .info-block {
+        /* Info container */
+        .info-container {
             display: flex;
             flex-direction: column;
             gap: 18px;
@@ -1065,66 +1275,17 @@
 
         .info-row .label {
             font-weight: 600;
-            color: #717d83;
+            color: var(--color-gray-600);
             margin-right: 6px;
-        }
-
-        .info-row .value {
-            color: var(--gray-600);
-            display: inline-block;
-            background: #EBF7FF;
-            border-radius: 16px;
-            font-size: 13px;
         }
 
         /* Chips */
         .chip {
             display: inline-block;
             background: #EBF7FF;
-
             border-radius: 16px;
             padding: 4px 12px;
             font-size: 13px;
-            color: #858e95;
-        }
-
-        /* Status Chips */
-        .status-chip {
-            display: inline-block;
-            border-radius: 16px;
-            padding: 4px 12px;
-            font-size: 13px;
-            color: #fff;
-        }
-
-        /* โทนส้มพาสเทล */
-        .status-chip.orange {
-            background: #FFD1A8;
-            color: #1f2937;
-        }
-
-        /* โทนเขียวพาสเทล */
-        .status-chip.green {
-            background: #A8FFBD;
-            color: #1f2937;
-        }
-
-        /* โทนน้ำเงินพาสเทล */
-        .status-chip.blue {
-            background: #A8D4FF;
-            color: #1f2937;
-        }
-
-        /* โทนเทาพาสเทล */
-        .status-chip.gray {
-            background: #E5E7EB;
-            /* gray-200 */
-            color: #1f2937;
-        }
-
-        .status-chip.red {
-            background: #FFA8A8;
-            /* red-500 */
             color: #858e95;
         }
 
@@ -1137,9 +1298,7 @@
         .trumbowyg-editor ol,
         .trumbowyg-editor ul {
             list-style-position: inside;
-            /* สำคัญ */
             padding-left: 0;
-            /* ตัดระยะเว้นซ้ายของลิสต์เดิม */
         }
 
         /* ให้กล่อง Trumbowyg กลมกลืนกับธีมเดิม */
@@ -1161,18 +1320,19 @@
 
 
 
+        .percentage-text {
+            font-size: 18px;
+            font-weight: 600;
+            color: #374151;
+        }
+
         .evidence-containers {
             width: 85%;
-            /* ไม่เต็มจอ */
             max-width: 600px;
-            /* กว้างสุด 600px */
             max-height: 80vh;
-            /* สูงสุด 80% ของหน้าจอ */
             overflow-y: auto;
-            /* ถ้าเนื้อหาเกิน ให้ scroll */
             margin: 40px auto;
-            /* จัดให้อยู่ตรงกลาง */
-            background: #fff;
+            background: var(--color-white);
             border-radius: 10px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
         }
@@ -1182,140 +1342,10 @@
             justify-content: center;
             align-items: center;
             font-size: 18px;
-            /* เล็กลงอีก */
             padding: 10px 14px;
             font-weight: 700;
-
-            background: linear-gradient(90deg, #a9c6ff 0%, #fff3d4 100%);
+            background: linear-gradient(90deg, #a9c6ff 0%, var(--color-white)3d4 100%);
             color: #222;
-        }
-
-        .score-display-container {
-            display: flex;
-            align-items: flex-end;
-            justify-content: center;
-            gap: 20px;
-            padding: 24px;
-            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-            border-radius: 16px;
-            border: 1px solid #e2e8f0;
-            margin-bottom: 20px;
-        }
-
-        .score-item {
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .score-label {
-            font-size: 14px;
-            font-weight: 600;
-            color: #64748b;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .score-value-display {
-            font-size: 36px;
-            font-weight: 700;
-            line-height: 1;
-            padding: 12px 20px;
-            border-radius: 12px;
-            min-width: 80px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-
-        .score-value-display.current-score {
-            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-            color: white;
-        }
-
-        .score-value-display.max-score {
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            color: white;
-        }
-
-        .score-separator {
-            font-size: 42px;
-            font-weight: 300;
-            color: #94a3b8;
-            margin: 0 10px;
-        }
-
-        /* .score-percentage {
-                                    margin-top: 16px;
-                                    text-align: center;
-                                }
-
-                                .percentage-bar {
-                                    width: 100%;
-                                    height: 12px;
-                                    background: #e2e8f0;
-                                    border-radius: 6px;
-                                    overflow: hidden;
-                                    margin-bottom: 8px;
-                                    position: relative;
-                                }
-
-                                .percentage-fill {
-                                    height: 100%;
-                                    background: linear-gradient(90deg, #3b82f6 0%, #10b981 50%, #22c55e 100%);
-                                    border-radius: 6px;
-                                    transition: width 0.3s ease;
-                                    position: relative;
-                                }
-
-                                .percentage-fill::after {
-                                    content: '';
-                                    position: absolute;
-                                    top: 0;
-                                    left: 0;
-                                    right: 0;
-                                    bottom: 0;
-                                    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.3) 50%, transparent 100%);
-                                    animation: shimmer 2s infinite;
-                                } */
-
-        @keyframes shimmer {
-            0% {
-                transform: translateX(-100%);
-            }
-
-            100% {
-                transform: translateX(100%);
-            }
-        }
-
-        .percentage-text {
-            font-size: 18px;
-            font-weight: 600;
-            color: #374151;
-        }
-
-        /* Responsive adjustments */
-        @media (max-width: 768px) {
-            .score-display-container {
-                flex-direction: column;
-                gap: 16px;
-                padding: 20px;
-            }
-
-            .score-separator {
-                transform: rotate(90deg);
-                margin: 0;
-            }
-
-            .score-value-display {
-                font-size: 28px;
-                padding: 10px 16px;
-                min-width: 60px;
-            }
         }
 
         .evidence-form {
@@ -1382,26 +1412,6 @@
             flex-shrink: 0;
         }
 
-        .remove-file {
-            background: none;
-            border: none;
-            cursor: pointer;
-            color: #6b7280;
-            padding: 4px;
-            border-radius: 4px;
-            flex-shrink: 0;
-        }
-
-        .remove-file:hover {
-            background: #e5e7eb;
-            color: #ef4444;
-        }
-
-        /* URL */
-        .url-section {
-            margin-bottom: 30px;
-        }
-
         .section-divider {
             position: relative;
             text-align: center;
@@ -1424,7 +1434,7 @@
 
         .section-divider:after {
             content: 'หรือ';
-            background: #fff;
+            background: var(--color-white);
             padding: 0 15px;
             position: relative;
             z-index: 2;
@@ -1449,53 +1459,6 @@
             outline: none;
             border-color: #3b82f6;
             box-shadow: 0 0 0 3px rgba(59, 130, 246, .1);
-        }
-
-        .url-input {
-            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1'/%3E%3C/svg%3E") no-repeat 16px center;
-            background-size: 20px;
-            padding-left: 48px;
-        }
-
-        .url-row {
-            display: flex;
-            gap: 8px;
-            align-items: stretch;
-            flex-wrap: nowrap;
-        }
-
-        .url-row .form-input {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .add-url-btn,
-        .remove-url-btn {
-            width: 44px;
-            min-width: 44px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 2px solid #d1d5db;
-            border-radius: 8px;
-            background: #f3f4f6;
-            cursor: pointer;
-            transition: .2s;
-        }
-
-        .add-url-btn:hover {
-            background: #e5e7eb;
-            border-color: #9ca3af;
-        }
-
-        .remove-url-btn {
-            background: #fef2f2;
-            border-color: #fecaca;
-        }
-
-        .remove-url-btn:hover {
-            background: #fee2e2;
-            border-color: #fca5a5;
         }
 
         .form-input.locked {
@@ -1533,7 +1496,7 @@
             padding: 4px 8px;
             border: 1px solid #d1d5db;
             border-radius: 4px;
-            background: #fff;
+            background: var(--color-white);
             font-size: 14px;
         }
 
@@ -1578,41 +1541,258 @@
             margin-top: 30px;
         }
 
-        .btn-primary,
-        .btn-secondary {
-            padding: 12px 24px;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: .3s;
-            border: none;
+        /* Score Display Styles */
+        .score-display-container {
             display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            gap: 20px;
+            padding: 24px;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border-radius: 16px;
+            border: 1px solid #e2e8f0;
+            margin-bottom: 20px;
+        }
+
+        .score-item {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
             align-items: center;
             gap: 8px;
         }
 
-        .btn-primary {
-            background: #3b82f6;
-            color: #fff;
+        .score-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
-        .btn-primary:hover {
-            background: #2563eb;
+        .score-value-display {
+            font-size: 36px;
+            font-weight: 700;
+            /* line-height: 1; */
+            padding: 12px 20px;
+            border-radius: 12px;
+            min-width: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
 
-        .btn-secondary {
-            background: #fff;
-            color: #374151;
-            border: 2px solid #d1d5db;
+        .score-value-display.current-score {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: white;
         }
 
-        .btn-secondary:hover {
-            background: #f9fafb;
-            border-color: #9ca3af;
+        .score-value-display.max-score {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
         }
 
-        @media (max-width:768px) {
+        .score-separator {
+            font-size: 42px;
+            font-weight: 300;
+            color: #94a3b8;
+            margin: 0 10px;
+        }
+
+        @keyframes shimmer {
+            0% {
+                transform: translateX(-100%);
+            }
+
+            100% {
+                transform: translateX(100%);
+            }
+        }
+    </style>
+    <style>
+        @media (max-width: 639px) {
+            .evidence-edit {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .evidence-edit input {
+                width: 100%;
+            }
+
+            .evidence-edit .button-group {
+                width: 100%;
+                align-items: center;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 639px) {
+
+            .card {
+                padding: 16px;
+                margin-bottom: 12px;
+            }
+
+            .indicator-title {
+                font-size: 20px;
+                /* line-height: 1.3; */
+            }
+
+            .indicator-tabs {
+                flex-direction: column;
+                gap: 3px;
+                align-items: flex-start;
+            }
+
+            .tab-for-divider {
+                display: none;
+            }
+
+            .info-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 4px;
+            }
+
+            .chip {
+                font-size: 12px;
+                padding: 3px 8px;
+            }
+
+            .criteria-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+
+            .criteria-title {
+                font-size: 13px;
+            }
+
+            .evidence-item {
+                gap: 8px;
+                padding: 8px;
+            }
+
+            .action-bts {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .score-display-container {
+                flex-direction: column;
+                gap: 16px;
+                padding: 20px 16px;
+                border-radius: 12px;
+            }
+
+            .score-item {
+                text-align: center;
+                padding: 12px;
+                background: rgba(255, 255, 255, 0.8);
+                border-radius: 8px;
+                border: 1px solid #e2e8f0;
+                width: 100%;
+            }
+
+            .score-label {
+                font-size: 12px;
+                margin-bottom: 8px;
+            }
+
+            .score-separator {
+                display: none;
+            }
+
+            .score-value-display {
+                font-size: 28px;
+                padding: 12px 20px;
+                min-width: 80px;
+                margin: 0 auto;
+            }
+
+            .variable-row {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 8px;
+                text-align: left;
+            }
+
+            .variable-input {
+                width: 100%;
+                text-align: left;
+            }
+        }
+
+        @media (min-width: 640px) and (max-width: 767px) {
+
+            .card {
+                padding: 20px;
+            }
+
+            .indicator-title {
+                font-size: 22px;
+            }
+
+            .criteria-header {
+                flex-wrap: wrap;
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .evidence-item {
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+
+            .action-bts {
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+
+            .score-display-container {
+                flex-direction: row;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 20px;
+                padding: 24px 20px;
+            }
+
+            .score-item {
+                flex: 1;
+                min-width: 120px;
+                max-width: 200px;
+            }
+
+            .score-separator {
+                align-self: center;
+                font-size: 36px;
+                margin: 0 8px;
+            }
+
+            .score-value-display {
+                font-size: 30px;
+                padding: 12px 18px;
+                min-width: 70px;
+            }
+
+            .variable-row {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 8px;
+            }
+
+            .variable-input {
+                width: 100%;
+            }
+
             .evidence-form {
                 padding: 20px;
             }
@@ -1628,6 +1808,104 @@
             .add-url-btn,
             .remove-url-btn {
                 align-self: flex-start;
+            }
+        }
+
+        @media (min-width: 768px) and (max-width: 1023px) {
+
+            .card {
+                padding: 22px;
+            }
+
+            .indicator-title {
+                font-size: 24px;
+            }
+
+            .criteria-header {
+                gap: 12px;
+            }
+
+            .score-display-container {
+                gap: 18px;
+                padding: 22px;
+            }
+
+            .score-value-display {
+                font-size: 32px;
+                padding: 10px 18px;
+                min-width: 70px;
+            }
+
+            .variable-input {
+                width: 250px;
+            }
+
+            .action-bts {
+                gap: 10px;
+            }
+
+            .evidence-item {
+                padding: 8px 12px;
+            }
+        }
+
+        @media (min-width: 1024px) and (max-width: 1279px) {
+
+            .card {
+                padding: 24px;
+            }
+
+            .indicator-title {
+                font-size: 25px;
+            }
+
+            .score-display-container {
+                gap: 20px;
+                padding: 24px;
+            }
+
+            .score-value-display {
+                font-size: 34px;
+                padding: 11px 19px;
+                min-width: 75px;
+            }
+
+            .variable-input {
+                width: 280px;
+            }
+
+            .action-bts {
+                gap: 12px;
+            }
+        }
+
+        @media (min-width: 1280px) and (max-width: 1535px) {
+
+            .card {
+                padding: 24px;
+            }
+
+            .indicator-title {
+                font-size: 26px;
+            }
+
+            .score-display-container {
+                gap: 20px;
+                padding: 24px;
+            }
+
+            .score-value-display {
+                font-size: 36px;
+                padding: 12px 20px;
+                min-width: 80px;
+            }
+
+            .variable-input {
+                width: 300px;
+            }
+
+            .action-bts {
+                gap: 12px;
             }
         }
     </style>

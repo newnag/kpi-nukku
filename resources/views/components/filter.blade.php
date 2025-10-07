@@ -323,30 +323,6 @@
         margin-top: 18px;
     }
 
-    .card-title {
-        font-size: 18px;
-        font-weight: 700;
-        color: var(--blue);
-        margin: 0 0 16px;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        position: relative;
-        padding-left: 10px;
-    }
-
-    .card-title::before {
-        content: "";
-        width: 4px;
-        height: 20px;
-        border-radius: 8px;
-        background: var(--color-blue-600);
-        position: absolute;
-        left: 0;
-        top: 2px;
-        opacity: .25;
-    }
-
     .field label {
         display: block;
         font-size: 13px;

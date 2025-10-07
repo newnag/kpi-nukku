@@ -20,22 +20,16 @@ class DashboardKpiAdminController extends Controller
         $indicator = Indicator::with([
             'category.standard',
             'assignments.collectorUser.department',
+            'criterias' => function($query) {
+                $query->orderBy('sequence', 'asc');
+            },
             'criterias.evidences.user.department',
             'variables',
             'formulas.variables',
             'checklistItems',
         ])->findOrFail($id);
-
-        $criteria_id = optional($indicator->criterias->first())->id;
-
-        // dd($request->all(), $id);
-
-        return view('kpi_dashboard_assigned.vrf_show', compact('indicator', 'criteria_id'));
-
-        // return response()->json([
-        //     'indicator'  => $indicator,
-        //     'criteria_id' => $criteria_id,
-        // ]);
+        // dd($indicator);
+        return view('kpi_dashboard_assigned.vrf_show', compact('indicator'));
     }
 
     public function saveVariables(Request $request, $id)

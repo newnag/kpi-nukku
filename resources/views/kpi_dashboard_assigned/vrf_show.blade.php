@@ -7,22 +7,22 @@
     @php
         $locked = in_array($indicator->status, [3, 4]);
     @endphp
+    <div class="w-full h-full flex text-center justify-center">
+        <div class="indicator-card">
+            <div class="indicator-header-container">
+                <h1 class="indicator-title">
+                    {{ $indicator->name }} ({{ $indicator->code }})
+                </h1>
+                <div class="indicator-tabs">
+                    <span class="tab ">{{ $indicator->category->standard->name ?? '-' }}</span>
+                    <span class="tab-for-divider">|</span>
+                    <span class="tab">{{ $indicator->category->name ?? '-' }}</span>
+                </div>
 
-    <div class="dashboard-container">
-        <div class="card indicator-card">
-            <h1 class="indicator-title">
-                {{ $indicator->name }} ({{ $indicator->code }})
-            </h1>
-            <div class="indicator-tabs">
-                <span class="tab ">{{ $indicator->category->standard->name ?? '-' }}</span>
-                <span class="tab-divider">|</span>
-                <span class="tab">{{ $indicator->category->name ?? '-' }}</span>
-            </div>
-            <hr class="tab-divider">
-            <div class="info-block">
-                <div class="info-row">
-                    <span class="label">หน่วยงานที่รับผิดชอบ:</span>
-                    <span class="value">
+                <hr class="tab-divider">
+                <div class="info-container">
+                    <div class="info-row">
+                        <span class="label">หน่วยงานที่รับผิดชอบ:</span>
                         @forelse($indicator->assignments as $assignment)
                             @if ($assignment->collectorUser)
                                 <span class="chip">
@@ -32,81 +32,71 @@
                         @empty
                             <span class="value">-</span>
                         @endforelse
-                    </span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">ผู้รับผิดชอบในการรวบรวม:</span>
+                        @forelse($indicator->assignments as $assignment)
+                            @if ($assignment->collectorUser)
+                                <span class="chip">
+                                    {{ $assignment->collectorUser->name }}
+                                </span>
+                            @endif
+                        @empty
+                            <span class="value">-</span>
+                        @endforelse
+                    </div>
+                    <div class="info-row">
+                        <span class="label">สถานะตัวบ่งชี้:</span>
+                        <x-status-badge :status="$indicator->status" size="sm" />
+                    </div>
                 </div>
-
-                <div class="info-row">
-                    <span class="label">ผู้รับผิดชอบในการรวบรวม:</span>
-                    @forelse($indicator->assignments as $assignment)
-                        @if ($assignment->collectorUser)
-                            <span class="chip">
-                                {{ $assignment->collectorUser->name }}
-                            </span>
-                        @endif
-                    @empty
-                        <span class="value">-</span>
-                    @endforelse
-                </div>
-
-                <div class="info-row">
-                    <span class="label">สถานะตัวบ่งชี้:</span>
-                    <x-status-badge :status="$indicator->status" size="sm" />
-                </div>
-
             </div>
-            <hr class="section-divider">
-
+            <hr class="tab-divider">
             <div class="card ">
                 <h2 class="card-title">คำอธิบายตัวบ่งชี้</h2>
                 <div class="description-box">
                     {!! $indicator->description ?? '-' !!}
                 </div>
             </div>
-
             <div class="card">
                 <h2 class="card-title">เกณฑ์การพิจารณา</h2>
-
                 @forelse($indicator->criterias as $criteriaIndex => $criteria)
                     <div class="criteria-box" id="criteria-{{ $criteria->id }}">
-                        <!-- ชื่อเกณฑ์ -->
                         <div class="criteria-header">
                             <div class="criteria-title">
                                 {{ $criteria->sequence }}. {!! $criteria->name !!}
                             </div>
-                            <div class="criteria-status">
-                                <select name="criterias[{{ $criteria->id }}][status]" class="text-sm text-center"
-                                    @if ($locked) disabled @endif form="variables-form"
-                                    data-criteria-id="{{ $criteria->id }}">
-                                    <option value="0" {{ ($criteria->status ?? 0) == 0 ? 'selected' : '' }}>
-                                        รอดำเนินการ</option>
-                                    <option value="1" {{ ($criteria->status ?? 0) == 1 ? 'selected' : '' }}>
-                                        เอกสารครบถ้วน
-                                    </option>
-                                    <option value="2" {{ ($criteria->status ?? 0) == 2 ? 'selected' : '' }}>
-                                        เอกสารไม่ครบถ้วน
-                                    </option>
-                                </select>
-                            </div>
+                            {{-- <div class="criteria-status"> --}}
+                            <select name="criterias[{{ $criteria->id }}][status]"
+                                class="criteria-status text-sm text-center"
+                                @if ($locked) disabled @endif form="variables-form"
+                                data-criteria-id="{{ $criteria->id }}">
+                                <option value="0" {{ ($criteria->status ?? 0) == 0 ? 'selected' : '' }}>
+                                    รอดำเนินการ</option>
+                                <option value="1" {{ ($criteria->status ?? 0) == 1 ? 'selected' : '' }}>
+                                    เอกสารครบถ้วน
+                                </option>
+                                <option value="2" {{ ($criteria->status ?? 0) == 2 ? 'selected' : '' }}>
+                                    เอกสารไม่ครบถ้วน
+                                </option>
+                            </select>
+                            {{-- </div> --}}
                         </div>
-
                         <div class="criteria-content">
+                            {{-- อัปโหลดหลักฐาน --}}
                             <x-evidence-uploader :criteria="$criteria" :store-route="route('evidences.store')" :locked-statuses="$locked" />
-
-                            <!-- คำอธิบายเกณฑ์ -->
+                            {{-- คำอธิบายเกณฑ์ --}}
                             @if ($criteria->description)
                                 <div class="criteria-description">
                                     {!! $criteria->description !!}
                                 </div>
                             @endif
-
-                            <!-- หลักฐานของเกณฑ์นี้ -->
                             <div class="evidence-list evidence-list-{{ $criteria->id }}">
                                 @forelse($criteria->evidences as $evidence)
                                     @php
                                         $type = strtolower($evidence->type ?? '');
                                         $name = strtolower($evidence->name ?? '');
                                     @endphp
-
                                     <div class="evidence-item" id="evidence-{{ $evidence->id }}">
                                         <div class="flex items-center space-x-2">
                                             <span class="evidence-icon">
@@ -165,30 +155,36 @@
                                                         </a>
                                                     </span>
                                                 @endif
-
-                                                @if (!$locked)
-                                                    <button type="button" class="ml-2 text-slate-500 hover:text-slate-700"
-                                                        title="แก้ไขชื่อไฟล์"
-                                                        onclick="startEditEvidenceName({{ $evidence->id }})">
-                                                        ✏️
-                                                    </button>
-                                                    <span id="evidence-edit-{{ $evidence->id }}"
-                                                        class="inline-flex items-center gap-1 hidden" style="display:none"
-                                                        data-update-url="{{ route('evidences.update', $evidence->id) }}">
-                                                        <input type="text" id="evidence-input-{{ $evidence->id }}"
-                                                            value="{{ $evidence->name }}"
-                                                            class="border rounded px-2 py-0.5 text-sm" />
-                                                        <button type="button" class="text-green-600 hover:text-green-700"
-                                                            onclick="saveEvidenceName({{ $evidence->id }})">บันทึก</button>
-                                                        <button type="button" class="text-slate-600 hover:text-slate-800"
-                                                            onclick="cancelEditEvidenceName({{ $evidence->id }})">ยกเลิก</button>
-                                                    </span>
-                                                @endif
                                             </span>
+                                            @if (!$locked)
+                                                <button type="button"
+                                                    class=" text-slate-500 hover:text-slate-700 cursor-pointer"
+                                                    title="แก้ไขชื่อไฟล์"
+                                                    onclick="startEditEvidenceName({{ $evidence->id }})">
+                                                    ✏️
+                                                </button>
+                                                <span id="evidence-edit-{{ $evidence->id }}"
+                                                    class="evidence-edit flex flex-wrap sm:flex-nowrap items-center gap-2 w-full sm:w-auto"
+                                                    style="display:none"
+                                                    data-update-url="{{ route('evidences.update', $evidence->id) }}">
+                                                    <input type="text" id="evidence-input-{{ $evidence->id }}"
+                                                        value="{{ $evidence->name }}"
+                                                        class="border rounded px-2 py-1 text-[13px] min-w-0 w-full sm:w-60" />
+                                                    <div class="button-group flex space-x-2">
+                                                        <button type="button"
+                                                            class="text-green-600 hover:text-green-700 cursor-pointer "
+                                                            onclick="saveEvidenceName({{ $evidence->id }})">บันทึก</button>
+                                                        <button type="button"
+                                                            class="text-slate-600 hover:text-slate-800 cursor-pointer"
+                                                            onclick="cancelEditEvidenceName({{ $evidence->id }})">ยกเลิก</button>
+                                                    </div>
+                                                </span>
+                                            @endif
 
                                         </div>
 
                                         <div class="flex items-center justify-center">
+                                            {{-- Modal ลบหลักฐาน --}}
                                             <x-modal title="ยืนยันการลบหลักฐาน" size="sm" :context="'delete-evidence-' . $evidence->id">
                                                 <x-slot:trigger>
                                                     <button type="button" class="btn-delete" title="ลบหลักฐาน"
@@ -215,7 +211,7 @@
                                                 </div>
 
                                                 <x-slot:footer>
-                                                    <div class="flex justify-between">
+                                                    <div class="flex justify-between gap-5">
                                                         <button type="button" class="btn btn-outline"
                                                             @click="$dispatch('modal:close')">
                                                             ยกเลิก
@@ -238,7 +234,7 @@
                         </div>
                     </div>
                 @empty
-                    <p class="text-gray-500">ยังไม่มีเกณฑ์การพิจารณา</p>
+                    <p class="text-gray-500">----- ยังไม่มีเกณฑ์การพิจารณา -----</p>
                 @endforelse
             </div>
             @php
@@ -268,42 +264,35 @@
 
             </div>
 
+            @if ($indicator->variables->where('type', 'input')->isNotEmpty())
+                <div class="card">
+                    <h2 class="card-title">กรอกค่าตัวแปร</h2>
+                    @php
+                        $inputVariables = $indicator->variables->filter(fn($v) => trim($v->type) === 'input');
+                    @endphp
+                    @forelse($inputVariables as $variable)
+                        <div class="variable-row">
+                            <label class="variable-label">
+                                {{ $variable->label_name ?? $variable->variable_name }}
+                            </label>
+                            <input type="number" name="variables[{{ $variable->id }}]"
+                                value="{{ old('variables.' . $variable->id, $variable->value) }}"
+                                placeholder="กรุณากรอกร้อยละเป็นตัวเลข" class="variable-input" form="variables-form"
+                                @if ($locked) readonly @endif>
+                        </div>
+                    @empty
+                        <p class="text-gray-500">ยังไม่มีตัวแปรที่ต้องกรอก</p>
+                    @endforelse
+                </div>
+            @endif
 
-            <form id="variables-form" action="{{ route('dashboardkpi.admin.saveVariables', $indicator->id) }}"
-                method="POST">
-                @csrf
-                @method('PUT')
-
-                @if ($indicator->variables->where('type', 'input')->isNotEmpty())
-                    <div class="card">
-                        <h2 class="card-title">กรอกค่าตัวแปร</h2>
-                        @php
-                            $inputVariables = $indicator->variables->filter(fn($v) => trim($v->type) === 'input');
-                        @endphp
-                        @forelse($inputVariables as $variable)
-                            <div class="variable-row">
-                                <label class="variable-label">
-                                    {{ $variable->label_name ?? $variable->variable_name }}
-                                </label>
-                                <input type="number" name="variables[{{ $variable->id }}]"
-                                    value="{{ old('variables.' . $variable->id, $variable->value) }}"
-                                    placeholder="กรุณากรอกร้อยละเป็นตัวเลข" class="variable-input"
-                                    @if ($locked) readonly @endif>
-                            </div>
-                        @empty
-                            <p class="text-gray-500">ยังไม่มีตัวแปรที่ต้องกรอก</p>
-                        @endforelse
-                    </div>
-                @endif
-                <!-- ✅ hidden status -->
-                <input type="hidden" name="status" id="status-input" value="{{ $indicator->status ?? 2 }}">
-            </form>
-            <div class="card annotation-card">
+            <div class="card">
                 <h2 class="card-title">หมายเหตุ</h2>
-                <div class="description-box">
+                <div class="annotation-box">
                     {!! $indicator->annotation ?? '-' !!}
                 </div>
             </div>
+
             <div class="card">
                 <h2 class="card-title">คะแนนที่ได้</h2>
                 <div class="score-display-container">
@@ -321,8 +310,15 @@
                         </div>
                     </div>
                 </div>
-
             </div>
+
+            <form id="variables-form" action="{{ route('dashboardkpi.admin.saveVariables', $indicator->id) }}"
+                method="POST" class="hidden">
+                @csrf
+                @method('PUT')
+                <!-- ✅ hidden status -->
+                <input type="hidden" name="status" id="status-input" value="{{ $indicator->status ?? 2 }}">
+            </form>
 
             <div class="action-bts">
                 <button type="button" class="btn btn-outline" id="back-btn"
@@ -330,7 +326,7 @@
                     <i class="fa fa-undo"></i> กลับ
                 </button>
 
-                <button type="button" class="save-btn btn btn-primary" id="save-results-btn"
+                <button type="submit" class="btn btn-primary" form="variables-form"
                     @if ($locked) hidden @endif>
                     <i class="fa fa-save"></i> บันทึกผลลัพธ์
                 </button>
@@ -372,7 +368,6 @@
                 </x-modal>
             </div>
         </div>
-
     </div>
 @endsection
 
@@ -400,8 +395,8 @@
             const form = document.getElementById("variables-form");
             const statusInput = document.getElementById("status-input");
 
-            // Add event listeners to all buttons with the class .save-btn
-            document.querySelectorAll(".save-btn").forEach(btn => {
+            // Add event listeners to all buttons with the class #save-results-btn
+            document.querySelectorAll("#save-results-btn").forEach(btn => {
                 btn.addEventListener("click", function() {
                     // Get the status from the button's data-status attribute
                     const status = this.getAttribute("data-status") || statusInput.value;
@@ -425,6 +420,35 @@
                     // Submit the form
                     form.submit();
                 });
+            });
+
+            // จัดการการเปลี่ยนสีของ criteria status
+            function updateCriteriaStatusStyle() {
+                document.querySelectorAll('.criteria-status').forEach(select => {
+                    const value = select.value;
+
+                    // ลบ class เดิมทั้งหมด
+                    select.classList.remove('status-pending', 'status-completed', 'status-rejected');
+
+                    // เพิ่ม class ใหม่ตามค่าที่เลือก
+                    if (value === '0') {
+                        select.classList.add('status-pending');
+                    } else if (value === '1') {
+                        select.classList.add('status-completed');
+                    } else if (value === '2') {
+                        select.classList.add('status-rejected');
+                    }
+                });
+            }
+
+            // เรียกใช้เมื่อโหลดหน้าเว็บ
+            updateCriteriaStatusStyle();
+
+            // เพิ่ม event listener สำหรับการเปลี่ยนค่า
+            document.addEventListener('change', function(e) {
+                if (e.target.classList.contains('criteria-status')) {
+                    updateCriteriaStatusStyle();
+                }
             });
         });
     </script>
@@ -466,8 +490,7 @@
             <span class="evidence-icon">${icon}</span>
             <span class="evidence-name">${nameHtml}</span>
             <button class="btn-delete" data-id="${ev.id}" title="ลบหลักฐาน">x</button>
-        </div>
-    `;
+        </div>`;
         }
 
 
@@ -733,8 +756,6 @@
             @endforeach
         });
     </script>
-@endpush
-@push('scripts')
     <script>
         function getCsrfToken() {
             const meta = document.querySelector('meta[name="csrf-token"]');
@@ -747,7 +768,7 @@
             if (linkSpan && editSpan) {
                 // Hide link, show input row
                 linkSpan.style.display = 'none';
-                editSpan.style.display = 'inline-flex';
+                editSpan.style.display = 'flex';
                 const input = document.getElementById('evidence-input-' + id);
                 if (input) {
                     input.focus();
@@ -822,19 +843,24 @@
             margin-top: 20px;
         }
 
+        .indicator-header-container {
+            background: var(--color-white);
+            padding: 0 16px;
+        }
+
         .card {
-            background: var(--bg);
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
+            background: var(--color-white);
+            border-radius: var(--radius-default);
+            box-shadow: var(--shadow-default);
             padding: 24px;
             border: 1px solid #f3f4f6;
             margin: 20px;
         }
 
         .card_total {
-            background: var(--bg);
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
+            background: var(--color-white);
+            border-radius: var(--radius-default);
+            box-shadow: var(--shadow-default);
             padding: 24px;
             margin: 16px;
             border: 1px solid #f3f4f6;
@@ -842,7 +868,7 @@
 
         .card-title {
             font-size: 18px;
-            color: var(--blue);
+            color: var(--blue-default);
             margin: 0 0 16px;
             display: flex;
             align-items: center;
@@ -856,7 +882,7 @@
             width: 4px;
             height: 20px;
             border-radius: 8px;
-            background: var(--blue);
+            background: var(--blue-default);
             position: absolute;
             left: 0;
             top: 2px;
@@ -878,12 +904,13 @@
             border-radius: 12px;
             padding: 16px 20px;
             font-size: 14px;
-            line-height: 1.7;
+            /* line-height: 1.7; */
             color: #374151;
+            text-align: left;
         }
 
         .description-box p {
-            margin-bottom: 12px;
+            margin-bottom: 6px;
         }
 
         .description-box ul {
@@ -891,18 +918,76 @@
             list-style: disc;
         }
 
+        .description-box ul {
+            list-style-type: disc;
+            padding-left: 1.5rem;
+            margin: 0.5rem 0;
+        }
+
+        .description-box ol {
+            list-style-type: decimal;
+            padding-left: 1.5rem;
+            margin: 0.5rem 0;
+        }
+
+        .description-box li {
+            margin: 0.25rem 0;
+        }
+
+        .annotation-card {
+            background: var(--color-white);
+            color: #92400e;
+        }
+
+        .annotation-header {
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #b45309;
+        }
+
+        .annotation-body {
+            font-size: 14px;
+            /* line-height: 1.6; */
+            color: #78350f;
+        }
+
+        .annotation-box {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 16px 20px;
+            font-size: 14px;
+            /* line-height: 1.7; */
+            color: #374151;
+            text-align: left;
+        }
+
+        .annotation-box p {
+            margin-bottom: 6px;
+        }
+
+        .annotation-box ul {
+            margin: 8px 0 8px 20px;
+            list-style: disc;
+        }
+
         .criteria-box {
-            background: #fff;
+            background: var(--color-white);
             border: 1px solid #e5e7eb;
             border-radius: 12px;
             padding: 16px;
             margin-bottom: 16px;
+            text-align: left;
         }
 
         .criteria-header {
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            align-items: flex-start;
+            gap: 12px;
             margin-bottom: 8px;
         }
 
@@ -913,9 +998,65 @@
         }
 
         .criteria-status {
-            /* font-weight: 600;
-                                                                                                        font-size: 14px; */
-            color: #1f2937;
+            border: 1px solid #e5e7eb;
+            padding: 3px 0px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .criteria-status:hover {
+            border-color: #cbd5e1;
+            color: #1e293b;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+        }
+
+        .criteria-status:focus {
+            outline: none;
+            border-color: #3b82f6;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+        }
+
+        /* สไตล์สำหรับ options ภายใน dropdown */
+        .criteria-status option {
+            padding: 8px 12px;
+            font-weight: 500;
+            font-size: 12px;
+        }
+
+        /* สีตามสถานะของแต่ละ option */
+        .criteria-status option[value="0"] {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+
+        .criteria-status option[value="1"] {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+
+        .criteria-status option[value="2"] {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+
+        /* สไตล์เมื่อ select ถูกเลือกตามค่า */
+        .criteria-status.status-pending {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+
+        .criteria-status.status-completed {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+
+        .criteria-status.status-rejected {
+            background-color: #fee2e2;
+            color: #991b1b;
         }
 
         .criteria-description {
@@ -934,6 +1075,18 @@
             padding: 10px;
             display: flex;
             justify-content: center;
+        }
+
+        .criteria-box ul {
+            list-style-type: disc;
+            list-style-position: outside;
+            padding-left: 1.5rem;
+        }
+
+        .criteria-box ol {
+            list-style-type: decimal;
+            margin-left: 1.5rem;
+            padding-left: 1.5rem;
         }
 
         .btn-delete {
@@ -959,20 +1112,6 @@
             gap: 6px;
         }
 
-        .criteria-box ul {
-            list-style-type: disc;
-            list-style-position: outside;
-
-            /* ขยับเข้า */
-            padding-left: 1.5rem;
-        }
-
-        .criteria-box ol {
-            list-style-type: decimal;
-            margin-left: 1.5rem;
-            padding-left: 1.5rem;
-        }
-
         .evidence-item {
             background: #f0f9ff;
             border-radius: 8px;
@@ -983,55 +1122,22 @@
             column-gap: 10px;
             font-size: 13px;
             color: #374151;
+            overflow: hidden;
+        }
+
+        .evidence-name {
+            max-width: 550px;
+            word-break: break-word;
+            text-align: left;
+
         }
 
         .evidence-icon {
-            margin-right: 6px;
+            /* margin-right: 6px; */
         }
 
         .file-icon {
             flex-shrink: 0;
-        }
-
-        .annotation-card {
-            padding: 16px 20px;
-            background: #fffbea;
-            border: 1px solid #fde68a;
-            border-radius: 12px;
-            color: #92400e;
-        }
-
-        .annotation-header {
-            font-weight: 600;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            color: #b45309;
-        }
-
-        .annotation-body {
-            font-size: 14px;
-            line-height: 1.6;
-            color: #78350f;
-        }
-
-        .description-box ul {
-            list-style-type: disc;
-            /* จุดกลม */
-            padding-left: 1.5rem;
-            margin: 0.5rem 0;
-        }
-
-        .description-box ol {
-            list-style-type: decimal;
-            /* ตัวเลข */
-            padding-left: 1.5rem;
-            margin: 0.5rem 0;
-        }
-
-        .description-box li {
-            margin: 0.25rem 0;
         }
 
         .total-score-card {
@@ -1080,37 +1186,37 @@
         .variable-label {
             font-weight: 600;
             font-size: 14px;
-            color: #374151;
+            color: var(--color-gray-700);
         }
 
         .variable-input {
-            border: 1px solid #e5e7eb;
+            border: 1px solid var(--color-gray-200);
             border-radius: 6px;
             padding: 6px 10px;
             width: 300px;
             text-align: center;
             font-size: 14px;
-            background: #fff;
+            background: var(--color-white);
         }
 
-
-        .dashboard-container {
+        /* Indicator Card */
+        .indicator-card {
+            display: flex;
+            flex-direction: column;
+            background: var(--color-white);
+            border-radius: var(--radius-default);
+            box-shadow: var(--shadow-default);
+            border: 1px solid var(--color-gray-100);
+            padding: 24px;
+            gap: 24px;
             max-width: 960px;
-            margin: 0 auto;
-        }
-
-        .card.indicator-card {
-            background: #fff;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            border: 1px solid var(--gray-100);
         }
 
         /* Title */
         .indicator-title {
             font-size: 26px;
             font-weight: 700;
-            color: var(--gray-800);
+            color: var(--color-gray-800);
             margin-bottom: 16px;
         }
 
@@ -1118,8 +1224,8 @@
         .indicator-tabs {
             display: flex;
             align-items: center;
-            gap: 12px;
-            margin-bottom: 8px;
+            justify-content: center;
+            gap: 8px;
             font-size: 14px;
         }
 
@@ -1128,19 +1234,16 @@
             cursor: default;
         }
 
-        .tab-divider {
-            color: var(--color-gray-300);
-        }
-
         hr.tab-divider {
             border: none;
-            border-bottom: 2px solid #bbc8e0;
-            margin: 0 0 16px 0;
+            color: var(--color-gray-300);
+            border-bottom: 2px solid var(--color-gray-300);
+            margin: 16px 0;
         }
 
 
-        /* Info block */
-        .info-block {
+        /* Info container */
+        .info-container {
             display: flex;
             flex-direction: column;
             gap: 18px;
@@ -1156,16 +1259,8 @@
 
         .info-row .label {
             font-weight: 600;
-            color: #717d83;
+            color: var(--color-gray-600);
             margin-right: 6px;
-        }
-
-        .info-row .value {
-            color: var(--gray-600);
-            display: inline-block;
-            background: #EBF7FF;
-            border-radius: 16px;
-            font-size: 13px;
         }
 
         /* Chips */
@@ -1207,133 +1302,10 @@
             border-color: #3b82f6;
         }
 
-        /* Score Display Styles */
-        .score-display-container {
-            display: flex;
-            align-items: flex-end;
-            justify-content: center;
-            gap: 20px;
-            padding: 24px;
-            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-            border-radius: 16px;
-            border: 1px solid #e2e8f0;
-            margin-bottom: 20px;
-        }
-
-        .score-item {
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .score-label {
-            font-size: 14px;
-            font-weight: 600;
-            color: #64748b;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .score-value-display {
-            font-size: 36px;
-            font-weight: 700;
-            line-height: 1;
-            padding: 12px 20px;
-            border-radius: 12px;
-            min-width: 80px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-
-        .score-value-display.current-score {
-            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-            color: white;
-        }
-
-        .score-value-display.max-score {
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            color: white;
-        }
-
-        .score-separator {
-            font-size: 42px;
-            font-weight: 300;
-            color: #94a3b8;
-            margin: 0 10px;
-        }
-
-        /* .score-percentage {
-                                        margin-top: 16px;
-                                        text-align: center;
-                                    }
-
-                                    .percentage-bar {
-                                        width: 100%;
-                                        height: 12px;
-                                        background: #e2e8f0;
-                                        border-radius: 6px;
-                                        overflow: hidden;
-                                        margin-bottom: 8px;
-                                        position: relative;
-                                    }
-
-                                    .percentage-fill {
-                                        height: 100%;
-                                        background: linear-gradient(90deg, #3b82f6 0%, #10b981 50%, #22c55e 100%);
-                                        border-radius: 6px;
-                                        transition: width 0.3s ease;
-                                        position: relative;
-                                    }
-
-                                    .percentage-fill::after {
-                                        content: '';
-                                        position: absolute;
-                                        top: 0;
-                                        left: 0;
-                                        right: 0;
-                                        bottom: 0;
-                                        background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.3) 50%, transparent 100%);
-                                        animation: shimmer 2s infinite;
-                                    } */
-
-        @keyframes shimmer {
-            0% {
-                transform: translateX(-100%);
-            }
-
-            100% {
-                transform: translateX(100%);
-            }
-        }
-
         .percentage-text {
             font-size: 18px;
             font-weight: 600;
             color: #374151;
-        }
-
-        /* Responsive adjustments */
-        @media (max-width: 768px) {
-            .score-display-container {
-                flex-direction: column;
-                gap: 16px;
-                padding: 20px;
-            }
-
-            .score-separator {
-                transform: rotate(90deg);
-                margin: 0;
-            }
-
-            .score-value-display {
-                font-size: 28px;
-                padding: 10px 16px;
-                min-width: 60px;
-            }
         }
 
         .evidence-containers {
@@ -1342,7 +1314,7 @@
             max-height: 80vh;
             overflow-y: auto;
             margin: 40px auto;
-            background: #fff;
+            background: var(--color-white);
             border-radius: 10px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
         }
@@ -1354,7 +1326,7 @@
             font-size: 18px;
             padding: 10px 14px;
             font-weight: 700;
-            background: linear-gradient(90deg, #a9c6ff 0%, #fff3d4 100%);
+            background: linear-gradient(90deg, #a9c6ff 0%, var(--color-white)3d4 100%);
             color: #222;
         }
 
@@ -1422,26 +1394,6 @@
             flex-shrink: 0;
         }
 
-        /* .remove-file {
-                    background: none;
-                    border: none;
-                    cursor: pointer;
-                    color: #6b7280;
-                    padding: 4px;
-                    border-radius: 4px;
-                    flex-shrink: 0;
-                }
-
-                .remove-file:hover {
-                    background: #e5e7eb;
-                    color: #ef4444;
-                } */
-
-        /* URL */
-        /* .url-section {
-                    margin-bottom: 30px;
-                } */
-
         .section-divider {
             position: relative;
             text-align: center;
@@ -1464,7 +1416,7 @@
 
         .section-divider:after {
             content: 'หรือ';
-            background: #fff;
+            background: var(--color-white);
             padding: 0 15px;
             position: relative;
             z-index: 2;
@@ -1479,7 +1431,7 @@
         .form-input {
             flex: 1;
             padding: 12px 16px;
-            border: 2px solid #d1d5db;
+            border: 1.5px dashed #d1d5db;
             border-radius: 8px;
             font-size: 16px;
             transition: border-color .3s;
@@ -1490,53 +1442,6 @@
             border-color: #3b82f6;
             box-shadow: 0 0 0 3px rgba(59, 130, 246, .1);
         }
-
-        /* .url-input {
-                    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1'/%3E%3C/svg%3E") no-repeat 16px center;
-                    background-size: 20px;
-                    padding-left: 48px;
-                } */
-
-        /* .url-row {
-                    display: flex;
-                    gap: 8px;
-                    align-items: stretch;
-                    flex-wrap: nowrap;
-                }
-
-                .url-row .form-input {
-                    flex: 1;
-                    min-width: 0;
-                } */
-
-        /* .add-url-btn,
-                .remove-url-btn {
-                    width: 44px;
-                    min-width: 44px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    border: 2px solid #d1d5db;
-                    border-radius: 8px;
-                    background: #f3f4f6;
-                    cursor: pointer;
-                    transition: .2s;
-                }
-
-                .add-url-btn:hover {
-                    background: #e5e7eb;
-                    border-color: #9ca3af;
-                }
-
-                .remove-url-btn {
-                    background: #fef2f2;
-                    border-color: #fecaca;
-                }
-
-                .remove-url-btn:hover {
-                    background: #fee2e2;
-                    border-color: #fca5a5;
-                } */
 
         .form-input.locked {
             background: #f3f4f6;
@@ -1573,7 +1478,7 @@
             padding: 4px 8px;
             border: 1px solid #d1d5db;
             border-radius: 4px;
-            background: #fff;
+            background: var(--color-white);
             font-size: 14px;
         }
 
@@ -1618,41 +1523,259 @@
             margin-top: 30px;
         }
 
-        /* .btn-primary,
-                .btn-secondary {
-                    padding: 12px 24px;
-                    border-radius: 8px;
-                    font-size: 16px;
-                    font-weight: 500;
-                    cursor: pointer;
-                    transition: .3s;
-                    border: none;
-                    display: flex;
-                    align-items: center;
-                    gap: 8px;
-                }
+        /* Score Display Styles */
+        .score-display-container {
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            gap: 20px;
+            padding: 24px;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border-radius: 16px;
+            border: 1px solid #e2e8f0;
+            margin-bottom: 20px;
+        }
 
-                .btn-primary {
-                    background: #3b82f6;
-                    color: #fff;
-                }
+        .score-item {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
 
-                .btn-primary:hover {
-                    background: #2563eb;
-                }
+        .score-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
 
-                .btn-secondary {
-                    background: #fff;
-                    color: #374151;
-                    border: 2px solid #d1d5db;
-                }
+        .score-value-display {
+            font-size: 36px;
+            font-weight: 700;
+            /* line-height: 1; */
+            padding: 12px 20px;
+            border-radius: 12px;
+            min-width: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
 
-                .btn-secondary:hover {
-                    background: #f9fafb;
-                    border-color: #9ca3af;
-                } */
+        .score-value-display.current-score {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: white;
+        }
 
-        @media (max-width:768px) {
+        .score-value-display.max-score {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+
+        .score-separator {
+            font-size: 42px;
+            font-weight: 300;
+            color: #94a3b8;
+            margin: 0 10px;
+        }
+
+        @keyframes shimmer {
+            0% {
+                transform: translateX(-100%);
+            }
+
+            100% {
+                transform: translateX(100%);
+            }
+        }
+    </style>
+    <style>
+
+        @media (max-width: 639px) {
+            .evidence-edit {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .evidence-edit input {
+                width: 100%;
+            }
+
+            .evidence-edit .button-group {
+                width: 100%;
+                align-items: center;
+                justify-content: center;
+            }   
+        }
+
+        @media (max-width: 639px) {
+
+            .card {
+                padding: 16px;
+                margin-bottom: 12px;
+            }
+
+            .indicator-title {
+                font-size: 20px;
+                /* line-height: 1.3; */
+            }
+
+            .indicator-tabs {
+                flex-direction: column;
+                gap: 3px;
+                align-items: flex-start;
+            }
+
+            .tab-for-divider {
+                display: none;
+            }
+
+            .info-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 4px;
+            }
+
+            .chip {
+                font-size: 12px;
+                padding: 3px 8px;
+            }
+
+            .criteria-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+
+            .criteria-title {
+                font-size: 13px;
+            }
+
+            .evidence-item {
+                gap: 8px;
+                padding: 8px;
+            }
+
+            .action-bts {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .score-display-container {
+                flex-direction: column;
+                gap: 16px;
+                padding: 20px 16px;
+                border-radius: 12px;
+            }
+
+            .score-item {
+                text-align: center;
+                padding: 12px;
+                background: rgba(255, 255, 255, 0.8);
+                border-radius: 8px;
+                border: 1px solid #e2e8f0;
+                width: 100%;
+            }
+
+            .score-label {
+                font-size: 12px;
+                margin-bottom: 8px;
+            }
+
+            .score-separator {
+                display: none;
+            }
+
+            .score-value-display {
+                font-size: 28px;
+                padding: 12px 20px;
+                min-width: 80px;
+                margin: 0 auto;
+            }
+
+            .variable-row {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 8px;
+                text-align: left;
+            }
+
+            .variable-input {
+                width: 100%;
+                text-align: left;
+            }
+        }
+
+        @media (min-width: 640px) and (max-width: 767px) {
+
+            .card {
+                padding: 20px;
+            }
+
+            .indicator-title {
+                font-size: 22px;
+            }
+
+            .criteria-header {
+                flex-wrap: wrap;
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .evidence-item {
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+
+            .action-bts {
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+
+            .score-display-container {
+                flex-direction: row;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 20px;
+                padding: 24px 20px;
+            }
+
+            .score-item {
+                flex: 1;
+                min-width: 120px;
+                max-width: 200px;
+            }
+
+            .score-separator {
+                align-self: center;
+                font-size: 36px;
+                margin: 0 8px;
+            }
+
+            .score-value-display {
+                font-size: 30px;
+                padding: 12px 18px;
+                min-width: 70px;
+            }
+
+            .variable-row {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 8px;
+            }
+
+            .variable-input {
+                width: 100%;
+            }
+
             .evidence-form {
                 padding: 20px;
             }
@@ -1668,6 +1791,104 @@
             .add-url-btn,
             .remove-url-btn {
                 align-self: flex-start;
+            }
+        }
+
+        @media (min-width: 768px) and (max-width: 1023px) {
+
+            .card {
+                padding: 22px;
+            }
+
+            .indicator-title {
+                font-size: 24px;
+            }
+
+            .criteria-header {
+                gap: 12px;
+            }
+
+            .score-display-container {
+                gap: 18px;
+                padding: 22px;
+            }
+
+            .score-value-display {
+                font-size: 32px;
+                padding: 10px 18px;
+                min-width: 70px;
+            }
+
+            .variable-input {
+                width: 250px;
+            }
+
+            .action-bts {
+                gap: 10px;
+            }
+
+            .evidence-item {
+                padding: 8px 12px;
+            }
+        }
+
+        @media (min-width: 1024px) and (max-width: 1279px) {
+
+            .card {
+                padding: 24px;
+            }
+
+            .indicator-title {
+                font-size: 25px;
+            }
+
+            .score-display-container {
+                gap: 20px;
+                padding: 24px;
+            }
+
+            .score-value-display {
+                font-size: 34px;
+                padding: 11px 19px;
+                min-width: 75px;
+            }
+
+            .variable-input {
+                width: 280px;
+            }
+
+            .action-bts {
+                gap: 12px;
+            }
+        }
+
+        @media (min-width: 1280px) and (max-width: 1535px) {
+
+            .card {
+                padding: 24px;
+            }
+
+            .indicator-title {
+                font-size: 26px;
+            }
+
+            .score-display-container {
+                gap: 20px;
+                padding: 24px;
+            }
+
+            .score-value-display {
+                font-size: 36px;
+                padding: 12px 20px;
+                min-width: 80px;
+            }
+
+            .variable-input {
+                width: 300px;
+            }
+
+            .action-bts {
+                gap: 12px;
             }
         }
     </style>
