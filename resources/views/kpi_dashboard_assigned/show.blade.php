@@ -171,17 +171,20 @@
                                                     ✏️
                                                 </button>
                                                 <span id="evidence-edit-{{ $evidence->id }}"
-                                                    class="inline-flex items-center gap-2 w-fit" style="display:none"
+                                                    class="evidence-edit flex flex-wrap sm:flex-nowrap items-center gap-2 w-full sm:w-auto"
+                                                    style="display:none"
                                                     data-update-url="{{ route('evidences.update', $evidence->id) }}">
                                                     <input type="text" id="evidence-input-{{ $evidence->id }}"
                                                         value="{{ $evidence->name }}"
-                                                        class="border rounded px-2 py-0.5 text-[13px]" />
-                                                    <button type="button"
-                                                        class="text-green-600 hover:text-green-700 cursor-pointer"
-                                                        onclick="saveEvidenceName({{ $evidence->id }})">บันทึก</button>
-                                                    <button type="button"
-                                                        class="text-slate-600 hover:text-slate-800 cursor-pointer"
-                                                        onclick="cancelEditEvidenceName({{ $evidence->id }})">ยกเลิก</button>
+                                                        class="border rounded px-2 py-1 text-[13px] min-w-0 w-full sm:w-60" />
+                                                    <div class="button-group flex space-x-2">
+                                                        <button type="button"
+                                                            class="text-green-600 hover:text-green-700 cursor-pointer "
+                                                            onclick="saveEvidenceName({{ $evidence->id }})">บันทึก</button>
+                                                        <button type="button"
+                                                            class="text-slate-600 hover:text-slate-800 cursor-pointer"
+                                                            onclick="cancelEditEvidenceName({{ $evidence->id }})">ยกเลิก</button>
+                                                    </div>
                                                 </span>
                                             @endif
 
@@ -718,7 +721,7 @@
             const editSpan = document.getElementById('evidence-edit-' + id);
             if (linkSpan && editSpan) {
                 linkSpan.style.display = 'none';
-                editSpan.style.display = 'inline-flex';
+                editSpan.style.display = 'flex';
                 const input = document.getElementById('evidence-input-' + id);
                 if (input) {
                     input.focus();
@@ -1609,7 +1612,23 @@
     </style>
     <style>
         @media (max-width: 639px) {
+            .evidence-edit {
+                flex-direction: column;
+                align-items: center;
+            }
 
+            .evidence-edit input {
+                width: 100%;
+            }
+
+            .evidence-edit .button-group {
+                width: 100%;
+                align-items: center;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 639px) {
 
             .card {
                 padding: 16px;
@@ -1653,8 +1672,6 @@
             }
 
             .evidence-item {
-                flex-direction: column;
-                align-items: flex-start;
                 gap: 8px;
                 padding: 8px;
             }
