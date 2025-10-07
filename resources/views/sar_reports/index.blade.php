@@ -127,14 +127,28 @@
                                                 <div class="border-t border-gray-200 my-1"></div>
 
                                                 <!-- ปุ่มลบ -->
-                                                <form action="{{ route('sar_reports.destroy', $r->id) }}" method="POST"
-                                                    onsubmit="return confirm('คุณแน่ใจหรือไม่ว่าต้องการลบข้อมูลนี้?');">
+                                                <form id="del-sar-{{ $r->id }}" action="{{ route('sar_reports.destroy', $r->id) }}" method="POST">
                                                     @csrf
                                                     @method('DELETE')
-                                                    <button type="submit"
-                                                        class="flex items-center w-full px-4 py-2 text-red-700 hover:bg-red-50 transition">
-                                                        <i data-lucide="trash-2" class="w-4 h-4 mr-2"></i> ลบข้อมูล
-                                                    </button>
+                                                    <x-modal title="ยืนยันการลบข้อมูล" size="sm">
+                                                        <x-slot:trigger>
+                                                            <button type="button"
+                                                                class="flex items-center w-full px-4 py-2 text-red-700 hover:bg-red-50 transition">
+                                                                <i data-lucide="trash-2" class="w-4 h-4 mr-2"></i> ลบข้อมูล
+                                                            </button>
+                                                        </x-slot:trigger>
+
+                                                        <div class="space-y-2">
+                                                            <p class="text-slate-700">คุณแน่ใจหรือไม่ว่าต้องการลบข้อมูลนี้?</p>
+                                                        </div>
+
+                                                        <x-slot:footer>
+                                                            <div class="flex justify-between gap-5">
+                                                                <button type="button" class="btn btn-outline" @click="$dispatch('modal:close')">ยกเลิก</button>
+                                                                <button type="button" class="btn btn-danger" onclick="document.getElementById('del-sar-{{ $r->id }}').submit()">ยืนยันการลบ</button>
+                                                            </div>
+                                                        </x-slot:footer>
+                                                    </x-modal>
                                                 </form>
 
                                                 <!-- เส้นคั่น -->

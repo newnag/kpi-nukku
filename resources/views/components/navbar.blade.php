@@ -468,7 +468,7 @@
                 </div>
                 <div class="dropdown-menu-navbar">
                     <div class="user-info">
-                        <div class="user-name">{{ auth()->user()->name ?? 'ผู้ใช้' }}</div>
+                        <div class="user-name">{{ auth()->user()->display_name ?? 'ผู้ใช้' }}</div>
                         @if (auth()->user()->roles->isNotEmpty())
                             <div class="user-role">บทบาท: {{ auth()->user()->roles->pluck('name')->join(', ') }}</div>
                         @endif

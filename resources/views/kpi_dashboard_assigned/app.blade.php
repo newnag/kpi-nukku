@@ -589,11 +589,11 @@
                             data-order="{{ $is_assigned ? '1' : '0' }}">{{ $is_assigned ? '1' : '0' }}</td>
                     </tr>
                     @empty
-                        <tr>
-                            <td colspan="10" class=" px-4 py-8 text-center text-gray-500">
+                        <!--
+                            
                                 ไม่พบข้อมูลตัวบ่งชี้
-                            </td>
-                        </tr>
+                            
+                        -->
                     @endforelse
                 </tbody>
             </table>

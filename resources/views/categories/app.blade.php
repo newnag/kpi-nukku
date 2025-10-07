@@ -429,7 +429,7 @@
             }
         });
 
-        lucide.createIcons();
+    
     </script>
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -1101,6 +1101,7 @@
         }
 
         .modal-btn {
+            display: flex;
             padding: 10px 20px;
             border: none;
             border-radius: 5px;
