@@ -7,22 +7,22 @@
     @php
         $locked = in_array($indicator->status, [2, 3, 4]);
     @endphp
+    <div class="w-full h-full flex text-center justify-center">
+        <div class="indicator-card">
+            <div class="indicator-header-container">
+                <h1 class="indicator-title">
+                    {{ $indicator->name }} ({{ $indicator->code }})
+                </h1>
+                <div class="indicator-tabs">
+                    <span class="tab ">{{ $indicator->category->standard->name ?? '-' }}</span>
+                    <span class="tab-for-divider">|</span>
+                    <span class="tab">{{ $indicator->category->name ?? '-' }}</span>
+                </div>
 
-    <div class="dashboard-container">
-        <div class="card indicator-card">
-            <h1 class="indicator-title">
-                {{ $indicator->name }} ({{ $indicator->code }})
-            </h1>
-            <div class="indicator-tabs">
-                <span class="tab ">{{ $indicator->category->standard->name ?? '-' }}</span>
-                <span class="tab-divider">|</span>
-                <span class="tab">{{ $indicator->category->name ?? '-' }}</span>
-            </div>
-            <hr class="tab-divider">
-            <div class="info-block">
-                <div class="info-row">
-                    <span class="label">หน่วยงานที่รับผิดชอบ:</span>
-                    <span class="value">
+                <hr class="tab-divider">
+                <div class="info-container">
+                    <div class="info-row">
+                        <span class="label">หน่วยงานที่รับผิดชอบ:</span>
                         @forelse($indicator->assignments as $assignment)
                             @if ($assignment->collectorUser)
                                 <span class="chip">
@@ -32,58 +32,63 @@
                         @empty
                             <span class="value">-</span>
                         @endforelse
-                    </span>
-                </div>
+                    </div>
 
-                <div class="info-row">
-                    <span class="label">ผู้รับผิดชอบในการรวบรวม:</span>
-                    @forelse($indicator->assignments as $assignment)
-                        @if ($assignment->collectorUser)
-                            <span class="chip">
-                                {{ $assignment->collectorUser->name }}
-                            </span>
-                        @endif
-                    @empty
-                        <span class="value">-</span>
-                    @endforelse
-                </div>
+                    <div class="info-row">
+                        <span class="label">ผู้รับผิดชอบในการรวบรวม:</span>
+                        @forelse($indicator->assignments as $assignment)
+                            @if ($assignment->collectorUser)
+                                <span class="chip">
+                                    {{ $assignment->collectorUser->name }}
+                                </span>
+                            @endif
+                        @empty
+                            <span class="value">-</span>
+                        @endforelse
+                    </div>
 
-                <div class="info-row">
-                    <span class="label">สถานะตัวบ่งชี้:</span>
-                    <x-status-badge :status="$indicator->status" size="sm" />
-                </div>
+                    <div class="info-row">
+                        <span class="label">สถานะตัวบ่งชี้:</span>
+                        <x-status-badge :status="$indicator->status" size="sm" />
+                    </div>
 
+                </div>
             </div>
-            <hr class="section-divider">
-
+            <hr class="tab-divider">
             <div class="card ">
                 <h2 class="card-title">คำอธิบายตัวบ่งชี้</h2>
                 <div class="description-box">
                     {!! $indicator->description ?? '-' !!}
                 </div>
             </div>
-
             <div class="card">
                 <h2 class="card-title">เกณฑ์การพิจารณา</h2>
-
-                @forelse($indicator->criterias as $criteria)
+                @forelse($indicator->criterias as $criteriaIndex => $criteria)
                     <div class="criteria-box" id="criteria-{{ $criteria->id }}">
-                        <div class="criteria-header gap-x-2">
+                        <div class="criteria-header">
                             <div class="criteria-title">
                                 {{ $criteria->sequence }}. {!! $criteria->name !!}
                             </div>
                             @php
                                 $statuscriteria = match ($criteria->status) {
-                                    1 => 'ผ่านเกณฑ์การพิจารณา',
-                                    2 => 'ไม่ผ่านเกณฑ์การพิจารณา',
+                                    1 => 'เอกสารครบถ้วน',
+                                    2 => 'เอกสารไม่ครบถ้วน',
                                     default => 'รอดำเนินการ',
                                 };
-                            @endphp
-                            <label class="text-sm text-nowrap text-gray-700">
-                                {{ $statuscriteria }}
-                            </label>
-                        </div>
 
+                                $statusColor = match ($criteria->status) {
+                                    1 => 'bg-[#d1fae5] text-[#065f46]',
+                                    2 => 'bg-[#fee2e2] text-[#991b1b]',
+                                    default => 'bg-[#fef3c7] text-[#92400e]',
+                                };
+
+                            @endphp
+                            <div class="criteria-status {{ $statusColor }}">
+                                <label>
+                                    {{ $statuscriteria }}
+                                </label>
+                            </div>
+                        </div>
                         <div class="criteria-content">
                             {{-- อัปโหลดหลักฐาน --}}
                             <x-evidence-uploader :criteria="$criteria" :store-route="route('evidences.store')" :locked-statuses="$locked" />
@@ -157,26 +162,31 @@
                                                         </a>
                                                     </span>
                                                 @endif
-
-                                                @if (!$locked)
-                                                    <button type="button" class="ml-2 text-slate-500 hover:text-slate-700"
-                                                        title="แก้ไขชื่อไฟล์"
-                                                        onclick="startEditEvidenceName({{ $evidence->id }})">
-                                                        ✏️
-                                                    </button>
-                                                    <span id="evidence-edit-{{ $evidence->id }}"
-                                                        class="inline-flex items-center gap-1 hidden" style="display:none"
-                                                        data-update-url="{{ route('evidences.update', $evidence->id) }}">
-                                                        <input type="text" id="evidence-input-{{ $evidence->id }}"
-                                                            value="{{ $evidence->name }}"
-                                                            class="border rounded px-2 py-0.5 text-sm" />
-                                                        <button type="button" class="text-green-600 hover:text-green-700"
-                                                            onclick="saveEvidenceName({{ $evidence->id }})">บันทึก</button>
-                                                        <button type="button" class="text-slate-600 hover:text-slate-800"
-                                                            onclick="cancelEditEvidenceName({{ $evidence->id }})">ยกเลิก</button>
-                                                    </span>
-                                                @endif
                                             </span>
+                                            @if (!$locked)
+                                                <button type="button"
+                                                    class=" text-slate-500 hover:text-slate-700 cursor-pointer"
+                                                    title="แก้ไขชื่อไฟล์"
+                                                    onclick="startEditEvidenceName({{ $evidence->id }})">
+                                                    ✏️
+                                                </button>
+                                                <span id="evidence-edit-{{ $evidence->id }}"
+                                                    class="evidence-edit flex flex-wrap sm:flex-nowrap items-center gap-2 w-full sm:w-auto"
+                                                    style="display:none"
+                                                    data-update-url="{{ route('evidences.update', $evidence->id) }}">
+                                                    <input type="text" id="evidence-input-{{ $evidence->id }}"
+                                                        value="{{ $evidence->name }}"
+                                                        class="border rounded px-2 py-1 text-[13px] min-w-0 w-full sm:w-60" />
+                                                    <div class="button-group flex space-x-2">
+                                                        <button type="button"
+                                                            class="text-green-600 hover:text-green-700 cursor-pointer "
+                                                            onclick="saveEvidenceName({{ $evidence->id }})">บันทึก</button>
+                                                        <button type="button"
+                                                            class="text-slate-600 hover:text-slate-800 cursor-pointer"
+                                                            onclick="cancelEditEvidenceName({{ $evidence->id }})">ยกเลิก</button>
+                                                    </div>
+                                                </span>
+                                            @endif
 
                                         </div>
 
@@ -224,23 +234,18 @@
                                     </div>
                                 @empty
                                     <div class="text-sm text-center text-gray-500 opacity-75">----- ยังไม่มีหลักฐานแนบ
-                                        -----
-                                    </div>
+                                        -----</div>
                                 @endforelse
                             </div>
                         </div>
                     </div>
                 @empty
-                    <p class="text-gray-500">ยังไม่มีเกณฑ์การพิจารณา</p>
+                    <p class="text-gray-500">----- ยังไม่มีเกณฑ์การพิจารณา -----</p>
                 @endforelse
             </div>
-
             @php
                 $condition = $indicator->condition ?? '';
-                // ลบช่องว่างรอบ ๆ
                 $trimmed = trim($condition);
-
-                // เช็คว่ามีแท็ก <img> หรือมีข้อความจริง ๆ หลังจากลบแท็ก HTML
                 $hasImage = preg_match('/<img\s[^>]*src=["\']?([^>"\']+)["\']?/i', $trimmed);
                 $hasText = trim(strip_tags($trimmed)) !== '';
             @endphp
@@ -259,212 +264,130 @@
                 <div class="criteria-box list-disc list-inside">
                     {!! $indicator->comment ?? '-' !!}
                 </div>
-
             </div>
+
+            @if ($indicator->variables->where('type', 'input')->isNotEmpty())
+                <div class="card">
+                    <h2 class="card-title">กรอกค่าตัวแปร</h2>
+                    @php
+                        $inputVariables = $indicator->variables->filter(fn($v) => trim($v->type) === 'input');
+                    @endphp
+                    @forelse($inputVariables as $variable)
+                        <div class="variable-row">
+                            <label class="variable-label">
+                                {{ $variable->label_name ?? $variable->variable_name }}
+                            </label>
+                            <input type="number" name="variables[{{ $variable->id }}]"
+                                value="{{ old('variables.' . $variable->id, $variable->value) }}"
+                                placeholder="กรุณากรอกร้อยละเป็นตัวเลข" class="variable-input" form="variables-form"
+                                {{ $indicator->status == 2 ? 'readonly' : '' }}>
+                        </div>
+                    @empty
+                        <p class="text-gray-500">ยังไม่มีตัวแปรที่ต้องกรอก</p>
+                    @endforelse
+                </div>
+            @endif
+
+            <div class="card">
+                <h2 class="card-title">หมายเหตุ</h2>
+                <div class="annotation-box">
+                    {!! $indicator->annotation ?? '-' !!}
+                </div>
+            </div>
+
+            @if (in_array($indicator->status, [3, 4]))
+                <div class="card">
+                    <h2 class="card-title">คะแนนที่ได้</h2>
+                    <div class="score-display-container">
+                        <div class="score-item">
+                            <div class="score-label">คะแนนที่ได้</div>
+                            <div class="score-value-display current-score">
+                                {{ $indicator->score_acc ?? '0' }}
+                            </div>
+                        </div>
+                        <div class="score-separator">/</div>
+                        <div class="score-item">
+                            <div class="score-label">คะแนนเต็ม</div>
+                            <div class="score-value-display max-score">
+                                {{ $indicator->max_score ?? '0' }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @endif
 
             <form id="variables-form" action="{{ route('dashboardkpi.user.saveVariables', $indicator->id) }}"
                 method="POST">
                 @csrf
                 @method('PUT')
-
-                @if ($indicator->variables->where('type', 'input')->isNotEmpty())
-                    <div class="card">
-                        <h2 class="card-title">กรอกค่าตัวแปร</h2>
-
-                        @php
-                            $inputVariables = $indicator->variables->filter(fn($v) => trim($v->type) === 'input');
-                        @endphp
-
-                        @forelse($inputVariables as $variable)
-                            <div class="variable-row">
-                                <label class="variable-label">
-                                    {{ $variable->label_name ?? $variable->variable_name }}
-                                </label>
-                                <input type="number" name="variables[{{ $variable->id }}]"
-                                    value="{{ old('variables.' . $variable->id, $variable->value) }}"
-                                    placeholder="กรุณากรอกร้อยละเป็นตัวเลข" class="variable-input"
-                                    {{ $indicator->status == 2 ? 'readonly' : '' }}>
-                            </div>
-                        @empty
-                            <p class="text-gray-500">ยังไม่มีตัวแปรที่ต้องกรอก</p>
-                        @endforelse
-                    </div>
-                @endif
-                <div class="card annotation-card">
-                    <h2 class="card-title">หมายเหตุ</h2>
-                    <div class="description-box">
-                        {!! $indicator->annotation ?? '-' !!}
-                    </div>
-                </div>
-                @if (in_array($indicator->status, [3, 4]))
-                    <div class="card">
-                        <h2 class="card-title">คะแนนที่ได้</h2>
-                        <div class="score-display-container">
-                            <div class="score-item">
-                                <div class="score-label">คะแนนที่ได้</div>
-                                <div class="score-value-display current-score">
-                                    {{ $indicator->score_acc ?? '0' }}
-                                </div>
-                            </div>
-                            <div class="score-separator">/</div>
-                            <div class="score-item">
-                                <div class="score-label">คะแนนเต็ม</div>
-                                <div class="score-value-display max-score">
-                                    {{ $indicator->max_score ?? '0' }}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                @endif
-
-
                 <!-- ✅ hidden status -->
-                <input type="hidden" name="status" id="status-input">
+                <input type="hidden" name="status" id="status-input" value="{{ $indicator->status ?? 2 }}">
+            </form>
 
-                <div class="action-bts">
-                    <button type="button" class="btn btn-outline"
-                        onclick="location.href='{{ route('dashboardkpi.index') }}'">
-                        <i class="fa fa-undo"></i> กลับ
+            <div class="action-bts">
+                <button type="button" class="btn btn-outline" id="back-btn"
+                    onclick="location.href='{{ route('dashboardkpi.index') }}'">
+                    <i class="fa fa-undo"></i> กลับ
+                </button>
+
+                @if (!$locked)
+                    <!-- ปุ่มบันทึกฉบับร่าง (แก้ไขแล้ว: submit ฟอร์มเดียวกัน + data-status=1) -->
+                    <button id="btn-save-draft" class="btn btn-primary" type="submit" form="variables-form"
+                        data-status="1">
+                        <i class="fa fa-save"></i> บันทึกเป็นฉบับร่าง
                     </button>
 
-                    @if (!$locked)
-                        <!-- ปุ่มบันทึกฉบับร่าง -->
-                        <button type="submit" class="btn btn-primary" data-status="1">
-                            <i class="fa fa-save"></i> บันทึกเป็นฉบับร่าง
-                        </button>
+                    <!-- บันทึกเป็นฉบับจริง (ยืนยันด้วย Modal) -->
+                    <x-modal title="⚠️ โปรดยืนยันการบันทึกเป็นฉบับจริง ⚠️" size="lg" :context="'confirm-final-save'">
+                        <x-slot:trigger>
+                            <!-- เพิ่ม id เพื่อรีเซ็ตก่อนเปิด -->
+                            <button id="final-save-trigger" type="button" class="btn btn-success">
+                                <i class="fa fa-save"></i> บันทึกเป็นฉบับจริง
+                            </button>
+                        </x-slot:trigger>
 
-                        <!-- บันทึกเป็นฉบับจริง (ยืนยันด้วย Modal) -->
-                        <x-modal title="⚠️ โปรดยืนยันการบันทึกเป็นฉบับจริง ⚠️" size="lg" :context="'confirm-final-save'">
-                            <x-slot:trigger >
-                                <!-- เพิ่ม id เพื่อรีเซ็ตก่อนเปิด -->
-                                <button id="final-save-trigger" type="button" class="btn btn-success">
-                                    <i class="fa fa-save"></i> บันทึกเป็นฉบับจริง
-                                </button>
-                            </x-slot:trigger>
-
-                            <div class="space-y-3">
-                                <div class="rounded-md border border-amber-300 bg-amber-50 p-3">
-                                    <p class="font-semibold text-amber-800">
-                                        การดำเนินการนี้มีผลถาวรจนกว่าจะได้รับอนุมัติให้เปลี่ยนสถานะกลับเป็นฉบับร่าง
-                                    </p>
-                                    <ul class="mt-2 list-disc pl-5 text-sm text-amber-900">
-                                        <li>ระบบจะบันทึกเป็น <strong>ฉบับจริงทันที</strong></li>
-                                        <li><strong>ไม่สามารถแก้ไขได้</strong> หลังยืนยัน</li>
-                                    </ul>
-                                </div>
-
-                                <p class="text-sm text-slate-600">
-                                    โปรดยืนยันว่าคุณเข้าใจผลกระทบจากการบันทึกเป็นฉบับจริง:
+                        <div class="space-y-3">
+                            <div class="rounded-md border border-amber-300 bg-amber-50 p-3">
+                                <p class="font-semibold text-amber-800">
+                                    การดำเนินการนี้มีผลถาวรจนกว่าจะได้รับอนุมัติให้เปลี่ยนสถานะกลับเป็นฉบับร่าง
                                 </p>
-                                <label class="flex items-start gap-2 text-sm text-slate-700">
-                                    <input id="confirm-understand" type="checkbox" class="mt-0.5">
-                                    <span>ฉันเข้าใจว่าหลังยืนยันแล้วจะไม่สามารถแก้ไขได้
-                                        จนกว่าจะได้รับอนุมัติให้เปลี่ยนสถานะกลับเป็นฉบับร่าง</span>
-                                </label>
+                                <ul class="mt-2 list-disc pl-5 text-sm text-amber-900">
+                                    <li>ระบบจะบันทึกเป็น <strong>ฉบับจริงทันที</strong></li>
+                                    <li><strong>ไม่สามารถแก้ไขได้</strong> หลังยืนยัน</li>
+                                </ul>
                             </div>
 
-                            <x-slot:footer>
-                                <div class="flex justify-between gap-5">
-                                    <!-- ส่ง context ตอนปิด เพื่อให้สคริปต์รู้ว่าเป็นโมดัลนี้ -->
-                                    <button type="button" class="btn btn-outline"
-                                        @click="$dispatch('modal:close', { context: 'confirm-final-save' })">
-                                        ยกเลิก
-                                    </button>
+                            <p class="text-sm text-slate-600">
+                                โปรดยืนยันว่าคุณเข้าใจผลกระทบจากการบันทึกเป็นฉบับจริง:
+                            </p>
+                            <label class="flex items-start gap-2 text-sm text-slate-700">
+                                <input id="confirm-understand" type="checkbox" class="mt-0.5">
+                                <span>ฉันเข้าใจว่าหลังยืนยันแล้วจะไม่สามารถแก้ไขได้
+                                    จนกว่าจะได้รับอนุมัติให้เปลี่ยนสถานะกลับเป็นฉบับร่าง</span>
+                            </label>
+                        </div>
 
-                                    <button id="btn-final-submit" type="button"
-                                        class="btn btn-success disabled:opacity-50" disabled
-                                        onclick="(function(){
-                    var form=document.getElementById('variables-form');
-                    var statusInput=document.getElementById('status-input');
-                    if(statusInput){statusInput.value='2';}
-                    if(form){
-                        this.disabled=true;
-                        form.submit();
-                    }
-                }).call(this)">
-                                        ยืนยันการบันทึกเป็นฉบับจริง
-                                    </button>
-                                </div>
+                        <x-slot:footer>
+                            <div class="flex justify-between gap-5">
+                                <button type="button" class="btn btn-outline"
+                                    @click="$dispatch('modal:close', { context: 'confirm-final-save' })">
+                                    ยกเลิก
+                                </button>
 
-                                <script>
-                                    (function() {
-                                        // ---------- Helpers ----------
-                                        function $id(id) {
-                                            return document.getElementById(id);
-                                        }
-
-                                        function resetConfirmFinalSave() {
-                                            var cb = $id('confirm-understand');
-                                            var btn = $id('btn-final-submit');
-                                            if (cb) cb.checked = false;
-                                            if (btn) btn.disabled = true;
-                                        }
-
-                                        // ---------- 1) รีเซ็ต "ก่อนเปิด" ทุกครั้ง ----------
-                                        var trigger = $id('final-save-trigger');
-                                        if (trigger) {
-                                            trigger.addEventListener('click', resetConfirmFinalSave, {
-                                                passive: true
-                                            });
-                                        }
-
-                                        // ---------- 2) เปิด/ปิดปุ่มตามเช็กบ็อกซ์ ----------
-                                        (function wireEnableSubmit() {
-                                            var cb = $id('confirm-understand');
-                                            var btn = $id('btn-final-submit');
-                                            if (cb && btn) {
-                                                cb.addEventListener('change', function() {
-                                                    btn.disabled = !this.checked;
-                                                });
-                                            }
-                                        })();
-
-                                        // ---------- 3) รีเซ็ตเมื่อโมดัลถูกปิดด้วยอีเวนต์จากคอมโพเนนต์ ----------
-                                        // รองรับ modal:closed (ถ้ามี dispatch จากคอมโพเนนต์)
-                                        window.addEventListener('modal:closed', function(e) {
-                                            if (!e.detail || e.detail.context !== 'confirm-final-save') return;
-                                            resetConfirmFinalSave();
-                                        });
-
-                                        // รองรับ modal:close (เช่นปุ่มยกเลิกที่เราแนบ context ไว้)
-                                        window.addEventListener('modal:close', function(e) {
-                                            if (e.detail && e.detail.context && e.detail.context !== 'confirm-final-save') return;
-                                            resetConfirmFinalSave();
-                                        });
-
-                                        // ---------- 4) กันเหนียว: เฝ้าดูการปิดด้วย X/ESC/พื้นหลัง (Teleport ไป body) ----------
-                                        var modalSelector = '[role="dialog"][aria-label="⚠️ โปรดยืนยันการบันทึกเป็นฉบับจริง ⚠️"]';
-                                        var observer = new MutationObserver(function() {
-                                            var modal = document.querySelector(modalSelector);
-                                            var isClosed = !modal ||
-                                                modal.hasAttribute('x-cloak') ||
-                                                modal.style.display === 'none' ||
-                                                (modal.offsetParent === null);
-                                            if (isClosed) resetConfirmFinalSave();
-                                        });
-                                        observer.observe(document.body, {
-                                            childList: true,
-                                            subtree: true
-                                        });
-
-                                        // เสริม: กด ESC ก็รีเซ็ต (หลัง Alpine ปิด)
-                                        window.addEventListener('keydown', function(e) {
-                                            if (e.key === 'Escape') {
-                                                setTimeout(resetConfirmFinalSave, 0);
-                                            }
-                                        }, {
-                                            passive: true
-                                        });
-                                    })();
-                                </script>
-                            </x-slot:footer>
-                        </x-modal>
-                    @endif
-                </div>
-            </form>
+                                {{-- ปุ่มยืนยันฉบับจริง (แก้ไขแล้ว: ไม่มี inline onclick, ใช้ submit + data-status=2) --}}
+                                <button id="btn-final-submit" class="btn btn-success disabled:opacity-50" type="submit"
+                                    form="variables-form" data-status="2" disabled>
+                                    ยืนยันการบันทึกเป็นฉบับจริง
+                                </button>
+                            </div>
+                        </x-slot:footer>
+                    </x-modal>
+                @endif
+            </div>
         </div>
     </div>
 @endsection
+
 @push('scripts')
     <link
         href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;600&family=Kanit:wght@400;600&family=Sarabun:wght@400;600&display=swap"
@@ -483,31 +406,11 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Trumbowyg/2.27.3/plugins/fontfamily/trumbowyg.fontfamily.min.js">
     </script>
 
-    {{-- <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> --}}
-    <script>
-        window.addEventListener('modal:close', resetConfirmFinalSave);
-
-        document.addEventListener("DOMContentLoaded", function() {
-            const form = document.getElementById("variables-form");
-            const statusInput = document.getElementById("status-input");
-
-            // ดักทุกปุ่มที่มี class .save-btn
-            document.querySelectorAll(".save-btn").forEach(btn => {
-                btn.addEventListener("click", function() {
-                    const status = this.getAttribute("data-status");
-
-                    // ใส่ค่า status ลง hidden input
-                    statusInput.value = status;
-
-                    // ส่ง form
-                    form.submit();
-                });
-            });
-        });
-    </script>
     <script>
         // กัน error ถ้าไม่ได้โหลด lucide
-        if (window.lucide && typeof lucide.createIcons === 'function') {
+        if (window.lucide && typeof lucide.create() === 'function') {
+            lucide.create();
+        } else if (window.lucide && typeof lucide.createIcons === 'function') {
             lucide.createIcons();
         }
 
@@ -546,11 +449,10 @@
         </div>`;
         }
 
-
         document.addEventListener('DOMContentLoaded', function() {
             const fileHandlers = {};
             const editorInitialized = {};
-            const form = document.getElementById("evidence-form-{{ $criteria->id }}");
+
             /*** ---------- File Upload Handler Class ---------- ***/
             class FileUploadHandler {
                 constructor(criteriaId) {
@@ -808,8 +710,7 @@
                 observePopupVisibility({{ $criteria->id }});
             @endforeach
         });
-    </script>
-    <script>
+
         function getCsrfToken() {
             const meta = document.querySelector('meta[name="csrf-token"]');
             return meta && meta.content ? meta.content : '';
@@ -819,9 +720,8 @@
             const linkSpan = document.getElementById('evidence-link-' + id);
             const editSpan = document.getElementById('evidence-edit-' + id);
             if (linkSpan && editSpan) {
-                // Hide link, show input row
                 linkSpan.style.display = 'none';
-                editSpan.style.display = 'inline-flex';
+                editSpan.style.display = 'flex';
                 const input = document.getElementById('evidence-input-' + id);
                 if (input) {
                     input.focus();
@@ -885,6 +785,122 @@
             }
         }
     </script>
+    <script>
+        (function() {
+            function $id(id) {
+                return document.getElementById(id);
+            }
+
+            var form = $id('variables-form');
+            var statusInput = $id('status-input');
+            var btnDraft = $id('btn-save-draft');
+            var finalTrigger = $id('final-save-trigger');
+
+            if (!form || !statusInput) return;
+
+            function getFinalCheckbox() {
+                return document.getElementById('confirm-understand');
+            }
+
+            function getFinalButton() {
+                return document.getElementById('btn-final-submit');
+            }
+
+            function handleFinalUnderstandChange(e) {
+                var btn = getFinalButton();
+                if (btn) btn.disabled = !e.target.checked;
+            }
+
+            function bindFinalConfirmHandlers() {
+                var cb = getFinalCheckbox();
+                var btn = getFinalButton();
+
+                if (cb && cb.dataset.boundFinalConfirm !== '1') {
+                    cb.addEventListener('change', handleFinalUnderstandChange);
+                    cb.dataset.boundFinalConfirm = '1';
+                }
+
+                if (btn && btn.dataset.boundFinalConfirm !== '1') {
+                    btn.addEventListener('click', setStatusBeforeSubmit);
+                    btn.dataset.boundFinalConfirm = '1';
+                }
+            }
+
+            function resetConfirmFinalSave() {
+                var cb = getFinalCheckbox();
+                var btn = getFinalButton();
+                if (cb) cb.checked = false;
+                if (btn) btn.disabled = true;
+            }
+
+            bindFinalConfirmHandlers();
+
+            if (finalTrigger) {
+                finalTrigger.addEventListener('click', function() {
+                    resetConfirmFinalSave();
+                    bindFinalConfirmHandlers();
+                }, {
+                    passive: true
+                });
+            }
+
+            window.addEventListener('modal:opened', function(e) {
+                if (!e.detail || e.detail.context !== 'confirm-final-save') return;
+                bindFinalConfirmHandlers();
+                resetConfirmFinalSave();
+            });
+
+            window.addEventListener('modal:closed', function(e) {
+                if (!e.detail || e.detail.context !== 'confirm-final-save') return;
+                resetConfirmFinalSave();
+            });
+            window.addEventListener('modal:close', function(e) {
+                if (e.detail && e.detail.context && e.detail.context !== 'confirm-final-save') return;
+                resetConfirmFinalSave();
+            });
+
+            var modalSelector = '[role="dialog"][aria-label="⚠️ โปรดยืนยันการบันทึกเป็นฉบับจริง ⚠️"]';
+            var observer = new MutationObserver(function() {
+                var modal = document.querySelector(modalSelector);
+                var isClosed = !modal || modal.hasAttribute('x-cloak') || modal.style.display === 'none' || (
+                    modal.offsetParent === null);
+                if (isClosed) resetConfirmFinalSave();
+            });
+            observer.observe(document.body, {
+                childList: true,
+                subtree: true
+            });
+
+            function setStatusBeforeSubmit(ev) {
+                var btn = ev.currentTarget;
+                var st = btn.getAttribute('data-status');
+                if (st && statusInput) statusInput.value = st;
+            }
+            if (btnDraft) btnDraft.addEventListener('click', setStatusBeforeSubmit);
+
+            var submitting = false;
+            form.addEventListener('submit', function(e) {
+                if (submitting) {
+                    e.preventDefault();
+                    return;
+                }
+
+                var submitter = e.submitter || document.activeElement;
+                var newStatus = submitter && submitter.getAttribute ? submitter.getAttribute('data-status') :
+                    null;
+                if (newStatus) {
+                    statusInput.value = newStatus;
+                }
+
+                var buttons = form.querySelectorAll('button[type="submit"]');
+                buttons.forEach(function(b) {
+                    b.disabled = true;
+                });
+
+                submitting = true;
+            });
+        })();
+    </script>
 @endpush
 
 @push('styles')
@@ -894,6 +910,11 @@
             justify-content: center;
             gap: 12px;
             margin-top: 20px;
+        }
+
+        .indicator-header-container {
+            background: var(--color-white);
+            padding: 0 16px;
         }
 
         .card {
@@ -951,12 +972,13 @@
             border-radius: 12px;
             padding: 16px 20px;
             font-size: 14px;
-            line-height: 1.7;
+            /* line-height: 1.7; */
             color: #374151;
+            text-align: left;
         }
 
         .description-box p {
-            margin-bottom: 12px;
+            margin-bottom: 6px;
         }
 
         .description-box ul {
@@ -964,18 +986,77 @@
             list-style: disc;
         }
 
+        .description-box ul {
+            list-style-type: disc;
+            padding-left: 1.5rem;
+            margin: 0.5rem 0;
+        }
+
+        .description-box ol {
+            list-style-type: decimal;
+            padding-left: 1.5rem;
+            margin: 0.5rem 0;
+        }
+
+        .description-box li {
+            margin: 0.25rem 0;
+        }
+
+        .annotation-card {
+            background: var(--color-white);
+            color: #92400e;
+        }
+
+        .annotation-header {
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #b45309;
+        }
+
+        .annotation-body {
+            font-size: 14px;
+            /* line-height: 1.6; */
+            color: #78350f;
+        }
+
+        .annotation-box {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 16px 20px;
+            font-size: 14px;
+            /* line-height: 1.7; */
+            color: #374151;
+            text-align: left;
+        }
+
+        .annotation-box p {
+            margin-bottom: 6px;
+        }
+
+        .annotation-box ul {
+            margin: 8px 0 8px 20px;
+            list-style: disc;
+        }
+
+
         .criteria-box {
             background: var(--color-white);
             border: 1px solid #e5e7eb;
             border-radius: 12px;
             padding: 16px;
             margin-bottom: 16px;
+            text-align: left;
         }
 
         .criteria-header {
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            align-items: flex-start;
+            gap: 12px;
             margin-bottom: 8px;
         }
 
@@ -986,7 +1067,12 @@
         }
 
         .criteria-status {
-            color: #1f2937;
+            border: 1px solid #e5e7eb;
+            padding: 3px 0px;
+            font-size: 12px;
+            font-weight: 500;
+            min-width: 130px;
+            text-align: center;
         }
 
         .criteria-description {
@@ -1052,50 +1138,22 @@
             column-gap: 10px;
             font-size: 13px;
             color: #374151;
+            overflow: hidden;
+        }
+
+        .evidence-name {
+            max-width: 550px;
+            word-break: break-word;
+            text-align: left;
+
         }
 
         .evidence-icon {
-            margin-right: 6px;
+            /* margin-right: 6px; */
         }
 
         .file-icon {
             flex-shrink: 0;
-        }
-
-        .annotation-card {
-            background: var(--color-white)bea;
-            color: #92400e;
-        }
-
-        .annotation-header {
-            font-weight: 600;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            color: #b45309;
-        }
-
-        .annotation-body {
-            font-size: 14px;
-            line-height: 1.6;
-            color: #78350f;
-        }
-
-        .description-box ul {
-            list-style-type: disc;
-            padding-left: 1.5rem;
-            margin: 0.5rem 0;
-        }
-
-        .description-box ol {
-            list-style-type: decimal;
-            padding-left: 1.5rem;
-            margin: 0.5rem 0;
-        }
-
-        .description-box li {
-            margin: 0.25rem 0;
         }
 
         .total-score-card {
@@ -1157,18 +1215,17 @@
             background: var(--color-white);
         }
 
-
-        .dashboard-container {
-            max-width: 960px;
-            margin: 0 auto;
-        }
-
-        /* Card */
+        /* Indicator Card */
         .indicator-card {
+            display: flex;
+            flex-direction: column;
             background: var(--color-white);
             border-radius: var(--radius-default);
             box-shadow: var(--shadow-default);
             border: 1px solid var(--color-gray-100);
+            padding: 24px;
+            gap: 24px;
+            max-width: 960px;
         }
 
         /* Title */
@@ -1183,8 +1240,8 @@
         .indicator-tabs {
             display: flex;
             align-items: center;
-            gap: 12px;
-            margin-bottom: 8px;
+            justify-content: center;
+            gap: 8px;
             font-size: 14px;
         }
 
@@ -1193,19 +1250,16 @@
             cursor: default;
         }
 
-        .tab-divider {
-            color: var(--color-gray-300);
-        }
-
         hr.tab-divider {
             border: none;
+            color: var(--color-gray-300);
             border-bottom: 2px solid var(--color-gray-300);
-            margin: 0 0 16px 0;
+            margin: 16px 0;
         }
 
 
-        /* Info block */
-        .info-block {
+        /* Info container */
+        .info-container {
             display: flex;
             flex-direction: column;
             gap: 18px;
@@ -1223,14 +1277,6 @@
             font-weight: 600;
             color: var(--color-gray-600);
             margin-right: 6px;
-        }
-
-        .info-row .value {
-            color: var(--color-gray-600);
-            display: inline-block;
-            background: #EBF7FF;
-            border-radius: 16px;
-            font-size: 13px;
         }
 
         /* Chips */
@@ -1527,7 +1573,7 @@
         .score-value-display {
             font-size: 36px;
             font-weight: 700;
-            line-height: 1;
+            /* line-height: 1; */
             padding: 12px 20px;
             border-radius: 12px;
             min-width: 80px;
@@ -1566,10 +1612,23 @@
     </style>
     <style>
         @media (max-width: 639px) {
-            .dashboard-container {
-                margin: 0 8px;
-                max-width: none;
+            .evidence-edit {
+                flex-direction: column;
+                align-items: center;
             }
+
+            .evidence-edit input {
+                width: 100%;
+            }
+
+            .evidence-edit .button-group {
+                width: 100%;
+                align-items: center;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 639px) {
 
             .card {
                 padding: 16px;
@@ -1578,13 +1637,17 @@
 
             .indicator-title {
                 font-size: 20px;
-                line-height: 1.3;
+                /* line-height: 1.3; */
             }
 
             .indicator-tabs {
                 flex-direction: column;
-                gap: 6px;
+                gap: 3px;
                 align-items: flex-start;
+            }
+
+            .tab-for-divider {
+                display: none;
             }
 
             .info-row {
@@ -1609,8 +1672,6 @@
             }
 
             .evidence-item {
-                flex-direction: column;
-                align-items: flex-start;
                 gap: 8px;
                 padding: 8px;
             }
@@ -1671,9 +1732,6 @@
         }
 
         @media (min-width: 640px) and (max-width: 767px) {
-            .dashboard-container {
-                margin: 0 16px;
-            }
 
             .card {
                 padding: 20px;
@@ -1685,6 +1743,7 @@
 
             .criteria-header {
                 flex-wrap: wrap;
+                flex-direction: column;
                 gap: 8px;
             }
 
@@ -1753,9 +1812,6 @@
         }
 
         @media (min-width: 768px) and (max-width: 1023px) {
-            .dashboard-container {
-                margin: 0 24px;
-            }
 
             .card {
                 padding: 22px;
@@ -1794,9 +1850,6 @@
         }
 
         @media (min-width: 1024px) and (max-width: 1279px) {
-            .dashboard-container {
-                max-width: 900px;
-            }
 
             .card {
                 padding: 24px;
@@ -1827,9 +1880,6 @@
         }
 
         @media (min-width: 1280px) and (max-width: 1535px) {
-            .dashboard-container {
-                max-width: 960px;
-            }
 
             .card {
                 padding: 24px;

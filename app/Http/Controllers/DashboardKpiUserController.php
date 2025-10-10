@@ -67,6 +67,9 @@ class DashboardKpiUserController extends Controller
         $indicator = Indicator::with([
             'category.standard',
             'assignments.collectorUser.department',
+            'criterias' => function ($query) {
+                $query->orderBy('sequence', 'asc');
+            },
             'criterias.evidences.user.department',
             'variables',
             'formulas.variables',

@@ -7,6 +7,7 @@
     @php
         $locked = in_array($indicator->status, [3, 4]);
     @endphp
+    <div class="w-full h-full flex text-center justify-center">
         <div class="indicator-card">
             <div class="indicator-header-container">
                 <h1 class="indicator-title">
@@ -22,19 +23,16 @@
                 <div class="info-container">
                     <div class="info-row">
                         <span class="label">หน่วยงานที่รับผิดชอบ:</span>
-                        <span class="value">
-                            @forelse($indicator->assignments as $assignment)
-                                @if ($assignment->collectorUser)
-                                    <span class="chip">
-                                        {{ $assignment->collectorUser->department->name }}
-                                    </span>
-                                @endif
-                            @empty
-                                <span class="value">-</span>
-                            @endforelse
-                        </span>
+                        @forelse($indicator->assignments as $assignment)
+                            @if ($assignment->collectorUser)
+                                <span class="chip">
+                                    {{ $assignment->collectorUser->department->name }}
+                                </span>
+                            @endif
+                        @empty
+                            <span class="value">-</span>
+                        @endforelse
                     </div>
-
                     <div class="info-row">
                         <span class="label">ผู้รับผิดชอบในการรวบรวม:</span>
                         @forelse($indicator->assignments as $assignment)
@@ -47,12 +45,10 @@
                             <span class="value">-</span>
                         @endforelse
                     </div>
-
                     <div class="info-row">
                         <span class="label">สถานะตัวบ่งชี้:</span>
                         <x-status-badge :status="$indicator->status" size="sm" />
                     </div>
-
                 </div>
             </div>
             <hr class="tab-divider">
@@ -62,30 +58,29 @@
                     {!! $indicator->description ?? '-' !!}
                 </div>
             </div>
-
             <div class="card">
                 <h2 class="card-title">เกณฑ์การพิจารณา</h2>
-
                 @forelse($indicator->criterias as $criteriaIndex => $criteria)
                     <div class="criteria-box" id="criteria-{{ $criteria->id }}">
                         <div class="criteria-header">
                             <div class="criteria-title">
                                 {{ $criteria->sequence }}. {!! $criteria->name !!}
                             </div>
-                            <div class="criteria-status">
-                                <select name="criterias[{{ $criteria->id }}][status]" class="text-sm text-center"
-                                    @if ($locked) disabled @endif form="variables-form"
-                                    data-criteria-id="{{ $criteria->id }}">
-                                    <option value="0" {{ ($criteria->status ?? 0) == 0 ? 'selected' : '' }}>
-                                        รอดำเนินการ</option>
-                                    <option value="1" {{ ($criteria->status ?? 0) == 1 ? 'selected' : '' }}>
-                                        เอกสารครบถ้วน
-                                    </option>
-                                    <option value="2" {{ ($criteria->status ?? 0) == 2 ? 'selected' : '' }}>
-                                        เอกสารไม่ครบถ้วน
-                                    </option>
-                                </select>
-                            </div>
+                            {{-- <div class="criteria-status"> --}}
+                            <select name="criterias[{{ $criteria->id }}][status]"
+                                class="criteria-status text-sm text-center"
+                                @if ($locked) disabled @endif form="variables-form"
+                                data-criteria-id="{{ $criteria->id }}">
+                                <option value="0" {{ ($criteria->status ?? 0) == 0 ? 'selected' : '' }}>
+                                    รอดำเนินการ</option>
+                                <option value="1" {{ ($criteria->status ?? 0) == 1 ? 'selected' : '' }}>
+                                    เอกสารครบถ้วน
+                                </option>
+                                <option value="2" {{ ($criteria->status ?? 0) == 2 ? 'selected' : '' }}>
+                                    เอกสารไม่ครบถ้วน
+                                </option>
+                            </select>
+                            {{-- </div> --}}
                         </div>
                         <div class="criteria-content">
                             {{-- อัปโหลดหลักฐาน --}}
@@ -160,26 +155,31 @@
                                                         </a>
                                                     </span>
                                                 @endif
-
-                                                @if (!$locked)
-                                                    <button type="button" class="ml-2 text-slate-500 hover:text-slate-700"
-                                                        title="แก้ไขชื่อไฟล์"
-                                                        onclick="startEditEvidenceName({{ $evidence->id }})">
-                                                        ✏️
-                                                    </button>
-                                                    <span id="evidence-edit-{{ $evidence->id }}"
-                                                        class="inline-flex items-center gap-1 hidden" style="display:none"
-                                                        data-update-url="{{ route('evidences.update', $evidence->id) }}">
-                                                        <input type="text" id="evidence-input-{{ $evidence->id }}"
-                                                            value="{{ $evidence->name }}"
-                                                            class="border rounded px-2 py-0.5 text-sm" />
-                                                        <button type="button" class="text-green-600 hover:text-green-700"
-                                                            onclick="saveEvidenceName({{ $evidence->id }})">บันทึก</button>
-                                                        <button type="button" class="text-slate-600 hover:text-slate-800"
-                                                            onclick="cancelEditEvidenceName({{ $evidence->id }})">ยกเลิก</button>
-                                                    </span>
-                                                @endif
                                             </span>
+                                            @if (!$locked)
+                                                <button type="button"
+                                                    class=" text-slate-500 hover:text-slate-700 cursor-pointer"
+                                                    title="แก้ไขชื่อไฟล์"
+                                                    onclick="startEditEvidenceName({{ $evidence->id }})">
+                                                    ✏️
+                                                </button>
+                                                <span id="evidence-edit-{{ $evidence->id }}"
+                                                    class="evidence-edit flex flex-wrap sm:flex-nowrap items-center gap-2 w-full sm:w-auto"
+                                                    style="display:none"
+                                                    data-update-url="{{ route('evidences.update', $evidence->id) }}">
+                                                    <input type="text" id="evidence-input-{{ $evidence->id }}"
+                                                        value="{{ $evidence->name }}"
+                                                        class="border rounded px-2 py-1 text-[13px] min-w-0 w-full sm:w-60" />
+                                                    <div class="button-group flex space-x-2">
+                                                        <button type="button"
+                                                            class="text-green-600 hover:text-green-700 cursor-pointer "
+                                                            onclick="saveEvidenceName({{ $evidence->id }})">บันทึก</button>
+                                                        <button type="button"
+                                                            class="text-slate-600 hover:text-slate-800 cursor-pointer"
+                                                            onclick="cancelEditEvidenceName({{ $evidence->id }})">ยกเลิก</button>
+                                                    </div>
+                                                </span>
+                                            @endif
 
                                         </div>
 
@@ -234,7 +234,7 @@
                         </div>
                     </div>
                 @empty
-                    <p class="text-gray-500">ยังไม่มีเกณฑ์การพิจารณา</p>
+                    <p class="text-gray-500">----- ยังไม่มีเกณฑ์การพิจารณา -----</p>
                 @endforelse
             </div>
             @php
@@ -264,42 +264,35 @@
 
             </div>
 
+            @if ($indicator->variables->where('type', 'input')->isNotEmpty())
+                <div class="card">
+                    <h2 class="card-title">กรอกค่าตัวแปร</h2>
+                    @php
+                        $inputVariables = $indicator->variables->filter(fn($v) => trim($v->type) === 'input');
+                    @endphp
+                    @forelse($inputVariables as $variable)
+                        <div class="variable-row">
+                            <label class="variable-label">
+                                {{ $variable->label_name ?? $variable->variable_name }}
+                            </label>
+                            <input type="number" name="variables[{{ $variable->id }}]"
+                                value="{{ old('variables.' . $variable->id, $variable->value) }}"
+                                placeholder="กรุณากรอกร้อยละเป็นตัวเลข" class="variable-input" form="variables-form"
+                                @if ($locked) readonly @endif>
+                        </div>
+                    @empty
+                        <p class="text-gray-500">ยังไม่มีตัวแปรที่ต้องกรอก</p>
+                    @endforelse
+                </div>
+            @endif
 
-            <form id="variables-form" action="{{ route('dashboardkpi.admin.saveVariables', $indicator->id) }}"
-                method="POST">
-                @csrf
-                @method('PUT')
-
-                @if ($indicator->variables->where('type', 'input')->isNotEmpty())
-                    <div class="card">
-                        <h2 class="card-title">กรอกค่าตัวแปร</h2>
-                        @php
-                            $inputVariables = $indicator->variables->filter(fn($v) => trim($v->type) === 'input');
-                        @endphp
-                        @forelse($inputVariables as $variable)
-                            <div class="variable-row">
-                                <label class="variable-label">
-                                    {{ $variable->label_name ?? $variable->variable_name }}
-                                </label>
-                                <input type="number" name="variables[{{ $variable->id }}]"
-                                    value="{{ old('variables.' . $variable->id, $variable->value) }}"
-                                    placeholder="กรุณากรอกร้อยละเป็นตัวเลข" class="variable-input"
-                                    @if ($locked) readonly @endif>
-                            </div>
-                        @empty
-                            <p class="text-gray-500">ยังไม่มีตัวแปรที่ต้องกรอก</p>
-                        @endforelse
-                    </div>
-                @endif
-                <!-- ✅ hidden status -->
-                <input type="hidden" name="status" id="status-input" value="{{ $indicator->status ?? 2 }}">
-            </form>
-            <div class="card annotation-card">
+            <div class="card">
                 <h2 class="card-title">หมายเหตุ</h2>
-                <div class="description-box">
+                <div class="annotation-box">
                     {!! $indicator->annotation ?? '-' !!}
                 </div>
             </div>
+
             <div class="card">
                 <h2 class="card-title">คะแนนที่ได้</h2>
                 <div class="score-display-container">
@@ -319,13 +312,21 @@
                 </div>
             </div>
 
+            <form id="variables-form" action="{{ route('dashboardkpi.admin.saveVariables', $indicator->id) }}"
+                method="POST" class="hidden">
+                @csrf
+                @method('PUT')
+                <!-- ✅ hidden status -->
+                <input type="hidden" name="status" id="status-input" value="{{ $indicator->status ?? 2 }}">
+            </form>
+
             <div class="action-bts">
                 <button type="button" class="btn btn-outline" id="back-btn"
                     onclick="location.href='{{ route('dashboardkpi.index') }}'">
                     <i class="fa fa-undo"></i> กลับ
                 </button>
 
-                <button type="button" class="save-btn btn btn-primary" id="save-results-btn"
+                <button type="submit" class="btn btn-primary" form="variables-form"
                     @if ($locked) hidden @endif>
                     <i class="fa fa-save"></i> บันทึกผลลัพธ์
                 </button>
@@ -367,6 +368,7 @@
                 </x-modal>
             </div>
         </div>
+    </div>
 @endsection
 
 @push('scripts')
@@ -393,8 +395,8 @@
             const form = document.getElementById("variables-form");
             const statusInput = document.getElementById("status-input");
 
-            // Add event listeners to all buttons with the class .save-btn
-            document.querySelectorAll(".save-btn").forEach(btn => {
+            // Add event listeners to all buttons with the class #save-results-btn
+            document.querySelectorAll("#save-results-btn").forEach(btn => {
                 btn.addEventListener("click", function() {
                     // Get the status from the button's data-status attribute
                     const status = this.getAttribute("data-status") || statusInput.value;
@@ -418,6 +420,35 @@
                     // Submit the form
                     form.submit();
                 });
+            });
+
+            // จัดการการเปลี่ยนสีของ criteria status
+            function updateCriteriaStatusStyle() {
+                document.querySelectorAll('.criteria-status').forEach(select => {
+                    const value = select.value;
+
+                    // ลบ class เดิมทั้งหมด
+                    select.classList.remove('status-pending', 'status-completed', 'status-rejected');
+
+                    // เพิ่ม class ใหม่ตามค่าที่เลือก
+                    if (value === '0') {
+                        select.classList.add('status-pending');
+                    } else if (value === '1') {
+                        select.classList.add('status-completed');
+                    } else if (value === '2') {
+                        select.classList.add('status-rejected');
+                    }
+                });
+            }
+
+            // เรียกใช้เมื่อโหลดหน้าเว็บ
+            updateCriteriaStatusStyle();
+
+            // เพิ่ม event listener สำหรับการเปลี่ยนค่า
+            document.addEventListener('change', function(e) {
+                if (e.target.classList.contains('criteria-status')) {
+                    updateCriteriaStatusStyle();
+                }
             });
         });
     </script>
@@ -737,7 +768,7 @@
             if (linkSpan && editSpan) {
                 // Hide link, show input row
                 linkSpan.style.display = 'none';
-                editSpan.style.display = 'inline-flex';
+                editSpan.style.display = 'flex';
                 const input = document.getElementById('evidence-input-' + id);
                 if (input) {
                     input.focus();
@@ -812,7 +843,6 @@
             margin-top: 20px;
         }
 
-        
         .indicator-header-container {
             background: var(--color-white);
             padding: 0 16px;
@@ -874,15 +904,72 @@
             border-radius: 12px;
             padding: 16px 20px;
             font-size: 14px;
-            line-height: 1.7;
+            /* line-height: 1.7; */
             color: #374151;
+            text-align: left;
         }
 
         .description-box p {
-            margin-bottom: 12px;
+            margin-bottom: 6px;
         }
 
         .description-box ul {
+            margin: 8px 0 8px 20px;
+            list-style: disc;
+        }
+
+        .description-box ul {
+            list-style-type: disc;
+            padding-left: 1.5rem;
+            margin: 0.5rem 0;
+        }
+
+        .description-box ol {
+            list-style-type: decimal;
+            padding-left: 1.5rem;
+            margin: 0.5rem 0;
+        }
+
+        .description-box li {
+            margin: 0.25rem 0;
+        }
+
+        .annotation-card {
+            background: var(--color-white);
+            color: #92400e;
+        }
+
+        .annotation-header {
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #b45309;
+        }
+
+        .annotation-body {
+            font-size: 14px;
+            /* line-height: 1.6; */
+            color: #78350f;
+        }
+
+        .annotation-box {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 16px 20px;
+            font-size: 14px;
+            /* line-height: 1.7; */
+            color: #374151;
+            text-align: left;
+        }
+
+        .annotation-box p {
+            margin-bottom: 6px;
+        }
+
+        .annotation-box ul {
             margin: 8px 0 8px 20px;
             list-style: disc;
         }
@@ -893,12 +980,14 @@
             border-radius: 12px;
             padding: 16px;
             margin-bottom: 16px;
+            text-align: left;
         }
 
         .criteria-header {
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            align-items: flex-start;
+            gap: 12px;
             margin-bottom: 8px;
         }
 
@@ -909,7 +998,65 @@
         }
 
         .criteria-status {
-            color: #1f2937;
+            border: 1px solid #e5e7eb;
+            padding: 3px 0px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .criteria-status:hover {
+            border-color: #cbd5e1;
+            color: #1e293b;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+        }
+
+        .criteria-status:focus {
+            outline: none;
+            border-color: #3b82f6;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+        }
+
+        /* สไตล์สำหรับ options ภายใน dropdown */
+        .criteria-status option {
+            padding: 8px 12px;
+            font-weight: 500;
+            font-size: 12px;
+        }
+
+        /* สีตามสถานะของแต่ละ option */
+        .criteria-status option[value="0"] {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+
+        .criteria-status option[value="1"] {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+
+        .criteria-status option[value="2"] {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+
+        /* สไตล์เมื่อ select ถูกเลือกตามค่า */
+        .criteria-status.status-pending {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+
+        .criteria-status.status-completed {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+
+        .criteria-status.status-rejected {
+            background-color: #fee2e2;
+            color: #991b1b;
         }
 
         .criteria-description {
@@ -975,50 +1122,22 @@
             column-gap: 10px;
             font-size: 13px;
             color: #374151;
+            overflow: hidden;
+        }
+
+        .evidence-name {
+            max-width: 550px;
+            word-break: break-word;
+            text-align: left;
+
         }
 
         .evidence-icon {
-            margin-right: 6px;
+            /* margin-right: 6px; */
         }
 
         .file-icon {
             flex-shrink: 0;
-        }
-
-        .annotation-card {
-            background: var(--color-white)bea;
-            color: #92400e;
-        }
-
-        .annotation-header {
-            font-weight: 600;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            color: #b45309;
-        }
-
-        .annotation-body {
-            font-size: 14px;
-            line-height: 1.6;
-            color: #78350f;
-        }
-
-        .description-box ul {
-            list-style-type: disc;
-            padding-left: 1.5rem;
-            margin: 0.5rem 0;
-        }
-
-        .description-box ol {
-            list-style-type: decimal;
-            padding-left: 1.5rem;
-            margin: 0.5rem 0;
-        }
-
-        .description-box li {
-            margin: 0.25rem 0;
         }
 
         .total-score-card {
@@ -1105,6 +1224,7 @@
         .indicator-tabs {
             display: flex;
             align-items: center;
+            justify-content: center;
             gap: 8px;
             font-size: 14px;
         }
@@ -1141,14 +1261,6 @@
             font-weight: 600;
             color: var(--color-gray-600);
             margin-right: 6px;
-        }
-
-        .info-row .value {
-            color: var(--color-gray-600);
-            display: inline-block;
-            background: #EBF7FF;
-            border-radius: 16px;
-            font-size: 13px;
         }
 
         /* Chips */
@@ -1189,8 +1301,6 @@
             box-shadow: 0 0 0 3px rgba(59, 130, 246, .1);
             border-color: #3b82f6;
         }
-
-
 
         .percentage-text {
             font-size: 18px;
@@ -1321,7 +1431,7 @@
         .form-input {
             flex: 1;
             padding: 12px 16px;
-            border: 2px solid #d1d5db;
+            border: 1.5px dashed #d1d5db;
             border-radius: 8px;
             font-size: 16px;
             transition: border-color .3s;
@@ -1445,7 +1555,7 @@
         .score-value-display {
             font-size: 36px;
             font-weight: 700;
-            line-height: 1;
+            /* line-height: 1; */
             padding: 12px 20px;
             border-radius: 12px;
             min-width: 80px;
@@ -1483,8 +1593,25 @@
         }
     </style>
     <style>
-        @media (max-width: 639px) {
 
+        @media (max-width: 639px) {
+            .evidence-edit {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .evidence-edit input {
+                width: 100%;
+            }
+
+            .evidence-edit .button-group {
+                width: 100%;
+                align-items: center;
+                justify-content: center;
+            }   
+        }
+
+        @media (max-width: 639px) {
 
             .card {
                 padding: 16px;
@@ -1493,7 +1620,7 @@
 
             .indicator-title {
                 font-size: 20px;
-                line-height: 1.3;
+                /* line-height: 1.3; */
             }
 
             .indicator-tabs {
@@ -1528,8 +1655,6 @@
             }
 
             .evidence-item {
-                flex-direction: column;
-                align-items: flex-start;
                 gap: 8px;
                 padding: 8px;
             }
@@ -1601,6 +1726,7 @@
 
             .criteria-header {
                 flex-wrap: wrap;
+                flex-direction: column;
                 gap: 8px;
             }
 

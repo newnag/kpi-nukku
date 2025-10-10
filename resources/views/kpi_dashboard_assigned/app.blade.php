@@ -52,7 +52,7 @@
                             <button
                                 class="sort-option text-left block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                                 data-column="7" data-order="desc" role="menuitem">ผลลัพธ์ (มากไปน้อย)</button>
-                            <button id="clear-sort"
+                            <button id="clear-sort" type="button"
                                 class=" text-left block w-full px-4 py-2 text-sm text-gray-600 hover:bg-gray-100">ล้างตัวเรียงลำดับ</button>
                         </div>
                     </div>
@@ -351,8 +351,8 @@
                         </div>
                         <div class="filters-actions">
                             {{-- Buttons --}}
-                            <button id="clear-filters" class="btn px-1.5 py-2.5">ล้างตัวกรอง</button>
-                            <button id="apply-filters" class="btn btn-primary px-1.5 py-2.5">ใช้ตัวกรอง</button>
+                            <button id="clear-filters" type="button" class="btn px-1.5 py-2.5">ล้างตัวกรอง</button>
+                            <button id="apply-filters" type="button" class="btn btn-primary px-1.5 py-2.5">ใช้ตัวกรอง</button>
                         </div>
                     </div>
                 </div>
@@ -1281,6 +1281,10 @@
 
                 });
 
+                const defaultOrder = JSON.parse(JSON.stringify(table.order()));
+                const sortButtonDefault = $('#sort-button span').text();
+                const filterButtonDefault = $('#filter-button span').text();
+
                 // Adjust columns to fill available width
                 setTimeout(() => {
                     table.columns.adjust().draw(false);
@@ -1337,17 +1341,20 @@
 
                 // Handle sort options
                 $('.sort-option').on('click', function() {
-                    const column = $(this).data('column');
+                    const columnData = $(this).data('column');
                     const order = $(this).data('order');
 
-                    // Apply sorting
-                    table.order([column, order]).draw();
+                    const columnIndex = Number(columnData);
+                    if (Number.isNaN(columnIndex) || !order) {
+                        return;
+                    }
 
-                    // Update button text to show active sort
-                    $('#sort-button span').text('เรียงลำดับ: ' + $(this).text().trim().substring(0, 15) +
-                        '...');
+                    table.order([columnIndex, order]).draw();
 
-                    // Close dropdown
+                    const labelText = $(this).text().trim();
+                    const truncated = labelText.length > 24 ? `${labelText.slice(0, 24)}...` : labelText;
+                    $('#sort-button span').text(`เรียงลำดับ: ${truncated}`);
+
                     $('#sort-dropdown').addClass('hidden');
                 });
 
@@ -1356,21 +1363,22 @@
 
                 // Handle filter checkboxes
                 $('.filter-option').on('change', function() {
-                    const column = $(this).data('column');
-                    const value = $(this).data('value');
+                    const columnKey = String($(this).data('column'));
+                    const rawValue = $(this).data('value');
+                    const value = rawValue === null || rawValue === undefined ? '' : String(rawValue).trim();
 
-                    // Initialize filter array for this column if needed
-                    if (!activeFilters[column]) {
-                        activeFilters[column] = [];
+                    if (!activeFilters[columnKey]) {
+                        activeFilters[columnKey] = [];
                     }
 
-                    // Add or remove value from filter
                     if ($(this).is(':checked')) {
-                        activeFilters[column].push(value);
+                        if (value !== '' && !activeFilters[columnKey].includes(value)) {
+                            activeFilters[columnKey].push(value);
+                        }
                     } else {
-                        activeFilters[column] = activeFilters[column].filter(v => v !== value);
-                        if (activeFilters[column].length === 0) {
-                            delete activeFilters[column];
+                        activeFilters[columnKey] = activeFilters[columnKey].filter((v) => v !== value);
+                        if (activeFilters[columnKey].length === 0) {
+                            delete activeFilters[columnKey];
                         }
                     }
                 });
@@ -1380,49 +1388,47 @@
                 // helper: multiple exact choices
                 const makeExactRegex = (values) => `^(?:${values.map(escapeRegex).join('|')})$`;
 
-                $('#apply-filters').on('click', function() {
-                    // clear previous
-                    table.columns().search('');
+                                $('#apply-filters').on('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    const columnCount = table.columns().count();
+
+                    table.columns().every(function() {
+                        this.search('');
+                    });
 
                     let filterCount = 0;
 
-                    for (const column in activeFilters) {
-                        if (activeFilters[column].length > 0) {
-                            filterCount += activeFilters[column].length;
-
-                            const colIdx = Number(column);
-
-                            // Column 6 (Departments): cell contains multiple dept tags; match any selected
-                            if (colIdx === 6) {
-                                const regex = activeFilters[column]
-                                    .map(v => escapeRegex(String(v)))
-                                    .join('|');
-                                table.column(colIdx).search(regex, true, false);
-                                continue;
-                            }
-
-                            // Column 9 (Status): use exact Thai labels present in sr-only text
-                            if (colIdx === 9) {
-                                const regex = makeExactRegex(activeFilters[column].map(String));
-                                table.column(colIdx).search(regex, true, false);
-                                continue;
-                            }
-
-                            // Column 11 (is_assigned hidden): values are '1' or '0'
-                            if (colIdx === 11) {
-                                const regex = makeExactRegex(activeFilters[column].map(String));
-                                table.column(colIdx).search(regex, true, false);
-                                continue;
-                            }
-
-                            // Other columns: exact matching (0: year, 1: category, 2: standard, 5: type)
-                            const regex = makeExactRegex(activeFilters[column].map(String));
-                            table.column(colIdx).search(regex, true, false);
+                    Object.keys(activeFilters).forEach((columnKey) => {
+                        const selections = activeFilters[columnKey];
+                        if (!Array.isArray(selections) || selections.length === 0) {
+                            return;
                         }
-                    }
 
-                    $('#filter-button span').text(filterCount > 0 ? `กรองข้อมูล (${filterCount})` :
-                        'กรองข้อมูล');
+                        const colIdx = Number(columnKey);
+                        if (Number.isNaN(colIdx) || colIdx < 0 || colIdx >= columnCount) {
+                            return;
+                        }
+
+                        filterCount += selections.length;
+
+                        if (colIdx === 6) {
+                            const regex = selections
+                                .map((v) => escapeRegex(String(v)))
+                                .join('|');
+                            table.column(colIdx).search(regex, true, false);
+                            return;
+                        }
+
+                        const regex = makeExactRegex(selections.map((v) => String(v)));
+                        table.column(colIdx).search(regex, true, false);
+                    });
+
+                    const filterLabel = filterCount > 0
+                        ? `${filterButtonDefault} (${filterCount})`
+                        : filterButtonDefault;
+                    $('#filter-button span').text(filterLabel);
 
                     table.draw();
                     $('#filter-dropdown').addClass('hidden');
@@ -1431,42 +1437,49 @@
 
 
                 // Clear filters button
-                $('#clear-filters').on('click', function() {
-                    // Uncheck all filter checkboxes
-                    $('.filter-option').prop('checked', false);
+                $('#clear-filters').on('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
 
-                    // Clear filter tracking
+                    $('.filter-option').each(function() {
+                        if ($(this).is(':checked')) {
+                            $(this).prop('checked', false).trigger('change');
+                        }
+                    });
+
                     activeFilters = {};
 
-                    // Reset button text
-                    $('#filter-button span').text('กรองข้อมูล');
+                    $('#filter-button span').text(filterButtonDefault);
 
-                    // Clear all column searches
-                    table.columns().search('').draw();
+                    table.columns().every(function() {
+                        this.search('');
+                    });
+                    table.draw();
 
-                    // Reset labels
+                    $('#filter-dropdown').addClass('hidden');
+
                     $('#year-label').text('เลือกปี');
                     $('#standard-label').text('เลือกมาตรฐาน');
                     $('#dimension-label').text('เลือกด้าน');
                     $('#dept-label').text('เลือกหน่วยงาน');
                     $('#type-label').text('เลือกประเภท');
                     $('#status-label').text('เลือกสถานะ');
-                    $('#assigned-label').text('เลือกการมอบหมาย');
+                    if ($('#statusEnv-label').length) {
+                        $('#statusEnv-label').text('เลือกสถานะเอกสาร');
+                    }
+                    if ($('#assigned-label').length) {
+                        $('#assigned-label').text('เลือกการมอบหมาย');
+                    }
                 });
 
                 // Clear sort button
-                $('#clear-sort').on('click', function() {
-                    // Reset all column orders
-                    $('#sort-button span').text('เรียงลำดับ');
-                    table.order([]).draw();
-                    // Close dropdown
+                $('#clear-sort').on('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    table.order(defaultOrder).draw();
+                    $('#sort-button span').text(sortButtonDefault);
                     $('#sort-dropdown').addClass('hidden');
-                    // // Reset sort icon states
-                    // $('.sort-icon').removeClass('sorting_asc sorting_desc').addClass('sorting');
-                    // $('.sort-icon').css('opacity', '0.3');
-                    // $('.sort-icon').css('transform', 'rotate(0deg)');
-
-
                 });
 
 

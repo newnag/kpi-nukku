@@ -420,9 +420,9 @@
 
             @hasanyrole('super_admin|system_admin')
                 <div class="dropdown">
-                    <div class="dropdown-toggle" role="button" tabindex="0" onclick="toggleDropdown(this)">
-                        <i class="fa-solid fa-gear"></i>
-                        <span class="dropdown-toggle-span">ตั้งค่าระบบ</span>
+                    <div class="dropdown-toggle justify-between" role="button" tabindex="0" onclick="toggleDropdown(this)">
+                        <div><i class="fa-solid fa-gear"></i>
+                        <span class="dropdown-toggle-span">ตั้งค่าระบบ</span></div>
                         <i class="fa-solid fa-caret-down"></i>
                     </div>
                     <div class="dropdown-menu-navbar">
@@ -461,9 +461,9 @@
             @endhasanyrole
 
             <div class="dropdown">
-                <div class="dropdown-toggle" role="button" tabindex="0" onclick="toggleDropdown(this)">
-                    <i class="fa-solid fa-user-circle"></i>
-                    <span class="dropdown-toggle-span">{{ auth()->user()->display_name ?? 'ผู้ใช้' }}</span>
+                <div class="dropdown-toggle justify-between" role="button" tabindex="0" onclick="toggleDropdown(this)">
+                    <div><i class="fa-solid fa-user-circle"></i>
+                    <span class="dropdown-toggle-span">{{ auth()->user()->name ?? 'ผู้ใช้' }}</span></div>
                     <i class="fa-solid fa-caret-down"></i>
                 </div>
                 <div class="dropdown-menu-navbar">
