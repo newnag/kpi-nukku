@@ -202,9 +202,28 @@
     transform: translateY(1px);
 }
 
+.btn-delete {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #dc2626;
+    transition: color 0.2s, transform 0.1s;
+}
+
+.btn-delete:hover {
+    color: #b91c1c;
+    transform: scale(1.1);
+    text-underline-offset: 1px;
+    text-decoration: underline;
+}
+
 /* Button Sizes */
 .btn-xs {
-    padding: 0.25rem 0.5rem !important; 
+    padding: 0.25rem 0.5rem !important;
     font-size: 0.625rem !important;
     border-radius: 6px !important;
 }

@@ -2,25 +2,6 @@
 
 @section('title', 'รายละเอียดตัวบ่งชี้')
 
-@push('styles')
-    <style>
-        /* Custom banner gradient with a modern, soft look */
-        .banner {
-            background: linear-gradient(90deg, #e0f2fe 0%, #fef3e0 100%);
-            transition: all 0.3s ease-in-out;
-        }
-
-        /* Smooth hover effects for buttons */
-        .action-btn {
-            transition: background-color 0.2s ease, transform 0.1s ease;
-        }
-
-        .action-btn:hover {
-            transform: translateY(-2px);
-        }
-    </style>
-@endpush
-
 @section('content')
     @php
         // --- Normalize input (works with: ['data'=>...] JSON, or $indicator model/array) ---
@@ -121,374 +102,383 @@ $showVFSection = $type === 'variable_formula' || ($type !== 'checklist' && ($has
 $showChecklistSection = $type === 'checklist' || ($type !== 'variable_formula' && $hasChecklist);
 
 // ---- Status mapping -> label + badge classes (shadcn-like) ----
-$statusOptions = [
-    0 => [
-        'label' => 'รอดำเนินการ',
-        'class' => 'bg-slate-100 text-slate-800 ring-slate-300',
-        'dot' => 'bg-slate-500',
-    ],
-    1 => [
-        'label' => 'บันทึกร่าง',
-        'class' => 'bg-amber-100 text-amber-800 ring-amber-300',
-        'dot' => 'bg-amber-600',
-    ],
-    2 => [
-        'label' => 'บันทึกจริง',
-        'class' => 'bg-blue-100 text-blue-800 ring-blue-300',
-        'dot' => 'bg-blue-600',
-    ],
-    3 => [
-        'label' => 'ผลการดำเนินงานครบถ้วนตามเกณฑ์มาตรฐาน',
-        'class' => 'bg-emerald-100 text-emerald-800 ring-emerald-300',
-        'dot' => 'bg-emerald-600',
-    ],
-    4 => [
-        'label' => 'ผลการดำเนินงานไม่ครบถ้วนตามเกณฑ์มาตรฐาน',
-        'class' => 'bg-rose-100 text-rose-800 ring-rose-300',
-        'dot' => 'bg-rose-600',
-    ],
-];
+// $statusOptions = [
+//     0 => [
+//         'label' => 'รอดำเนินการ',
+//         'class' => 'bg-slate-100 text-slate-800 ring-slate-300',
+//         'dot' => 'bg-slate-500',
+//     ],
+//     1 => [
+//         'label' => 'บันทึกร่าง',
+//         'class' => 'bg-amber-100 text-amber-800 ring-amber-300',
+//         'dot' => 'bg-amber-600',
+//     ],
+//     2 => [
+//         'label' => 'บันทึกจริง',
+//         'class' => 'bg-blue-100 text-blue-800 ring-blue-300',
+//         'dot' => 'bg-blue-600',
+//     ],
+//     3 => [
+//         'label' => 'ผลการดำเนินงานครบถ้วนตามเกณฑ์มาตรฐาน',
+//         'class' => 'bg-emerald-100 text-emerald-800 ring-emerald-300',
+//         'dot' => 'bg-emerald-600',
+//     ],
+//     4 => [
+//         'label' => 'ผลการดำเนินงานไม่ครบถ้วนตามเกณฑ์มาตรฐาน',
+//         'class' => 'bg-rose-100 text-rose-800 ring-rose-300',
+//         'dot' => 'bg-rose-600',
+//     ],
+// ];
 
-$statusKey = is_numeric($status) ? (int) $status : null;
-$opt = $statusKey !== null && array_key_exists($statusKey, $statusOptions) ? $statusOptions[$statusKey] : null;
+// $statusKey = is_numeric($status) ? (int) $status : null;
+// $opt = $statusKey !== null && array_key_exists($statusKey, $statusOptions) ? $statusOptions[$statusKey] : null;
 
-$statusLabel = $opt['label'] ?? ($status !== null && $status !== '' ? (string) $status : '-');
-$statusBadgeClass =
-    'inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium ring-1 ring-inset ' .
-    ($opt['class'] ?? 'bg-slate-100 text-slate-700 ring-slate-300');
-$statusDotClass = $opt['dot'] ?? 'bg-slate-500';
+// $statusLabel = $opt['label'] ?? ($status !== null && $status !== '' ? (string) $status : '-');
+// $statusBadgeClass =
+//     'inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium ring-1 ring-inset ' .
+//     ($opt['class'] ?? 'bg-slate-100 text-slate-700 ring-slate-300');
+// $statusDotClass = $opt['dot'] ?? 'bg-slate-500';
+
     @endphp
-
-    <div class="max-w-1200px mx-auto px-5">
-        <div class="w-full max-w-1200px mx-auto">
-            {{-- Header --}}
-            <div class="banner rounded-t-2xl border border-slate-200 p-5 ">
-                <h1 class="text-2xl sm:text-3xl text-center font-bold">รายละเอียดตัวบ่งชี้</h1>
-            </div>
-            <div class="mb-5 w-full px-4 sm:px-6 lg:px-8 py-6 bg-white rounded-b-2xl-2xl border border-slate-200 shadow-sm">
-                <div class="space-y-6 sm:space-y-5">
-                    {{-- Card 1: Basic --}}
-                    <x-card number="1" title="ข้อมูลตัวบ่งชี้">
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4">
-                            <div>
-                                <div class="text-sm text-slate-500">ปีการประเมิน</div>
-                                <div class="font-medium text-slate-900">{{ $year ?: '-' }}</div>
-                            </div>
-
-                            <div>
-                                <div class="text-sm text-slate-500">คะแนนตัวบ่งชี้</div>
-                                <div class="font-medium text-slate-900">
-                                    {{ $maxScore !== null ? number_format((float) $maxScore, 2) : '-' }}
-                                </div>
-                            </div>
-
-                            <div class="sm:col-span-2">
-                                <div class="text-sm text-slate-500">ชื่อตัวบ่งชี้</div>
-                                <div class="font-medium text-slate-900">{{ $name ?: '-' }}</div>
-                            </div>
-
-                            <div>
-                                <div class="text-sm text-slate-500">รหัสตัวบ่งชี้</div>
-                                <div class="font-medium text-slate-900">{{ $code ?: '-' }}</div>
-                            </div>
-
-                            <div>
-                                <div class="text-sm text-slate-500">มาตรฐานตัวบ่งชี้</div>
-                                <div class="font-medium text-slate-900">{{ $standardName }}</div>
-                            </div>
-
-                            <div>
-                                <div class="text-sm text-slate-500">ด้านตัวบ่งชี้</div>
-                                <div class="font-medium text-slate-900">{{ $categoryName }}</div>
-                            </div>
-
-                            <div>
-                                <div class="text-sm text-slate-500 ">ประเภทตัวบ่งชี้</div>
-                                <div class="font-medium text-slate-900">{{ $type ?: '-' }}</div>
-                            </div>
-
-                            <div>
-                                <div class="text-sm text-slate-500">สถานะตัวบ่งชี้</div>
-                                <div class="mt-1">
-                                    <x-status-badge :status="$status" size="sm" />
-                                </div>
-                            </div>
-
-                            <div>
-                                <div class="text-sm text-slate-500">วันสิ้นสุดการประเมิน</div>
-                                <div class="font-medium text-slate-900">{{ $deadlineDisplay }}</div>
-                            </div>
-                        </div>
-                    </x-card>
-
-                    {{-- Card 2: Responsible --}}
-                    <x-card number="2" title="ผู้รับผิดชอบ">
-                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                            <div>
-                                <div class="text-sm text-slate-500 mb-1">หน่วยงานที่รับผิดชอบ</div>
-                                @if (count($departments))
-                                    <ol class="list-decimal list-inside space-y-1 text-slate-900">
-                                        @foreach ($departments as $department)
-                                            <li>{{ $department }}</li>
-                                        @endforeach
-                                    </ol>
-                                @else
-                                    <div class="text-slate-400">-</div>
-                                @endif
-                            </div>
-                            <div>
-                                <div class="text-sm text-slate-500 mb-1">ผู้รับผิดชอบในการรวบรวมข้อมูล</div>
-                                @if (count($collectors))
-                                    <ol class="list-decimal list-inside space-y-1 text-slate-900">
-                                        @foreach ($collectors as $collector)
-                                            <li>{{ $collector }}</li>
-                                        @endforeach
-                                    </ol>
-                                @else
-                                    <div class="text-slate-400">-</div>
-                                @endif
-                            </div>
-                        </div>
-                    </x-card>
-
-
-                    {{-- Card 3: Description (richtext) --}}
-                    <x-card number="3" title="คำอธิบายตัวบ่งชี้">
-                        <x-richtext-content :html="$descHtml" empty="-" />
-                    </x-card>
-
-                    {{-- Card 4: Criteria --}}
-                    <x-card number="4" title="เกณฑ์การพิจารณา">
-                        @if (count($criteriaList))
-                            <ol class="list-decimal pl-5 space-y-1 text-slate-800">
-                                @foreach ($criteriaList as $text)
-                                    <li>{{ $text }}</li>
-                                @endforeach
-                            </ol>
-                        @else
-                            <div class="text-slate-400">-</div>
-                        @endif
-                        <br />
-                        <x-card-box title="วิธีการคำนวณ" icon="📋">
-                            <x-richtext-content :html="$condHtml" empty="-" />
-                        </x-card-box>
-                    </x-card>
-
-                    {{-- Card 5: Scoring (comment richtext + variable/formula + checklist rules) --}}
-                    <x-card number="5" title="เกณฑ์การให้คะแนน" class="space-y-6" x-data="{ copiedId: null }">
-                        {{-- คำอธิบาย --}}
-                        <div class="space-y-1">
-                            <div class="text-sm font-medium text-slate-700">คำอธิบาย</div>
-                            <x-richtext-content :html="$comment" empty="ไม่มีคำอธิบายเกณฑ์" />
+    <div class="w-full mx-auto">
+        {{-- Header --}}
+        <div class="banner rounded-t-2xl border border-slate-200 p-5 ">
+            <h1 class="text-2xl sm:text-3xl text-center font-bold">รายละเอียดตัวบ่งชี้</h1>
+        </div>
+        <div class="mb-5 w-full px-4 sm:px-6 lg:px-8 py-6 bg-white rounded-b-2xl-2xl border border-slate-200 shadow-sm">
+            <div class="space-y-6 sm:space-y-5">
+                {{-- Card 1: Basic --}}
+                <x-card number="1" title="ข้อมูลตัวบ่งชี้">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4">
+                        <div>
+                            <div class="text-sm text-slate-500">ปีการประเมิน</div>
+                            <div class="font-medium text-slate-900">{{ $year ?: '-' }}</div>
                         </div>
 
-                        {{-- ตัวแปร/สูตร --}}
-                        @if ($showVFSection && ($hasVFVars || $hasVFFx))
-                            <div class="space-y-3">
-                                <div class="flex items-center justify-between">
-                                    <div class="text-sm font-medium text-slate-700">ตัวแปรและสูตรคำนวณ</div>
-
-                                    {{-- Legend --}}
-                                    <div class="hidden sm:flex items-center gap-2 text-xs text-slate-500">
-                                        <span class="px-2 py-0.5 rounded-full bg-blue-100 text-blue-800">defined</span>
-                                        <span class="px-2 py-0.5 rounded-full bg-green-100 text-green-800">input</span>
-                                        <span class="px-2 py-0.5 rounded-full bg-purple-100 text-purple-800">output</span>
-                                    </div>
-                                </div>
-
-                                {{-- 2-column layout on large screens --}}
-                                <div class="grid gap-4 lg:grid-cols-2">
-                                    {{-- Variables table --}}
-                                    @if ($hasVFVars)
-                                        <div class="overflow-hidden rounded-xl border border-slate-200 bg-white">
-                                            <div
-                                                class="px-3 py-2 text-sm font-medium text-slate-700 bg-slate-50 border-b border-slate-200">
-                                                รายชื่อตัวแปร
-                                            </div>
-                                            <div class="overflow-x-auto">
-                                                <table class="min-w-full text-sm text-slate-800">
-                                                    <thead class="bg-slate-50">
-                                                        <tr class="text-left">
-                                                            <th class="px-3 py-2 font-semibold border-b border-slate-200">
-                                                                ตัวแปร</th>
-                                                            <th class="px-3 py-2 font-semibold border-b border-slate-200">
-                                                                ป้ายชื่อ</th>
-                                                            <th class="px-3 py-2 font-semibold border-b border-slate-200">
-                                                                ประเภท</th>
-                                                            <th class="px-3 py-2 font-semibold border-b border-slate-200">
-                                                                ค่าเริ่มต้น</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        @foreach ($variablesVF as $v)
-                                                            @php
-                                                                $var = $v['var'] ?? null;
-                                                                $label = $v['label'] ?? null;
-                                                                $vtype = $v['vtype'] ?? null;
-                                                                $value = $v['value'] ?? null;
-
-                                                                $badgeClass = match ($vtype) {
-                                                                    'defined' => 'bg-blue-100 text-blue-800',
-                                                                    'input' => 'bg-green-100 text-green-800',
-                                                                    'output' => 'bg-purple-100 text-purple-800',
-                                                                    default => 'bg-slate-100 text-slate-700',
-                                                                };
-                                                                $badgeText = $vtype ?: 'unknown';
-                                                            @endphp
-                                                            <tr class="odd:bg-white even:bg-slate-50">
-                                                                <td class="px-3 py-2 font-medium">{{ $var ?: '-' }}</td>
-                                                                <td class="px-3 py-2 text-slate-600">{{ $label ?: '-' }}
-                                                                </td>
-                                                                <td class="px-3 py-2">
-                                                                    <span
-                                                                        class="px-2 py-1 text-xs rounded-full {{ $badgeClass }}">
-                                                                        {{ $badgeText }}
-                                                                    </span>
-                                                                </td>
-                                                                <td class="px-3 py-2">
-                                                                    @if (is_null($value))
-                                                                        -
-                                                                    @elseif (is_bool($value))
-                                                                        {{ $value ? 'true' : 'false' }}
-                                                                    @else
-                                                                        {{ $value }}
-                                                                    @endif
-                                                                </td>
-                                                            </tr>
-                                                        @endforeach
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                        </div>
-                                    @endif
-
-                                    {{-- Formulas list --}}
-                                    @if ($hasVFFx)
-                                        <div class="overflow-hidden rounded-xl border border-slate-200 bg-white">
-                                            <div
-                                                class="px-3 py-2 text-sm font-medium text-slate-700 bg-slate-50 border-b border-slate-200">
-                                                สูตร/เงื่อนไข
-                                            </div>
-
-                                            <div class="p-3 space-y-2">
-                                                @foreach ($formulasVF as $i => $fx)
-                                                    <div class="group relative">
-                                                        <pre
-                                                            class="whitespace-pre-wrap leading-relaxed font-mono text-[13px] bg-slate-50 rounded-md px-3 py-2 border border-slate-200">{{ $fx }}</pre>
-                                                    </div>
-                                                @endforeach
-                                            </div>
-                                        </div>
-                                    @endif
-                                </div>
+                        <div>
+                            <div class="text-sm text-slate-500">คะแนนตัวบ่งชี้</div>
+                            <div class="font-medium text-slate-900">
+                                {{ $maxScore !== null ? number_format((float) $maxScore, 2) : '-' }}
                             </div>
-                        @endif
+                        </div>
 
-                        {{-- เช็กลิสต์ --}}
-                        @if ($showChecklistSection && $hasChecklist)
-                            <div class="space-y-2">
-                                <div class="text-sm font-medium text-slate-700">เกณฑ์ให้คะแนนแบบเช็กลิสต์</div>
+                        <div class="sm:col-span-2">
+                            <div class="text-sm text-slate-500">ชื่อตัวบ่งชี้</div>
+                            <div class="font-medium text-slate-900">{{ $name ?: '-' }}</div>
+                        </div>
 
-                                <div class="overflow-hidden rounded-xl border border-slate-200 bg-white">
-                                    <div class="overflow-x-auto">
-                                        <table class="min-w-full text-sm text-slate-800">
-                                            <thead class="bg-slate-50">
-                                                <tr class="text-left">
-                                                    <th class="px-3 py-2 font-semibold border-b border-slate-200">รายการ
-                                                    </th>
-                                                    <th
-                                                        class="px-3 py-2 font-semibold border-b border-slate-200 w-40 text-right">
-                                                        คะแนน</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                @foreach ($checklist as $r)
-                                                    <tr class="odd:bg-white even:bg-slate-50">
-                                                        <td class="px-3 py-2">
-                                                            @if (str_contains($r['label'], ','))
-                                                                <ul class="list-disc list-inside space-y-1 text-slate-800">
-                                                                    @foreach (explode(',', $r['label']) as $item)
-                                                                        <li class="text-sm ">{{ trim($item) }}</li>
-                                                                    @endforeach
-                                                                </ul>
-                                                            @else
-                                                                <div class="text-sm text-slate-800">{{ $r['label'] }}</div>
-                                                            @endif
-                                                        </td>
-                                                        <td class="px-3 py-2 text-right font-medium">
-                                                            {{ number_format($r['score'] ?? 0, 2) }}</td>
-                                                    </tr>
-                                                @endforeach
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
+                        <div>
+                            <div class="text-sm text-slate-500">รหัสตัวบ่งชี้</div>
+                            <div class="font-medium text-slate-900">{{ $code ?: '-' }}</div>
+                        </div>
+
+                        <div>
+                            <div class="text-sm text-slate-500">มาตรฐานตัวบ่งชี้</div>
+                            <div class="font-medium text-slate-900">{{ $standardName }}</div>
+                        </div>
+
+                        <div>
+                            <div class="text-sm text-slate-500">ด้านตัวบ่งชี้</div>
+                            <div class="font-medium text-slate-900">{{ $categoryName }}</div>
+                        </div>
+
+                        <div>
+                            <div class="text-sm text-slate-500 ">ประเภทตัวบ่งชี้</div>
+                            <div class="font-medium text-slate-900">{{ $type ?: '-' }}</div>
+                        </div>
+
+                        <div>
+                            <div class="text-sm text-slate-500">สถานะตัวบ่งชี้</div>
+                            <div class="mt-1">
+                                <x-status-badge :status="$status" size="sm" />
                             </div>
-                        @endif
+                        </div>
 
-                        {{-- ว่างทั้งสองฝั่ง --}}
-                        @if (!($showVFSection && ($hasVFVars || $hasVFFx)) && !($showChecklistSection && $hasChecklist))
-                            <div class="flex items-center gap-2 text-slate-400 text-sm">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20"
-                                    fill="currentColor">
-                                    <path
-                                        d="M8.257 3.099c.366-.446 1.12-.446 1.486 0l6.347 7.732c.43.524.058 1.169-.743 1.169H2.653c-.801 0-1.173-.645-.743-1.169l6.347-7.732z" />
-                                </svg>
-                                ไม่มีข้อมูลสำหรับตัวแปร/สูตร หรือเช็กลิสต์
-                            </div>
-                        @endif
-                    </x-card>
-
-                    {{-- Card 6: Annotation/Note (richtext) --}}
-                    <x-card number="6" title="หมายเหตุ">
-                        <x-richtext-content :html="$annoHtml" empty="-" />
-                    </x-card>
-
-                    {{-- Actions --}}
-                    <div class="flex flex-col sm:flex-row justify-between gap-4 pt-2">
-                        <a href="{{ route('indicator.index') }}"
-                            class="inline-flex items-center justify-center gap-2 rounded-xl bg-gray-200 text-gray-700 px-6 py-3 hover:bg-gray-300 text-sm md:text-base transition-colors order-2 sm:order-1">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M15 19l-7-7 7-7" />
-                            </svg>
-                            <span>กลับ</span>
-                        </a>
-
-                        <div class="flex flex-col sm:flex-row gap-3 order-1 sm:order-2">
-                            <form action="{{ route('indicator.delete', $dg('id')) }}" method="POST"
-                                onsubmit="return confirm('ต้องการลบตัวบ่งชี้นี้ใช่หรือไม่?')">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit"
-                                    class="inline-flex items-center justify-center gap-2 rounded-xl bg-rose-600 text-white px-6 py-3 hover:bg-rose-700 text-sm md:text-base transition-colors">
-                                    ลบตัวบ่งชี้
-                                </button>
-                            </form>
-
-                            {{-- Enable when edit route is ready --}}
-                            <a href="{{ route('indicator.edit', $indicatorId) }}"
-                                class="inline-flex items-center justify-center gap-2 rounded-xl bg-amber-500 text-white px-6 py-3 hover:bg-amber-600 text-sm md:text-base transition-colors">
-                                แก้ไข
-                            </a>
-
-                            <button type="button"
-                                class="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 text-white px-6 py-3 hover:bg-blue-700 text-sm md:text-base transition-colors">
-                                แจ้งเตือนผู้รับผิดชอบ
-                            </button>
+                        <div>
+                            <div class="text-sm text-slate-500">วันสิ้นสุดการประเมิน</div>
+                            <div class="font-medium text-slate-900">{{ $deadlineDisplay }}</div>
                         </div>
                     </div>
-                </div> {{-- /space-y --}}
-            </div>
+                </x-card>
+
+                {{-- Card 2: Responsible --}}
+                <x-card number="2" title="ผู้รับผิดชอบ">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div>
+                            <div class="text-sm text-slate-500 mb-1">หน่วยงานที่รับผิดชอบ</div>
+                            @if (count($departments))
+                                <ol class="list-decimal list-inside space-y-1 text-slate-900">
+                                    @foreach ($departments as $department)
+                                        <li>{{ $department }}</li>
+                                    @endforeach
+                                </ol>
+                            @else
+                                <div class="text-slate-400">-</div>
+                            @endif
+                        </div>
+                        <div>
+                            <div class="text-sm text-slate-500 mb-1">ผู้รับผิดชอบในการรวบรวมข้อมูล</div>
+                            @if (count($collectors))
+                                <ol class="list-decimal list-inside space-y-1 text-slate-900">
+                                    @foreach ($collectors as $collector)
+                                        <li>{{ $collector }}</li>
+                                    @endforeach
+                                </ol>
+                            @else
+                                <div class="text-slate-400">-</div>
+                            @endif
+                        </div>
+                    </div>
+                </x-card>
+
+
+                {{-- Card 3: Description (richtext) --}}
+                <x-card number="3" title="คำอธิบายตัวบ่งชี้">
+                    <x-richtext-content :html="$descHtml" empty="-" />
+                </x-card>
+
+                {{-- Card 4: Criteria --}}
+                <x-card number="4" title="เกณฑ์การพิจารณา">
+                    @if (count($criteriaList))
+                        <ol class="list-decimal pl-5 space-y-1 text-slate-800">
+                            @foreach ($criteriaList as $text)
+                                <li>{{ $text }}</li>
+                            @endforeach
+                        </ol>
+                    @else
+                        <div class="text-slate-400">-</div>
+                    @endif
+                    <br />
+                    <x-card-box title="วิธีการคำนวณ" icon="📋">
+                        <x-richtext-content :html="$condHtml" empty="-" />
+                    </x-card-box>
+                </x-card>
+
+                {{-- Card 5: Scoring (comment richtext + variable/formula + checklist rules) --}}
+                <x-card number="5" title="เกณฑ์การให้คะแนน" class="space-y-6" x-data="{ copiedId: null }">
+                    {{-- คำอธิบาย --}}
+                    <div class="space-y-1">
+                        <div class="text-sm font-medium text-slate-700">คำอธิบาย</div>
+                        <x-richtext-content :html="$comment" empty="ไม่มีคำอธิบายเกณฑ์" />
+                    </div>
+
+                    {{-- ตัวแปร/สูตร --}}
+                    @if ($showVFSection && ($hasVFVars || $hasVFFx))
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between">
+                                <div class="text-sm font-medium text-slate-700">ตัวแปรและสูตรคำนวณ</div>
+
+                                {{-- Legend --}}
+                                <div class="hidden sm:flex items-center gap-2 text-xs text-slate-500">
+                                    <span class="px-2 py-0.5 rounded-full bg-blue-100 text-blue-800">defined</span>
+                                    <span class="px-2 py-0.5 rounded-full bg-green-100 text-green-800">input</span>
+                                    <span class="px-2 py-0.5 rounded-full bg-purple-100 text-purple-800">output</span>
+                                </div>
+                            </div>
+
+                            {{-- 2-column layout on large screens --}}
+                            <div class="grid gap-4 lg:grid-cols-2">
+                                {{-- Variables table --}}
+                                @if ($hasVFVars)
+                                    <div class="overflow-hidden rounded-xl border border-slate-200 bg-white">
+                                        <div
+                                            class="px-3 py-2 text-sm font-medium text-slate-700 bg-slate-50 border-b border-slate-200">
+                                            รายชื่อตัวแปร
+                                        </div>
+                                        <div class="overflow-x-auto">
+                                            <table class="min-w-full text-sm text-slate-800">
+                                                <thead class="bg-slate-50">
+                                                    <tr class="text-left">
+                                                        <th class="px-3 py-2 font-semibold border-b border-slate-200">
+                                                            ตัวแปร</th>
+                                                        <th class="px-3 py-2 font-semibold border-b border-slate-200">
+                                                            ป้ายชื่อ</th>
+                                                        <th class="px-3 py-2 font-semibold border-b border-slate-200">
+                                                            ประเภท</th>
+                                                        <th class="px-3 py-2 font-semibold border-b border-slate-200">
+                                                            ค่าเริ่มต้น</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @foreach ($variablesVF as $v)
+                                                        @php
+                                                            $var = $v['var'] ?? null;
+                                                            $label = $v['label'] ?? null;
+                                                            $vtype = $v['vtype'] ?? null;
+                                                            $value = $v['value'] ?? null;
+
+                                                            $badgeClass = match ($vtype) {
+                                                                'defined' => 'bg-blue-100 text-blue-800',
+                                                                'input' => 'bg-green-100 text-green-800',
+                                                                'output' => 'bg-purple-100 text-purple-800',
+                                                                default => 'bg-slate-100 text-slate-700',
+                                                            };
+                                                            $badgeText = $vtype ?: 'unknown';
+                                                        @endphp
+                                                        <tr class="odd:bg-white even:bg-slate-50">
+                                                            <td class="px-3 py-2 font-medium">{{ $var ?: '-' }}</td>
+                                                            <td class="px-3 py-2 text-slate-600">{{ $label ?: '-' }}
+                                                            </td>
+                                                            <td class="px-3 py-2">
+                                                                <span
+                                                                    class="px-2 py-1 text-xs rounded-full {{ $badgeClass }}">
+                                                                    {{ $badgeText }}
+                                                                </span>
+                                                            </td>
+                                                            <td class="px-3 py-2">
+                                                                @if (is_null($value))
+                                                                    -
+                                                                @elseif (is_bool($value))
+                                                                    {{ $value ? 'true' : 'false' }}
+                                                                @else
+                                                                    {{ $value }}
+                                                                @endif
+                                                            </td>
+                                                        </tr>
+                                                    @endforeach
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                @endif
+
+                                {{-- Formulas list --}}
+                                @if ($hasVFFx)
+                                    <div class="overflow-hidden rounded-xl border border-slate-200 bg-white">
+                                        <div
+                                            class="px-3 py-2 text-sm font-medium text-slate-700 bg-slate-50 border-b border-slate-200">
+                                            สูตร/เงื่อนไข
+                                        </div>
+
+                                        <div class="p-3 space-y-2">
+                                            @foreach ($formulasVF as $i => $fx)
+                                                <div class="group relative">
+                                                    <pre
+                                                        class="whitespace-pre-wrap leading-relaxed font-mono text-[13px] bg-slate-50 rounded-md px-3 py-2 border border-slate-200">{{ $fx }}</pre>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                    @endif
+
+                    {{-- เช็กลิสต์ --}}
+                    @if ($showChecklistSection && $hasChecklist)
+                        <div class="space-y-2">
+                            <div class="text-sm font-medium text-slate-700">เกณฑ์ให้คะแนนแบบเช็กลิสต์</div>
+
+                            <div class="overflow-hidden rounded-xl border border-slate-200 bg-white">
+                                <div class="overflow-x-auto">
+                                    <table class="min-w-full text-sm text-slate-800">
+                                        <thead class="bg-slate-50">
+                                            <tr class="text-left">
+                                                <th class="px-3 py-2 font-semibold border-b border-slate-200">รายการ
+                                                </th>
+                                                <th
+                                                    class="px-3 py-2 font-semibold border-b border-slate-200 w-40 text-right">
+                                                    คะแนน</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach ($checklist as $r)
+                                                <tr class="odd:bg-white even:bg-slate-50">
+                                                    <td class="px-3 py-2">
+                                                        @if (str_contains($r['label'], ','))
+                                                            <ul class="list-disc list-inside space-y-1 text-slate-800">
+                                                                @foreach (explode(',', $r['label']) as $item)
+                                                                    <li class="text-sm ">{{ trim($item) }}</li>
+                                                                @endforeach
+                                                            </ul>
+                                                        @else
+                                                            <div class="text-sm text-slate-800">{{ $r['label'] }}
+                                                            </div>
+                                                        @endif
+                                                    </td>
+                                                    <td class="px-3 py-2 text-right font-medium">
+                                                        {{ number_format($r['score'] ?? 0, 2) }}</td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+
+                    {{-- ว่างทั้งสองฝั่ง --}}
+                    @if (!($showVFSection && ($hasVFVars || $hasVFFx)) && !($showChecklistSection && $hasChecklist))
+                        <div class="flex items-center gap-2 text-slate-400 text-sm">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20"
+                                fill="currentColor">
+                                <path
+                                    d="M8.257 3.099c.366-.446 1.12-.446 1.486 0l6.347 7.732c.43.524.058 1.169-.743 1.169H2.653c-.801 0-1.173-.645-.743-1.169l6.347-7.732z" />
+                            </svg>
+                            ไม่มีข้อมูลสำหรับตัวแปร/สูตร หรือเช็กลิสต์
+                        </div>
+                    @endif
+                </x-card>
+
+                {{-- Card 6: Annotation/Note (richtext) --}}
+                <x-card number="6" title="หมายเหตุ">
+                    <x-richtext-content :html="$annoHtml" empty="-" />
+                </x-card>
+
+                {{-- Actions --}}
+                <div class="flex flex-col sm:flex-row justify-between gap-4 pt-2">
+                    <a href="{{ route('indicator.index') }}"
+                        class="inline-flex items-center justify-center gap-2 rounded-xl bg-gray-200 text-gray-700 px-6 py-3 hover:bg-gray-300 text-sm md:text-base transition-colors order-2 sm:order-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                        </svg>
+                        <span>กลับ</span>
+                    </a>
+
+                    <div class="flex flex-col sm:flex-row gap-3 order-1 sm:order-2">
+                        <form action="{{ route('indicator.delete', $dg('id')) }}" method="POST"
+                            onsubmit="return confirm('ต้องการลบตัวบ่งชี้นี้ใช่หรือไม่?')">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit"
+                                class="inline-flex items-center justify-center gap-2 rounded-xl bg-rose-600 text-white px-6 py-3 hover:bg-rose-700 text-sm md:text-base transition-colors">
+                                ลบตัวบ่งชี้
+                            </button>
+                        </form>
+
+                        {{-- Enable when edit route is ready --}}
+                        <a href="{{ route('indicator.edit', $indicatorId) }}"
+                            class="inline-flex items-center justify-center gap-2 rounded-xl bg-amber-500 text-white px-6 py-3 hover:bg-amber-600 text-sm md:text-base transition-colors">
+                            แก้ไข
+                        </a>
+
+                        <button type="button"
+                            class="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 text-white px-6 py-3 hover:bg-blue-700 text-sm md:text-base transition-colors">
+                            แจ้งเตือนผู้รับผิดชอบ
+                        </button>
+                    </div>
+                </div>
+            </div> {{-- /space-y --}}
         </div>
     </div>
 @endsection
 
 @push('styles')
     <style>
-        .max-w-1200px {
-            max-width: 1200px;
+        /* Custom banner gradient with a modern, soft look */
+        .banner {
+            background: linear-gradient(90deg, #e0f2fe 0%, #fef3e0 100%);
+            transition: all 0.3s ease-in-out;
+        }
+
+        /* Smooth hover effects for buttons */
+        .action-btn {
+            transition: background-color 0.2s ease, transform 0.1s ease;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
         }
     </style>
 @endpush

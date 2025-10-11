@@ -19,10 +19,10 @@
     }
 </style>
 
-<div
+<div {{-- hover:shadow-md transition --}}
     {{ $attributes->merge([
         'class' => 'bg-white rounded-2xl border border-slate-200 shadow-sm 
-           p-4 sm:p-5 md:p-6 hover:shadow-md transition',
+               p-4 sm:p-5 md:p-6 ',
     ]) }}>
     @if ($title)
         <div class="flex items-center gap-3 mb-3 md:mb-4">

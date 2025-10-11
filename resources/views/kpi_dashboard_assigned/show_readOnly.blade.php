@@ -248,7 +248,7 @@
             @endif
 
             <div class="action-bts">
-                                <a href="{{ route('dashboardkpi.index') }}" class="btn btn-outline" id="back-btn">
+                <a href="{{ route('dashboardkpi.index') }}" class="btn btn-outline" id="back-btn">
                     <i data-lucide="arrow-left"></i>
                     ย้อนกลับ
                 </a>
@@ -274,6 +274,11 @@
 
 @push('styles')
     <style>
+        .container {
+            max-width: 960px !important;
+        }
+
+
         .action-bts {
             display: flex;
             justify-content: center;
@@ -578,7 +583,6 @@
             border: 1px solid var(--color-gray-100);
             padding: 24px;
             gap: 24px;
-            max-width: 960px;
         }
 
         /* Title */
@@ -587,6 +591,7 @@
             font-weight: 700;
             color: var(--color-gray-800);
             margin-bottom: 16px;
+            text-align: center;
         }
 
         /* Tabs */

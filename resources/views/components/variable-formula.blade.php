@@ -182,7 +182,7 @@ initializeVariableNames();" class="space-y-5">
         </div>
 
         <button type="button" @click="add()"
-            class="justify-self-start md:justify-self-end inline-flex items-center gap-2 rounded-xl border border-blue-500 text-blue-600 px-3 py-2 md:px-4 md:py-2 hover:bg-blue-50 text-sm md:text-base">
+            class="btn btn-outline">
             เพิ่มตัวแปร <span class="text-xl leading-none">＋</span>
         </button>
     </div>

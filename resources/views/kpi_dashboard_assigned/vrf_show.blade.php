@@ -7,366 +7,369 @@
     @php
         $locked = in_array($indicator->status, [3, 4]);
     @endphp
-    <div class="w-full h-full flex text-center justify-center">
-        <div class="indicator-card">
-            <div class="indicator-header-container">
-                <h1 class="indicator-title">
-                    {{ $indicator->name }} ({{ $indicator->code }})
-                </h1>
-                <div class="indicator-tabs">
-                    <span class="tab ">{{ $indicator->category->standard->name ?? '-' }}</span>
-                    <span class="tab-for-divider">|</span>
-                    <span class="tab">{{ $indicator->category->name ?? '-' }}</span>
-                </div>
-
-                <hr class="tab-divider">
-                <div class="info-container">
-                    <div class="info-row">
-                        <span class="label">หน่วยงานที่รับผิดชอบ:</span>
-                        @forelse($indicator->assignments as $assignment)
-                            @if ($assignment->collectorUser)
-                                <span class="chip">
-                                    {{ $assignment->collectorUser->department->name }}
-                                </span>
-                            @endif
-                        @empty
-                            <span class="value">-</span>
-                        @endforelse
-                    </div>
-                    <div class="info-row">
-                        <span class="label">ผู้รับผิดชอบในการรวบรวม:</span>
-                        @forelse($indicator->assignments as $assignment)
-                            @if ($assignment->collectorUser)
-                                <span class="chip">
-                                    {{ $assignment->collectorUser->name }}
-                                </span>
-                            @endif
-                        @empty
-                            <span class="value">-</span>
-                        @endforelse
-                    </div>
-                    <div class="info-row">
-                        <span class="label">สถานะตัวบ่งชี้:</span>
-                        <x-status-badge :status="$indicator->status" size="sm" />
-                    </div>
-                </div>
+    <div class="indicator-card">
+        <div class="indicator-header-container">
+            <h1 class="indicator-title">
+                {{ $indicator->name }} ({{ $indicator->code }})
+            </h1>
+            <div class="indicator-tabs">
+                <span class="tab ">{{ $indicator->category->standard->name ?? '-' }}</span>
+                <span class="tab-for-divider">|</span>
+                <span class="tab">{{ $indicator->category->name ?? '-' }}</span>
             </div>
+
             <hr class="tab-divider">
-            <div class="card ">
-                <h2 class="card-title">คำอธิบายตัวบ่งชี้</h2>
-                <div class="description-box">
-                    {!! $indicator->description ?? '-' !!}
-                </div>
-            </div>
-            <div class="card">
-                <h2 class="card-title">เกณฑ์การพิจารณา</h2>
-                @forelse($indicator->criterias as $criteriaIndex => $criteria)
-                    <div class="criteria-box" id="criteria-{{ $criteria->id }}">
-                        <div class="criteria-header">
-                            <div class="criteria-title">
-                                {{ $criteria->sequence }}. {!! $criteria->name !!}
-                            </div>
-                            {{-- <div class="criteria-status"> --}}
-                            <select name="criterias[{{ $criteria->id }}][status]"
-                                class="criteria-status text-sm text-center"
-                                @if ($locked) disabled @endif form="variables-form"
-                                data-criteria-id="{{ $criteria->id }}">
-                                <option value="0" {{ ($criteria->status ?? 0) == 0 ? 'selected' : '' }}>
-                                    รอดำเนินการ</option>
-                                <option value="1" {{ ($criteria->status ?? 0) == 1 ? 'selected' : '' }}>
-                                    เอกสารครบถ้วน
-                                </option>
-                                <option value="2" {{ ($criteria->status ?? 0) == 2 ? 'selected' : '' }}>
-                                    เอกสารไม่ครบถ้วน
-                                </option>
-                            </select>
-                            {{-- </div> --}}
-                        </div>
-                        <div class="criteria-content">
-                            {{-- อัปโหลดหลักฐาน --}}
-                            <x-evidence-uploader :criteria="$criteria" :store-route="route('evidences.store')" :locked-statuses="$locked" />
-                            {{-- คำอธิบายเกณฑ์ --}}
-                            @if ($criteria->description)
-                                <div class="criteria-description">
-                                    {!! $criteria->description !!}
-                                </div>
-                            @endif
-                            <div class="evidence-list evidence-list-{{ $criteria->id }}">
-                                @forelse($criteria->evidences as $evidence)
-                                    @php
-                                        $type = strtolower($evidence->type ?? '');
-                                        $name = strtolower($evidence->name ?? '');
-                                    @endphp
-                                    <div class="evidence-item" id="evidence-{{ $evidence->id }}">
-                                        <div class="flex items-center space-x-2">
-                                            <span class="evidence-icon">
-                                                @if (Str::endsWith($type, 'pdf'))
-                                                    <i data-lucide="file-text" style="color:#dc2626;"></i>
-                                                @elseif (Str::endsWith($type, 'doc') || Str::endsWith($type, 'docx') || Str::endsWith($name, '.docx'))
-                                                    <i data-lucide="file-text" style="color:#2563eb;"></i>
-                                                @elseif (Str::endsWith($type, 'ppt') || Str::endsWith($type, 'pptx') || Str::endsWith($name, '.pptx'))
-                                                    <i data-lucide="presentation" style="color:#eb7e25;"></i>
-                                                @elseif (in_array($type, ['jpg', 'jpeg', 'png', 'gif', 'image']))
-                                                    <i data-lucide="image" style="color:#16a34a;"></i>
-                                                @elseif (Str::endsWith($type, 'xls') || Str::endsWith($type, 'xlsx') || Str::contains($name, '.xls'))
-                                                    <i data-lucide="file-spreadsheet" style="color:#059669;"></i>
-                                                @elseif ($type === 'url')
-                                                    <i data-lucide="link" style="color:#9333ea;"></i>
-                                                @elseif ($type === 'note')
-                                                    <i data-lucide="sticky-note" style="color:#f59e0b;"></i>
-                                                @else
-                                                    <i data-lucide="file" style="color:#6b7280;"></i>
-                                                @endif
-                                            </span>
-                                            <span class="evidence-name">
-                                                @php
-                                                    $ext = strtolower(pathinfo($evidence->name, PATHINFO_EXTENSION));
-                                                    $openInNewTab = in_array($ext, [
-                                                        'pdf',
-                                                        'jpg',
-                                                        'jpeg',
-                                                        'png',
-                                                        'gif',
-                                                        'svg',
-                                                        'txt',
-                                                        'csv',
-                                                        'htm',
-                                                        'html',
-                                                    ]);
-                                                @endphp
-
-                                                @if ($openInNewTab)
-                                                    {{-- PDF & Image → เปิดในแท็บใหม่ --}}
-                                                    <span id="evidence-link-{{ $evidence->id }}">
-                                                        <a href="{{ route('evidences.download', $evidence->id) }}"
-                                                            target="_blank" rel="noopener noreferrer"
-                                                            class="text-blue-600 underline hover:text-blue-800">
-                                                            <span
-                                                                id="evidence-name-text-{{ $evidence->id }}">{{ $evidence->name }}</span>
-                                                        </a>
-                                                    </span>
-                                                @else
-                                                    {{-- Word, Excel, PPT → ดาวน์โหลด --}}
-                                                    <span id="evidence-link-{{ $evidence->id }}">
-                                                        <a href="{{ route('evidences.download', $evidence->id) }}" download
-                                                            class="text-blue-600 underline hover:text-blue-800">
-                                                            <span
-                                                                id="evidence-name-text-{{ $evidence->id }}">{{ $evidence->name }}</span>
-                                                        </a>
-                                                    </span>
-                                                @endif
-                                            </span>
-                                            @if (!$locked)
-                                                <button type="button"
-                                                    class=" text-slate-500 hover:text-slate-700 cursor-pointer"
-                                                    title="แก้ไขชื่อไฟล์"
-                                                    onclick="startEditEvidenceName({{ $evidence->id }})">
-                                                    ✏️
-                                                </button>
-                                                <span id="evidence-edit-{{ $evidence->id }}"
-                                                    class="evidence-edit flex flex-wrap sm:flex-nowrap items-center gap-2 w-full sm:w-auto"
-                                                    style="display:none"
-                                                    data-update-url="{{ route('evidences.update', $evidence->id) }}">
-                                                    <input type="text" id="evidence-input-{{ $evidence->id }}"
-                                                        value="{{ $evidence->name }}"
-                                                        class="border rounded px-2 py-1 text-[13px] min-w-0 w-full sm:w-60" />
-                                                    <div class="button-group flex space-x-2">
-                                                        <button type="button"
-                                                            class="text-green-600 hover:text-green-700 cursor-pointer "
-                                                            onclick="saveEvidenceName({{ $evidence->id }})">บันทึก</button>
-                                                        <button type="button"
-                                                            class="text-slate-600 hover:text-slate-800 cursor-pointer"
-                                                            onclick="cancelEditEvidenceName({{ $evidence->id }})">ยกเลิก</button>
-                                                    </div>
-                                                </span>
-                                            @endif
-
-                                        </div>
-
-                                        <div class="flex items-center justify-center">
-                                            {{-- Modal ลบหลักฐาน --}}
-                                            <x-modal title="ยืนยันการลบหลักฐาน" size="sm" :context="'delete-evidence-' . $evidence->id">
-                                                <x-slot:trigger>
-                                                    <button type="button" class="btn-delete" title="ลบหลักฐาน"
-                                                        @if ($locked) hidden @endif>
-                                                        ลบ
-                                                    </button>
-                                                </x-slot:trigger>
-
-                                                <div class="space-y-2">
-                                                    <p class="text-slate-700">
-                                                        ต้องการลบหลักฐาน <span
-                                                            class="font-semibold">{{ $evidence->name }}</span> ใช่หรือไม่?
-                                                    </p>
-
-                                                    {{-- ฟอร์มลบ (DELETE) --}}
-                                                    <form x-ref="delForm" method="POST"
-                                                        action="{{ route('evidences.destroy', $evidence->id) }}">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                        {{-- ถ้าต้องการกลับมาหน้าปัจจุบันหลังลบ --}}
-                                                        <input type="hidden" name="redirect"
-                                                            value="{{ url()->current() }}">
-                                                    </form>
-                                                </div>
-
-                                                <x-slot:footer>
-                                                    <div class="flex justify-between gap-5">
-                                                        <button type="button" class="btn btn-outline"
-                                                            @click="$dispatch('modal:close')">
-                                                            ยกเลิก
-                                                        </button>
-                                                        <button type="button" class="btn btn-danger"
-                                                            @click="$refs.delForm.submit()">
-                                                            ยืนยันการลบ
-                                                        </button>
-                                                    </div>
-                                                </x-slot:footer>
-                                            </x-modal>
-                                        </div>
-                                    </div>
-                                @empty
-                                    <div class="text-sm text-center text-gray-500 opacity-75">----- ยังไม่มีหลักฐานแนบ
-                                        -----
-                                    </div>
-                                @endforelse
-                            </div>
-                        </div>
-                    </div>
-                @empty
-                    <p class="text-gray-500">----- ยังไม่มีเกณฑ์การพิจารณา -----</p>
-                @endforelse
-            </div>
-            @php
-                $condition = $indicator->condition ?? '';
-                // ลบช่องว่างรอบ ๆ
-                $trimmed = trim($condition);
-
-                // เช็คว่ามีแท็ก <img> หรือมีข้อความจริง ๆ หลังจากลบแท็ก HTML
-                $hasImage = preg_match('/<img\s[^>]*src=["\']?([^>"\']+)["\']?/i', $trimmed);
-                $hasText = trim(strip_tags($trimmed)) !== '';
-            @endphp
-
-            @if ($hasImage || $hasText)
-                <div class="card">
-                    <h2 class="card-title">วิธีการคำนวน</h2>
-                    <div class="criteria-box">
-                        {!! $indicator->condition !!}
-                    </div>
-                </div>
-            @endif
-
-            <div class="card">
-                <h2 class="card-title">เกณฑ์การให้คะแนน</h2>
-                <div class="criteria-box list-disc list-inside">
-                    {!! $indicator->comment ?? '-' !!}
-                </div>
-
-            </div>
-
-            @if ($indicator->variables->where('type', 'input')->isNotEmpty())
-                <div class="card">
-                    <h2 class="card-title">กรอกค่าตัวแปร</h2>
-                    @php
-                        $inputVariables = $indicator->variables->filter(fn($v) => trim($v->type) === 'input');
-                    @endphp
-                    @forelse($inputVariables as $variable)
-                        <div class="variable-row">
-                            <label class="variable-label">
-                                {{ $variable->label_name ?? $variable->variable_name }}
-                            </label>
-                            <input type="number" name="variables[{{ $variable->id }}]"
-                                value="{{ old('variables.' . $variable->id, $variable->value) }}"
-                                placeholder="กรุณากรอกร้อยละเป็นตัวเลข" class="variable-input" form="variables-form"
-                                @if ($locked) readonly @endif>
-                        </div>
+            <div class="info-container">
+                <div class="info-row">
+                    <span class="label">หน่วยงานที่รับผิดชอบ:</span>
+                    @forelse($indicator->assignments as $assignment)
+                        @if ($assignment->collectorUser)
+                            <span class="chip">
+                                {{ $assignment->collectorUser->department->name }}
+                            </span>
+                        @endif
                     @empty
-                        <p class="text-gray-500">ยังไม่มีตัวแปรที่ต้องกรอก</p>
+                        <span class="value">-</span>
                     @endforelse
                 </div>
-            @endif
-
-            <div class="card">
-                <h2 class="card-title">หมายเหตุ</h2>
-                <div class="annotation-box">
-                    {!! $indicator->annotation ?? '-' !!}
+                <div class="info-row">
+                    <span class="label">ผู้รับผิดชอบในการรวบรวม:</span>
+                    @forelse($indicator->assignments as $assignment)
+                        @if ($assignment->collectorUser)
+                            <span class="chip">
+                                {{ $assignment->collectorUser->name }}
+                            </span>
+                        @endif
+                    @empty
+                        <span class="value">-</span>
+                    @endforelse
+                </div>
+                <div class="info-row">
+                    <span class="label">สถานะตัวบ่งชี้:</span>
+                    <x-status-badge :status="$indicator->status" size="sm" />
                 </div>
             </div>
-
-            <div class="card">
-                <h2 class="card-title">คะแนนที่ได้</h2>
-                <div class="score-display-container">
-                    <div class="score-item">
-                        <div class="score-label">คะแนนที่ได้</div>
-                        <div class="score-value-display current-score">
-                            {{ $indicator->score_acc ?? '0' }}
+        </div>
+        <hr class="tab-divider">
+        <div class="card ">
+            <h2 class="card-title">คำอธิบายตัวบ่งชี้</h2>
+            <div class="description-box">
+                {!! $indicator->description ?? '-' !!}
+            </div>
+        </div>
+        <div class="card">
+            <h2 class="card-title">เกณฑ์การพิจารณา</h2>
+            @forelse($indicator->criterias as $criteriaIndex => $criteria)
+                <div class="criteria-box" id="criteria-{{ $criteria->id }}">
+                    <div class="criteria-header">
+                        <div class="criteria-title">
+                            {{ $criteria->sequence }}. {!! $criteria->name !!}
                         </div>
+                        {{-- <div class="criteria-status"> --}}
+                        <select name="criterias[{{ $criteria->id }}][status]" class="criteria-status text-sm text-center"
+                            @if ($locked) disabled @endif form="variables-form"
+                            data-criteria-id="{{ $criteria->id }}">
+                            <option value="0" {{ ($criteria->status ?? 0) == 0 ? 'selected' : '' }}>
+                                รอดำเนินการ</option>
+                            <option value="1" {{ ($criteria->status ?? 0) == 1 ? 'selected' : '' }}>
+                                เอกสารครบถ้วน
+                            </option>
+                            <option value="2" {{ ($criteria->status ?? 0) == 2 ? 'selected' : '' }}>
+                                เอกสารไม่ครบถ้วน
+                            </option>
+                        </select>
+                        {{-- </div> --}}
                     </div>
-                    <div class="score-separator">/</div>
-                    <div class="score-item">
-                        <div class="score-label">คะแนนเต็ม</div>
-                        <div class="score-value-display max-score">
-                            {{ $indicator->max_score ?? '0' }}
+                    <div class="criteria-content">
+                        {{-- อัปโหลดหลักฐาน --}}
+                        <x-evidence-uploader :criteria="$criteria" :store-route="route('evidences.store')" :locked-statuses="$locked" />
+                        {{-- คำอธิบายเกณฑ์ --}}
+                        @if ($criteria->description)
+                            <div class="criteria-description">
+                                {!! $criteria->description !!}
+                            </div>
+                        @endif
+                        <div class="evidence-list evidence-list-{{ $criteria->id }}">
+                            @forelse($criteria->evidences as $evidence)
+                                @php
+                                    $type = strtolower($evidence->type ?? '');
+                                    $name = strtolower($evidence->name ?? '');
+                                @endphp
+                                <div class="evidence-item" id="evidence-{{ $evidence->id }}">
+                                    <div class="flex items-center space-x-2">
+                                        <span class="evidence-icon">
+                                            @if (Str::endsWith($type, 'pdf'))
+                                                <i data-lucide="file-text" style="color:#dc2626;"></i>
+                                            @elseif (Str::endsWith($type, 'doc') || Str::endsWith($type, 'docx') || Str::endsWith($name, '.docx'))
+                                                <i data-lucide="file-text" style="color:#2563eb;"></i>
+                                            @elseif (Str::endsWith($type, 'ppt') || Str::endsWith($type, 'pptx') || Str::endsWith($name, '.pptx'))
+                                                <i data-lucide="presentation" style="color:#eb7e25;"></i>
+                                            @elseif (in_array($type, ['jpg', 'jpeg', 'png', 'gif', 'image']))
+                                                <i data-lucide="image" style="color:#16a34a;"></i>
+                                            @elseif (Str::endsWith($type, 'xls') || Str::endsWith($type, 'xlsx') || Str::contains($name, '.xls'))
+                                                <i data-lucide="file-spreadsheet" style="color:#059669;"></i>
+                                            @elseif ($type === 'url')
+                                                <i data-lucide="link" style="color:#9333ea;"></i>
+                                            @elseif ($type === 'note')
+                                                <i data-lucide="sticky-note" style="color:#f59e0b;"></i>
+                                            @else
+                                                <i data-lucide="file" style="color:#6b7280;"></i>
+                                            @endif
+                                        </span>
+                                        <span class="evidence-name">
+                                            @php
+                                                $ext = strtolower(pathinfo($evidence->name, PATHINFO_EXTENSION));
+                                                $openInNewTab = in_array($ext, [
+                                                    'pdf',
+                                                    'jpg',
+                                                    'jpeg',
+                                                    'png',
+                                                    'gif',
+                                                    'svg',
+                                                    'txt',
+                                                    'csv',
+                                                    'htm',
+                                                    'html',
+                                                ]);
+                                            @endphp
+
+                                            @if ($openInNewTab)
+                                                {{-- PDF & Image → เปิดในแท็บใหม่ --}}
+                                                <span id="evidence-link-{{ $evidence->id }}">
+                                                    <a href="{{ route('evidences.download', $evidence->id) }}"
+                                                        target="_blank" rel="noopener noreferrer"
+                                                        class="text-blue-600 underline hover:text-blue-800">
+                                                        <span
+                                                            id="evidence-name-text-{{ $evidence->id }}">{{ $evidence->name }}</span>
+                                                    </a>
+                                                </span>
+                                            @else
+                                                {{-- Word, Excel, PPT → ดาวน์โหลด --}}
+                                                <span id="evidence-link-{{ $evidence->id }}">
+                                                    <a href="{{ route('evidences.download', $evidence->id) }}" download
+                                                        class="text-blue-600 underline hover:text-blue-800">
+                                                        <span
+                                                            id="evidence-name-text-{{ $evidence->id }}">{{ $evidence->name }}</span>
+                                                    </a>
+                                                </span>
+                                            @endif
+                                        </span>
+                                        @if (!$locked)
+                                            <button type="button"
+                                                class=" text-slate-500 hover:text-slate-700 cursor-pointer"
+                                                title="แก้ไขชื่อไฟล์" onclick="startEditEvidenceName({{ $evidence->id }})">
+                                                ✏️
+                                            </button>
+                                            <span id="evidence-edit-{{ $evidence->id }}"
+                                                class="evidence-edit flex flex-wrap sm:flex-nowrap items-center gap-2 w-full sm:w-auto"
+                                                style="display:none"
+                                                data-update-url="{{ route('evidences.update', $evidence->id) }}">
+                                                <input type="text" id="evidence-input-{{ $evidence->id }}"
+                                                    value="{{ $evidence->name }}"
+                                                    class="border rounded px-2 py-1 text-[13px] min-w-0 w-full sm:w-60" />
+                                                <div class="button-group flex space-x-2">
+                                                    <button type="button"
+                                                        class="text-green-600 hover:text-green-700 cursor-pointer "
+                                                        onclick="saveEvidenceName({{ $evidence->id }})">บันทึก</button>
+                                                    <button type="button"
+                                                        class="text-slate-600 hover:text-slate-800 cursor-pointer"
+                                                        onclick="cancelEditEvidenceName({{ $evidence->id }})">ยกเลิก</button>
+                                                </div>
+                                            </span>
+                                        @endif
+
+                                    </div>
+
+                                    <div class="flex items-center justify-center">
+                                        {{-- Modal ลบหลักฐาน --}}
+                                        <x-modal title="ยืนยันการลบหลักฐาน" size="sm" :context="'delete-evidence-' . $evidence->id">
+                                            <x-slot:trigger>
+                                                <button type="button" class="btn-delete" title="ลบหลักฐาน"
+                                                    @if ($locked) hidden @endif>
+                                                    ลบ
+                                                </button>
+                                            </x-slot:trigger>
+
+                                            <div class="space-y-2">
+                                                <p class="text-slate-700">
+                                                    ต้องการลบหลักฐาน <span
+                                                        class="font-semibold">{{ $evidence->name }}</span> ใช่หรือไม่?
+                                                </p>
+
+                                                {{-- ฟอร์มลบ (DELETE) --}}
+                                                <form x-ref="delForm" method="POST"
+                                                    action="{{ route('evidences.destroy', $evidence->id) }}">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    {{-- ถ้าต้องการกลับมาหน้าปัจจุบันหลังลบ --}}
+                                                    <input type="hidden" name="redirect"
+                                                        value="{{ url()->current() }}">
+                                                </form>
+                                            </div>
+
+                                            <x-slot:footer>
+                                                <div class="flex justify-between gap-5">
+                                                    <button type="button" class="btn btn-outline"
+                                                        @click="$dispatch('modal:close')">
+                                                        ยกเลิก
+                                                    </button>
+                                                    <button type="button" class="btn btn-danger"
+                                                        @click="$refs.delForm.submit()">
+                                                        ยืนยันการลบ
+                                                    </button>
+                                                </div>
+                                            </x-slot:footer>
+                                        </x-modal>
+                                    </div>
+                                </div>
+                            @empty
+                                <div class="text-sm text-center text-gray-500 opacity-75">----- ยังไม่มีหลักฐานแนบ
+                                    -----
+                                </div>
+                            @endforelse
                         </div>
                     </div>
                 </div>
+            @empty
+                <p class="text-gray-500">----- ยังไม่มีเกณฑ์การพิจารณา -----</p>
+            @endforelse
+        </div>
+        @php
+            $condition = $indicator->condition ?? '';
+            // ลบช่องว่างรอบ ๆ
+            $trimmed = trim($condition);
+
+            // เช็คว่ามีแท็ก <img> หรือมีข้อความจริง ๆ หลังจากลบแท็ก HTML
+            $hasImage = preg_match('/<img\s[^>]*src=["\']?([^>"\']+)["\']?/i', $trimmed);
+            $hasText = trim(strip_tags($trimmed)) !== '';
+        @endphp
+
+        @if ($hasImage || $hasText)
+            <div class="card">
+                <h2 class="card-title">วิธีการคำนวน</h2>
+                <div class="criteria-box">
+                    {!! $indicator->condition !!}
+                </div>
+            </div>
+        @endif
+
+        <div class="card">
+            <h2 class="card-title">เกณฑ์การให้คะแนน</h2>
+            <div class="criteria-box list-disc list-inside">
+                {!! $indicator->comment ?? '-' !!}
             </div>
 
-            <form id="variables-form" action="{{ route('dashboardkpi.admin.saveVariables', $indicator->id) }}"
-                method="POST" class="hidden">
-                @csrf
-                @method('PUT')
-                <!-- ✅ hidden status -->
-                <input type="hidden" name="status" id="status-input" value="{{ $indicator->status ?? 2 }}">
-            </form>
+        </div>
 
-            <div class="action-bts">
-                <button type="button" class="btn btn-outline" id="back-btn"
-                    onclick="location.href='{{ route('dashboardkpi.index') }}'">
-                    <i class="fa fa-undo"></i> กลับ
-                </button>
+        @if ($indicator->variables->where('type', 'input')->isNotEmpty())
+            <div class="card">
+                <h2 class="card-title">กรอกค่าตัวแปร</h2>
+                @php
+                    $inputVariables = $indicator->variables->filter(fn($v) => trim($v->type) === 'input');
+                @endphp
+                @forelse($inputVariables as $variable)
+                    <div class="variable-row">
+                        <label class="variable-label">
+                            {{ $variable->label_name ?? $variable->variable_name }}
+                        </label>
+                        <input type="number" name="variables[{{ $variable->id }}]"
+                            value="{{ old('variables.' . $variable->id, $variable->value) }}"
+                            placeholder="กรุณากรอกร้อยละเป็นตัวเลข" class="variable-input" form="variables-form"
+                            @if ($locked) readonly @endif>
+                    </div>
+                @empty
+                    <p class="text-gray-500">ยังไม่มีตัวแปรที่ต้องกรอก</p>
+                @endforelse
+            </div>
+        @endif
 
-                <button type="submit" class="btn btn-primary" form="variables-form"
-                    @if ($locked) hidden @endif>
-                    <i class="fa fa-save"></i> บันทึกผลลัพธ์
-                </button>
+        <div class="card">
+            <h2 class="card-title">หมายเหตุ</h2>
+            <div class="annotation-box">
+                {!! $indicator->annotation ?? '-' !!}
+            </div>
+        </div>
 
-                <x-modal title="เปลี่ยนสถานะตัวบ่งชี้" size="sm" :context="'status'">
-                    <x-slot:trigger>
-                        <button type="button" class="btn btn-secondary" data-allow-when-locked="true">
-                            <i class="fa-solid fa-gear"></i>เปลี่ยนสถานะตัวบ่งชี้
-                        </button>
-                    </x-slot:trigger>
+        <div class="card">
+            <h2 class="card-title">คะแนนที่ได้</h2>
+            <div class="score-display-container">
+                <div class="score-item">
+                    <div class="score-label">คะแนนที่ได้</div>
+                    <div class="score-value-display current-score">
+                        {{ $indicator->score_acc ?? '0' }}
+                    </div>
+                </div>
+                <div class="score-separator">/</div>
+                <div class="score-item">
+                    <div class="score-label">คะแนนเต็ม</div>
+                    <div class="score-value-display max-score">
+                        {{ $indicator->max_score ?? '0' }}
+                    </div>
+                </div>
+            </div>
+        </div>
 
-                    <div class="space-y-2">
-                        <button type="button" class="status-choice w-full text-left px-4 py-2 rounded hover:bg-slate-50"
-                            data-status="1">
-                            1 — บันทึกเป็นฉบับร่าง
-                        </button>
-                        <button type="button" class="status-choice w-full text-left px-4 py-2 rounded hover:bg-slate-50"
-                            data-status="2">
-                            2 — บันทึกเป็นฉบับจริง
-                        </button>
-                        <hr class="my-1 border-slate-200">
-                        <button type="button" class="status-choice w-full text-left px-4 py-2 rounded hover:bg-slate-50"
-                            data-status="3">
-                            3 — ผลการดำเนินงานครบถ้วนตามเกณฑ์มาตรฐาน
-                        </button>
-                        <button type="button" class="status-choice w-full text-left px-4 py-2 rounded hover:bg-slate-50"
-                            data-status="4">
-                            4 — ผลการดำเนินงานไม่ครบถ้วนตามเกณฑ์มาตรฐาน
+        <form id="variables-form" action="{{ route('dashboardkpi.admin.saveVariables', $indicator->id) }}"
+            method="POST" class="hidden">
+            @csrf
+            @method('PUT')
+            <!-- ✅ hidden status -->
+            <input type="hidden" name="status" id="status-input" value="{{ $indicator->status ?? 2 }}">
+        </form>
+
+        <div class="action-bts">
+            <button type="button" class="btn btn-outline" id="back-btn"
+                onclick="location.href='{{ route('dashboardkpi.index') }}'">
+                <i class="fa fa-undo"></i> กลับ
+            </button>
+
+            <button type="submit" class="btn btn-primary" form="variables-form"
+                @if ($locked) hidden @endif>
+                <i class="fa fa-save"></i> บันทึกผลลัพธ์
+            </button>
+
+            <x-modal title="เปลี่ยนสถานะตัวบ่งชี้" size="sm" :context="'status'">
+                <x-slot:trigger>
+                    <button type="button" class="btn btn-secondary" data-allow-when-locked="true">
+                        <i class="fa-solid fa-gear"></i>เปลี่ยนสถานะตัวบ่งชี้
+                    </button>
+                </x-slot:trigger>
+
+                <div class="space-y-2">
+                    <button type="button" class="status-choice w-full text-left px-4 py-2 rounded hover:bg-slate-50"
+                        data-status="1">
+                        1 — บันทึกเป็นฉบับร่าง
+                    </button>
+                    <button type="button" class="status-choice w-full text-left px-4 py-2 rounded hover:bg-slate-50"
+                        data-status="2">
+                        2 — บันทึกเป็นฉบับจริง
+                    </button>
+                    <hr class="my-1 border-slate-200">
+                    <button type="button" class="status-choice w-full text-left px-4 py-2 rounded hover:bg-slate-50"
+                        data-status="3">
+                        3 — ผลการดำเนินงานครบถ้วนตามเกณฑ์มาตรฐาน
+                    </button>
+                    <button type="button" class="status-choice w-full text-left px-4 py-2 rounded hover:bg-slate-50"
+                        data-status="4">
+                        4 — ผลการดำเนินงานไม่ครบถ้วนตามเกณฑ์มาตรฐาน
+                    </button>
+                </div>
+
+                <x-slot:footer>
+                    <div class="flex justify-end">
+                        <button type="button" class="btn btn-ghost" @click="$dispatch('modal:close')">
+                            ปิด
                         </button>
                     </div>
+                </x-slot:footer>
+            </x-modal>
 
-                    <x-slot:footer>
-                        <div class="flex justify-end">
-                            <button type="button" class="btn btn-ghost" @click="$dispatch('modal:close')">
-                                ปิด
-                            </button>
-                        </div>
-                    </x-slot:footer>
-                </x-modal>
-            </div>
+            <button type="button" class="btn btn-warning" form=""
+                @if ($locked) hidden @endif>
+                <i class="fa-solid fa-bell"></i>
+                <span class="hidden sm:inline">แจ้งเตือนผู้รับผิดชอบ</span>
+                <span class="sm:hidden">แจ้งเตือน</span>
+            </button>
         </div>
     </div>
 @endsection
@@ -836,6 +839,11 @@
 
 @push('styles')
     <style>
+        .container {
+            max-width: 960px !important;
+        }
+
+
         .action-bts {
             display: flex;
             justify-content: center;
@@ -854,7 +862,6 @@
             box-shadow: var(--shadow-default);
             padding: 24px;
             border: 1px solid #f3f4f6;
-            margin: 20px;
         }
 
         .card_total {
@@ -1209,7 +1216,7 @@
             border: 1px solid var(--color-gray-100);
             padding: 24px;
             gap: 24px;
-            max-width: 960px;
+
         }
 
         /* Title */
@@ -1218,6 +1225,7 @@
             font-weight: 700;
             color: var(--color-gray-800);
             margin-bottom: 16px;
+            text-align: center;
         }
 
         /* Tabs */
@@ -1593,7 +1601,6 @@
         }
     </style>
     <style>
-
         @media (max-width: 639px) {
             .evidence-edit {
                 flex-direction: column;
@@ -1608,7 +1615,7 @@
                 width: 100%;
                 align-items: center;
                 justify-content: center;
-            }   
+            }
         }
 
         @media (max-width: 639px) {

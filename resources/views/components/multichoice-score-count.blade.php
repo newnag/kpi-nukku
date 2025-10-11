@@ -65,7 +65,7 @@
 
         <div>
             <button type="button" @click="addRule()"
-                class="inline-flex items-center gap-2 rounded-xl border border-blue-500 text-blue-600 px-3 py-2 md:px-4 md:py-2 hover:bg-blue-50 text-sm md:text-base">
+                class="btn btn-outline">
                 เพิ่มเงื่อนไข <span class="text-xl leading-none">＋</span>
             </button>
         </div>
