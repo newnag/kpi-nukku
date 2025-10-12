@@ -200,6 +200,10 @@ class PermissionsTableSeeder extends Seeder
         $administrationAdmin->syncPermissions([
             // ===== Indicator =====
             'view-indicator-dashboard',
+            'view-indicator',
+            'create-indicator',
+            'edit-indicator',
+            'delete-indicator',
 
             // ===== Users =====
             'view-users',
