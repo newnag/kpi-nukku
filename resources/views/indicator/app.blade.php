@@ -329,7 +329,7 @@
                 @if ($indicators->isNotEmpty())
                     <!-- ปุ่มเปิด Modal -->
                     <button type="button" onclick="document.getElementById('preset-modal').classList.remove('hidden')"
-                        class="h-fit bg-purple-500 hover:bg-purple-600 text-white rounded-lg px-4 py-2 flex items-center gap-2">
+                        class="btn bg-purple-500 hover:bg-purple-600 text-white">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
                             stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -348,7 +348,7 @@
                 @endif
 
                 <button id="add_indicator_button"
-                    class="h-fit bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-4 py-2 flex items-center gap-2">
+                    class="btn btn-primary">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
@@ -1249,10 +1249,6 @@
                         table.search('').draw();
                     }
                 });
-
-                // $('#export_button').on('click', function() {
-                //     alert('Export to Excel functionality will be implemented here');
-                // });
 
                 $('#add_indicator_button').on('click', function() {
                     window.location.href = "{{ route('indicator.create') }}";
