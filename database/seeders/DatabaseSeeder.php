@@ -59,9 +59,16 @@ class DatabaseSeeder extends Seeder
 
         // Cleanup: remove all data related to indicators 57 and 58 (cascades will clean children)
         DB::table('indicators')->whereIn('id', [57, 58])->delete();
+
+        // Reseed core data affected by the cleanup
         $this->call(IndicatorsTableSeeder::class);
         $this->call(VariablesTableSeeder::class);
         $this->call(CriteriasTableSeeder::class);
         $this->call(ChecklistItemsTableSeeder::class);
+
+        // IMPORTANT: After reseeding indicators/variables, formulas and their pivot are
+        // cascaded-deleted earlier. Seed them again to ensure UI loads formulas.
+        $this->call(FormulasTableSeeder::class);
+        $this->call(VariableFormulasTableSeeder::class);
     }
 }
