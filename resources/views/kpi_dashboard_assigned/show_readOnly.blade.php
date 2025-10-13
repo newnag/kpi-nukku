@@ -248,10 +248,10 @@
             @endif
 
             <div class="action-bts">
-                <a href="{{ route('dashboardkpi.index') }}" class="btn btn-outline" id="back-btn">
-                    <i data-lucide="arrow-left"></i>
-                    ย้อนกลับ
-                </a>
+                <button type="button" class="btn btn-outline" id="back-btn"
+                    onclick="location.href='{{ route('dashboardkpi.index') }}'">
+                    <i class="fa fa-undo"></i> กลับ
+                </button>
             </div>
         </div>
     </div>
