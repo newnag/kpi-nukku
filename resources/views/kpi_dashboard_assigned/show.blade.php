@@ -329,7 +329,12 @@
                     onclick="location.href='{{ route('dashboardkpi.index') }}'">
                     <i class="fa fa-undo"></i> กลับ
                 </button>
-
+                @if ($locked)
+                    <button type="button" class="btn btn-secondary" 
+                      >
+                        <i class="fa fa-refresh"></i>แจ้งเจ้าหน้าที่ ขอแก้ไขข้อมูล
+                    </button>
+                @endif
                 @if (!$locked)
                     <!-- ปุ่มบันทึกฉบับร่าง (แก้ไขแล้ว: submit ฟอร์มเดียวกัน + data-status=1) -->
                     <button id="btn-save-draft" class="btn btn-primary" type="submit" form="variables-form"

@@ -410,39 +410,39 @@
                     <i class="fa-solid fa-chart-line"></i> ตรวจสอบตัวบ่งชี้
                 </a>
             @endhasanyrole
-            @canany(['view-indicator-dashboard', 'view-evidence', 'view-sar_report'])
-                <div class="dropdown">
-                    <div class="dropdown-toggle justify-between" role="button" tabindex="0" onclick="toggleDropdown(this)">
-                        <div><i class="fa-solid fa-database"></i>
-                            <span class="dropdown-toggle-span">จัดการข้อมูล</span>
+            @hasanyrole('super_admin|system_admin|qa_admin')
+                @canany(['view-indicator-dashboard', 'view-evidence', 'view-sar_report'])
+                    <div class="dropdown">
+                        <div class="dropdown-toggle justify-between" role="button" tabindex="0" onclick="toggleDropdown(this)">
+                            <div><i class="fa-solid fa-database"></i>
+                                <span class="dropdown-toggle-span">จัดการข้อมูล</span>
+                            </div>
+                            <i class="fa-solid fa-caret-down"></i>
                         </div>
-                        <i class="fa-solid fa-caret-down"></i>
+                        <div class="dropdown-menu-navbar">
+                            @can('view-indicator-dashboard')
+                                <a href="{{ route('indicator.index') }}"
+                                    class="buttonNav-item {{ request()->is('indicator*') ? 'active' : '' }}">
+                                    <i class="fa-solid fa-sliders"></i> จัดการตัวบ่งชี้
+                                </a>
+                            @endcan
+                            @can('view-sar_report')
+                                <a href="{{ route('sar_reports.index') }}"
+                                    class="buttonNav-item {{ request()->is('sar_reports*') ? 'active' : '' }}">
+                                    <i class="fa-solid fa-file-lines"></i> จัดการเอกสาร
+                                </a>
+                            @endcan
+                            @can('view-evidence')
+                                <a href="{{ route('evidences.index') }}"
+                                    class="buttonNav-item {{ request()->is('evidences*') ? 'active' : '' }}">
+                                    <i class="fa-solid fa-folder-open"></i> จัดการหลักฐาน
+                                </a>
+                            @endcan
+
+                        </div>
                     </div>
-                    <div class="dropdown-menu-navbar">
-                        @can('view-indicator-dashboard')
-                            <a href="{{ route('indicator.index') }}"
-                                class="buttonNav-item {{ request()->is('indicator*') ? 'active' : '' }}">
-                                <i class="fa-solid fa-sliders"></i> จัดการตัวบ่งชี้
-                            </a>
-                        @endcan
-                        @can('view-sar_report')
-                            <a href="{{ route('sar_reports.index') }}"
-                                class="buttonNav-item {{ request()->is('sar_reports*') ? 'active' : '' }}">
-                                <i class="fa-solid fa-file-lines"></i> จัดการเอกสาร
-                            </a>
-                        @endcan
-                        @can('view-evidence')
-                            <a href="{{ route('evidences.index') }}"
-                                class="buttonNav-item {{ request()->is('evidences*') ? 'active' : '' }}">
-                                <i class="fa-solid fa-folder-open"></i> จัดการหลักฐาน
-                            </a>
-                        @endcan
-
-                    </div>
-                </div>
-            @endcanany
-
-
+                @endcanany
+            @endhasanyrole
 
             @hasanyrole('super_admin|system_admin')
                 <div class="dropdown">
