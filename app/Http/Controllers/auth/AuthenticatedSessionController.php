@@ -30,7 +30,7 @@ class AuthenticatedSessionController extends Controller
 
         if (RateLimiter::tooManyAttempts($key, $maxAttempts)) {
             return response()->json([
-                'message' => 'พยายามเข้าสู่ระบบมากเกินไป โปรดลองใหม่ภายหลัง.',
+                'message' => 'พยายามเข้าสู่ระบบมากเกินไป โปรดลองใหม่ภายหลัง..',
             ], 429);
         }
 
