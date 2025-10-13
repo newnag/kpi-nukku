@@ -410,6 +410,12 @@
                     <i class="fa-solid fa-chart-line"></i> ตรวจสอบตัวบ่งชี้
                 </a>
             @endhasanyrole
+            @hasanyrole('administration_admin')
+                <a href="{{ route('indicator.index') }}"
+                    class="buttonNav-item {{ request()->is('indicator*') ? 'active' : '' }}">
+                    <i class="fa-solid fa-sliders"></i> จัดการตัวบ่งชี้
+                </a>
+            @endhasanyrole
             @hasanyrole('super_admin|system_admin|qa_admin')
                 @canany(['view-indicator-dashboard', 'view-evidence', 'view-sar_report'])
                     <div class="dropdown">
