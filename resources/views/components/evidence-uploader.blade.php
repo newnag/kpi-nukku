@@ -145,7 +145,19 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Trumbowyg/2.27.3/ui/trumbowyg.min.css">
     <link rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/Trumbowyg/2.27.3/plugins/colors/ui/trumbowyg.colors.min.css">
+    <style>
+        .trumbowyg-box .trumbowyg-editor-box {
+            height: fit-content !important;
+        }
 
+        .trumbowyg-box {
+            min-height: unset !important;
+        }
+
+        .trumbowyg-box {
+            overflow: hidden !important;
+        }
+    </style>
     <style>
         [x-cloak] {
             display: none !important

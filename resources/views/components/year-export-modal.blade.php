@@ -14,7 +14,7 @@
 <x-modal :title="$title" size="sm" :context="$context">
     <x-slot:trigger>
         <button type="button"
-            class="h-fit bg-green-500 hover:bg-green-600 text-white rounded-lg px-3 sm:px-4 py-2 flex items-center gap-2 text-xs sm:text-sm font-medium">
+            class="btn btn-success">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 sm:h-5 sm:w-5" fill="none" viewBox="0 0 24 24"
                 stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

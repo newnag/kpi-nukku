@@ -121,7 +121,7 @@
                 </div>
                 <input type="hidden" name="year" id="hidden-year-{{ $modalId }}" value="">
                 <button type="submit"
-                    class="mt-auto block w-full text-center bg-blue-500 text-white py-2 rounded hover:bg-blue-600 text-xs sm:text-sm font-medium flex justify-center items-center">
+                    class="btn bg-blue-500 text-white py-2 rounded hover:bg-blue-600 text-xs sm:text-sm font-medium flex justify-center items-center">
                     นำออกข้อมูล
                 </button>
             </form>
@@ -141,7 +141,7 @@
                     required>
 
                 <button type="submit"
-                    class="mt-auto w-full bg-green-500 text-white py-2 rounded hover:bg-green-600 text-xs sm:text-sm font-medium flex justify-center items-center">
+                    class="btn bg-green-500 text-white py-2 rounded hover:bg-green-600 text-xs sm:text-sm font-medium flex justify-center items-center">
                     นำเข้าข้อมูล
                 </button>
             </form>
@@ -160,7 +160,7 @@
                 <div id="duplicate-ids-container-{{ $modalId }}"></div>
 
                 <button type="button" id="duplicate-submit-{{ $modalId }}"
-                    class="mt-auto w-full bg-indigo-500 text-white py-2 rounded hover:bg-indigo-600 text-xs sm:text-sm font-medium flex justify-center items-center">
+                    class="btn bg-indigo-500 text-white py-2 rounded hover:bg-indigo-600 text-xs sm:text-sm font-medium flex justify-center items-center">
                     คัดลอกข้อมูล
                 </button>
             </form>

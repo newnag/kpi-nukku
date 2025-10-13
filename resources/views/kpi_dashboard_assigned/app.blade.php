@@ -1243,16 +1243,6 @@
                 if (url) window.location.href = url;
             });
 
-            // รองรับ Enter/Space เพื่อเข้าหน้าใหม่ (accessibility)
-            // $(document).on('keydown', '#myTable tbody tr[data-href]', function(e) {
-            //     const isEnter = e.key === 'Enter' || e.keyCode === 13;
-            //     const isSpace = e.key === ' ' || e.keyCode === 32;
-            //     if (isEnter || isSpace) {
-            //         e.preventDefault();
-            //         const url = this.dataset.href;
-            //         if (url) window.location.href = url;
-            //     }
-            // });
         </script>
 
         <script>
@@ -1309,10 +1299,6 @@
                 $('#export_button').on('click', function() {
                     alert('Export to Excel functionality will be implemented here');
                 });
-
-                // $('#add_indicator_button').on('click', function() {
-                //     window.location.href = "{{ route('indicator.create') }}";
-                // });
 
                 // Sorting dropdown functionality
                 $('#sort-button').on('click', function(e) {

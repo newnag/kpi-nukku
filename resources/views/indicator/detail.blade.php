@@ -145,7 +145,7 @@ $showChecklistSection = $type === 'checklist' || ($type !== 'variable_formula' &
         <div class="banner rounded-t-2xl border border-slate-200 p-5 ">
             <h1 class="text-2xl sm:text-3xl text-center font-bold">รายละเอียดตัวบ่งชี้</h1>
         </div>
-        <div class="mb-5 w-full px-4 sm:px-6 lg:px-8 py-6 bg-white rounded-b-2xl-2xl border border-slate-200 shadow-sm">
+        <div class="mb-5 w-full px-4 sm:px-6 lg:px-8 py-6 bg-white rounded-b-2xl border border-slate-200 shadow-sm">
             <div class="space-y-6 sm:space-y-5">
                 {{-- Card 1: Basic --}}
                 <x-card number="1" title="ข้อมูลตัวบ่งชี้">
@@ -428,12 +428,8 @@ $showChecklistSection = $type === 'checklist' || ($type !== 'variable_formula' &
                 {{-- Actions --}}
                 <div class="flex flex-col sm:flex-row justify-between gap-4 pt-2">
                     <a href="{{ route('indicator.index') }}"
-                        class="inline-flex items-center justify-center gap-2 rounded-xl bg-gray-200 text-gray-700 px-6 py-3 hover:bg-gray-300 text-sm md:text-base transition-colors order-2 sm:order-1">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
-                            stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-                        </svg>
-                        <span>กลับ</span>
+                        class="btn btn-outline">
+                        <i class="fa fa-undo"></i> กลับ
                     </a>
 
                     <div class="flex flex-col sm:flex-row gap-3 order-1 sm:order-2">
@@ -442,19 +438,19 @@ $showChecklistSection = $type === 'checklist' || ($type !== 'variable_formula' &
                             @csrf
                             @method('DELETE')
                             <button type="submit"
-                                class="inline-flex items-center justify-center gap-2 rounded-xl bg-rose-600 text-white px-6 py-3 hover:bg-rose-700 text-sm md:text-base transition-colors">
+                                class="btn btn-danger">
                                 ลบตัวบ่งชี้
                             </button>
                         </form>
 
                         {{-- Enable when edit route is ready --}}
                         <a href="{{ route('indicator.edit', $indicatorId) }}"
-                            class="inline-flex items-center justify-center gap-2 rounded-xl bg-amber-500 text-white px-6 py-3 hover:bg-amber-600 text-sm md:text-base transition-colors">
+                            class="btn btn-warning">
                             แก้ไข
                         </a>
 
                         <button type="button"
-                            class="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 text-white px-6 py-3 hover:bg-blue-700 text-sm md:text-base transition-colors">
+                            class="btn btn-primary">
                             แจ้งเตือนผู้รับผิดชอบ
                         </button>
                     </div>
