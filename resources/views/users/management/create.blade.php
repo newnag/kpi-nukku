@@ -17,12 +17,26 @@
 
                 <form action="{{ route('users.store') }}" method="POST">
                     @csrf
-                    <input type="hidden" id="name" name="name" value="{{ old('name') }}">
 
                     <div class="form-section">
                         <div class="section-title">ข้อมูลส่วนตัว</div>
                         <div class="form-row">
-                            <div class="form-group half-width">
+                            <div class="form-group third-width">
+                                <label class="form-label">คำนำหน้าชื่อ</label>
+                                <select name="title" class="form-input">
+                                    <option value="">-- เลือกคำนำหน้า --</option>
+                                    <option value="นาย" {{ old('title') == 'นาย' ? 'selected' : '' }}>นาย</option>
+                                    <option value="นาง" {{ old('title') == 'นาง' ? 'selected' : '' }}>นาง</option>
+                                    <option value="นางสาว" {{ old('title') == 'นางสาว' ? 'selected' : '' }}>นางสาว</option>
+                                    <option value="ผศ." {{ old('title') == 'ผศ.' ? 'selected' : '' }}>ผศ.</option>
+                                    <option value="รศ." {{ old('title') == 'รศ.' ? 'selected' : '' }}>รศ.</option>
+                                    <option value="ศ." {{ old('title') == 'ศ.' ? 'selected' : '' }}>ศ.</option>
+                                </select>
+                                @error('title')
+                                    <div class="error-message">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <div class="form-group third-width">
                                 <label class="form-label">ชื่อจริง <span class="required">*</span></label>
                                 <input id="first_name" type="text" name="first_name" class="form-input"
                                     value="{{ old('first_name') }}" placeholder="กรุณากรอกชื่อจริง" required>
@@ -30,10 +44,10 @@
                                     <div class="error-message">{{ $message }}</div>
                                 @enderror
                             </div>
-                            <div class="form-group half-width">
+                            <div class="form-group third-width">
                                 <label class="form-label">นามสกุล <span class="required">*</span></label>
                                 <input id="last_name" type="text" name="last_name" class="form-input"
-                                    value="{{ old('last_name') }}" placeholder="กรุณากรอกนามสกุลจริง" required>
+                                    value="{{ old('last_name') }}" placeholder="กรุณากรอกนามสกุล" required>
                                 @error('last_name')
                                     <div class="error-message">{{ $message }}</div>
                                 @enderror
@@ -49,17 +63,18 @@
                                 @enderror
                             </div>
                             <div class="form-group half-width">
-                                <label class="form-label">เบอร์โทรศัพท์ <span class="required">*</span></label>
+                                <label class="form-label">เบอร์โทรศัพท์</label>
                                 <input type="text" name="phone" class="form-input" value="{{ old('phone') }}"
-                                    placeholder="กรุณากรอกเบอร์โทรศัพท์" required>
+                                    placeholder="กรุณากรอกเบอร์โทรศัพท์">
                                 @error('phone')
                                     <div class="error-message">{{ $message }}</div>
                                 @enderror
                             </div>
                         </div>
+                    </div>
 
-
-
+                    <div class="form-section">
+                        <div class="section-title">ข้อมูลการทำงาน</div>
                         <div class="form-row">
                             <div class="form-group half-width">
                                 <label class="form-label">หน่วยงาน <span class="required">*</span></label>
@@ -75,15 +90,39 @@
                                     <div class="error-message">{{ $message }}</div>
                                 @enderror
                             </div>
+                        </div>
+                        <div class="form-row">
                             <div class="form-group half-width">
-                                <label class="form-label">สถานะ <span class="required">*</span></label>
-                                <select name="status" class="form-input" required>
-                                    <option value="1" {{ old('status', '1') == '1' ? 'selected' : '' }}>Active
-                                    </option>
-                                    <option value="0" {{ old('status', '1') == '0' ? 'selected' : '' }}>Inactive
-                                    </option>
-                                </select>
-                                @error('status')
+                                <label class="form-label">ประเภทบุคลากร</label>
+                                <input type="text" name="positype" class="form-input" value="{{ old('positype') }}"
+                                    placeholder="เช่น พนักงานมหาวิทยาลัย, ข้าราชการ">
+                                @error('positype')
+                                    <div class="error-message">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <div class="form-group half-width">
+                                <label class="form-label">สายงาน</label>
+                                <input type="text" name="workline" class="form-input" value="{{ old('workline') }}"
+                                    placeholder="เช่น สนับสนุน, วิชาการ">
+                                @error('workline')
+                                    <div class="error-message">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group half-width">
+                                <label class="form-label">ตำแหน่ง</label>
+                                <input type="text" name="posi" class="form-input" value="{{ old('posi') }}"
+                                    placeholder="เช่น นักวิชาการคอมพิวเตอร์">
+                                @error('posi')
+                                    <div class="error-message">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <div class="form-group half-width">
+                                <label class="form-label">ระดับ</label>
+                                <input type="text" name="level" class="form-input" value="{{ old('level') }}"
+                                    placeholder="เช่น ปฏิบัติการ, ชำนาญการ, เชี่ยวชาญ">
+                                @error('level')
                                     <div class="error-message">{{ $message }}</div>
                                 @enderror
                             </div>
@@ -93,12 +132,15 @@
                     <div class="form-section">
                         <div class="section-title">ความปลอดภัย</div>
                         <div class="form-row">
-                            <div class="form-group half-width" style="position: relative;">
+                            <div class="form-group half-width">
                                 <label class="form-label">รหัสผ่าน <span class="required">*</span></label>
                                 <input type="password" id="password" name="password" class="form-input"
-                                    placeholder="กรุณากรอกรหัสผ่าน" required>
+                                    placeholder="กรุณากรอกรหัสผ่าน (อย่างน้อย 6 ตัวอักษร)" required>
+                                @error('password')
+                                    <div class="error-message">{{ $message }}</div>
+                                @enderror
                             </div>
-                            <div class="form-group half-width" style="position: relative;">
+                            <div class="form-group half-width">
                                 <label class="form-label">ยืนยันรหัสผ่าน <span class="required">*</span></label>
                                 <input type="password" id="password_confirmation" name="password_confirmation"
                                     class="form-input" placeholder="กรุณายืนยันรหัสผ่าน" required>
@@ -118,13 +160,22 @@
                                     <div class="error-message">{{ $message }}</div>
                                 @enderror
                             </div>
+                            <div class="form-group half-width">
+                                <label class="form-label">สถานะระบบ <span class="required">*</span></label>
+                                <select name="status" class="form-input" required>
+                                    <option value="1" {{ old('status', 1) == 1 ? 'selected' : '' }}>Active</option>
+                                    <option value="0" {{ old('status', 1) == 0 ? 'selected' : '' }}>Inactive</option>
+                                </select>
+                                @error('status')
+                                    <div class="error-message">{{ $message }}</div>
+                                @enderror
+                            </div>
                         </div>
                     </div>
 
                     <div class="form-actions">
-                        <a href="{{ route('users.index') }}" class="btn-back"><i data-lucide="arrow-left"
-                                class="btn-icon"></i> ยกเลิก</a>
-                        <button type="submit" class="submit-btn"><i data-lucide="save" class="btn-icon"></i>
+                        <a href="{{ route('users.index') }}" class="btn btn-outline"> ยกเลิก</a>
+                        <button type="submit" class="btn btn-primary"><i data-lucide="save" class="btn-icon"></i>
                             บันทึก</button>
                     </div>
                 </form>
@@ -133,19 +184,8 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const first = document.getElementById('first_name');
-            const last = document.getElementById('last_name');
-            const nameField = document.getElementById('name');
-
-            function compose() {
-                const full = [first?.value?.trim(), last?.value?.trim()].filter(Boolean).join(' ');
-                if (nameField) nameField.value = full;
-            }
-            first && first.addEventListener('input', compose);
-            last && last.addEventListener('input', compose);
-            compose();
-        });
+        // ไม่จำเป็นต้องมี script สร้าง name field แล้ว
+        // เพราะ display_name จะถูกสร้างใน Model ผ่าน Accessor
     </script>
 
     <style>
@@ -242,32 +282,6 @@
             margin-top: 40px;
             padding-top: 20px;
             border-top: 1px solid #eee;
-        }
-
-        .submit-btn {
-            background: #2196f3;
-            color: #fff;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 5px;
-            font-size: 16px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .btn-back {
-            background: #fff;
-            color: #398ECA;
-            border: 1px solid #398ECA;
-            padding: 12px 20px;
-            border-radius: 5px;
-            font-size: 16px;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 8px;
         }
     </style>
 @endsection

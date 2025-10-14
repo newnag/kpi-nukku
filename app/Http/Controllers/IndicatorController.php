@@ -70,12 +70,13 @@ class IndicatorController extends Controller
         $data['criteriaOptions'] = [];
 
         // ใช้สำหรับ multi-select + filter
-        $data['usersForAssign'] = User::select('id', 'name', 'department_id')
-            ->orderBy('name')
+        $data['usersForAssign'] = User::select('id', 'first_name', 'last_name', 'department_id')
+            ->orderBy('first_name')
+            ->orderBy('last_name')
             ->get()
             ->map(fn($u) => [
                 'id' => $u->id,
-                'name' => $u->name,
+                'name' => $u->display_name,
                 'department_id' => $u->department_id,
             ]);
 
@@ -207,12 +208,13 @@ class IndicatorController extends Controller
         // $data['criteriaOptions'] = [];
 
         // ใช้สำหรับ multi-select + filter
-        $data['usersForAssign'] = User::select('id', 'name', 'department_id')
-            ->orderBy('name')
+        $data['usersForAssign'] = User::select('id', 'first_name', 'last_name', 'department_id')
+            ->orderBy('first_name')
+            ->orderBy('last_name')
             ->get()
             ->map(fn($u) => [
                 'id' => $u->id,
-                'name' => $u->name,
+                'name' => $u->display_name,
                 'department_id' => $u->department_id,
             ]);
 

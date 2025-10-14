@@ -30,25 +30,41 @@ class UserController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-
-            'name' => 'required|string|max:100',
-            'password' => 'required|string|min:6',
-            'email' => 'required|email|max:50|unique:users',
-            'phone' => 'required|string|max:20',
-            'department_id' => 'required|integer',
-            'status' => 'required|boolean',
-            'role' => 'required|exists:roles,name', // ✅ ตรวจสอบชื่อบทบาท
+            'first_name' => 'required|string|max:100',
+            'last_name' => 'required|string|max:100',
+            'password' => 'required|string|min:6|confirmed',
+            'email' => 'required|email|max:100|unique:users',
+            'phone' => 'nullable|string|max:20',
+            'department_id' => 'required|integer|exists:departments,id',
+            'status' => 'required|in:0,1',
+            'role' => 'required|exists:roles,name',
+            
+            // ฟิลด์เสริม (ทั้งหมดเป็น nullable)
+            'title' => 'nullable|string|max:50',
+            'positype' => 'nullable|string|max:100',
+            'workline' => 'nullable|string|max:100',
+            'posi' => 'nullable|string|max:100',
+            'level' => 'nullable|string|max:100',
         ]);
 
         $user = User::create([
-
-            'name' => $request->name,
-            'password' => Hash::make($request->password),
+            // ข้อมูลส่วนตัว
+            'title' => $request->title,
+            'first_name' => $request->first_name,
+            'last_name' => $request->last_name,
+            
+            // ข้อมูลการทำงาน
+            'positype' => $request->positype,
+            'workline' => $request->workline,
+            'posi' => $request->posi,
+            'level' => $request->level,
+            
+            // ข้อมูลติดต่อและระบบ
             'email' => $request->email,
             'phone' => $request->phone,
+            'password' => Hash::make($request->password),
+            'status' => (bool) $request->status,
             'department_id' => $request->department_id,
-            'status' => $request->status,
-            'remember_token' => null
         ]);
 
         // ✅ กำหนดบทบาท
@@ -76,22 +92,42 @@ class UserController extends Controller
         $user = User::findOrFail($id);
 
         $validated = $request->validate([
-            'name'          => ['required', 'string', 'max:100'],
-            'email'         => ['required', 'email', 'max:100', Rule::unique('users', 'email')->ignore($user->id)],
-            'phone'         => ['required', 'string', 'max:20'],
+            'first_name' => ['required', 'string', 'max:100'],
+            'last_name' => ['required', 'string', 'max:100'],
+            'email' => ['required', 'email', 'max:100', Rule::unique('users', 'email')->ignore($user->id)],
+            'phone' => ['nullable', 'string', 'max:20'],
             'department_id' => ['required', 'integer', 'exists:departments,id'],
-            'status'        => ['required', 'in:0,1'],
-            'role'          => ['required', 'exists:roles,name'],
-            'password'      => ['nullable', 'confirmed', 'min:8'],
+            'status' => ['required', 'in:0,1'],
+            'role' => ['required', 'exists:roles,name'],
+            'password' => ['nullable', 'confirmed', 'min:8'],
+            
+            // ฟิลด์เสริม
+            'title' => ['nullable', 'string', 'max:50'],
+            'positype' => ['nullable', 'string', 'max:100'],
+            'workline' => ['nullable', 'string', 'max:100'],
+            'posi' => ['nullable', 'string', 'max:100'],
+            'level' => ['nullable', 'string', 'max:100'],
         ]);
 
         $updateData = [
-            'name'          => $validated['name'],
-            'email'         => $validated['email'],
-            'phone'         => $validated['phone'],
+            // ข้อมูลส่วนตัว
+            'title' => $validated['title'] ?? null,
+            'first_name' => $validated['first_name'],
+            'last_name' => $validated['last_name'],
+            
+            // ข้อมูลการทำงาน
+            'positype' => $validated['positype'] ?? null,
+            'workline' => $validated['workline'] ?? null,
+            'posi' => $validated['posi'] ?? null,
+            'level' => $validated['level'] ?? null,
+            
+            // ข้อมูลติดต่อและระบบ
+            'email' => $validated['email'],
+            'phone' => $validated['phone'],
             'department_id' => (int) $validated['department_id'],
-            'status'        => (int) $validated['status'],
+            'status' => (bool) $validated['status'],
         ];
+        
         if (!empty($validated['password'])) {
             $updateData['password'] = Hash::make($validated['password']);
         }
