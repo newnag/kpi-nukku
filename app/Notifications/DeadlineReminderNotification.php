@@ -33,7 +33,6 @@ class DeadlineReminderNotification extends Notification
             $mail->action('เปิดดูรายการตัวชี้วัดที่รับผิดชอบ', $this->actionUrl);
         }
 
-        return $mail->line('ขอบคุณค่ะ/ครับ');
+        return $mail->line('ขอบคุณค่ะ/ครับ')->salutation(' ');
     }
 }
-

@@ -24,7 +24,6 @@ class IndicatorAssignedNotification extends Notification
     {
         $indicator = $this->indicator;
         $title = sprintf('[KPI] มอบหมายงานใหม่: %s %s', (string) ($indicator->code ?? ''), (string) ($indicator->name ?? ''));
-
         $url = route('dashboardkpi.user.show', ['id' => $indicator->id]);
 
         return (new MailMessage)
@@ -33,7 +32,8 @@ class IndicatorAssignedNotification extends Notification
             ->line('คุณได้รับมอบหมายงานตัวชี้วัดใหม่ในระบบ KPI')
             ->line(sprintf('ตัวชี้วัด: %s (%s)', (string) ($indicator->name ?? '-'), (string) ($indicator->code ?? '-')))
             ->action('เปิดดูตัวชี้วัด', $url)
-            ->line('ขอบคุณที่ใช้งานระบบ');
+            ->line('ขอบคุณที่ใช้งานระบบ')
+            ->salutation(' ');
     }
 }
 

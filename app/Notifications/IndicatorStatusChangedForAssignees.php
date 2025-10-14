@@ -63,7 +63,7 @@ class IndicatorStatusChangedForAssignees extends Notification
             $mail->line('ปรับโดย: ' . $this->changedBy);
         }
 
-        return $mail->line('ขอบคุณค่ะ/ครับ');
+        return $mail->line('ขอบคุณค่ะ/ครับ')->salutation(' ');
     }
 }
 
