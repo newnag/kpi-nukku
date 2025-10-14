@@ -10,7 +10,7 @@
 
             <!-- ฟอร์ม setting -->
             <div class="Setting-form">
-                <div class="add-section-title">การตั้งค่าเว็บไซต์</div>
+                <div class="add-section-title">การตั้งค่าการแจ้งเตือน</div>
 
                 <form action="{{ route('settings.store') }}" method="POST">
                     @csrf
@@ -38,6 +38,36 @@
                     <div class="form-group">
                         <label class="form-label">ข้อความแจ้งเตือน</label>
                         <textarea name="message" class="form-input" rows="3" placeholder="เช่น กรุณากรอกข้อมูลภายในสิ้นเดือน">{{ old('message', $setting->message ?? '') }}</textarea>
+                    </div>
+
+                    <!-- เพิ่มเวลาในการแจ้งเตือน และตัวเลือกเตือนอัตโนมัติ -->
+                    <div class="form-group">
+                        <label class="form-label">เวลาแจ้งเตือน (รอบที่ 1)</label>
+                        <input type="time" name="notify_time1" class="form-input2" style="width:140px;"
+                            value="{{ old('notify_time1', $setting->notify_time1 ?? '09:00') }}">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">เวลาแจ้งเตือน (รอบที่ 2)</label>
+                        <input type="time" name="notify_time2" class="form-input2" style="width:140px;"
+                            value="{{ old('notify_time2', $setting->notify_time2 ?? '09:00') }}">
+                    </div>
+
+                    <hr style="margin: 20px 0;" />
+                    <div class="add-section-title">ตัวเลือกแจ้งเตือนอัตโนมัติ (ก่อนวันกำหนด)</div>
+                    <div class="form-group">
+                        <label class="form-label">เปิดใช้งาน</label>
+                        <input type="checkbox" name="remind_enabled" value="1" {{ old('remind_enabled', $setting->remind_enabled ?? false) ? 'checked' : '' }} />
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">จำนวนวันก่อนกำหนด (เช่น 7,3,1)</label>
+                        <input type="text" name="remind_days" class="form-input"
+                            value="{{ old('remind_days', $setting->remind_days ?? '7,3,1') }}" placeholder="7,3,1">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">เวลาแจ้งเตือนอัตโนมัติ</label>
+                        <input type="time" name="remind_time" class="form-input2" style="width:140px;"
+                            value="{{ old('remind_time', $setting->remind_time ?? '09:00') }}">
                     </div>
 
                     <!-- Submit -->

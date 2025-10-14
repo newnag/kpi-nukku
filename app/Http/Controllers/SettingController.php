@@ -19,8 +19,13 @@ class SettingController extends Controller
         $validated = $request->validate([
             'title'        => ['nullable', 'string', 'max:255'],
             'notify_date1' => ['nullable', 'date'],
+            'notify_time1' => ['nullable', 'date_format:H:i'],
             'notify_date2' => ['nullable', 'date'],
+            'notify_time2' => ['nullable', 'date_format:H:i'],
             'message'      => ['nullable', 'string', 'max:500'],
+            'remind_days'  => ['nullable', 'string', 'max:50'],
+            'remind_time'  => ['nullable', 'date_format:H:i'],
+            'remind_enabled' => ['nullable', 'boolean'],
         ]);
 
         // Normalize empty string to null for nullable fields
@@ -29,6 +34,8 @@ class SettingController extends Controller
         }
 
         // อัปเดตหรือสร้างแถวเดียว (id = 1)
+        $validated['remind_enabled'] = (bool) ($validated['remind_enabled'] ?? false);
+
         $setting = Setting::updateOrCreate(
             ['id' => 1],
             $validated
@@ -42,14 +49,21 @@ class SettingController extends Controller
         $validated = $request->validate([
             'title'        => ['nullable', 'string', 'max:255'],
             'notify_date1' => ['nullable', 'date'],
+            'notify_time1' => ['nullable', 'date_format:H:i'],
             'notify_date2' => ['nullable', 'date'],
+            'notify_time2' => ['nullable', 'date_format:H:i'],
             'message'      => ['nullable', 'string', 'max:500'],
+            'remind_days'  => ['nullable', 'string', 'max:50'],
+            'remind_time'  => ['nullable', 'date_format:H:i'],
+            'remind_enabled' => ['nullable', 'boolean'],
         ]);
 
         // Normalize empty string to null for nullable fields
         if (array_key_exists('title', $validated) && $validated['title'] === '') {
             $validated['title'] = null;
         }
+
+        $validated['remind_enabled'] = (bool) ($validated['remind_enabled'] ?? false);
 
         $setting = Setting::findOrFail($id);
         $setting->update($validated);

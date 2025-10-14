@@ -3,6 +3,10 @@
 @section('title', 'รายละเอียดตัวบ่งชี้')
 
 @section('content')
+    <div class="flex items-center justify-between mb-4">
+        <h1 class="text-xl font-semibold">รายละเอียดตัวชี้วัด</h1>
+
+    </div>
     @php
         // --- Normalize input (works with: ['data'=>...] JSON, or $indicator model/array) ---
         $ind = $data['data'] ?? ($data ?? ($indicator ?? null));
@@ -427,8 +431,7 @@ $showChecklistSection = $type === 'checklist' || ($type !== 'variable_formula' &
 
                 {{-- Actions --}}
                 <div class="flex flex-col sm:flex-row justify-between gap-4 pt-2">
-                    <a href="{{ route('indicator.index') }}"
-                        class="btn btn-outline">
+                    <a href="{{ route('indicator.index') }}" class="btn btn-outline">
                         <i class="fa fa-undo"></i> กลับ
                     </a>
 
@@ -437,22 +440,32 @@ $showChecklistSection = $type === 'checklist' || ($type !== 'variable_formula' &
                             onsubmit="return confirm('ต้องการลบตัวบ่งชี้นี้ใช่หรือไม่?')">
                             @csrf
                             @method('DELETE')
-                            <button type="submit"
-                                class="btn btn-danger">
+                            <button type="submit" class="btn btn-danger">
                                 ลบตัวบ่งชี้
                             </button>
                         </form>
 
                         {{-- Enable when edit route is ready --}}
-                        <a href="{{ route('indicator.edit', $indicatorId) }}"
-                            class="btn btn-warning">
+                        <a href="{{ route('indicator.edit', $indicatorId) }}" class="btn btn-warning">
                             แก้ไข
                         </a>
-
-                        <button type="button"
+                        @can('edit-indicator')
+                            @php $indicatorId = ($data['data']['id'] ?? ($data['id'] ?? ($indicator->id ?? null))); @endphp
+                            @if (!empty($indicatorId))
+                                {{-- @if (\Illuminate\Support\Facades\Route::has('indicator.notify')) --}}
+                                <form method="POST" action="{{ route('indicator.notify', ['id' => $indicatorId]) }}">
+                                    @csrf
+                                    <button type="submit" class="btn btn-primary">
+                                        ส่งแจ้งเตือนผู้รับมอบหมาย
+                                    </button>
+                                </form>
+                                {{-- @endif --}}
+                            @endif
+                        @endcan
+                        {{-- <button type="button"
                             class="btn btn-primary">
                             แจ้งเตือนผู้รับผิดชอบ
-                        </button>
+                        </button> --}}
                     </div>
                 </div>
             </div> {{-- /space-y --}}

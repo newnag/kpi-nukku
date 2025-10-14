@@ -375,9 +375,13 @@
                 </x-modal>
             @endif
             @if ($locked)
-                <button type="button" class="btn btn-warning">
-                    <i class="fa-solid fa-bell"></i>แจ้งเจ้าหน้าที่ ขอแก้ไขข้อมูล
-                </button>
+                <form method="POST" action="{{ route('dashboardkpi.user.requestCorrection', ['id' => $indicator->id]) }}" style="display:inline-block;margin-right:8px;">
+                    @csrf
+                    <button type="submit" class="btn btn-warning">
+                        <i class="fa-solid fa-bell"></i> ร้องขอให้ เจ้าหน้าที่ ปลดล็อก/แก้ไข
+                    </button>
+                </form>
+               
             @endif
         </div>
     </div>

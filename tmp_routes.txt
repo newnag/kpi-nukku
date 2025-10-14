@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\CategorieController;
@@ -88,11 +88,6 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/{id}/show', [IndicatorController::class, 'show'])
             ->name('show')
             ->middleware('permission:view-indicator');
-
-        // Manual notify assignees
-        Route::post('/{id}/notify', [IndicatorController::class, 'notifyAssignees'])
-            ->name('notify')
-            ->middleware('permission:edit-indicator');
 
         // Create
         Route::get('/create', [IndicatorController::class, 'create'])
@@ -330,7 +325,6 @@ Route::middleware(['auth'])->group(function () {
         Route::prefix('/user')->name('user.')->group(function () {
             Route::get('/kpi/{id}', [DashboardKpiUserController::class, 'show'])->name('show');
             Route::put('/kpi/{id}/save-variables', [DashboardKpiUserController::class, 'saveVariables'])->name('saveVariables');
-            Route::post('/kpi/{id}/request-correction', [DashboardKpiUserController::class, 'requestCorrection'])->name('requestCorrection');
         });
 
         Route::prefix('/admin')->name('admin.')->group(function () {
@@ -384,51 +378,3 @@ Route::get('/test', function () {
             foreach (glob($pub . DIRECTORY_SEPARATOR . '*.ttf') as $f) {
                 $t = $dst . DIRECTORY_SEPARATOR . basename($f);
                 if (!file_exists($t)) @copy($f, $t);
-            }
-        }
-        $sar = $dst . DIRECTORY_SEPARATOR . 'Sarabun-Regular.ttf';
-        $sarb = $dst . DIRECTORY_SEPARATOR . 'Sarabun-Bold.ttf';
-        if (!file_exists($sar) || filesize($sar) < 200000 || !file_exists($sarb) || filesize($sarb) < 200000) {
-            $winFonts = getenv('WINDIR') ? getenv('WINDIR') . DIRECTORY_SEPARATOR . 'Fonts' : 'C:\\Windows\\Fonts';
-            $tahoma = $winFonts . DIRECTORY_SEPARATOR . 'tahoma.ttf';
-            $tahomab = $winFonts . DIRECTORY_SEPARATOR . 'tahomabd.ttf';
-            if (@is_file($tahoma) && @is_file($tahomab)) {
-                @copy($tahoma, $sar);
-                @copy($tahomab, $sarb);
-            }
-        }
-    } catch (\Throwable $e) {
-    }
-
-    $pdf = Pdf::loadView('pdf_test')
-        ->setPaper('a4', 'portrait')
-        ->setOptions([
-            'isHtml5ParserEnabled' => true,
-            'isRemoteEnabled' => true,
-            'defaultFont' => 'SarabunLocal',
-            'enableFontSubsetting' => false,
-            'fontDir' => storage_path('fonts'),
-            'fontCache' => storage_path('fonts'),
-            'chroot' => base_path(),
-            'log_output_file' => storage_path('logs/dompdf.log'),
-            'logOutputFile' => storage_path('logs/dompdf.log'),
-        ]);
-
-    // Explicitly register the Sarabun font family with Dompdf's font metrics
-    try {
-        $dompdf = $pdf->getDomPDF();
-        $fm = $dompdf->getFontMetrics();
-        $fm->registerFont('SarabunLocal', [
-            'normal' => storage_path('fonts/Sarabun-Regular.ttf'),
-            'bold'   => storage_path('fonts/Sarabun-Bold.ttf'),
-        ]);
-    } catch (\Throwable $e) {
-        // ignore
-    }
-    return $pdf->stream('thai-test.pdf');
-});
-
-// View raw HTML of the same template to verify encoding independent of Dompdf
-Route::get('/test-html', function () {
-    return view('pdf_test');
-});
