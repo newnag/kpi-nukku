@@ -12,15 +12,27 @@ class User extends Authenticatable
 {
     use HasFactory, Notifiable;
     use HasRoles;
+    
     protected $fillable = [
-   
-        'name',
-        'password',
-        'phone',
-        'status',
+        // ข้อมูลส่วนตัว
+        'title',
+        'first_name',
+        'last_name',
+        
+        // ข้อมูลการทำงาน
+        'positype',
+        'workline',
+        'posi',
+        'level',
+        
+        // ข้อมูลติดต่อ
         'email',
+        'phone',
+        
+        // ระบบ
+        'password',
+        'status',
         'department_id',
-        'password_reset_token_id',
     ];
 
     protected $hidden = [
@@ -33,7 +45,34 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'status' => 'boolean',
         ];
+    }
+    
+    /**
+     * Get the user's name (backward compatibility)
+     * Alias for display_name
+     */
+    public function getNameAttribute()
+    {
+        return $this->display_name;
+    }
+    
+    /**
+     * Get the user's display name
+     */
+    public function getDisplayNameAttribute()
+    {
+        return trim($this->first_name . ' ' . $this->last_name);
+    }
+    
+    /**
+     * Get the user's full name with title
+     */
+    public function getFullNameAttribute()
+    {
+        $parts = array_filter([$this->title, $this->first_name, $this->last_name]);
+        return implode(' ', $parts);
     }
 
      public function department()
