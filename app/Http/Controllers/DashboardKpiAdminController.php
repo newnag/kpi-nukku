@@ -89,6 +89,21 @@ class DashboardKpiAdminController extends Controller
                 if ($previousStatus === 2 && $newStatus === 1) {
                     foreach ($indicator->assignments as $assignment) {
                         if ($assignment->collectorUser) {
+                            $recipient = $assignment->collectorUser;
+                            $email = (string) ($recipient->email ?? '');
+                            \Illuminate\Support\Facades\Log::info('Notify assignee about status change (2->1)', [
+                                'indicator_id' => $indicator->id,
+                                'recipient_id' => $recipient->id ?? null,
+                                'email' => $email,
+                                'prev' => $previousStatus,
+                                'new' => $newStatus,
+                            ]);
+                            if ($email === '') {
+                                \Illuminate\Support\Facades\Log::warning('Skip notify: recipient has no email', [
+                                    'recipient_id' => $recipient->id ?? null,
+                                ]);
+                                continue;
+                            }
                             $assignment->collectorUser->notify(new \App\Notifications\IndicatorStatusChangedForAssignees($indicator, $newStatus, $previousStatus, $changedBy));
                         }
                     }
@@ -97,13 +112,31 @@ class DashboardKpiAdminController extends Controller
                 if (in_array($newStatus, [3, 4], true)) {
                     foreach ($indicator->assignments as $assignment) {
                         if ($assignment->collectorUser) {
+                            $recipient = $assignment->collectorUser;
+                            $email = (string) ($recipient->email ?? '');
+                            \Illuminate\Support\Facades\Log::info('Notify assignee about status change (QA->assignee)', [
+                                'indicator_id' => $indicator->id,
+                                'recipient_id' => $recipient->id ?? null,
+                                'email' => $email,
+                                'prev' => $previousStatus,
+                                'new' => $newStatus,
+                            ]);
+                            if ($email === '') {
+                                \Illuminate\Support\Facades\Log::warning('Skip notify: recipient has no email', [
+                                    'recipient_id' => $recipient->id ?? null,
+                                ]);
+                                continue;
+                            }
                             $assignment->collectorUser->notify(new \App\Notifications\IndicatorStatusChangedForAssignees($indicator, $newStatus, $previousStatus, $changedBy));
                         }
                     }
                 }
             }
         } catch (\Throwable $e) {
-            // Silently ignore email issues
+            \Illuminate\Support\Facades\Log::error('Notify assignees failed', [
+                'indicator_id' => $indicator->id ?? null,
+                'error' => $e->getMessage(),
+            ]);
         }
 
         // ✅ ส่ง JSON กลับไป

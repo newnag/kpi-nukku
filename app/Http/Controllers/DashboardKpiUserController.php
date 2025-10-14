@@ -154,7 +154,7 @@ class DashboardKpiUserController extends Controller
         }
 
         return redirect()->route('dashboardkpi.user.show', $indicator->id)
-            ->with('success', 'ส่งคำร้องขอแก้ไขไปยัง QA แล้ว');
+            ->with('success', 'ส่งคำร้องขอแก้ไขไปยังเจ้าหน้าแล้ว');
     }
 
     private function serializeIndicatorForList(Indicator $i): array
