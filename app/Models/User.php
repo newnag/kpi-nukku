@@ -13,12 +13,13 @@ class User extends Authenticatable
     use HasFactory, Notifiable;
     use HasRoles;
     protected $fillable = [
-   
+    
         'name',
         'password',
         'phone',
         'status',
         'email',
+        'employee_id',
         'department_id',
         'password_reset_token_id',
     ];
@@ -50,5 +51,11 @@ class User extends Authenticatable
     public function evidences()
     {
         return $this->hasMany(Evidence::class);
+    }
+
+    // Computed display name for views referencing `$user->display_name`
+    public function getDisplayNameAttribute()
+    {
+        return $this->name ?: ($this->email ?? '');
     }
 }
