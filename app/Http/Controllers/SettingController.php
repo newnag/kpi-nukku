@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Setting;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
+use Carbon\Carbon;
 
 class SettingController extends Controller
 {
@@ -41,6 +43,15 @@ class SettingController extends Controller
             $validated
         );
 
+        // Auto-clear fixed reminder caches for today so new times take effect immediately
+        try {
+            $today = Carbon::now('Asia/Bangkok')->toDateString();
+            Cache::forget("reminder:fixed:d1:$today");
+            Cache::forget("reminder:fixed:d2:$today");
+        } catch (\Throwable $e) {
+            // ignore cache clear failures
+        }
+
         return redirect()->route('settings.index')->with('success', 'บันทึกข้อมูลสำเร็จ!');
     }
 
@@ -67,6 +78,15 @@ class SettingController extends Controller
 
         $setting = Setting::findOrFail($id);
         $setting->update($validated);
+
+        // Auto-clear fixed reminder caches for today so new times take effect immediately
+        try {
+            $today = Carbon::now('Asia/Bangkok')->toDateString();
+            Cache::forget("reminder:fixed:d1:$today");
+            Cache::forget("reminder:fixed:d2:$today");
+        } catch (\Throwable $e) {
+            // ignore cache clear failures
+        }
 
         return redirect()->route('settings.index')->with('success', 'อัปเดตข้อมูลสำเร็จ!');
     }
