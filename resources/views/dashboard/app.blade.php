@@ -16,8 +16,8 @@
     </div>
 
     <!-- Filter Card (component) -->
-    <x-filter :years="$yearsForFilter" :standards="$allStandards" :departments="$departments" :collectors="$collectors" :dimensions="$dimensionStats" :action="route('dashboard.index')"
-        :selectedYear="$displayYear" />
+    <x-filter :years="$yearsForFilter" :standards="$allStandards" :departments="$departments" :collectors="$collectors" 
+        :dimensions="$dimensionStats" :filters="$filters" :action="route('dashboard.index')" :selectedYear="$displayYear" />
 
     <!-- Stats Cards -->
     <div class="stats-grid">
@@ -364,6 +364,8 @@
                 window.ALL_COLLECTORS = @json($collectors);
                 window.ALL_STANDARDS = @json($allStandards);
                 window.ALL_DIMENSIONS = @json($dimensionNames);
+                window.ALL_CODES = @json($filters['codes'] ?? []);
+                window.ALL_TYPES = @json($filters['types'] ?? []);
 
                 function fillSelect($sel, items, mapper) {
                     $sel.find('option:not([value=""])').remove();
