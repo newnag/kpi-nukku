@@ -71,9 +71,14 @@
                     </div>
 
                     <!-- Submit -->
-                    <button type="submit" class="submit-btn">
-                        <i data-lucide="save" class="btn-icon"></i> บันทึก
-                    </button>
+                    <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
+                        <button type="submit" class="submit-btn">
+                            <i data-lucide="save" class="btn-icon"></i> บันทึก
+                        </button>
+                        <button type="submit" name="send_now" value="1" formaction="{{ route('settings.sendNow') }}" class="submit-btn" style="background:#16a34a;">
+                            <i data-lucide="send" class="btn-icon"></i> บันทึกและส่งแจ้งเตือนทันที
+                        </button>
+                    </div>
                 </form>
             </div>
         </div>
