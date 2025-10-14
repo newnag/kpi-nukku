@@ -584,7 +584,7 @@
     @endsection
 
     @push('styles')
-        <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.dataTables.min.css">
+        {{-- <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.dataTables.min.css"> --}}
         <style>
             /* ================ Base / Datatable ================ */
             #myTable,
