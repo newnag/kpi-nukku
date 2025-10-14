@@ -8,251 +8,249 @@
         $locked = true; // Force read-only mode
     @endphp
 
-    <div class="w-full h-full flex text-center justify-center">
-        <div class="indicator-card">
-            <div class="indicator-header-container">
-                <h1 class="indicator-title">
-                    {{ $indicator->name }} ({{ $indicator->code }})
-                </h1>
-                <div class="indicator-tabs">
-                    <span class="tab">{{ $indicator->category->standard->name ?? '-' }}</span>
-                    <span class="tab-for-divider">|</span>
-                    <span class="tab">{{ $indicator->category->name ?? '-' }}</span>
-                </div>
-
-                <hr class="tab-divider">
-                <div class="info-container">
-                    <div class="info-row">
-                        <span class="label">หน่วยงานที่รับผิดชอบ:</span>
-                        @forelse($indicator->assignments as $assignment)
-                            @if ($assignment->collectorUser)
-                                <span class="chip">
-                                    {{ $assignment->collectorUser->department->name }}
-                                </span>
-                            @endif
-                        @empty
-                            <span class="value">-</span>
-                        @endforelse
-                    </div>
-
-                    <div class="info-row">
-                        <span class="label">ผู้รับผิดชอบในการรวบรวม:</span>
-                        @forelse($indicator->assignments as $assignment)
-                            @if ($assignment->collectorUser)
-                                <span class="chip">
-                                    {{ $assignment->collectorUser->name }}
-                                </span>
-                            @endif
-                        @empty
-                            <span class="value">-</span>
-                        @endforelse
-                    </div>
-
-                    <div class="info-row">
-                        <span class="label">สถานะตัวบ่งชี้:</span>
-                        <x-status-badge :status="$indicator->status" size="sm" />
-                    </div>
-
-                </div>
+    <div class="indicator-card">
+        <div class="indicator-header-container">
+            <h1 class="indicator-title">
+                {{ $indicator->name }} ({{ $indicator->code }})
+            </h1>
+            <div class="indicator-tabs">
+                <span class="tab">{{ $indicator->category->standard->name ?? '-' }}</span>
+                <span class="tab-for-divider">|</span>
+                <span class="tab">{{ $indicator->category->name ?? '-' }}</span>
             </div>
+
             <hr class="tab-divider">
+            <div class="info-container">
+                <div class="info-row">
+                    <span class="label">หน่วยงานที่รับผิดชอบ:</span>
+                    @forelse($indicator->assignments as $assignment)
+                        @if ($assignment->collectorUser)
+                            <span class="chip">
+                                {{ $assignment->collectorUser->department->name }}
+                            </span>
+                        @endif
+                    @empty
+                        <span class="value">-</span>
+                    @endforelse
+                </div>
+
+                <div class="info-row">
+                    <span class="label">ผู้รับผิดชอบในการรวบรวม:</span>
+                    @forelse($indicator->assignments as $assignment)
+                        @if ($assignment->collectorUser)
+                            <span class="chip">
+                                {{ $assignment->collectorUser->name }}
+                            </span>
+                        @endif
+                    @empty
+                        <span class="value">-</span>
+                    @endforelse
+                </div>
+
+                <div class="info-row">
+                    <span class="label">สถานะตัวบ่งชี้:</span>
+                    <x-status-badge :status="$indicator->status" size="sm" />
+                </div>
+
+            </div>
+        </div>
+        <hr class="tab-divider">
+        <div class="card">
+            <h2 class="card-title">คำอธิบายตัวบ่งชี้</h2>
+            <div class="description-box">
+                {!! $indicator->description ?? '-' !!}
+            </div>
+        </div>
+        <div class="card">
+            <h2 class="card-title">เกณฑ์การพิจารณา</h2>
+            @forelse($indicator->criterias as $criteriaIndex => $criteria)
+                <div class="criteria-box" id="criteria-{{ $criteria->id }}">
+                    <div class="criteria-header">
+                        <div class="criteria-title">
+                            {{ $criteria->sequence }}. {!! $criteria->name !!}
+                        </div>
+                        @php
+                            $statuscriteria = match ($criteria->status) {
+                                1 => 'เอกสารครบถ้วน',
+                                2 => 'เอกสารไม่ครบถ้วน',
+                                default => 'รอดำเนินการ',
+                            };
+
+                            $statusColor = match ($criteria->status) {
+                                1 => 'bg-[#d1fae5] text-[#065f46]',
+                                2 => 'bg-[#fee2e2] text-[#991b1b]',
+                                default => 'bg-[#fef3c7] text-[#92400e]',
+                            };
+
+                        @endphp
+                        <div class="criteria-status {{ $statusColor }}">
+                            <label>
+                                {{ $statuscriteria }}
+                            </label>
+                        </div>
+                    </div>
+                    <div class="criteria-content">
+                        {{-- คำอธิบายเกณฑ์ --}}
+                        @if ($criteria->description)
+                            <div class="criteria-description">
+                                {!! $criteria->description !!}
+                            </div>
+                        @endif
+                        <div class="evidence-list evidence-list-{{ $criteria->id }}">
+                            @forelse($criteria->evidences as $evidence)
+                                @php
+                                    $type = strtolower($evidence->type ?? '');
+                                    $name = strtolower($evidence->name ?? '');
+                                @endphp
+                                <div class="evidence-item" id="evidence-{{ $evidence->id }}">
+                                    <div class="flex items-center space-x-2">
+                                        <span class="evidence-icon">
+                                            @if (Str::endsWith($type, 'pdf'))
+                                                <i data-lucide="file-text" style="color:#dc2626;"></i>
+                                            @elseif (Str::endsWith($type, 'doc') || Str::endsWith($type, 'docx') || Str::endsWith($name, '.docx'))
+                                                <i data-lucide="file-text" style="color:#2563eb;"></i>
+                                            @elseif (Str::endsWith($type, 'ppt') || Str::endsWith($type, 'pptx') || Str::endsWith($name, '.pptx'))
+                                                <i data-lucide="presentation" style="color:#eb7e25;"></i>
+                                            @elseif (in_array($type, ['jpg', 'jpeg', 'png', 'gif', 'image']))
+                                                <i data-lucide="image" style="color:#16a34a;"></i>
+                                            @elseif (Str::endsWith($type, 'xls') || Str::endsWith($type, 'xlsx') || Str::contains($name, '.xls'))
+                                                <i data-lucide="file-spreadsheet" style="color:#059669;"></i>
+                                            @elseif ($type === 'url')
+                                                <i data-lucide="link" style="color:#9333ea;"></i>
+                                            @elseif ($type === 'note')
+                                                <i data-lucide="sticky-note" style="color:#f59e0b;"></i>
+                                            @else
+                                                <i data-lucide="file" style="color:#6b7280;"></i>
+                                            @endif
+                                        </span>
+                                        <span class="evidence-name">
+                                            @php
+                                                $ext = strtolower(pathinfo($evidence->name, PATHINFO_EXTENSION));
+                                                $openInNewTab = in_array($ext, [
+                                                    'pdf',
+                                                    'jpg',
+                                                    'jpeg',
+                                                    'png',
+                                                    'gif',
+                                                    'svg',
+                                                    'txt',
+                                                    'csv',
+                                                    'htm',
+                                                    'html',
+                                                ]);
+                                            @endphp
+
+                                            @if ($openInNewTab)
+                                                {{-- PDF & Image → เปิดในแท็บใหม่ --}}
+                                                <span id="evidence-link-{{ $evidence->id }}">
+                                                    <a href="{{ route('evidences.download', $evidence->id) }}"
+                                                        target="_blank" rel="noopener noreferrer"
+                                                        class="text-blue-600 underline hover:text-blue-800">
+                                                        <span
+                                                            id="evidence-name-text-{{ $evidence->id }}">{{ $evidence->name }}</span>
+                                                    </a>
+                                                </span>
+                                            @else
+                                                {{-- Word, Excel, PPT → ดาวน์โหลด --}}
+                                                <span id="evidence-link-{{ $evidence->id }}">
+                                                    <a href="{{ route('evidences.download', $evidence->id) }}" download
+                                                        class="text-blue-600 underline hover:text-blue-800">
+                                                        <span
+                                                            id="evidence-name-text-{{ $evidence->id }}">{{ $evidence->name }}</span>
+                                                    </a>
+                                                </span>
+                                            @endif
+                                        </span>
+                                    </div>
+                                </div>
+                            @empty
+                                <div class="text-sm text-center text-gray-500 opacity-75">----- ยังไม่มีหลักฐานแนบ
+                                    -----</div>
+                            @endforelse
+                        </div>
+                    </div>
+                </div>
+            @empty
+                <p class="text-gray-500 text-center">----- ยังไม่มีเกณฑ์การพิจารณา -----</p>
+            @endforelse
+        </div>
+        @php
+            $condition = $indicator->condition ?? '';
+            $trimmed = trim($condition);
+            $hasImage = preg_match('/<img\s[^>]*src=["\']?([^>"\']+)["\']?/i', $trimmed);
+            $hasText = trim(strip_tags($trimmed)) !== '';
+        @endphp
+
+        @if ($hasImage || $hasText)
             <div class="card">
-                <h2 class="card-title">คำอธิบายตัวบ่งชี้</h2>
-                <div class="description-box">
-                    {!! $indicator->description ?? '-' !!}
+                <h2 class="card-title">วิธีการคำนวน</h2>
+                <div class="criteria-box">
+                    {!! $indicator->condition !!}
                 </div>
             </div>
+        @endif
+
+        <div class="card">
+            <h2 class="card-title">เกณฑ์การให้คะแนน</h2>
+            <div class="criteria-box list-disc list-inside">
+                {!! $indicator->comment ?? '-' !!}
+            </div>
+        </div>
+
+        @if ($indicator->variables->where('type', 'input')->isNotEmpty())
             <div class="card">
-                <h2 class="card-title">เกณฑ์การพิจารณา</h2>
-                @forelse($indicator->criterias as $criteriaIndex => $criteria)
-                    <div class="criteria-box" id="criteria-{{ $criteria->id }}">
-                        <div class="criteria-header">
-                            <div class="criteria-title">
-                                {{ $criteria->sequence }}. {!! $criteria->name !!}
-                            </div>
-                            @php
-                                $statuscriteria = match ($criteria->status) {
-                                    1 => 'เอกสารครบถ้วน',
-                                    2 => 'เอกสารไม่ครบถ้วน',
-                                    default => 'รอดำเนินการ',
-                                };
-
-                                $statusColor = match ($criteria->status) {
-                                    1 => 'bg-[#d1fae5] text-[#065f46]',
-                                    2 => 'bg-[#fee2e2] text-[#991b1b]',
-                                    default => 'bg-[#fef3c7] text-[#92400e]',
-                                };
-
-                            @endphp
-                            <div class="criteria-status {{ $statusColor }}">
-                                <label>
-                                    {{ $statuscriteria }}
-                                </label>
-                            </div>
-                        </div>
-                        <div class="criteria-content">
-                            {{-- คำอธิบายเกณฑ์ --}}
-                            @if ($criteria->description)
-                                <div class="criteria-description">
-                                    {!! $criteria->description !!}
-                                </div>
-                            @endif
-                            <div class="evidence-list evidence-list-{{ $criteria->id }}">
-                                @forelse($criteria->evidences as $evidence)
-                                    @php
-                                        $type = strtolower($evidence->type ?? '');
-                                        $name = strtolower($evidence->name ?? '');
-                                    @endphp
-                                    <div class="evidence-item" id="evidence-{{ $evidence->id }}">
-                                        <div class="flex items-center space-x-2">
-                                            <span class="evidence-icon">
-                                                @if (Str::endsWith($type, 'pdf'))
-                                                    <i data-lucide="file-text" style="color:#dc2626;"></i>
-                                                @elseif (Str::endsWith($type, 'doc') || Str::endsWith($type, 'docx') || Str::endsWith($name, '.docx'))
-                                                    <i data-lucide="file-text" style="color:#2563eb;"></i>
-                                                @elseif (Str::endsWith($type, 'ppt') || Str::endsWith($type, 'pptx') || Str::endsWith($name, '.pptx'))
-                                                    <i data-lucide="presentation" style="color:#eb7e25;"></i>
-                                                @elseif (in_array($type, ['jpg', 'jpeg', 'png', 'gif', 'image']))
-                                                    <i data-lucide="image" style="color:#16a34a;"></i>
-                                                @elseif (Str::endsWith($type, 'xls') || Str::endsWith($type, 'xlsx') || Str::contains($name, '.xls'))
-                                                    <i data-lucide="file-spreadsheet" style="color:#059669;"></i>
-                                                @elseif ($type === 'url')
-                                                    <i data-lucide="link" style="color:#9333ea;"></i>
-                                                @elseif ($type === 'note')
-                                                    <i data-lucide="sticky-note" style="color:#f59e0b;"></i>
-                                                @else
-                                                    <i data-lucide="file" style="color:#6b7280;"></i>
-                                                @endif
-                                            </span>
-                                            <span class="evidence-name">
-                                                @php
-                                                    $ext = strtolower(pathinfo($evidence->name, PATHINFO_EXTENSION));
-                                                    $openInNewTab = in_array($ext, [
-                                                        'pdf',
-                                                        'jpg',
-                                                        'jpeg',
-                                                        'png',
-                                                        'gif',
-                                                        'svg',
-                                                        'txt',
-                                                        'csv',
-                                                        'htm',
-                                                        'html',
-                                                    ]);
-                                                @endphp
-
-                                                @if ($openInNewTab)
-                                                    {{-- PDF & Image → เปิดในแท็บใหม่ --}}
-                                                    <span id="evidence-link-{{ $evidence->id }}">
-                                                        <a href="{{ route('evidences.download', $evidence->id) }}"
-                                                            target="_blank" rel="noopener noreferrer"
-                                                            class="text-blue-600 underline hover:text-blue-800">
-                                                            <span
-                                                                id="evidence-name-text-{{ $evidence->id }}">{{ $evidence->name }}</span>
-                                                        </a>
-                                                    </span>
-                                                @else
-                                                    {{-- Word, Excel, PPT → ดาวน์โหลด --}}
-                                                    <span id="evidence-link-{{ $evidence->id }}">
-                                                        <a href="{{ route('evidences.download', $evidence->id) }}" download
-                                                            class="text-blue-600 underline hover:text-blue-800">
-                                                            <span
-                                                                id="evidence-name-text-{{ $evidence->id }}">{{ $evidence->name }}</span>
-                                                        </a>
-                                                    </span>
-                                                @endif
-                                            </span>
-                                        </div>
-                                    </div>
-                                @empty
-                                    <div class="text-sm text-center text-gray-500 opacity-75">----- ยังไม่มีหลักฐานแนบ
-                                        -----</div>
-                                @endforelse
-                            </div>
+                <h2 class="card-title">ข้อมูลตัวแปร</h2>
+                @php
+                    $inputVariables = $indicator->variables->filter(fn($v) => trim($v->type) === 'input');
+                @endphp
+                @forelse($inputVariables as $variable)
+                    <div class="variable-row">
+                        <label class="variable-label">
+                            {{ $variable->label_name ?? $variable->variable_name }}
+                        </label>
+                        <div class="variable-display">
+                            {{ $variable->value ?? '-' }}
                         </div>
                     </div>
                 @empty
-                    <p class="text-gray-500">----- ยังไม่มีเกณฑ์การพิจารณา -----</p>
+                    <p class="text-gray-500">ยังไม่มีตัวแปรที่ต้องกรอก</p>
                 @endforelse
             </div>
-            @php
-                $condition = $indicator->condition ?? '';
-                $trimmed = trim($condition);
-                $hasImage = preg_match('/<img\s[^>]*src=["\']?([^>"\']+)["\']?/i', $trimmed);
-                $hasText = trim(strip_tags($trimmed)) !== '';
-            @endphp
+        @endif
 
-            @if ($hasImage || $hasText)
-                <div class="card">
-                    <h2 class="card-title">วิธีการคำนวน</h2>
-                    <div class="criteria-box">
-                        {!! $indicator->condition !!}
+        <div class="card">
+            <h2 class="card-title">หมายเหตุ</h2>
+            <div class="annotation-box">
+                {!! $indicator->annotation ?? '-' !!}
+            </div>
+        </div>
+
+        @if (in_array($indicator->status, [3, 4]))
+            <div class="card">
+                <h2 class="card-title">คะแนนที่ได้</h2>
+                <div class="score-display-container">
+                    <div class="score-item">
+                        <div class="score-label">คะแนนที่ได้</div>
+                        <div class="score-value-display current-score">
+                            {{ $indicator->score_acc ?? '0' }}
+                        </div>
                     </div>
-                </div>
-            @endif
-
-            <div class="card">
-                <h2 class="card-title">เกณฑ์การให้คะแนน</h2>
-                <div class="criteria-box list-disc list-inside">
-                    {!! $indicator->comment ?? '-' !!}
-                </div>
-            </div>
-
-            @if ($indicator->variables->where('type', 'input')->isNotEmpty())
-                <div class="card">
-                    <h2 class="card-title">ข้อมูลตัวแปร</h2>
-                    @php
-                        $inputVariables = $indicator->variables->filter(fn($v) => trim($v->type) === 'input');
-                    @endphp
-                    @forelse($inputVariables as $variable)
-                        <div class="variable-row">
-                            <label class="variable-label">
-                                {{ $variable->label_name ?? $variable->variable_name }}
-                            </label>
-                            <div class="variable-display">
-                                {{ $variable->value ?? '-' }}
-                            </div>
-                        </div>
-                    @empty
-                        <p class="text-gray-500">ยังไม่มีตัวแปรที่ต้องกรอก</p>
-                    @endforelse
-                </div>
-            @endif
-
-            <div class="card">
-                <h2 class="card-title">หมายเหตุ</h2>
-                <div class="annotation-box">
-                    {!! $indicator->annotation ?? '-' !!}
-                </div>
-            </div>
-
-            @if (in_array($indicator->status, [3, 4]))
-                <div class="card">
-                    <h2 class="card-title">คะแนนที่ได้</h2>
-                    <div class="score-display-container">
-                        <div class="score-item">
-                            <div class="score-label">คะแนนที่ได้</div>
-                            <div class="score-value-display current-score">
-                                {{ $indicator->score_acc ?? '0' }}
-                            </div>
-                        </div>
-                        <div class="score-separator">/</div>
-                        <div class="score-item">
-                            <div class="score-label">คะแนนเต็ม</div>
-                            <div class="score-value-display max-score">
-                                {{ $indicator->max_score ?? '0' }}
-                            </div>
+                    <div class="score-separator">/</div>
+                    <div class="score-item">
+                        <div class="score-label">คะแนนเต็ม</div>
+                        <div class="score-value-display max-score">
+                            {{ $indicator->max_score ?? '0' }}
                         </div>
                     </div>
                 </div>
-            @endif
-
-            <div class="action-bts">
-                <button type="button" class="btn btn-outline" id="back-btn"
-                    onclick="location.href='{{ route('dashboardkpi.index') }}'">
-                    <i class="fa fa-undo"></i> กลับ
-                </button>
             </div>
+        @endif
+
+        <div class="action-bts">
+            <button type="button" class="btn btn-outline" id="back-btn"
+                onclick="location.href='{{ route('dashboardkpi.index') }}'">
+                <i class="fa fa-undo"></i> กลับ
+            </button>
         </div>
     </div>
 @endsection
