@@ -25,7 +25,7 @@ Notes
 | Dashboard                    | view-dashboard                   | Y           | Y            | Y        | Y                    | N    |
 | Dashboard Export             | export-dashboard                 | Y           | Y            | Y        | Y                    | N    |
 | Indicator Dashboard          | view-indicator-dashboard         | Y           | Y            | Y        | Y                    | N    |
-| Indicator Create/Edit/Delete | create/edit/delete-indicator     | Y           | Y            | Y        | N                    | N    |
+| Indicator Create/Edit/Delete | create/edit/delete-indicator     | Y           | Y            | Y        | Y                    | N    |
 | Users Management             | view/create/edit/delete-users    | Y           | Y            | View     | View                 | N    |
 | Departments                  | view/create/edit/delete-dept     | Y           | Y            | View     | View                 | N    |
 | Categories                   | view/create/edit/delete-categories| Y          | Y            | View     | View                 | N    |

@@ -26,9 +26,10 @@ if (!function_exists('evidence_preview_url')) {
             return null;
         }
 
+        // Build public URL for fallback viewer integrations
         $fileUrl = asset('storage/' . ltrim($path, '/'));
 
-        // Office documents -> choose viewer by .env
+        // Office documents -> choose viewer by .env (or stream via server)
         if (in_array($ext, ['doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx'], true)) {
             $mode = strtolower((string) env('EVIDENCE_OFFICE_VIEWER', 'server'));
             switch ($mode) {
@@ -49,7 +50,8 @@ if (!function_exists('evidence_preview_url')) {
             }
         }
 
-        // Default: direct public storage URL
-        return $fileUrl;
+        // Default: stream through controller to avoid broken symlink issues
+        // This does not rely on public/storage symlink and works on Windows.
+        return route('evidences.preview', $evidence->id);
     }
 }

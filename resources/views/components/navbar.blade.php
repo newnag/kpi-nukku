@@ -404,25 +404,58 @@
                     <i class="fa-solid fa-file"></i> หลักฐานของฉัน
                 </a>
             @endhasanyrole
-
-            @can('view-indicator-dashboard')
-                <a href="{{ route('indicator.index') }}" class="{{ request()->is('indicator*') ? 'active' : '' }} buttonNav">
-                    <i class="fa-solid fa-sliders"></i> จัดการตัวบ่งชี้
-                </a>
-            @endcan
-
             @hasanyrole('super_admin|system_admin|qa_admin')
                 <a href="{{ route('dashboardkpi.index') }}"
                     class="{{ request()->routeIs('dashboardkpi.*') ? 'active' : '' }} buttonNav">
                     <i class="fa-solid fa-chart-line"></i> ตรวจสอบตัวบ่งชี้
                 </a>
             @endhasanyrole
+            @hasanyrole('administration_admin')
+                <a href="{{ route('indicator.index') }}"
+                    class="buttonNav-item {{ request()->is('indicator*') ? 'active' : '' }}">
+                    <i class="fa-solid fa-sliders"></i> จัดการตัวบ่งชี้
+                </a>
+            @endhasanyrole
+            @hasanyrole('super_admin|system_admin|qa_admin')
+                @canany(['view-indicator-dashboard', 'view-evidence', 'view-sar_report'])
+                    <div class="dropdown">
+                        <div class="dropdown-toggle justify-between" role="button" tabindex="0" onclick="toggleDropdown(this)">
+                            <div><i class="fa-solid fa-database"></i>
+                                <span class="dropdown-toggle-span">จัดการข้อมูล</span>
+                            </div>
+                            <i class="fa-solid fa-caret-down"></i>
+                        </div>
+                        <div class="dropdown-menu-navbar">
+                            @can('view-indicator-dashboard')
+                                <a href="{{ route('indicator.index') }}"
+                                    class="buttonNav-item {{ request()->is('indicator*') ? 'active' : '' }}">
+                                    <i class="fa-solid fa-sliders"></i> จัดการตัวบ่งชี้
+                                </a>
+                            @endcan
+                            @can('view-sar_report')
+                                <a href="{{ route('sar_reports.index') }}"
+                                    class="buttonNav-item {{ request()->is('sar_reports*') ? 'active' : '' }}">
+                                    <i class="fa-solid fa-file-lines"></i> จัดการเอกสาร
+                                </a>
+                            @endcan
+                            @can('view-evidence')
+                                <a href="{{ route('evidences.index') }}"
+                                    class="buttonNav-item {{ request()->is('evidences*') ? 'active' : '' }}">
+                                    <i class="fa-solid fa-folder-open"></i> จัดการหลักฐาน
+                                </a>
+                            @endcan
+
+                        </div>
+                    </div>
+                @endcanany
+            @endhasanyrole
 
             @hasanyrole('super_admin|system_admin')
                 <div class="dropdown">
                     <div class="dropdown-toggle justify-between" role="button" tabindex="0" onclick="toggleDropdown(this)">
                         <div><i class="fa-solid fa-gear"></i>
-                        <span class="dropdown-toggle-span">ตั้งค่าระบบ</span></div>
+                            <span class="dropdown-toggle-span">ตั้งค่าระบบ</span>
+                        </div>
                         <i class="fa-solid fa-caret-down"></i>
                     </div>
                     <div class="dropdown-menu-navbar">
@@ -446,7 +479,7 @@
                                 <i class="fa-solid fa-users"></i> จัดการผู้ใช้งาน
                             </a>
                         @endcan
-                        @can('view-evidence')
+                        {{-- @can('view-evidence')
                             <a href="{{ route('evidences.index') }}" class="buttonNav-item">
                                 <i class="fa-solid fa-folder-open"></i> จัดการหลักฐาน
                             </a>
@@ -455,7 +488,7 @@
                             <a href="{{ route('sar_reports.index') }}" class="buttonNav-item">
                                 <i class="fa-solid fa-file-lines"></i> จัดการเอกสาร
                             </a>
-                        @endcan
+                        @endcan --}}
                     </div>
                 </div>
             @endhasanyrole
@@ -463,7 +496,8 @@
             <div class="dropdown">
                 <div class="dropdown-toggle justify-between" role="button" tabindex="0" onclick="toggleDropdown(this)">
                     <div><i class="fa-solid fa-user-circle"></i>
-                    <span class="dropdown-toggle-span">{{ auth()->user()->name ?? 'ผู้ใช้' }}</span></div>
+                        <span class="dropdown-toggle-span">{{ auth()->user()->name ?? 'ผู้ใช้' }}</span>
+                    </div>
                     <i class="fa-solid fa-caret-down"></i>
                 </div>
                 <div class="dropdown-menu-navbar">

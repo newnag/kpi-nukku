@@ -14,7 +14,7 @@ class PermissionsTableSeeder extends Seeder
      *
      * @return void
      */
-   public function run()
+    public function run()
     {
         // Clear cached roles and permissions
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
@@ -29,7 +29,7 @@ class PermissionsTableSeeder extends Seeder
             'delete-indicator',
             'export-indicator',
             'import-indicator',
-            
+
 
             // ===== Users =====
             'view-users',
@@ -69,12 +69,12 @@ class PermissionsTableSeeder extends Seeder
 
             // ===== Sar Report =====
             'view-sar_report',
-            'export-sar_report',    
+            'export-sar_report',
             'create-sar_report',
             'edit-sar_report',
             'delete-sar_report',
 
-        
+
             // ===== Dashboard =====
             'view-dashboard',
             'export-dashboard',
@@ -143,6 +143,13 @@ class PermissionsTableSeeder extends Seeder
             'delete-evidence',
             'download-evidence',
 
+            // ===== Sar Report =====
+            'view-sar_report',
+            'export-sar_report',
+            'create-sar_report',
+            'edit-sar_report',
+            'delete-sar_report',
+
             // ===== Dashboard =====
             'view-dashboard',
             'export-dashboard',
@@ -187,6 +194,13 @@ class PermissionsTableSeeder extends Seeder
             'view-dashboard',
             'export-dashboard',
 
+            // ===== Sar Report =====
+            'view-sar_report',
+            'export-sar_report',
+            'create-sar_report',
+            'edit-sar_report',
+            'delete-sar_report',
+            
             // ===== Dashboard KPI per User =====
             'view-dashboard-kpi-user',
             'show-dashboard-kpi-user',
@@ -200,6 +214,10 @@ class PermissionsTableSeeder extends Seeder
         $administrationAdmin->syncPermissions([
             // ===== Indicator =====
             'view-indicator-dashboard',
+            'view-indicator',
+            'create-indicator',
+            'edit-indicator',
+            'delete-indicator',
 
             // ===== Users =====
             'view-users',

@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 
-class AuthController extends Controller
+class AuthenticatedSessionController extends Controller
 {
     public function showLoginForm()
     {
@@ -30,7 +30,7 @@ class AuthController extends Controller
 
         if (RateLimiter::tooManyAttempts($key, $maxAttempts)) {
             return response()->json([
-                'message' => 'คุณพยายามเข้าสู่ระบบมากเกินไป กรุณารอ 1 นาทีแล้วลองใหม่อีกครั้ง.',
+                'message' => 'พยายามเข้าสู่ระบบมากเกินไป โปรดลองใหม่ภายหลัง..',
             ], 429);
         }
 
@@ -40,12 +40,14 @@ class AuthController extends Controller
             RateLimiter::hit($key, $decaySeconds);
 
             return response()->json([
-                'message' => 'กรุณากรอกอีเมลและรหัสผ่านให้ถูกต้อง',
+                'message' => 'อีเมลหรือรหัสผ่านไม่ถูกต้อง',
             ], 401);
         }
 
         if ($user->status === 'inactive') {
-            return response()->json(['message' => 'บัญชีของคุณถูกระงับการใช้งาน...'], 403);
+            return response()->json([
+                'message' => 'บัญชีผู้ใช้นี้ถูกระงับการใช้งาน',
+            ], 403);
         }
 
         RateLimiter::clear($key);
@@ -53,9 +55,7 @@ class AuthController extends Controller
         Auth::login($user);
         $request->session()->regenerate(); // prevent session fixation
 
-        // ✅ เช็ก role ของ $user
-        // $redirect = '/dashboard'; // default
-
+        $redirect = '/dashboard';
         if ($user->hasRole('super_admin')) {
             $redirect = '/dashboard';
         } elseif ($user->hasRole('system_admin')) {
