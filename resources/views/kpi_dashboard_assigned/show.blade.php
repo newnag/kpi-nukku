@@ -326,18 +326,13 @@
                 onclick="location.href='{{ route('dashboardkpi.index') }}'">
                 <i class="fa fa-undo"></i> กลับ
             </button>
-
             @if (!$locked)
-                <!-- ปุ่มบันทึกฉบับร่าง (แก้ไขแล้ว: submit ฟอร์มเดียวกัน + data-status=1) -->
                 <button id="btn-save-draft" class="btn btn-primary" type="submit" form="variables-form"
                     data-status="1">
                     <i class="fa fa-save"></i> บันทึกเป็นฉบับร่าง
                 </button>
-
-                <!-- บันทึกเป็นฉบับจริง (ยืนยันด้วย Modal) -->
                 <x-modal title="⚠️ โปรดยืนยันการบันทึกเป็นฉบับจริง ⚠️" size="lg" :context="'confirm-final-save'">
                     <x-slot:trigger>
-                        <!-- เพิ่ม id เพื่อรีเซ็ตก่อนเปิด -->
                         <button id="final-save-trigger" type="button" class="btn btn-success">
                             <i class="fa fa-save"></i> บันทึกเป็นฉบับจริง
                         </button>
@@ -371,7 +366,6 @@
                                 ยกเลิก
                             </button>
 
-                            {{-- ปุ่มยืนยันฉบับจริง (แก้ไขแล้ว: ไม่มี inline onclick, ใช้ submit + data-status=2) --}}
                             <button id="btn-final-submit" class="btn btn-success disabled:opacity-50" type="submit"
                                 form="variables-form" data-status="2" disabled>
                                 ยืนยันการบันทึกเป็นฉบับจริง
@@ -379,6 +373,11 @@
                         </div>
                     </x-slot:footer>
                 </x-modal>
+            @endif
+            @if ($locked)
+                <button type="button" class="btn btn-warning">
+                    <i class="fa-solid fa-bell"></i>แจ้งเจ้าหน้าที่ ขอแก้ไขข้อมูล
+                </button>
             @endif
         </div>
     </div>

@@ -365,7 +365,7 @@
             </x-modal>
 
             <button type="button" class="btn btn-warning" form=""
-                @if ($locked) hidden @endif>
+                @if ($indicator->status === 2 || $locked) disabled @endif>
                 <i class="fa-solid fa-bell"></i>
                 <span class="hidden sm:inline">แจ้งเตือนผู้รับผิดชอบ</span>
                 <span class="sm:hidden">แจ้งเตือน</span>
