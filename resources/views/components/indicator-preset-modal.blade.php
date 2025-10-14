@@ -2,16 +2,15 @@
 
 <div id="{{ $modalId }}"
     class="fixed inset-0 bg-black/50 hidden z-[9999] flex items-center justify-center p-3 sm:p-6">
-    <div
-        class="bg-white rounded-lg shadow-lg w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-2xl xl:max-w-4xl 2xl:max-w-5xl p-4 sm:p-6 relative mx-auto">
-
-        <!-- ปุ่มปิด -->
-        <button type="button" onclick="document.getElementById('{{ $modalId }}').classList.add('hidden')"
-            class="absolute top-2 right-2 text-gray-500 hover:text-red-700 z-50">
-            ✕
-        </button>
-
-        <h2 class="text-lg font-bold mb-4">จัดการ Preset ตัวชี้วัด</h2>
+    <div class="bg-white rounded-xl shadow-lg w-full max-w-4xl max-h-[85vh] overflow-auto p-5 relative">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-lg font-bold">จัดการ Preset ตัวชี้วัด</h2>
+            <!-- ปุ่มปิด -->
+            <button type="button" onclick="document.getElementById('{{ $modalId }}').classList.add('hidden')"
+                class="btn btn-delete !w-fit !text-gray-500 hover:!text-red-500 btn btn-xs hover:!shadow-none">
+                <i data-lucide="x"></i>
+            </button>
+        </div>
 
         <!-- ✅ Filter มาตรฐาน -->
         @php
@@ -37,10 +36,9 @@
 
         <div x-data="{ showFilters: false }" class="mb-4">
             <!-- ✅ Toggle Switch -->
-            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-end gap-2 sm:gap-0 mb-3">
-                <span class="mr-3 text-sm font-medium text-gray-700">แสดงตัวกรอง</span>
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-start gap-2 sm:gap-0 mb-3">
                 <label class="relative inline-flex items-center cursor-pointer">
-                    <input type="checkbox" x-model="showFilters" class="sr-only peer">
+                    <input name="show-filters" type="checkbox" x-model="showFilters" class="sr-only peer">
                     <div
                         class="w-11 h-6 bg-gray-300 peer-focus:outline-none rounded-full peer dark:bg-gray-600
            peer-checked:bg-[#2196F3] transition-colors duration-300">
@@ -52,6 +50,7 @@
                        transition-transform duration-300 peer-checked:translate-x-5">
                     </div>
                 </label>
+                <span class="ml-3 text-sm font-medium text-gray-700">แสดงตัวกรอง</span>
             </div>
 
             <!-- ✅ ฟิลเตอร์ -->
