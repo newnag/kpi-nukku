@@ -231,7 +231,7 @@
                     </div>
                 </div>
             @empty
-                <p class="text-gray-500">----- ยังไม่มีเกณฑ์การพิจารณา -----</p>
+                <p class="text-gray-500 text-center">----- ยังไม่มีเกณฑ์การพิจารณา -----</p>
             @endforelse
         </div>
         @php
@@ -500,7 +500,6 @@
         document.addEventListener('DOMContentLoaded', function() {
             const fileHandlers = {};
             const editorInitialized = {};
-            const form = document.getElementById("evidence-form-{{ $criteria->id }}");
             /*** ---------- File Upload Handler Class ---------- ***/
             class FileUploadHandler {
                 constructor(criteriaId) {
@@ -1338,9 +1337,9 @@
             color: #222;
         }
 
-        .evidence-form {
+        /* .evidence-form {
             padding: 20px
-        }
+        } */
 
         /* Upload */
         .upload-section {
@@ -1783,9 +1782,9 @@
                 width: 100%;
             }
 
-            .evidence-form {
+            /* .evidence-form {
                 padding: 20px;
-            }
+            } */
 
             .action-buttons {
                 flex-direction: column;

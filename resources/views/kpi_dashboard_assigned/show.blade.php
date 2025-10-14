@@ -237,7 +237,7 @@
                     </div>
                 </div>
             @empty
-                <p class="text-gray-500">----- ยังไม่มีเกณฑ์การพิจารณา -----</p>
+                <p class="text-gray-500 text-center">----- ยังไม่มีเกณฑ์การพิจารณา -----</p>
             @endforelse
         </div>
         @php
