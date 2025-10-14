@@ -57,7 +57,7 @@
             <div x-show="showFilters" x-transition
                 class="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-gray-50 p-3 sm:p-4 rounded-lg shadow">
                 <div>
-                    <label class="block text-xs sm:text-sm font-medium text-gray-700 mb-1">กรองตามปี</label>
+                    <label for="year-filter-{{ $modalId }}" class="block text-xs sm:text-sm font-medium text-gray-700 mb-1">กรองตามปี</label>
                     <select id="year-filter-{{ $modalId }}"
                         class="w-full border rounded px-2 py-1 text-xs sm:text-sm focus:ring focus:ring-green-200">
                         <option value="">-- แสดงทั้งหมด --</option>
@@ -68,7 +68,7 @@
                 </div>
 
                 <div>
-                    <label class="block text-xs sm:text-sm font-medium text-gray-700 mb-1">กรองตามมาตรฐาน</label>
+                    <label for="standard-filter-{{ $modalId }}" class="block text-xs sm:text-sm font-medium text-gray-700 mb-1">กรองตามมาตรฐาน</label>
                     <select id="standard-filter-{{ $modalId }}"
                         class="w-full border rounded px-2 py-1 text-xs sm:text-sm focus:ring focus:ring-green-200">
                         <option value="">-- แสดงทั้งหมด --</option>
@@ -134,8 +134,8 @@
                     class="block w-full border rounded px-2 py-1 text-xs sm:text-sm focus:ring focus:ring-green-200">
 
                 <!-- เลือกปี -->
-                <label class="block text-xs sm:text-sm font-medium text-gray-700">ปีที่ต้องการนำเข้า</label>
-                <input type="number" name="year" value="{{ now()->year }}" min="2000" max="2100"
+                <label for="year-import" class="block text-xs sm:text-sm font-medium text-gray-700">ปีที่ต้องการนำเข้า</label>
+                <input type="number" id="year-import" name="year-import" value="{{ now()->year }}" min="2000" max="2100"
                     class="block w-full border rounded px-2 py-1 text-xs sm:text-sm focus:ring focus:ring-green-200"
                     required>
 
@@ -151,8 +151,8 @@
                 class="flex flex-col border rounded-lg p-3 sm:p-4 space-y-3">
                 @csrf
                 <div>
-                    <label class="block text-xs sm:text-sm font-medium text-gray-700 ">คัดลอกไปยังปี</label>
-                    <input type="number" name="target_year" value="{{ now()->year }}" min="2000" max="2100"
+                    <label for="target_year" class="block text-xs sm:text-sm font-medium text-gray-700 ">คัดลอกไปยังปี</label>
+                    <input type="number" id="target_year" name="target_year" value="{{ now()->year }}" min="2000" max="2100"
                         class="block w-full border rounded px-2 py-1 text-xs sm:text-sm focus:ring focus:ring-green-200 "
                         required>
                 </div>

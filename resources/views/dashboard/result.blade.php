@@ -17,7 +17,7 @@
             <div id="year-filters" style="margin-bottom:10px;margin-left: 20px;">
                 @foreach ($filters['years'] as $y)
                     <label style="margin-right:10px;">
-                        <input type="checkbox" class="year-checkbox" value="{{ $y }}" checked>
+                        <input name="year-checkbox-overall" type="checkbox" class="year-checkbox" value="{{ $y }}" checked>
                         {{ $y }}
                     </label>
                 @endforeach
@@ -35,7 +35,7 @@
             <div id="year-filters-standard" style="margin-bottom:10px;margin-left: 20px;">
                 @foreach ($filters['years'] as $y)
                     <label style="margin-right:10px;">
-                        <input type="checkbox" class="year-checkbox-std" value="{{ $y }}" checked>
+                        <input name="year-checkbox-std" type="checkbox" class="year-checkbox-std" value="{{ $y }}" checked>
                         {{ $y }}
                     </label>
                 @endforeach
@@ -64,7 +64,7 @@
             <div id="year-filters-dim" style="margin-bottom:10px;margin-left: 20px;">
                 @foreach ($filters['years'] as $y)
                     <label style="margin-right:10px;">
-                        <input type="checkbox" class="year-checkbox-dim" value="{{ $y }}" checked>
+                        <input name="year-checkbox-dim" type="checkbox" class="year-checkbox-dim" value="{{ $y }}" checked>
                         {{ $y }}
                     </label>
                 @endforeach
@@ -89,7 +89,7 @@
         <!-- Toggle Switch -->
         <div class="text-right">
             <label class="switch">
-                <input type="checkbox" id="toggle-filter">
+                <input name="filter-checkbox" type="checkbox" id="toggle-filter">
                 <span class="slider round"></span>
             </label>
             <span>กรองข้อมูล</span>
@@ -147,7 +147,7 @@
                             d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
                 </div>
-                <input type="text" id="custom-search" class="search-input" placeholder="ค้นหารายการตัวบ่งชี้">
+                <input name="custom-search" type="text" id="custom-search" class="search-input" placeholder="ค้นหารายการตัวบ่งชี้">
             </div>
             <div class="charts-grid">
                 @foreach ($standards as $standard)
