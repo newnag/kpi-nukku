@@ -262,7 +262,7 @@
 
     <!-- ตารางเอกสารและหลักฐาน -->
     <div class="border border-gray-200 rounded-lg overflow-x-auto ">
-        <table id="evidenceTable" class="w-full min-w-full ">
+        <table id="evidenceTable" class="w-full min-w-full overflow-x-auto">
             <thead>
                 <tr>
                     <th class="w-fit text-xs sm:text-sm font-medium text-gray-900 cursor-pointer select-none hidden sm:table-cell"
@@ -408,7 +408,7 @@
                             data-order="{{ optional($evidence->created_at)->timestamp }}">
                             {{ $evidence->created_at?->format('M d, Y') ?? '-' }}
                         </td>
-                        <td class="text-xs sm:text-sm text-gray-700 hidden lg:table-cell"
+                        <td class="text-xs sm:text-sm text-gray-700 text-center hidden lg:table-cell"
                             data-search="{{ optional($evidence->user)->display_name ?? '' }}">
                             {{ $evidence->user->display_name ?? '-' }}
                         </td>

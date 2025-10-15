@@ -1,91 +1,86 @@
 @extends('layouts.app')
 @section('title', 'ตั้งค่าการแจ้งเตือน')
+
+@section('header', 'ตั้งค่าการแจ้งเตือน')
+@section('subheader', 'ระบบบริหารจัดการข้อมูลการรับรองสถาบันจากสภาการพยาบาล')
+
 @section('content')
-
-    <div class="Setting-container">
-        <div class="Setting-containers">
-            <div class="header-contatainers">
-                ตั้งค่าการแจ้งเตือน
+    <div class="Setting-card">
+        <x-card>
+            <div class="card-title">การตั้งค่าการแจ้งเตือน</div>
+            <!-- Title -->
+            <div class="form-group">
+                <label class="form-label">หัวข้อการแจ้งเตือน <span class="required">*</span></label>
+                <input form="notification-settings-form" type="text" name="title" class="form-input"
+                    value="{{ old('title', $setting->title ?? '') }}">
             </div>
 
-            <!-- ฟอร์ม setting -->
-            <div class="Setting-form">
-                <div class="add-section-title">การตั้งค่าการแจ้งเตือน</div>
-
-                <form action="{{ route('settings.store') }}" method="POST">
-                    @csrf
-
-                    <!-- Title -->
-                    <div class="form-group">
-                        <label class="form-label">หัวข้อการแจ้งเตือน <span class="required">*</span></label>
-                        <input type="text" name="title" class="form-input"
-                            value="{{ old('title', $setting->title ?? '') }}">
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label">วันที่แจ้งเตือนรอบที่ 1</label>
-                        <input type="date" name="notify_date1" class="form-input2"
-                            value="{{ old('notify_date1', $setting?->notify_date1?->format('Y-m-d')) }}">
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label">วันที่แจ้งเตือนรอบที่ 2</label>
-                        <input type="date" name="notify_date2" class="form-input2"
-                            value="{{ old('notify_date2', $setting?->notify_date2?->format('Y-m-d')) }}">
-                    </div>
-
-                    <!-- Message -->
-                    <div class="form-group">
-                        <label class="form-label">ข้อความแจ้งเตือน</label>
-                        <textarea name="message" class="form-input" rows="3" placeholder="เช่น กรุณากรอกข้อมูลภายในสิ้นเดือน">{{ old('message', $setting->message ?? '') }}</textarea>
-                    </div>
-
-                    <!-- เพิ่มเวลาในการแจ้งเตือน และตัวเลือกเตือนอัตโนมัติ -->
-                    <div class="form-group">
-                        <label class="form-label">เวลาแจ้งเตือน (รอบที่ 1)</label>
-                        <input type="time" name="notify_time1" class="form-input2" style="width:140px;"
-                            value="{{ old('notify_time1', $setting->notify_time1 ?? '09:00') }}">
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label">เวลาแจ้งเตือน (รอบที่ 2)</label>
-                        <input type="time" name="notify_time2" class="form-input2" style="width:140px;"
-                            value="{{ old('notify_time2', $setting->notify_time2 ?? '09:00') }}">
-                    </div>
-
-                    <hr style="margin: 20px 0;" />
-                    <div class="add-section-title">ตัวเลือกแจ้งเตือนอัตโนมัติ (ก่อนวันกำหนด)</div>
-                    <div class="form-group">
-                        <label class="form-label">เปิดใช้งาน</label>
-                        <input type="checkbox" name="remind_enabled" value="1" {{ old('remind_enabled', $setting->remind_enabled ?? false) ? 'checked' : '' }} />
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">จำนวนวันก่อนกำหนด (เช่น 7,3,1)</label>
-                        <input type="text" name="remind_days" class="form-input"
-                            value="{{ old('remind_days', $setting->remind_days ?? '7,3,1') }}" placeholder="7,3,1">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">เวลาแจ้งเตือนอัตโนมัติ</label>
-                        <input type="time" name="remind_time" class="form-input2" style="width:140px;"
-                            value="{{ old('remind_time', $setting->remind_time ?? '09:00') }}">
-                    </div>
-
-                    <!-- Submit -->
-                    <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
-                        <button type="submit" class="submit-btn">
-                            <i data-lucide="save" class="btn-icon"></i> บันทึก
-                        </button>
-                        <button type="submit" name="send_now" value="1" formaction="{{ route('settings.sendNow') }}" class="submit-btn" style="background:#16a34a;">
-                            <i data-lucide="send" class="btn-icon"></i> บันทึกและส่งแจ้งเตือนทันที
-                        </button>
-                    </div>
-                </form>
+            <div class="form-group">
+                <label class="form-label">วันที่แจ้งเตือนรอบที่ 1</label>
+                <input form="notification-settings-form" type="date" name="notify_date1" class="form-input2"
+                    value="{{ old('notify_date1', $setting?->notify_date1?->format('Y-m-d')) }}">
             </div>
-        </div>
+
+            <div class="form-group">
+                <label class="form-label">วันที่แจ้งเตือนรอบที่ 2</label>
+                <input form="notification-settings-form" type="date" name="notify_date2" class="form-input2"
+                    value="{{ old('notify_date2', $setting?->notify_date2?->format('Y-m-d')) }}">
+            </div>
+
+            <!-- Message -->
+            <div class="form-group">
+                <label class="form-label">ข้อความแจ้งเตือน</label>
+                <textarea name="message" class="form-input" rows="3" placeholder="เช่น กรุณากรอกข้อมูลภายในสิ้นเดือน">{{ old('message', $setting->message ?? '') }}</textarea>
+            </div>
+
+            <!-- เพิ่มเวลาในการแจ้งเตือน และตัวเลือกเตือนอัตโนมัติ -->
+            <div class="form-group">
+                <label class="form-label">เวลาแจ้งเตือน (รอบที่ 1)</label>
+                <input form="notification-settings-form" type="time" name="notify_time1" class="form-input2"
+                    style="width:140px;" value="{{ old('notify_time1', $setting->notify_time1 ?? '09:00') }}">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">เวลาแจ้งเตือน (รอบที่ 2)</label>
+                <input form="notification-settings-form" type="time" name="notify_time2" class="form-input2"
+                    style="width:140px;" value="{{ old('notify_time2', $setting->notify_time2 ?? '09:00') }}">
+            </div>
+
+        </x-card>
+
+        <x-card>
+            <div class="card-title">ตัวเลือกแจ้งเตือนอัตโนมัติ (ก่อนวันกำหนด)</div>
+            <div class="form-group">
+                <label class="form-label">เปิดใช้งาน</label>
+                <input form="notification-settings-form" type="checkbox" name="remind_enabled" value="1"
+                    {{ old('remind_enabled', $setting->remind_enabled ?? false) ? 'checked' : '' }} />
+            </div>
+            <div class="form-group">
+                <label class="form-label">จำนวนวันก่อนกำหนด (เช่น 7,3,1)</label>
+                <input form="notification-settings-form" type="text" name="remind_days" class="form-input"
+                    value="{{ old('remind_days', $setting->remind_days ?? '7,3,1') }}" placeholder="7,3,1">
+            </div>
+            <div class="form-group">
+                <label class="form-label">เวลาแจ้งเตือนอัตโนมัติ</label>
+                <input form="notification-settings-form" type="time" name="remind_time" class="form-input2"
+                    style="width:140px;" value="{{ old('remind_time', $setting->remind_time ?? '09:00') }}">
+            </div>
+        </x-card>
+
+        <form id="notification-settings-form" action="{{ route('settings.store') }}" method="POST">
+            @csrf
+            <div class="action-bts">
+                <!-- Submit -->
+                <button type="submit" class="btn btn-primary">
+                    <i data-lucide="save" class="btn-icon"></i> บันทึก
+                </button>
+                <button type="submit" name="send_now" value="1" formaction="{{ route('settings.sendNow') }}"
+                    class="btn btn-secondary">
+                    <i data-lucide="send" class="btn-icon"></i> บันทึกและส่งแจ้งเตือนทันที
+                </button>
+            </div>
+        </form>
     </div>
-
-
-
 
     @if ($errors->any())
         <script>
@@ -94,93 +89,66 @@
             });
         </script>
     @endif
-    @push('styles')
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Trumbowyg/2.27.3/ui/trumbowyg.min.css" />
-    @endpush
-    @push('scripts')
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/Trumbowyg/2.27.3/trumbowyg.min.js"></script>
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                if (window.jQuery && typeof $.fn.trumbowyg === 'function') {
-                    $('textarea[name="message"]').trumbowyg({
-                        svgPath: 'https://cdnjs.cloudflare.com/ajax/libs/Trumbowyg/2.27.3/ui/icons.svg',
-                    });
-                }
-            });
-        </script>
-    @endpush
+@endsection
+
+@push('scripts')
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Trumbowyg/2.27.3/trumbowyg.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            if (window.jQuery && typeof $.fn.trumbowyg === 'function') {
+                $('textarea[name="message"]').trumbowyg({
+                    svgPath: 'https://cdnjs.cloudflare.com/ajax/libs/Trumbowyg/2.27.3/ui/icons.svg',
+                });
+            }
+        });
+    </script>
+@endpush
+
+@push('styles')
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Trumbowyg/2.27.3/ui/trumbowyg.min.css" />
     <style>
-        .Setting-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-
+        .container {
+            max-width: 960px !important;
         }
 
-        .Setting-containers {
-            width: 100%;
-            max-width: 1200px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-            /* ทำให้มุมมนทำงานดีขึ้น */
+        .Setting-card {
+            display: flex;
+            flex-direction: column;
+            background: var(--color-white);
+            border-radius: var(--radius-default);
+            box-shadow: var(--shadow-default);
+            border: 1px solid var(--color-gray-100);
+            padding: 24px;
+            gap: 24px;
         }
 
-        .header-contatainers {
+        .card-title {
+            font-size: 18px;
+            color: var(--blue-default);
+            margin: 0 0 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            position: relative;
+            padding-left: 10px;
+        }
+
+        .card-title::before {
+            content: "";
+            width: 4px;
+            height: 20px;
+            border-radius: 8px;
+            background: var(--blue-default);
+            position: absolute;
+            left: 0;
+            top: 2px;
+            opacity: .25;
+        }
+
+        .action-bts {
             display: flex;
             justify-content: center;
-            align-items: center;
-            padding: 15px 20px;
-            font-weight: 700;
-            font-size: 30px;
-            background: linear-gradient(90deg, #a9c6ff 0%, #fff3d4 100%);
-            border-top-left-radius: 10px;
-            border-top-right-radius: 10px;
-            color: #222;
-        }
-
-        .Setting-form {
-
-            margin-bottom: 30px;
-            position: relative;
-            background: white;
-            border-radius: 10px;
-            padding: 30px;
-            /* box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); */
-            border: 2px solid #C2D9EB;
-            margin-top: 40px;
-            margin-bottom: 40px;
-            margin-left: 60px;
-            margin-right: 60px;
-        }
-
-        .close-btn {
-            position: absolute;
-            right: 20px;
-            top: 20px;
-            background: none;
-            border: none;
-            font-size: 24px;
-            color: #666;
-            cursor: pointer;
-        }
-
-        .form-title {
-            color: #1976d2;
-            font-size: 24px;
-            font-weight: bold;
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .add-section-title {
-            color: #2196f3;
-            font-size: 18px;
-            font-weight: bold;
-            margin-bottom: 20px;
-            text-decoration: underline;
+            gap: 12px;
         }
 
         .form-group {
@@ -228,32 +196,10 @@
             border-color: #2196f3;
         }
 
-        .submit-btn {
-            background: #2196f3;
-            color: white;
-            border: none;
-            padding: 12px 16px;
-            border-radius: 5px;
-            font-size: 16px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            /* ระยะห่างระหว่างไอคอนและข้อความ */
-            transition: background-color 0.3s;
-            margin: 0 auto;
-        }
-
-        .submit-btn:hover {
-            background: #1976d2;
-        }
-
         .btn-icon {
             width: 20px;
             height: 20px;
         }
-
 
         .Setting-list {
             background: white;
@@ -303,16 +249,10 @@
             gap: 10px;
         }
 
-
-
-
-
-
-
         .lucide-icon {
             width: 30px;
             height: 30px;
             color: #D9D9D9;
         }
     </style>
-@endsection
+@endpush
