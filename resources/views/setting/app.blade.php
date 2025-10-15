@@ -191,5 +191,209 @@
             outline: none;
             border-color: #2196f3;
         }
+
+        /* ================ Responsive Design ================ */
+        /* < 640px (Mobile) */
+        @media (max-width: 639px) {
+            .container {
+                max-width: 100% !important;
+                padding: 8px !important;
+            }
+
+            .Setting-card {
+                padding: 12px;
+                gap: 16px;
+            }
+
+            .card-title {
+                font-size: 16px;
+                padding-left: 8px;
+                margin-bottom: 12px;
+            }
+
+            .card-title::before {
+                width: 3px;
+                height: 16px;
+            }
+
+            .form-group {
+                margin-bottom: 16px;
+            }
+
+            .form-label {
+                font-size: 14px;
+                margin-bottom: 6px;
+            }
+
+            .form-input,
+            .form-input2 {
+                font-size: 14px;
+                padding: 10px 12px;
+            }
+
+            .form-input2 {
+                width: 100%;
+                max-width: 100%;
+            }
+
+            .action-bts {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .action-bts button {
+                width: 100%;
+                font-size: 13px;
+                padding: 10px 16px;
+            }
+
+            .action-bts button i {
+                width: 18px !important;
+            }
+
+            .action-bts button span {
+                font-size: 13px;
+            }
+        }
+
+        /* 640px–767px (Small Tablet) */
+        @media (min-width: 640px) and (max-width: 767px) {
+            .container {
+                max-width: 100% !important;
+                padding: 12px !important;
+            }
+
+            .Setting-card {
+                padding: 16px;
+                gap: 20px;
+            }
+
+            .card-title {
+                font-size: 17px;
+            }
+
+            .form-group {
+                margin-bottom: 18px;
+            }
+
+            .form-label {
+                font-size: 15px;
+            }
+
+            .form-input,
+            .form-input2 {
+                font-size: 15px;
+                padding: 11px 14px;
+            }
+
+            .form-input2 {
+                width: auto;
+                min-width: 160px;
+            }
+
+            .action-bts {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .action-bts button {
+                width: 100%;
+                font-size: 14px;
+            }
+        }
+
+        /* 768px–1023px (Tablet) */
+        @media (min-width: 768px) and (max-width: 1023px) {
+            .container {
+                max-width: 768px !important;
+                padding: 16px !important;
+            }
+
+            .Setting-card {
+                padding: 20px;
+                gap: 22px;
+            }
+
+            .card-title {
+                font-size: 17px;
+            }
+
+            .form-group {
+                margin-bottom: 18px;
+            }
+
+            .form-label {
+                font-size: 15px;
+            }
+
+            .form-input,
+            .form-input2 {
+                font-size: 15px;
+                padding: 11px 14px;
+            }
+
+            .action-bts {
+                flex-direction: row;
+                flex-wrap: wrap;
+                gap: 10px;
+                justify-content: center;
+            }
+
+            .action-bts button {
+                flex: 1;
+                min-width: calc(50% - 5px);
+                font-size: 14px;
+            }
+        }
+
+        /* 1024px–1279px (Desktop) */
+        @media (min-width: 1024px) and (max-width: 1279px) {
+            .container {
+                max-width: 900px !important;
+            }
+
+            .Setting-card {
+                padding: 22px;
+            }
+
+            .form-group {
+                margin-bottom: 20px;
+            }
+
+            .action-bts {
+                gap: 12px;
+            }
+
+            .action-bts button {
+                font-size: 14px;
+            }
+        }
+
+        /* 1280px–1535px (Large Desktop) */
+        @media (min-width: 1280px) and (max-width: 1535px) {
+            .container {
+                max-width: 960px !important;
+            }
+
+            .Setting-card {
+                padding: 24px;
+                gap: 24px;
+            }
+
+            .form-group {
+                margin-bottom: 20px;
+            }
+
+            .action-bts {
+                gap: 12px;
+            }
+        }
+
+        /* 1536px+ (Extra Large) */
+        @media (min-width: 1536px) {
+            .container {
+                max-width: 1024px !important;
+            }
+        }
     </style>
 @endpush
