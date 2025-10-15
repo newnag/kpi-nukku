@@ -3,10 +3,6 @@
 @section('title', 'รายละเอียดตัวบ่งชี้')
 
 @section('content')
-    <div class="flex items-center justify-between mb-4">
-        <h1 class="text-xl font-semibold">รายละเอียดตัวชี้วัด</h1>
-
-    </div>
     @php
         // --- Normalize input (works with: ['data'=>...] JSON, or $indicator model/array) ---
         $ind = $data['data'] ?? ($data ?? ($indicator ?? null));
@@ -104,44 +100,6 @@ $hasChecklist = $checklist->isNotEmpty();
 // โชว์ตามโหมด (และซ่อนส่วนว่างอัตโนมัติ)
 $showVFSection = $type === 'variable_formula' || ($type !== 'checklist' && ($hasVFVars || $hasVFFx));
 $showChecklistSection = $type === 'checklist' || ($type !== 'variable_formula' && $hasChecklist);
-
-// ---- Status mapping -> label + badge classes (shadcn-like) ----
-// $statusOptions = [
-//     0 => [
-//         'label' => 'รอดำเนินการ',
-//         'class' => 'bg-slate-100 text-slate-800 ring-slate-300',
-//         'dot' => 'bg-slate-500',
-//     ],
-//     1 => [
-//         'label' => 'บันทึกร่าง',
-//         'class' => 'bg-amber-100 text-amber-800 ring-amber-300',
-//         'dot' => 'bg-amber-600',
-//     ],
-//     2 => [
-//         'label' => 'บันทึกจริง',
-//         'class' => 'bg-blue-100 text-blue-800 ring-blue-300',
-//         'dot' => 'bg-blue-600',
-//     ],
-//     3 => [
-//         'label' => 'ผลการดำเนินงานครบถ้วนตามเกณฑ์มาตรฐาน',
-//         'class' => 'bg-emerald-100 text-emerald-800 ring-emerald-300',
-//         'dot' => 'bg-emerald-600',
-//     ],
-//     4 => [
-//         'label' => 'ผลการดำเนินงานไม่ครบถ้วนตามเกณฑ์มาตรฐาน',
-//         'class' => 'bg-rose-100 text-rose-800 ring-rose-300',
-//         'dot' => 'bg-rose-600',
-//     ],
-// ];
-
-// $statusKey = is_numeric($status) ? (int) $status : null;
-// $opt = $statusKey !== null && array_key_exists($statusKey, $statusOptions) ? $statusOptions[$statusKey] : null;
-
-// $statusLabel = $opt['label'] ?? ($status !== null && $status !== '' ? (string) $status : '-');
-// $statusBadgeClass =
-//     'inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium ring-1 ring-inset ' .
-//     ($opt['class'] ?? 'bg-slate-100 text-slate-700 ring-slate-300');
-// $statusDotClass = $opt['dot'] ?? 'bg-slate-500';
 
     @endphp
     <div class="w-full mx-auto">
