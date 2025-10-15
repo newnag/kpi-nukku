@@ -1,5 +1,6 @@
 ﻿<?php
 
+use App\Http\Controllers\Auth\Auth_ssoController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\CategorieController;
 use App\Http\Controllers\DashboardController;
@@ -10,6 +11,9 @@ use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\EvidenceController;
 use App\Http\Controllers\IndicatorController;
 use App\Http\Controllers\IndicatorPresetController;
+use App\Http\Controllers\KKUEmailController;
+use App\Http\Controllers\KKUMailController;
+use App\Http\Controllers\NotifycationController;
 use App\Http\Controllers\SarReportController;
 use App\Http\Controllers\SarReportExportController;
 use App\Http\Controllers\SettingController;
@@ -41,6 +45,11 @@ Route::middleware('guest')->group(function () {
         Route::get('/login', 'showLoginForm')->name('login');
         Route::post('/login', 'login');
     });
+
+    Route::get('/sso/login', [Auth_ssoController::class, 'redirectToSSO'])->name('sso.login');
+    // รองรับทั้ง /auth/callback (เดิม) และ /sso/callback (ตาม .env/SSO พอยต์ปัจจุบัน)
+    Route::get('/auth/callback', [Auth_ssoController::class, 'callback'])->name('sso.callback');
+    Route::get('/sso/callback', [Auth_ssoController::class, 'callback'])->name('sso.callback.alt');
 });
 
 /*
@@ -89,10 +98,8 @@ Route::middleware(['auth'])->group(function () {
             ->name('show')
             ->middleware('permission:view-indicator');
 
-        // Manual notify assignees
-        Route::post('/{id}/notify', [IndicatorController::class, 'notifyAssignees'])
-            ->name('notify')
-            ->middleware('permission:edit-indicator');
+
+
 
         // Create
         Route::get('/create', [IndicatorController::class, 'create'])
@@ -172,6 +179,10 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/store', [DepartmentController::class, 'store'])
             ->name('store')
             ->middleware('permission:create-departments');
+        // Redirect accidental GET access to /departments/store back to index
+        // Route::get('/store', function () {
+        //     return redirect()->route('departments.index');
+        // })->name('store.get');
 
         // Update
         Route::put('/{id}', [DepartmentController::class, 'update'])
@@ -193,6 +204,10 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/store', [CategorieController::class, 'store'])
             ->name('store')
             ->middleware('permission:create-categories');
+        // Redirect accidental GET access to /categories/store back to index
+        // Route::get('/store', function () {
+        //     return redirect()->route('categories.index');
+        // })->name('store.get');
 
         // Update
         Route::put('/{id}', [CategorieController::class, 'update'])
@@ -235,6 +250,10 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/store', [SettingController::class, 'store'])
             ->name('store')
             ->middleware('permission:create-settings');
+        // Send notifications immediately using current form values
+        Route::post('/send-now', [\App\Http\Controllers\SettingNotifyController::class, 'sendNow'])
+            ->name('sendNow')
+            ->middleware('permission:edit-settings');
 
         // Update
         Route::put('/{id}', [SettingController::class, 'update'])
@@ -432,3 +451,7 @@ Route::get('/test', function () {
 Route::get('/test-html', function () {
     return view('pdf_test');
 });
+
+Route::post('/{id}/notify', [NotifycationController::class, 'notifyCollectors'])
+    ->name('notify')
+;

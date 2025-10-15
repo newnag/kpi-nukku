@@ -11,6 +11,7 @@ use App\Models\Indicator;
 use App\Models\Standard;
 use App\Models\User;
 use App\Models\Variable;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -52,14 +53,14 @@ class IndicatorController extends Controller
             })
             ->values()
             ->map(fn($i) => $this->serializeIndicatorForList($i));
-            
+
         $years = Indicator::whereNotNull('year')
             ->selectRaw('DISTINCT year')
             ->orderBy('year', 'desc')
             ->pluck('year');
         // dd($indicators);
 
-        return view('indicator.app', compact('indicators' , 'years'));
+        return view('indicator.app', compact('indicators', 'years'));
 
         // return response()->json(['indicators' => $indicators]);
     }
@@ -213,20 +214,11 @@ class IndicatorController extends Controller
         }
     }
 
-    // Manually notify all assignees from indicator detail page
-    public function notifyAssignees($id)
-    {
-        $indicator = Indicator::with(['assignments.collectorUser'])->findOrFail($id);
+    // Manually notify all assignees from indicator detail page 
 
-        foreach ($indicator->assignments as $assignment) {
-            if ($assignment->collectorUser) {
-                $assignment->collectorUser->notify(new \App\Notifications\IndicatorAssignedNotification($indicator));
-            }
-        }
+ 
 
-        return redirect()->route('indicator.show', $indicator->id)
-            ->with('success', 'ส่งอีเมลแจ้งเตือนผู้รับมอบหมายแล้ว');
-    }
+
 
     public function edit($id)
     {

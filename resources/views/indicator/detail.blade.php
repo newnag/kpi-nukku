@@ -453,7 +453,7 @@ $showChecklistSection = $type === 'checklist' || ($type !== 'variable_formula' &
                             @php $indicatorId = ($data['data']['id'] ?? ($data['id'] ?? ($indicator->id ?? null))); @endphp
                             @if (!empty($indicatorId))
                                 {{-- @if (\Illuminate\Support\Facades\Route::has('indicator.notify')) --}}
-                                <form method="POST" action="{{ route('indicator.notify', ['id' => $indicatorId]) }}">
+                                <form method="POST" action="{{ route('notify', ['id' => $indicatorId]) }}">
                                     @csrf
                                     <button type="submit" class="btn btn-primary">
                                         ส่งแจ้งเตือนผู้รับมอบหมาย
