@@ -70,7 +70,7 @@
                         <th class="text-xs !text-center sm:text-sm font-medium text-gray-900 cursor-pointer">ลำดับ</th>
                         <th class="text-xs !text-center sm:text-sm font-medium text-gray-900 cursor-pointer">
                             ชื่อมาตรฐานการประเมิน</th>
-                        <th class="text-xs !text-center sm:text-sm font-medium text-gray-900 cursor-pointer w-fit">จัดการ</th>
+                        <th class="text-xs !text-center sm:text-sm font-medium text-gray-900 cursor-pointer w-5"><span class="w-fit">จัดการ</span></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -180,7 +180,7 @@
                             ชื่อด้านการประเมิน</th>
                         <th class="text-xs !text-center sm:text-sm font-medium text-gray-900 cursor-pointer">คะแนนเต็ม</th>
                         <th class="text-xs !text-center sm:text-sm font-medium text-gray-900 cursor-pointer">มาตรฐาน</th>
-                        <th class="text-xs !text-center sm:text-sm font-medium text-gray-900 cursor-pointer">จัดการ</th>
+                        <th class="text-xs !text-center sm:text-sm font-medium text-gray-900 cursor-pointer w-5"><span class="w-fit">จัดการ</span></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -723,6 +723,268 @@
             gap: 8px;
             justify-content: center;
             width: fit-content;
+        }
+
+        /* ================ Responsive Design ================ */
+        /* < 640px (Mobile) */
+        @media (max-width: 639px) {
+            .container {
+                padding: 8px !important;
+            }
+
+            .categories-card {
+                padding: 12px;
+                gap: 16px;
+            }
+
+            .card-title {
+                font-size: 16px;
+                padding-left: 8px;
+            }
+
+            .card-title::before {
+                width: 3px;
+                height: 16px;
+            }
+
+            .search-button-container {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .search-bar {
+                width: 100%;
+                min-width: 100%;
+            }
+
+            .search-bar input {
+                font-size: 13px;
+                padding: 8px 12px 8px 36px;
+            }
+
+            .dropdown-inds {
+                width: 100%;
+            }
+
+            .btns {
+                width: 100%;
+                justify-content: center;
+                font-size: 13px;
+                padding: 8px 12px;
+            }
+
+            .dropdown-menus {
+                left: 0;
+                right: 0;
+                width: calc(100% - 24px);
+                max-height: 250px;
+            }
+
+            .dropdown-item {
+                font-size: 13px;
+                padding: 6px 12px;
+            }
+
+            .table {
+                font-size: 12px;
+            }
+
+            .table th,
+            .table td {
+                padding: 8px 4px;
+            }
+
+            .categories-actions {
+                flex-direction: column;
+                width: 100%;
+                gap: 6px;
+            }
+
+            .categories-actions button {
+                width: 100%;
+                font-size: 12px;
+            }
+
+            form .form-group {
+                margin-bottom: 12px;
+            }
+
+            form input,
+            form select,
+            form textarea {
+                font-size: 13px;
+                padding: 8px 12px;
+            }
+
+            .action-bts {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .action-bts button {
+                width: 100%;
+            }
+        }
+
+        /* 640px–767px (Small Tablet) */
+        @media (min-width: 640px) and (max-width: 767px) {
+            .container {
+                padding: 12px !important;
+            }
+
+            .categories-card {
+                padding: 16px;
+                gap: 20px;
+            }
+
+            .card-title {
+                font-size: 17px;
+            }
+
+            .search-button-container {
+                flex-wrap: wrap;
+            }
+
+            .search-bar {
+                width: 100%;
+                min-width: 100%;
+            }
+
+            .search-bar input {
+                font-size: 13px;
+            }
+
+            .dropdown-inds {
+                flex: 1;
+                min-width: calc(50% - 4px);
+            }
+
+            .btns {
+                font-size: 13px;
+                width: 100%;
+            }
+
+            .dropdown-menus {
+                max-height: 300px;
+            }
+
+            .table {
+                font-size: 13px;
+            }
+
+            .table th,
+            .table td {
+                padding: 10px 6px;
+            }
+
+            .categories-actions {
+                gap: 6px;
+            }
+
+            form input,
+            form select,
+            form textarea {
+                font-size: 14px;
+            }
+        }
+
+        /* 768px–1023px (Tablet) */
+        @media (min-width: 768px) and (max-width: 1023px) {
+            .container {
+                max-width: 100% !important;
+                padding: 16px !important;
+            }
+
+            .categories-card {
+                padding: 20px;
+            }
+
+            .search-button-container {
+                flex-wrap: nowrap;
+            }
+
+            .search-bar {
+                width: 50%;
+                min-width: 200px;
+            }
+
+            .search-bar input {
+                font-size: 14px;
+            }
+
+            .btns {
+                font-size: 14px;
+                padding: 8px 14px;
+            }
+
+            .btns svg {
+                width: 15px;
+                height: 15px;
+            }
+
+            .dropdown-menus {
+                max-height: 350px;
+            }
+
+            .table {
+                font-size: 14px;
+            }
+
+            .table th,
+            .table td {
+                padding: 10px 8px;
+            }
+
+            .categories-actions button {
+                padding: 6px 10px;
+            }
+        }
+
+        /* 1024px–1279px (Desktop) */
+        @media (min-width: 1024px) and (max-width: 1279px) {
+            .container {
+                max-width: 960px !important;
+            }
+
+            .categories-card {
+                padding: 22px;
+            }
+
+            .search-bar {
+                width: 55%;
+            }
+
+            .btns {
+                font-size: 14px;
+            }
+
+            .dropdown-menus {
+                max-height: 380px;
+            }
+
+            .table th,
+            .table td {
+                padding: 10px;
+            }
+        }
+
+        /* 1280px–1535px (Large Desktop) */
+        @media (min-width: 1280px) and (max-width: 1535px) {
+            .container {
+                max-width: 1024px !important;
+            }
+
+            .categories-card {
+                padding: 24px;
+            }
+
+            .search-bar {
+                width: 60%;
+            }
+
+            .dropdown-menus {
+                max-height: 400px;
+            }
         }
     </style>
 @endpush
