@@ -246,6 +246,7 @@ class PermissionsTableSeeder extends Seeder
             'view-dashboard-kpi-user',
             'show-dashboard-kpi-user',
 
+            
             // ===== Auth/โปรไฟล์พื้นฐาน (เผื่อใช้) =====
             'edit-profile'
         ]);

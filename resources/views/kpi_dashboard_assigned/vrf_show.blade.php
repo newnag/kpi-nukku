@@ -364,12 +364,20 @@
                 </x-slot:footer>
             </x-modal>
 
-            <button type="button" class="btn btn-warning" form=""
-                @if ($indicator->status === 2 || $locked) disabled @endif>
-                <i class="fa-solid fa-bell"></i>
-                <span class="hidden sm:inline">แจ้งเตือนผู้รับผิดชอบ</span>
-                <span class="sm:hidden">แจ้งเตือน</span>
-            </button>
+
+            <form id="notify-form" action="{{ route('notify', $indicator->id) }}" method="POST">
+                @csrf
+            
+                <!-- ✅ hidden status -->
+               
+                <button type="submit" class="btn btn-warning" form="notify-form"
+                    @if ($indicator->status === 2 || $locked) disabled @endif>
+                    <i class="fa-solid fa-bell"></i>
+                    <span class="hidden sm:inline">แจ้งเตือนผู้รับผิดชอบ</span>
+                    <span class="sm:hidden">แจ้งเตือน</span>
+                </button>
+            </form>
+
         </div>
     </div>
 @endsection

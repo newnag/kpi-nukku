@@ -103,7 +103,6 @@ class DashboardKpiUserController extends Controller
     public function saveVariables(Request $request, $id)
     {
         $indicator = Indicator::findOrFail($id);
-        $previousStatus = (int) ($indicator->status ?? 0);
 
         if ($request->has('variables')) {
             foreach ($request->variables as $varId => $value) {
@@ -120,41 +119,9 @@ class DashboardKpiUserController extends Controller
 
         $indicator->save();
 
-        // Notify QA when user submits final (status=2)
-        try {
-            if ((int) ($indicator->status ?? 0) === 2 && $previousStatus !== 2) {
-                $qaUsers = \App\Models\User::role(['qa_admin','super_admin','system_admin'])->get();
-                foreach ($qaUsers as $qa) {
-                    $qa->notify(new \App\Notifications\IndicatorFinalSubmittedNotification($indicator, optional(\Illuminate\Support\Facades\Auth::user())->name));
-                }
-            }
-        } catch (\Throwable $e) {
-            // Silently ignore email errors
-        }
-
         return redirect()->route('dashboardkpi.user.show', $indicator->id)
             ->with('success', 'บันทึกข้อมูลเรียบร้อยแล้ว');
 
-    }
-
-    // User requests correction/unlock -> notify QA
-    public function requestCorrection(Request $request, $id)
-    {
-        $indicator = Indicator::findOrFail($id);
-        $note = (string) $request->input('note', '');
-
-        try {
-            $qaUsers = \App\Models\User::role(['qa_admin','super_admin','system_admin'])->get();
-            $by = optional(\Illuminate\Support\Facades\Auth::user())->name;
-            foreach ($qaUsers as $qa) {
-                $qa->notify(new \App\Notifications\IndicatorCorrectionRequestedNotification($indicator, $by, $note));
-            }
-        } catch (\Throwable $e) {
-            // ignore
-        }
-
-        return redirect()->route('dashboardkpi.user.show', $indicator->id)
-            ->with('success', 'ส่งคำร้องขอแก้ไขไปยังเจ้าหน้าแล้ว');
     }
 
     private function serializeIndicatorForList(Indicator $i): array

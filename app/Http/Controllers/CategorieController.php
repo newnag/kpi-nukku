@@ -41,15 +41,15 @@ class CategorieController extends Controller
         ]);
 
         // ตรวจสอบซ้ำชื่อที่ไม่ใช่ตัวเอง
-        $existingCategory = Category::where('name', $request->name)
-            ->where('id', '!=', $id)
-            ->first();
+        // $existingCategory = Category::where('name', $request->name)
+        //     ->where('id', '!=', $id)
+        //     ->first();
 
-        if ($existingCategory) {
-            return redirect()->back()
-                ->withInput()
-                ->withErrors(['name' => 'ชื่อด้านนี้มีอยู่ในระบบ กรุณาใช้ชื่ออื่น']);
-        }
+        // if ($existingCategory) {
+        //     return redirect()->back()
+        //         ->withInput()
+        //         ->withErrors(['name' => 'ชื่อด้านนี้มีอยู่ในระบบ กรุณาใช้ชื่ออื่น']);
+        // }
 
         $category = Category::findOrFail($id);
         $category->update([

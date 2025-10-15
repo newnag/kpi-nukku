@@ -35,6 +35,7 @@ class DashboardKpiAdminController extends Controller
     public function saveVariables(Request $request, $id)
     {
         $indicator = Indicator::findOrFail($id);
+        $previousStatus = (int) ($indicator->status ?? 0);
 
         // variables
         if ($request->has('variables')) {
@@ -76,6 +77,66 @@ class DashboardKpiAdminController extends Controller
 
         if ($indicator->status == 2 || $request->status == 2) {
             $this->calculateScore($indicator);
+        }
+
+        // Notify assignees on status changes handled by QA
+        try {
+            $newStatus = (int) ($indicator->status ?? 0);
+            if ($newStatus !== $previousStatus) {
+                $indicator->loadMissing(['assignments.collectorUser']);
+                $changedBy = optional(\Illuminate\Support\Facades\Auth::user())->name;
+                // 1) From final (2) -> draft (1)
+                if ($previousStatus === 2 && $newStatus === 1) {
+                    foreach ($indicator->assignments as $assignment) {
+                        if ($assignment->collectorUser) {
+                            $recipient = $assignment->collectorUser;
+                            $email = (string) ($recipient->email ?? '');
+                            \Illuminate\Support\Facades\Log::info('Notify assignee about status change (2->1)', [
+                                'indicator_id' => $indicator->id,
+                                'recipient_id' => $recipient->id ?? null,
+                                'email' => $email,
+                                'prev' => $previousStatus,
+                                'new' => $newStatus,
+                            ]);
+                            if ($email === '') {
+                                \Illuminate\Support\Facades\Log::warning('Skip notify: recipient has no email', [
+                                    'recipient_id' => $recipient->id ?? null,
+                                ]);
+                                continue;
+                            }
+                            $assignment->collectorUser->notify(new \App\Notifications\IndicatorStatusChangedForAssignees($indicator, $newStatus, $previousStatus, $changedBy));
+                        }
+                    }
+                }
+                // 2) QA sets to 3 or 4 -> notify assignees
+                if (in_array($newStatus, [3, 4], true)) {
+                    foreach ($indicator->assignments as $assignment) {
+                        if ($assignment->collectorUser) {
+                            $recipient = $assignment->collectorUser;
+                            $email = (string) ($recipient->email ?? '');
+                            \Illuminate\Support\Facades\Log::info('Notify assignee about status change (QA->assignee)', [
+                                'indicator_id' => $indicator->id,
+                                'recipient_id' => $recipient->id ?? null,
+                                'email' => $email,
+                                'prev' => $previousStatus,
+                                'new' => $newStatus,
+                            ]);
+                            if ($email === '') {
+                                \Illuminate\Support\Facades\Log::warning('Skip notify: recipient has no email', [
+                                    'recipient_id' => $recipient->id ?? null,
+                                ]);
+                                continue;
+                            }
+                            $assignment->collectorUser->notify(new \App\Notifications\IndicatorStatusChangedForAssignees($indicator, $newStatus, $previousStatus, $changedBy));
+                        }
+                    }
+                }
+            }
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Notify assignees failed', [
+                'indicator_id' => $indicator->id ?? null,
+                'error' => $e->getMessage(),
+            ]);
         }
 
         // ✅ ส่ง JSON กลับไป
