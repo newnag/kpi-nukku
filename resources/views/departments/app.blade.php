@@ -69,18 +69,19 @@
             <table class="table" id="table1">
                 <thead>
                     <tr>
-                        <th>ลำดับ</th>
-                        <th>ชื่อหน่วยงาน</th>
-                        <th>จัดการ</th>
+                        <th class="text-xs !text-center sm:text-sm font-medium text-gray-900 cursor-pointer">ลำดับ</th>
+                        <th class="text-xs !text-center sm:text-sm font-medium text-gray-900 cursor-pointer">ชื่อหน่วยงาน
+                        </th>
+                        <th class="text-xs !text-center sm:text-sm font-medium text-gray-900 cursor-pointer">จัดการ</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach ($departments as $index => $item)
                         <tr>
-                            <td>{{ $index + 1 }}</td>
-                            <td>{{ $item->name }}</td>
-                            <td>
-                                <div class="categories-actions text-center">
+                            <td class="text-xs text-center sm:text-sm text-gray-700 align-top">{{ $index + 1 }}</td>
+                            <td class="text-xs sm:text-sm text-gray-700 align-top">{{ $item->name }}</td>
+                            <td class="text-xs text-center sm:text-sm text-gray-700 align-top">
+                                <div class="categories-actions">
                                     <button class="btn btn-outline"
                                         onclick="openEditModal({{ $item->id }}, '{{ $item->name }}')">
                                         <i data-lucide="edit-3" style="width:15px;"></i> แก้ไข
@@ -102,7 +103,8 @@
     <x-modal title="แก้ไขชื่อหน่วยงาน" size="md" context="editModal" :closeOnBg="false">
         <div class="mb-4 text-sm text-gray-600">
             แก้ไขชื่อหน่วยงานที่ต้องการแล้วกดบันทึกเพื่อบันทึกผลที่ต้องการ
-            <p class="mt-2">ชื่อหน่วยงานเดิม : <span id="currentDepartmentName" class="font-semibold text-pretty"></span></p>
+            <p class="mt-2">ชื่อหน่วยงานเดิม : <span id="currentDepartmentName" class="font-semibold text-pretty"></span>
+            </p>
         </div>
 
         <form id="editForm" method="POST"
@@ -140,7 +142,8 @@
         </div>
 
         <div class="mb-6 text-center text-gray-700 text-sm">
-            คุณต้องการลบข้อมูลหน่วยงาน "<span id="deleteName" class="font-semibold text-red-600 text-pretty"></span>" หรือไม่?
+            คุณต้องการลบข้อมูลหน่วยงาน "<span id="deleteName" class="font-semibold text-red-600 text-pretty"></span>"
+            หรือไม่?
         </div>
 
         <form id="deleteForm" method="POST">
@@ -444,6 +447,13 @@
 
         .dropdown-item:hover {
             background: #f3f4f6;
+        }
+
+        .categories-actions {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            width: fit-content;
         }
     </style>
 @endpush

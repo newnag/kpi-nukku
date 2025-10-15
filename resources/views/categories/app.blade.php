@@ -67,17 +67,18 @@
             <table class="table" id="table1">
                 <thead>
                     <tr>
-                        <th>ลำดับ</th>
-                        <th>ชื่อมาตรฐานการประเมิน</th>
-                        <th>จัดการ</th>
+                        <th class="text-xs !text-center sm:text-sm font-medium text-gray-900 cursor-pointer">ลำดับ</th>
+                        <th class="text-xs !text-center sm:text-sm font-medium text-gray-900 cursor-pointer">
+                            ชื่อมาตรฐานการประเมิน</th>
+                        <th class="text-xs !text-center sm:text-sm font-medium text-gray-900 cursor-pointer w-fit">จัดการ</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach ($standards as $index => $item)
                         <tr>
-                            <td>{{ $index + 1 }}</td>
-                            <td>{{ $item->name }}</td>
-                            <td>
+                            <td class="text-xs text-center sm:text-sm text-gray-700 align-top">{{ $index + 1 }}</td>
+                            <td class="text-xs sm:text-sm text-gray-700 align-top">{{ $item->name }}</td>
+                            <td class="text-xs !text-center sm:text-sm text-gray-700 align-top w-fit">
                                 <div class="categories-actions">
                                     <button class="btn btn-outline"
                                         onclick="openEditModalStandards({{ $item->id }}, '{{ $item->name }}')">
@@ -174,21 +175,23 @@
             <table class="table" id="table2">
                 <thead>
                     <tr>
-                        <th>ลำดับ</th>
-                        <th>ชื่อด้านการประเมิน</th>
-                        <th>คะแนนเต็ม</th>
-                        <th>มาตรฐาน</th>
-                        <th>จัดการ</th>
+                        <th class="text-xs !text-center sm:text-sm font-medium text-gray-900 cursor-pointer">ลำดับ</th>
+                        <th class="text-xs !text-center sm:text-sm font-medium text-gray-900 cursor-pointer">
+                            ชื่อด้านการประเมิน</th>
+                        <th class="text-xs !text-center sm:text-sm font-medium text-gray-900 cursor-pointer">คะแนนเต็ม</th>
+                        <th class="text-xs !text-center sm:text-sm font-medium text-gray-900 cursor-pointer">มาตรฐาน</th>
+                        <th class="text-xs !text-center sm:text-sm font-medium text-gray-900 cursor-pointer">จัดการ</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach ($categories as $index => $cat)
                         <tr>
-                            <td>{{ $index + 1 }}</td>
-                            <td>{{ $cat->name }}</td>
-                            <td>{{ $cat->max_score }}</td>
-                            <td>{{ $cat->standard->name ?? '-' }}</td>
-                            <td>
+                            <td class="text-xs text-center sm:text-sm text-gray-700 align-top">{{ $index + 1 }}</td>
+                            <td class="text-xs sm:text-sm text-gray-700 align-top">{{ $cat->name }}</td>
+                            <td class="text-xs text-center sm:text-sm text-gray-700 align-top">{{ $cat->max_score }}</td>
+                            <td class="text-xs text-center sm:text-sm text-gray-700 align-top">
+                                {{ $cat->standard->name ?? '-' }}</td>
+                            <td class="text-xs text-center sm:text-sm text-gray-700 align-top">
                                 <div class="categories-actions">
                                     <button class="btn btn-outline"
                                         onclick="openEditModalCat({{ $cat->id }}, '{{ $cat->name }}', '{{ $cat->max_score }}', '{{ $cat->standard_id }}', '{{ $cat->standard->name }}')">
@@ -212,7 +215,8 @@
     <x-modal title="แก้ไขชื่อมาตรฐานการประเมิน" size="md" context="editModalStandards" :closeOnBg="false">
         <div class="mb-4 text-sm text-gray-600">
             แก้ไขชื่อมาตรฐานการประเมินที่ต้องการแล้วกดบันทึกเพื่อบันทึกผลที่ต้องการ
-            <p class="mt-2">ชื่อด้านการประเมินเดิม : <span id="currentstandardsName" class="font-semibold text-pretty"></span></p>
+            <p class="mt-2">ชื่อด้านการประเมินเดิม : <span id="currentstandardsName"
+                    class="font-semibold text-pretty"></span></p>
         </div>
 
         <form id="editFormStandards" method="POST" action="">
@@ -251,7 +255,8 @@
         </div>
 
         <div class="mb-6 text-center text-gray-700 text-sm">
-            คุณต้องการลบข้อมูลด้านการประเมิน "<span id="deleteNameStandards" class="font-semibold text-red-600 text-pretty"></span>"
+            คุณต้องการลบข้อมูลด้านการประเมิน "<span id="deleteNameStandards"
+                class="font-semibold text-red-600 text-pretty"></span>"
             หรือไม่?
         </div>
 
@@ -273,7 +278,8 @@
     <x-modal title="แก้ไขชื่อด้านการประเมิน" size="md" context="editModalCategories" :closeOnBg="false">
         <div class="mb-4 text-sm text-gray-600">
             แก้ไขชื่อด้านการประเมินที่ต้องการแล้วกดบันทึกเพื่อบันทึกผลที่ต้องการ
-            <p class="mt-2">ชื่อด้านการประเมินเดิม : <span id="currentcategoriesName" class="font-semibold text-pretty"></span></p>
+            <p class="mt-2">ชื่อด้านการประเมินเดิม : <span id="currentcategoriesName"
+                    class="font-semibold text-pretty"></span></p>
             <p>คะแนนเต็มเดิม : <span id="currentcategoriesMaxScore" class="font-semibold text-pretty"></span></p>
             <p>มาตรฐานเดิม : <span id="currentcategoriesStandardName" class="font-semibold text-pretty"></span></p>
         </div>
@@ -710,6 +716,13 @@
 
         .dropdown-item:hover {
             background: #f3f4f6;
+        }
+
+        .categories-actions {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            width: fit-content;
         }
     </style>
 @endpush

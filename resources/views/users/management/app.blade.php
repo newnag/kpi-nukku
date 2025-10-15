@@ -139,17 +139,17 @@
     </div>
 
     <!-- ตารางผู้ใช้งาน -->
-    <div class="user-containers">
-        <table class="table" id="table3">
+    <div class="border border-gray-200 rounded-lg shadow-sm overflow-x-hidden">
+        <table class="w-full min-w-full overflow-x-auto" id="table3">
             <thead>
                 <tr>
-                    <th>ลำดับ</th>
-                    <th>ชื่อ-สกุล</th>
-                    <th>อีเมล</th>
-                    <th>หน่วยงาน</th>
-                    <th>หมายเลขโทรศัพท์</th>
-                    <th>บทบาท</th>
-                    <th>จัดการ</th>
+                    <th class="text-xs !text-center sm:text-sm font-medium text-gray-900 cursor-pointer ">ลำดับ</th>
+                    <th class="text-xs !text-center sm:text-sm font-medium text-gray-900 cursor-pointer">ชื่อ-สกุล</th>
+                    <th class="text-xs !text-center sm:text-sm font-medium text-gray-900 cursor-pointer">อีเมล</th>
+                    <th class="text-xs !text-center sm:text-sm font-medium text-gray-900 cursor-pointer ">หน่วยงาน</th>
+                    <th class="text-xs !text-center sm:text-sm font-medium text-gray-900 cursor-pointer ">หมายเลขโทรศัพท์</th>
+                    <th class="text-xs !text-center sm:text-sm font-medium text-gray-900 cursor-pointer ">บทบาท</th>
+                    <th class="text-xs !text-center sm:text-sm font-medium text-gray-900 cursor-pointer ">จัดการ</th>
                 </tr>
             </thead>
             <tbody>
@@ -158,13 +158,13 @@
                         $rowClass = $item->status ? 'user-active-row' : 'user-inactive-row';
                     @endphp
                     <tr class="{{ $rowClass }}">
-                        <td>{{ $index + 1 }}</td>
-                        <td>{{ $item->display_name }}</td>
-                        <td>{{ $item->email }}</td>
-                        <td>{{ $item->department->name ?? '-' }}</td>
-                        <td>{{ $item->phone }}</td>
-                        <td>{{ $item->getRoleNames()->implode(', ') ?: '-' }}</td>
-                        <td>
+                        <td class="text-xs text-center sm:text-sm text-gray-700 align-top">{{ $index + 1 }}</td>
+                        <td class="text-xs sm:text-sm text-gray-700 align-top">{{ $item->display_name }}</td>
+                        <td class="text-xs sm:text-sm text-gray-700 align-top">{{ $item->email }}</td>
+                        <td class="text-xs sm:text-sm text-gray-700 align-top">{{ $item->department->name ?? '-' }}</td>
+                        <td class="text-xs sm:text-sm text-gray-700 align-top">{{ $item->phone }}</td>
+                        <td class="text-xs sm:text-sm text-gray-700 align-top">{{ $item->getRoleNames()->implode(', ') ?: '-' }}</td>
+                        <td class="text-xs text-center sm:text-sm text-gray-700 align-top">
                             <div class="categories-actions">
                                 {{-- ถ้าใช้ Route Model Binding --}}
                                 <a href="{{ route('users.edit', ['id' => $item->id]) }}" class="btn btn-outline">
@@ -533,168 +533,10 @@
             accent-color: #2563eb;
         }
 
-        /* ตาราง */
-        .table {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 0;
-        }
-
-        .table thead th {
-            text-align: left;
-            font-weight: 600;
-            background: #f9fafb;
-            border-bottom: 1px solid #e5e7eb;
-            padding: 12px;
-        }
-
-        .table tbody td {
-            padding: 12px;
-            border-bottom: 1px solid #e5e7eb;
-        }
-
-        /* Row status indicators with colored inset bars */
-        .table tbody tr {
-            transition: background-color .15s ease, transform .05s ease;
-        }
-
-        .table tbody tr.user-active-row {
-            box-shadow: inset 4px 0 0 0 #3b82f6;
-        }
-
-        .table tbody tr.user-inactive-row {
-            box-shadow: inset 4px 0 0 0 #ef4444;
-            background-color: #fef2f2 !important;
-        }
-
-        .table tbody tr.user-active-row:hover {
-            background-color: #dbeafe !important;
-        }
-
-        .table tbody tr.user-inactive-row:hover {
-            background-color: #fee2e2 !important;
-        }
-
         .categories-actions {
             display: flex;
             gap: 8px;
-        }
-
-        /* กล่องหัวข้อ/รายการ */
-        .user-containers {
-            margin-top: 12px;
-        }
-
-        .user-containers {
-            width: 100%;
-            max-width: 1500px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-        }
-
-        .categories-actions {
-            display: flex;
-            gap: 10px;
-        }
-
-        .dataTables_length,
-        .dataTables_filter {
-            display: none;
-        }
-
-        /* กล่องหัวข้อ/รายการ */
-        .user-containers {
-            margin-top: 12px;
-            width: 100%;
-            max-width: 1500px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-        }
-
-        /* ================ Responsive ================ */
-        /* < 640px */
-        @media (max-width: 639px) {
-            .card-header-table {
-                flex-direction: column;
-                gap: 16px;
-                padding: 0 6px 12px;
-            }
-
-            .search-button-container {
-                flex-direction: column;
-            }
-
-            .search-bar {
-                width: 100%;
-                max-width: none;
-            }
-
-            .search-bar input,
-            .action-buttons-container button,
-            .btns {
-                font-size: 12px;
-            }
-
-            .dropdown-menus {
-                right: 0;
-                left: auto;
-                padding: 6px;
-            }
-
-            .sort-filter-container {
-                width: 100%;
-                justify-content: space-between;
-            }
-
-            .dropdown-inds,
-            .dropdown-inds .btns {
-                width: 100%;
-            }
-
-            .action-buttons-container {
-                width: 100%;
-            }
-
-            .action-buttons-container button {
-                width: 100%;
-            }
-        }
-
-        /* 640px–767px */
-        @media (min-width: 640px) and (max-width: 767px) {
-            .card-header-table {
-                flex-wrap: wrap;
-                gap: 12px;
-            }
-
-            .search-bar {
-                min-width: 200px;
-            }
-
-            .search-bar input,
-            .action-buttons-container button,
-            .btns {
-                font-size: 13px;
-            }
-        }
-
-        /* 768px–1023px */
-        @media (min-width: 768px) and (max-width: 1023px) {
-            .search-button-container {
-                flex: 1;
-            }
-
-            .search-bar input,
-            .action-buttons-container button,
-            .btns {
-                font-size: 14px;
-            }
+            justify-content: center;
         }
     </style>
 @endpush

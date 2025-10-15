@@ -72,11 +72,11 @@
             <div class="action-bts">
                 <!-- Submit -->
                 <button type="submit" class="btn btn-primary">
-                    <i data-lucide="save" class="btn-icon"></i> บันทึก
+                    <i data-lucide="save" style="width: 20px;"></i> บันทึก
                 </button>
                 <button type="submit" name="send_now" value="1" formaction="{{ route('settings.sendNow') }}"
                     class="btn btn-secondary">
-                    <i data-lucide="send" class="btn-icon"></i> บันทึกและส่งแจ้งเตือนทันที
+                    <i data-lucide="send" style="width: 20px;"></i> บันทึกและส่งแจ้งเตือนทันที
                 </button>
             </div>
         </form>
@@ -162,10 +162,6 @@
             font-weight: normal;
         }
 
-        .required {
-            color: red;
-        }
-
         .form-input {
             width: 100%;
             padding: 12px 15px;
@@ -194,65 +190,6 @@
         .form-input2:focus {
             outline: none;
             border-color: #2196f3;
-        }
-
-        .btn-icon {
-            width: 20px;
-            height: 20px;
-        }
-
-        .Setting-list {
-            background: white;
-            border-radius: 10px;
-            padding: 30px;
-            /* box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); */
-            border: 2px solid #C2D9EB;
-            margin-top: 40px;
-            margin-bottom: 40px;
-            margin-left: 60px;
-            margin-right: 60px;
-        }
-
-        .list-title {
-            color: #2196f3;
-            font-size: 18px;
-            font-weight: bold;
-            margin-bottom: 20px;
-            text-decoration: underline;
-        }
-
-        .Setting-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 0;
-            border-bottom: 1px solid #eee;
-        }
-
-        .Setting-item:last-child {
-            border-bottom: none;
-        }
-
-        .Setting-name {
-            color: #333;
-            font-size: 16px;
-        }
-
-        .Setting-name::before {
-            content: " ";
-            color: #333;
-            margin-right: 8px;
-        }
-
-        .Setting-actions {
-            display: flex;
-            gap: 10px;
-        }
-
-        .lucide-icon {
-            width: 30px;
-            height: 30px;
-            color: #D9D9D9;
         }
     </style>
 @endpush
