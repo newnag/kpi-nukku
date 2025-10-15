@@ -110,7 +110,7 @@
                         <td class="max-w-32 text-xs sm:text-sm text-gray-700 text-center align-top hidden sm:table-cell">
                             {{ $r->created_at ? $r->created_at->format('d/m/Y') : '-' }}
                         </td>
-                        <td class="text-xs sm:text-sm text-gray-700 align-top" data-rowlink-ignore>
+                        <td class="text-xs sm:text-sm text-gray-700 align-top text-center" data-rowlink-ignore>
                             <div x-data="{
                                 open: false,
                                 pos: { top: 0, left: 0 },
@@ -134,7 +134,7 @@
                                 <button type="button" x-ref="trigger" @click="position(); open = !open"
                                     @keydown.escape.window="open=false"
                                     class="inline-flex items-center p-2 bg-gray-100 border border-gray-300 rounded-md shadow-sm 
-                   hover:bg-gray-200 focus:outline-none transition">
+                   hover:bg-gray-200 focus:outline-none transition cursor-pointer">
                                     <i data-lucide="more-vertical" class="w-5 h-5 text-gray-700"></i>
                                 </button>
 
@@ -150,7 +150,7 @@
                                             <a href="{{ route('sar_reports.edit', $r->id) }}"
                                                 class="flex items-center px-4 py-2 hover:bg-gray-100 transition">
                                                 <i data-lucide="edit-3" class="w-4 h-4 mr-2 text-gray-600"></i>
-                                                แก้ไขข้อมูล
+                                                แก้ไขเอกสาร
                                             </a>
 
                                             <!-- เส้นคั่น -->
@@ -164,9 +164,9 @@
                                                 <x-modal title="ยืนยันการลบข้อมูล" size="sm">
                                                     <x-slot:trigger>
                                                         <button type="button"
-                                                            class="flex items-center w-full px-4 py-2 text-red-700 hover:bg-red-50 transition">
+                                                            class="flex items-center w-full px-4 py-2 text-red-700 hover:bg-red-50 transition cursor-pointer">
                                                             <i data-lucide="trash-2" class="w-4 h-4 mr-2"></i>
-                                                            ลบข้อมูล
+                                                            ลบเอกสาร
                                                         </button>
                                                     </x-slot:trigger>
 
@@ -192,16 +192,14 @@
                                             <!-- ปุ่ม Export (Dropdown ซ้อน) -->
                                             <div x-data="{ open: false }" class="relative">
                                                 <button type="button" @click="open = !open"
-                                                    class="flex items-center w-full px-4 py-2 hover:bg-gray-100 transition">
+                                                    class="flex items-center w-full px-4 py-2 hover:bg-gray-100 transition cursor-pointer">
                                                     <i data-lucide="download" class="w-4 h-4 mr-2 text-gray-600"></i>
                                                     ส่งออกเอกสาร
-                                                    <i data-lucide="chevron-right"
-                                                        class="ml-auto w-4 h-4 text-gray-500"></i>
                                                 </button>
 
                                                 <!-- Submenu Export -->
                                                 <div x-show="open" @click.away="open = false" x-cloak
-                                                    class="absolute left-full top-0 ml-1 w-48 bg-white border border-gray-300 rounded-md shadow-lg z-50">
+                                                    class="absolute right-0 mt-2 w-48 bg-white border border-gray-300 rounded-md shadow-lg z-50">
 
                                                     <!-- DOCX -->
                                                     <a href="{{ route('sar_reports.export.docx', $r->id) }}"
@@ -307,7 +305,7 @@
         /* Row hover/focus */
         #myTable tbody tr {
             transition: background-color .15s ease, transform .05s ease;
-            cursor: pointer;
+            /* cursor: pointer; */
         }
 
         table.dataTable tbody tr {
@@ -584,10 +582,24 @@
             }
         }
 
-        /* 1280px–1535px */
+        /* 1280px–1535px (Large Desktop) */
         @media (min-width: 1280px) and (max-width: 1535px) {
             .container {
-                max-width: 1400px;
+                max-width: 1400px !important;
+            }
+
+            .card-header-table {
+                padding: 0 20px 20px;
+            }
+
+            .search-bar {
+                width: 60%;
+                max-width: 450px;
+            }
+
+            .action-buttons-container button {
+                font-size: 15px;
+                padding: 9px 18px;
             }
         }
     </style>
