@@ -59,7 +59,7 @@ class DashboardController extends Controller
             ->with([
                 'category:id,name,standard_id',
                 'category.standard:id,name',
-                'assignments.collectorUser' => fn($q) => $q->select('id', 'name', 'department_id'),
+                'assignments.collectorUser' => fn($q) => $q->select('id', 'first_name', 'last_name', 'department_id'),
                 'assignments.collectorUser.department:id,name',
             ])
             ->withCount(['criterias as criteria_count', 'evidences as evidence_count'])
@@ -112,8 +112,9 @@ class DashboardController extends Controller
             ->whereIn('id', function ($q) {
                 $q->select('collector')->from('assignments');
             })
-            ->orderBy('name')
-            ->pluck('name');
+            ->orderBy('first_name')
+            ->get()
+            ->pluck('display_name');
         // Unique dimension/aspect names for dropdown (6–7 choices, no duplicates)
         $dimensionNames = Category::query()
             ->whereNotNull('name')
@@ -136,6 +137,28 @@ class DashboardController extends Controller
         $allYears   = $yearsForFilter->toArray();
         $last5Years = array_slice($allYears, max(0, count($allYears) - 5));
 
+        // 9) Filters สำหรับ codes และ types
+        $codes = Indicator::query()
+            ->whereNotNull('code')
+            ->select('code')
+            ->distinct()
+            ->orderBy('code')
+            ->pluck('code')
+            ->toArray();
+
+        $types = Indicator::query()
+            ->whereNotNull('type')
+            ->select('type')
+            ->distinct()
+            ->orderBy('type')
+            ->pluck('type')
+            ->toArray();
+
+        $filters = [
+            'codes' => $codes,
+            'types' => $types,
+        ];
+
         // ===== RETURN VIEW =====
         return view('dashboard.app', compact(
             'indicators',
@@ -153,7 +176,8 @@ class DashboardController extends Controller
             'yearlyTotals',
             'yearsForFilter',
             'last5Years',
-            'indicatorCount'
+            'indicatorCount',
+            'filters'
         ));
     }
 
