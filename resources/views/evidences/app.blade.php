@@ -1389,8 +1389,7 @@
         /* 1280px–1535px */
         @media (min-width: 1280px) and (max-width: 1535px) {
             .container {
-                /* padding: 24px; */
-                max-width: 1400px;
+                max-width: 1400px !important;
             }
 
             .dropdown-menus {
