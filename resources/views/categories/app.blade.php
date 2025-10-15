@@ -70,7 +70,8 @@
                         <th class="text-xs !text-center sm:text-sm font-medium text-gray-900 cursor-pointer">ลำดับ</th>
                         <th class="text-xs !text-center sm:text-sm font-medium text-gray-900 cursor-pointer">
                             ชื่อมาตรฐานการประเมิน</th>
-                        <th class="text-xs !text-center sm:text-sm font-medium text-gray-900 cursor-pointer w-5"><span class="w-fit">จัดการ</span></th>
+                        <th class="text-xs !text-center sm:text-sm font-medium text-gray-900 cursor-pointer w-5"><span
+                                class="w-fit">จัดการ</span></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -172,42 +173,49 @@
                 </div>
             </div>
 
-            <table class="table" id="table2">
-                <thead>
-                    <tr>
-                        <th class="text-xs !text-center sm:text-sm font-medium text-gray-900 cursor-pointer">ลำดับ</th>
-                        <th class="text-xs !text-center sm:text-sm font-medium text-gray-900 cursor-pointer">
-                            ชื่อด้านการประเมิน</th>
-                        <th class="text-xs !text-center sm:text-sm font-medium text-gray-900 cursor-pointer">คะแนนเต็ม</th>
-                        <th class="text-xs !text-center sm:text-sm font-medium text-gray-900 cursor-pointer">มาตรฐาน</th>
-                        <th class="text-xs !text-center sm:text-sm font-medium text-gray-900 cursor-pointer w-5"><span class="w-fit">จัดการ</span></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach ($categories as $index => $cat)
+            <div class="overflow-x-scroll">
+                <table class="table" id="table2">
+                    <thead>
                         <tr>
-                            <td class="text-xs text-center sm:text-sm text-gray-700 align-top">{{ $index + 1 }}</td>
-                            <td class="text-xs sm:text-sm text-gray-700 align-top">{{ $cat->name }}</td>
-                            <td class="text-xs text-center sm:text-sm text-gray-700 align-top">{{ $cat->max_score }}</td>
-                            <td class="text-xs text-center sm:text-sm text-gray-700 align-top">
-                                {{ $cat->standard->name ?? '-' }}</td>
-                            <td class="text-xs text-center sm:text-sm text-gray-700 align-top">
-                                <div class="categories-actions">
-                                    <button class="btn btn-outline"
-                                        onclick="openEditModalCat({{ $cat->id }}, '{{ $cat->name }}', '{{ $cat->max_score }}', '{{ $cat->standard_id }}', '{{ $cat->standard->name }}')">
-                                        <i data-lucide="edit-3" style="width:15px;"></i> แก้ไข
-                                    </button>
-
-                                    <button class="btn btn-outline !text-red-500 !border-red-500"
-                                        onclick="openDeleteModalCat({{ $cat->id }}, '{{ $cat->name }}', '{{ $cat->max_score }}', '{{ $cat->standard->name }}')">
-                                        <i data-lucide="trash-2" style="width:15px;"></i> ลบ
-                                    </button>
-                                </div>
-                            </td>
+                            <th class="text-xs !text-center sm:text-sm font-medium text-gray-900 cursor-pointer">ลำดับ</th>
+                            <th class="text-xs !text-center sm:text-sm font-medium text-gray-900 cursor-pointer">
+                                ชื่อด้านการประเมิน</th>
+                            <th class="text-xs !text-center sm:text-sm font-medium text-gray-900 cursor-pointer">คะแนนเต็ม
+                            </th>
+                            <th class="text-xs !text-center sm:text-sm font-medium text-gray-900 cursor-pointer">มาตรฐาน
+                            </th>
+                            <th class="text-xs !text-center sm:text-sm font-medium text-gray-900 cursor-pointer w-5"><span
+                                    class="w-fit">จัดการ</span></th>
                         </tr>
-                    @endforeach
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        @foreach ($categories as $index => $cat)
+                            <tr>
+                                <td class="text-xs text-center sm:text-sm text-gray-700 align-top">{{ $index + 1 }}
+                                </td>
+                                <td class="text-xs sm:text-sm text-gray-700 align-top">{{ $cat->name }}</td>
+                                <td class="text-xs text-center sm:text-sm text-gray-700 align-top">{{ $cat->max_score }}
+                                </td>
+                                <td class="text-xs text-center sm:text-sm text-gray-700 align-top">
+                                    {{ $cat->standard->name ?? '-' }}</td>
+                                <td class="text-xs text-center sm:text-sm text-gray-700 align-top">
+                                    <div class="categories-actions">
+                                        <button class="btn btn-outline"
+                                            onclick="openEditModalCat({{ $cat->id }}, '{{ $cat->name }}', '{{ $cat->max_score }}', '{{ $cat->standard_id }}', '{{ $cat->standard->name }}')">
+                                            <i data-lucide="edit-3" style="width:15px;"></i> แก้ไข
+                                        </button>
+
+                                        <button class="btn btn-outline !text-red-500 !border-red-500"
+                                            onclick="openDeleteModalCat({{ $cat->id }}, '{{ $cat->name }}', '{{ $cat->max_score }}', '{{ $cat->standard->name }}')">
+                                            <i data-lucide="trash-2" style="width:15px;"></i> ลบ
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
         </x-card>
     </div>
 
@@ -729,6 +737,7 @@
         /* < 640px (Mobile) */
         @media (max-width: 639px) {
             .container {
+                max-width: 100% !important;
                 padding: 8px !important;
             }
 
@@ -829,6 +838,7 @@
         /* 640px–767px (Small Tablet) */
         @media (min-width: 640px) and (max-width: 767px) {
             .container {
+                max-width: 100% !important;
                 padding: 12px !important;
             }
 
@@ -891,7 +901,7 @@
         /* 768px–1023px (Tablet) */
         @media (min-width: 768px) and (max-width: 1023px) {
             .container {
-                max-width: 100% !important;
+                max-width: 768px !important;
                 padding: 16px !important;
             }
 
@@ -943,7 +953,7 @@
         /* 1024px–1279px (Desktop) */
         @media (min-width: 1024px) and (max-width: 1279px) {
             .container {
-                max-width: 960px !important;
+                max-width: 900px !important;
             }
 
             .categories-card {
@@ -971,7 +981,7 @@
         /* 1280px–1535px (Large Desktop) */
         @media (min-width: 1280px) and (max-width: 1535px) {
             .container {
-                max-width: 1024px !important;
+                max-width: 960px !important;
             }
 
             .categories-card {
@@ -984,6 +994,13 @@
 
             .dropdown-menus {
                 max-height: 400px;
+            }
+        }
+
+        /* 1536px+ (Extra Large) */
+        @media (min-width: 1536px) {
+            .container {
+                max-width: 1024px !important;
             }
         }
     </style>
