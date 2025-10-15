@@ -32,49 +32,52 @@
                         </svg>
                     </button>
                     <div id="sort-dropdown" class="dropdown-menus hidden" role="menu" aria-orientation="vertical">
-                        <!-- ลำดับ -->
-                        <button class="dropdown-item sort-option" data-column="0" data-order="asc" role="menuitem">
-                            ลำดับ (น้อยไปมาก)
-                        </button>
-                        <button class="dropdown-item sort-option" data-column="0" data-order="desc" role="menuitem">
-                            ลำดับ (มากไปน้อย)
-                        </button>
+                        <div class="sort-content-scrollable">
+                            <!-- ลำดับ -->
+                            <button class="dropdown-item sort-option" data-column="0" data-order="asc" role="menuitem">
+                                ลำดับ (น้อยไปมาก)
+                            </button>
+                            <button class="dropdown-item sort-option" data-column="0" data-order="desc" role="menuitem">
+                                ลำดับ (มากไปน้อย)
+                            </button>
 
-                        <!-- ชื่อผู้ใช้งาน -->
-                        <button class="dropdown-item sort-option" data-column="1" data-order="asc" role="menuitem">
-                            ชื่อผู้ใช้งาน (A-Z)
-                        </button>
-                        <button class="dropdown-item sort-option" data-column="1" data-order="desc" role="menuitem">
-                            ชื่อผู้ใช้งาน (Z-A)
-                        </button>
+                            <!-- ชื่อผู้ใช้งาน -->
+                            <button class="dropdown-item sort-option" data-column="1" data-order="asc" role="menuitem">
+                                ชื่อผู้ใช้งาน (A-Z)
+                            </button>
+                            <button class="dropdown-item sort-option" data-column="1" data-order="desc" role="menuitem">
+                                ชื่อผู้ใช้งาน (Z-A)
+                            </button>
 
-                        <!-- อีเมล -->
-                        <button class="dropdown-item sort-option" data-column="2" data-order="asc" role="menuitem">
-                            อีเมล (A-Z)
-                        </button>
-                        <button class="dropdown-item sort-option" data-column="2" data-order="desc" role="menuitem">
-                            อีเมล (Z-A)
-                        </button>
+                            <!-- อีเมล -->
+                            <button class="dropdown-item sort-option" data-column="2" data-order="asc" role="menuitem">
+                                อีเมล (A-Z)
+                            </button>
+                            <button class="dropdown-item sort-option" data-column="2" data-order="desc" role="menuitem">
+                                อีเมล (Z-A)
+                            </button>
 
-                        <!-- หน่วยงาน -->
-                        <button class="dropdown-item sort-option" data-column="3" data-order="asc" role="menuitem">
-                            หน่วยงาน (A-Z)
-                        </button>
-                        <button class="dropdown-item sort-option" data-column="3" data-order="desc" role="menuitem">
-                            หน่วยงาน (Z-A)
-                        </button>
+                            <!-- หน่วยงาน -->
+                            <button class="dropdown-item sort-option" data-column="3" data-order="asc" role="menuitem">
+                                หน่วยงาน (A-Z)
+                            </button>
+                            <button class="dropdown-item sort-option" data-column="3" data-order="desc" role="menuitem">
+                                หน่วยงาน (Z-A)
+                            </button>
 
-                        <!-- บทบาท -->
-                        <button class="dropdown-item sort-option" data-column="5" data-order="asc" role="menuitem">
-                            บทบาท (A-Z)
-                        </button>
-                        <button class="dropdown-item sort-option" data-column="5" data-order="desc" role="menuitem">
-                            บทบาท (Z-A)
-                        </button>
-
-                        <button id="clear-sort" type="button" class="dropdown-item" style="color:#4b5563;">
-                            ล้างการเรียงลำดับ
-                        </button>
+                            <!-- บทบาท -->
+                            <button class="dropdown-item sort-option" data-column="5" data-order="asc" role="menuitem">
+                                บทบาท (A-Z)
+                            </button>
+                            <button class="dropdown-item sort-option" data-column="5" data-order="desc" role="menuitem">
+                                บทบาท (Z-A)
+                            </button>
+                        </div>
+                        <div class="sort-actions-fixed">
+                            <button id="clear-sort" type="button" class="btn" style="width:100%;">
+                                ล้างการเรียงลำดับ
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -90,7 +93,7 @@
                     </button>
 
                     <div id="filter-dropdown" class="dropdown-menus hidden">
-                        <div style="padding:12px 12px;">
+                        <div class="filter-content-scrollable">
                             <h3 class="dropdown-title">หน่วยงาน</h3>
                             <div id="department-options" style="display:grid; gap:8px;">
                                 @foreach ($departments as $dep)
@@ -116,14 +119,11 @@
                                     </label>
                                 @endforeach
                             </div>
-
-                            <div class="dropdown-divider"></div>
-
-                            <div style="display:flex; justify-content:space-between; gap:12px;">
-                                <button id="clear-filters" class="btn" style="padding:6px 10px;">ล้างตัวกรอง</button>
-                                <button id="apply-filters" class="btn btn-primary"
-                                    style="padding:6px 10px;">ใช้ตัวกรอง</button>
-                            </div>
+                        </div>
+                        <div class="filter-actions-fixed">
+                            <button id="clear-filters" class="btn" style="padding:6px 10px;">ล้างตัวกรอง</button>
+                            <button id="apply-filters" class="btn btn-primary"
+                                style="padding:6px 10px;">ใช้ตัวกรอง</button>
                         </div>
                     </div>
                 </div>
@@ -139,7 +139,7 @@
     </div>
 
     <!-- ตารางผู้ใช้งาน -->
-    <div class="border border-gray-200 rounded-lg shadow-sm overflow-x-hidden">
+    <div class="border border-gray-200 rounded-lg shadow-sm overflow-x-scroll">
         <table class="w-full min-w-full overflow-x-auto" id="table3">
             <thead>
                 <tr>
@@ -147,7 +147,8 @@
                     <th class="text-xs !text-center sm:text-sm font-medium text-gray-900 cursor-pointer">ชื่อ-สกุล</th>
                     <th class="text-xs !text-center sm:text-sm font-medium text-gray-900 cursor-pointer">อีเมล</th>
                     <th class="text-xs !text-center sm:text-sm font-medium text-gray-900 cursor-pointer ">หน่วยงาน</th>
-                    <th class="text-xs !text-center sm:text-sm font-medium text-gray-900 cursor-pointer ">หมายเลขโทรศัพท์</th>
+                    <th class="text-xs !text-center sm:text-sm font-medium text-gray-900 cursor-pointer ">หมายเลขโทรศัพท์
+                    </th>
                     <th class="text-xs !text-center sm:text-sm font-medium text-gray-900 cursor-pointer ">บทบาท</th>
                     <th class="text-xs !text-center sm:text-sm font-medium text-gray-900 cursor-pointer ">จัดการ</th>
                 </tr>
@@ -163,7 +164,8 @@
                         <td class="text-xs sm:text-sm text-gray-700 align-top">{{ $item->email }}</td>
                         <td class="text-xs sm:text-sm text-gray-700 align-top">{{ $item->department->name ?? '-' }}</td>
                         <td class="text-xs sm:text-sm text-gray-700 align-top">{{ $item->phone }}</td>
-                        <td class="text-xs sm:text-sm text-gray-700 align-top">{{ $item->getRoleNames()->implode(', ') ?: '-' }}</td>
+                        <td class="text-xs sm:text-sm text-gray-700 align-top">
+                            {{ $item->getRoleNames()->implode(', ') ?: '-' }}</td>
                         <td class="text-xs text-center sm:text-sm text-gray-700 align-top">
                             <div class="categories-actions">
                                 {{-- ถ้าใช้ Route Model Binding --}}
@@ -485,16 +487,54 @@
             background: #fff;
             border: 1px solid #e5e7eb;
             border-radius: 8px;
-            padding: 12px;
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, .1), 0 4px 6px -4px rgba(0, 0, 0, .1);
             z-index: 50;
             max-height: 400px;
             width: fit-content;
-            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
         }
 
         .dropdown-menus.hidden {
             display: none !important;
+        }
+
+        /* Filter content scrollable area */
+        .filter-content-scrollable {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px;
+            max-height: 320px;
+        }
+
+        /* Sort content scrollable area */
+        .sort-content-scrollable {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px;
+            max-height: 320px;
+        }
+
+        /* Fixed filter actions at bottom */
+        .filter-actions-fixed {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 12px;
+            border-top: 1px solid #e5e7eb;
+            background: #fff;
+            border-radius: 0 0 8px 8px;
+        }
+
+        /* Fixed sort actions at bottom */
+        .sort-actions-fixed {
+            display: flex;
+            justify-content: center;
+            padding: 12px;
+            border-top: 1px solid #e5e7eb;
+            background: #fff;
+            border-radius: 0 0 8px 8px;
         }
 
         .dropdown-item {
@@ -537,6 +577,381 @@
             display: flex;
             gap: 8px;
             justify-content: center;
+        }
+
+        /* ================ Responsive Design ================ */
+        /* < 640px (Mobile) */
+        @media (max-width: 639px) {
+            .container {
+                max-width: 100% !important;
+                padding: 8px !important;
+                min-height: auto !important;
+            }
+
+            .card-header-table {
+                flex-direction: column;
+                gap: 12px;
+                padding: 0 8px 12px;
+            }
+
+            .search-button-container {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .search-bar {
+                width: 100%;
+                min-width: 100%;
+                max-width: 100%;
+            }
+
+            .search-bar input {
+                font-size: 13px;
+                padding: 8px 12px 8px 36px;
+            }
+
+            .sort-filter-container {
+                flex-direction: column;
+                width: 100%;
+                gap: 8px;
+            }
+
+            .dropdown-inds {
+                width: 100%;
+            }
+
+            .btns {
+                width: 100%;
+                justify-content: center;
+                font-size: 13px;
+                padding: 8px 12px;
+            }
+
+            .btns svg {
+                width: 14px;
+                height: 14px;
+            }
+
+            .dropdown-menus {
+                left: 0;
+                right: 0;
+                width: calc(100% - 24px);
+                max-height: 280px;
+            }
+
+            .filter-content-scrollable {
+                max-height: 200px;
+                padding: 10px;
+            }
+
+            .sort-content-scrollable {
+                max-height: 200px;
+                padding: 10px;
+            }
+
+            .filter-actions-fixed {
+                padding: 10px;
+                gap: 8px;
+            }
+
+            .sort-actions-fixed {
+                padding: 10px;
+            }
+
+            .filter-actions-fixed button {
+                font-size: 12px;
+                padding: 6px 8px !important;
+            }
+
+            .sort-actions-fixed button {
+                font-size: 12px;
+                padding: 6px 8px !important;
+            }
+
+            .dropdown-item {
+                font-size: 13px;
+                padding: 6px 12px;
+            }
+
+            .dropdown-title {
+                font-size: 13px;
+            }
+
+            .action-buttons-container {
+                width: 100%;
+            }
+
+            .action-buttons-container button {
+                width: 100%;
+                justify-content: center;
+                font-size: 13px;
+                padding: 8px 12px;
+            }
+
+            table#table3 {
+                font-size: 12px;
+            }
+
+            table#table3 th,
+            table#table3 td {
+                padding: 8px 4px;
+            }
+
+            .categories-actions {
+                /* flex-direction: column; */
+                gap: 6px;
+            }
+
+            .categories-actions button {
+                width: 100%;
+                font-size: 12px;
+            }
+        }
+
+        /* 640px–767px (Small Tablet) */
+        @media (min-width: 640px) and (max-width: 767px) {
+            .container {
+                max-width: 100% !important;
+                padding: 12px !important;
+            }
+
+            .card-header-table {
+                flex-wrap: wrap;
+                gap: 12px;
+                padding: 0 12px 12px;
+            }
+
+            .search-button-container {
+                flex: 1;
+                min-width: 100%;
+            }
+
+            .search-bar {
+                width: 100%;
+                max-width: 100%;
+            }
+
+            .search-bar input {
+                font-size: 13px;
+            }
+
+            .sort-filter-container {
+                gap: 8px;
+            }
+
+            .dropdown-inds {
+                flex: 1;
+                min-width: calc(50% - 4px);
+            }
+
+            .btns {
+                font-size: 13px;
+                width: 100%;
+            }
+
+            .btns svg {
+                width: 15px;
+                height: 15px;
+            }
+
+            .dropdown-menus {
+                max-height: 320px;
+            }
+
+            .filter-content-scrollable {
+                max-height: 230px;
+            }
+
+            .sort-content-scrollable {
+                max-height: 230px;
+            }
+
+            .filter-actions-fixed button {
+                font-size: 13px;
+                padding: 6px 10px !important;
+            }
+
+            .sort-actions-fixed button {
+                font-size: 13px;
+                padding: 6px 10px !important;
+            }
+
+            .action-buttons-container {
+                width: 100%;
+            }
+
+            .action-buttons-container button {
+                width: 100%;
+                font-size: 13px;
+            }
+
+            table#table3 {
+                font-size: 13px;
+            }
+
+            table#table3 th,
+            table#table3 td {
+                padding: 10px 6px;
+            }
+        }
+
+        /* 768px–1023px (Tablet) */
+        @media (min-width: 768px) and (max-width: 1023px) {
+            .container {
+                max-width: 100% !important;
+                padding: 16px !important;
+            }
+
+            .card-header-table {
+                gap: 16px;
+                padding: 0 16px 16px;
+            }
+
+            .search-button-container {
+                flex: 1;
+            }
+
+            .search-bar {
+                width: 50%;
+                min-width: 200px;
+                max-width: 350px;
+            }
+
+            .search-bar input {
+                font-size: 14px;
+            }
+
+            .sort-filter-container {
+                gap: 8px;
+            }
+
+            .btns {
+                font-size: 14px;
+                padding: 8px 14px;
+            }
+
+            .btns svg {
+                width: 15px;
+                height: 15px;
+            }
+
+            .dropdown-menus {
+                max-height: 380px;
+            }
+
+            .filter-content-scrollable {
+                max-height: 280px;
+            }
+
+            .sort-content-scrollable {
+                max-height: 280px;
+            }
+
+            .action-buttons-container button {
+                font-size: 14px;
+                padding: 8px 14px;
+            }
+
+            table#table3 {
+                font-size: 14px;
+            }
+
+            table#table3 th,
+            table#table3 td {
+                padding: 10px 8px;
+            }
+
+            .categories-actions {
+                gap: 6px;
+            }
+
+            .categories-actions button {
+                padding: 6px 10px;
+            }
+        }
+
+        /* 1024px–1279px (Desktop) */
+        @media (min-width: 1024px) and (max-width: 1279px) {
+            .container {
+                max-width: 1200px !important;
+            }
+
+            .card-header-table {
+                gap: 20px;
+            }
+
+            .search-bar {
+                width: 55%;
+                max-width: 380px;
+            }
+
+            .btns {
+                font-size: 14px;
+            }
+
+            .dropdown-menus {
+                max-height: 420px;
+            }
+
+            .filter-content-scrollable {
+                max-height: 320px;
+            }
+
+            .sort-content-scrollable {
+                max-height: 320px;
+            }
+
+            .action-buttons-container button {
+                font-size: 14px;
+            }
+
+            table#table3 th,
+            table#table3 td {
+                padding: 10px;
+            }
+        }
+
+        /* 1280px–1535px (Large Desktop) */
+        @media (min-width: 1280px) and (max-width: 1535px) {
+            .container {
+                max-width: 1400px !important;
+            }
+
+            .card-header-table {
+                gap: 24px;
+            }
+
+            .search-bar {
+                width: 60%;
+                max-width: 400px;
+            }
+
+            .dropdown-menus {
+                max-height: 450px;
+            }
+
+            .filter-content-scrollable {
+                max-height: 350px;
+            }
+
+            .sort-content-scrollable {
+                max-height: 350px;
+            }
+        }
+
+        /* 1536px+ (Extra Large) */
+        @media (min-width: 1536px) {
+            .container {
+                max-width: 1400px !important;
+            }
+
+            .filter-content-scrollable {
+                max-height: 400px;
+            }
+
+            .sort-content-scrollable {
+                max-height: 400px;
+            }
         }
     </style>
 @endpush
