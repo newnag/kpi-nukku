@@ -44,7 +44,7 @@ class AuthController extends Controller
             ], 401);
         }
 
-        if ($user->status === 'inactive') {
+        if (!$user->status) {
             return response()->json([
                 'message' => 'บัญชีผู้ใช้นี้ถูกระงับการใช้งาน',
             ], 403);

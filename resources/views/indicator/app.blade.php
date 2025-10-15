@@ -335,7 +335,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0l-4 4m4-4v12" />
                         </svg>
-                        Preset
+                        <span>Preset</span>
                     </button>
 
                     <!-- Modal Component -->
@@ -584,7 +584,7 @@
     @endsection
 
     @push('styles')
-        <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.dataTables.min.css">
+        {{-- <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.dataTables.min.css"> --}}
         <style>
             /* ================ Base / Datatable ================ */
             #myTable,
@@ -783,6 +783,7 @@
                 grid-template-columns: 1fr 1fr;
                 gap: 12px;
                 height: 310px;
+                overflow-y: auto;
             }
 
             .filter-section {
@@ -842,9 +843,12 @@
             }
 
             .dropdown-multiselect.open .dropdown-content {
-                display: flex;
+                /* display: flex;
+                flex-direction: column; */
+                /* position: absolute; */
+
+                display: inline-flex;
                 flex-direction: column;
-                position: absolute;
                 margin-top: 3px;
                 gap: 4px;
                 max-height: 150px;

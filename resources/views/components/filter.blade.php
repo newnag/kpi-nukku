@@ -45,8 +45,8 @@
             @if ($showFields['codes'])
                 <!-- Codes -->
                 <div class="field">
-                    <label for="filter-codes">รหัสตัวบ่งชี้</label>
-                    <select id="filter-codes" name="codes">
+                    <label for="filter-code">รหัสตัวบ่งชี้</label>
+                    <select id="filter-code" name="code">
                         <option value="">ทั้งหมด</option>
                         @foreach ($filters['codes'] ?? [] as $code)
                             @php

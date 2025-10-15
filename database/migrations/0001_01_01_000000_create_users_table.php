@@ -25,11 +25,26 @@ return new class extends Migration
 
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('name', 100);
-            $table->string('password');
-            $table->string('phone', 20)->nullable();
-            $table->boolean('status')->default(true);
+            
+            // ข้อมูลส่วนตัว (ภาษาไทย)
+            $table->string('title')->nullable(); // คำนำหน้าชื่อ: นาย, นาง, นางสาว
+            $table->string('first_name'); // ชื่อจริง
+            $table->string('last_name'); // นามสกุล
+            // Note: ชื่อเต็มจะใช้ Accessor ใน Model แทน (display_name, full_name)
+           
+            // ข้อมูลการทำงาน
+            $table->string('positype')->nullable(); // ประเภทบุคลากร: พนักงานมหาวิทยาลัย, ข้าราชการ
+            $table->string('workline')->nullable(); // สายงาน: สนับสนุน, วิชาการ
+            $table->string('posi')->nullable(); // ตำแหน่ง
+            $table->string('level')->nullable(); // ระดับ: ชำนาญการ, เชี่ยวชาญ
+            
+            // ข้อมูลติดต่อ
             $table->string('email')->unique();
+            $table->string('phone', 20)->nullable();
+            
+            // ระบบ
+            $table->string('password');
+            $table->boolean('status')->default(true); // true = Active, false = Inactive
             $table->timestamp('email_verified_at')->nullable();
             $table->rememberToken();
             $table->timestamps();

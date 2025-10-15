@@ -63,7 +63,12 @@ class EvidenceController extends Controller
         $dimensions = Category::select('name')->distinct()->orderBy('name')->pluck('name');
         $departments = Department::select('name')->distinct()->orderBy('name')->pluck('name');
         $collectors = User::whereHas('assignments')
-            ->select('name')->distinct()->orderBy('name')->pluck('name');
+            ->select('first_name', 'last_name')
+            ->get()
+            ->pluck('display_name')
+            ->unique()
+            ->sort()
+            ->values();
         $fileTypes = Evidence::whereNotNull('type')->distinct()->orderBy('type')->pluck('type');
         $statusMap = [
             0 => 'รอดำเนินการ',

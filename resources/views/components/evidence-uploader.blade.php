@@ -23,7 +23,7 @@
             <!-- Header -->
             <header class="eu-modal-header">
                 <h2 id="eu-title-{{ $cid }}">เพิ่มหลักฐานใหม่</h2>
-                <button type="button" class="!w-fit hover:!text-red-500 btn btn-xs hover:!shadow-none"
+                <button type="button" class="btn btn-delete !w-fit !text-gray-500 hover:!text-red-500 btn btn-xs hover:!shadow-none"
                     @click="closeModal()" aria-label="ปิด">
                     <i data-lucide="x"></i>
                 </button>

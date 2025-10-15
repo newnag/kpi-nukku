@@ -602,7 +602,7 @@
     @endsection
 
     @push('styles')
-        <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.dataTables.min.css">
+        {{-- <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.dataTables.min.css"> --}}
 
         <style>
             /* ================ Base / Datatable ======================= */
@@ -840,6 +840,7 @@
                 grid-template-columns: 1fr 1fr;
                 gap: 12px;
                 height: 310px;
+                overflow-y: auto;
             }
 
             .filter-section {
@@ -900,9 +901,12 @@
             }
 
             .dropdown-multiselect.open .dropdown-content {
-                display: flex;
+                /* display: flex;
                 flex-direction: column;
-                position: absolute;
+                position: absolute; */
+
+                display: inline-flex;
+                flex-direction: column;
                 margin-top: 3px;
                 gap: 4px;
                 max-height: 150px;
