@@ -91,9 +91,4 @@ class User extends Authenticatable
         return $this->hasMany(Evidence::class);
     }
 
-    // Computed display name for views referencing `$user->display_name`
-    public function getDisplayNameAttribute()
-    {
-        return $this->name ?: ($this->email ?? '');
-    }
 }
