@@ -140,7 +140,7 @@
 
     <!-- ตารางผู้ใช้งาน -->
     <div class="border border-gray-200 rounded-lg shadow-sm overflow-x-scroll">
-        <table class="w-full min-w-full overflow-x-auto" id="table3">
+        <table class="table w-full min-w-full overflow-x-auto" id="table3">
             <thead>
                 <tr>
                     <th class="text-xs !text-center sm:text-sm font-medium text-gray-900 cursor-pointer ">ลำดับ</th>
@@ -186,7 +186,7 @@
                                         <div class="space-y-2">
                                             <p class="text-slate-700">
                                                 ต้องการลบผู้ใช้งาน <span
-                                                    class="font-semibold">{{ $item->display_name }}</span> หรือไม่?
+                                                    class="font-semibold text-pretty">{{ $item->display_name }}</span> หรือไม่?
                                             </p>
                                         </div>
                                         <x-slot:footer>
@@ -378,6 +378,28 @@
 @push('styles')
     <!-- ========== CSS (แทน Tailwind) ========== -->
     <style>
+        /* Row status indicators with colored inset bars */
+        .table tbody tr {
+            transition: background-color .15s ease, transform .05s ease;
+        }
+
+        .table tbody tr.user-active-row {
+            box-shadow: inset 4px 0 0 0 #3b82f6;
+        }
+
+        .table tbody tr.user-inactive-row {
+            box-shadow: inset 4px 0 0 0 #ef4444;
+            background-color: #fef2f2 !important;
+        }
+
+        .table tbody tr.user-active-row:hover {
+            background-color: #dbeafe !important;
+        }
+
+        .table tbody tr.user-inactive-row:hover {
+            background-color: #fee2e2 !important;
+        }
+
         /* ================ Page Layout / Header Controls ================ */
         .card-header-table {
             display: flex;
