@@ -1046,10 +1046,6 @@
                 .btns {
                     font-size: 12px;
                 }
-
-                .filters-actions {
-                    font-size: 13px;
-                }
             }
 
             /* 768px–1023px */
