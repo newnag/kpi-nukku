@@ -154,7 +154,31 @@
                             return document.querySelector('input[name=scoring_method]')?.value || '';
                         }
                     }">
-                        <x-card-box title="เกณฑ์ให้คะแนนและคะแนนเต็ม" icon="📋">
+                        <x-card-box icon="📋">
+                            <x-slot name="title">
+                                <div class="flex items-center space-x-2 font-bold">
+                                    <span>เกณฑ์ให้คะแนนและคะแนนเต็ม</span>
+                                    <div class="group relative">
+                                        <i data-lucide="info" class="w-4 h-4 text-blue-500 cursor-pointer"></i>
+                                        <div
+                                            class="absolute hidden group-hover:block bg-gray-800 text-white text-xs rounded px-3 py-2 
+           bottom-full mb-2 left-1/2 -translate-x-1/2 whitespace-normal z-10 w-72 shadow-lg leading-relaxed">
+                                            <p class="font-semibold mb-1">
+                                                หมายเหตุ: วิธีกรอกเกณฑ์การให้คะแนน จะต้องมีวงเล็บคะแนน
+                                            </p>
+                                            <p class="mb-1">ตัวอย่างการกรอก:</p>
+                                            <ul class="list-disc list-inside space-y-1">
+                                                <li>ได้คะแนนเท่ากับ (10)</li>
+                                                <li>ได้คะแนนเท่ากับ (10 คะแนน)</li>
+                                                <li>ได้คะแนนเท่ากับ (คะแนน 10)</li>
+                                                <li>ได้คะแนนเท่ากับ (คะแนน10)</li>
+                                            </ul>
+                                        </div>
+
+
+                                    </div>
+                                </div>
+                            </x-slot>
                             <div>
                                 <x-richtext name="comment" placeholder="คำอธิบายเกณฑ์ให้คะแนน" />
                                 <label class="block">
@@ -263,6 +287,7 @@
             background: linear-gradient(90deg, #e0f2fe 0%, #fef3e0 100%);
             transition: all 0.3s ease-in-out;
         }
+
         .trumbowyg-box .trumbowyg-editor-box {
             height: fit-content !important;
         }
