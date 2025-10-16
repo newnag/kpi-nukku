@@ -175,6 +175,8 @@ hookFormValidation();">
             maxChipCount: config.maxChipCount ?? 6,
             listBelow: !!config.listBelow,
             listBelowThreshold: Number.isFinite(config.listBelowThreshold) ? config.listBelowThreshold : 6,
+            buttonHeight: config.buttonHeight || null,
+            chipsWrap: !!config.chipsWrap,
 
             // state
             open: false,
@@ -183,6 +185,9 @@ hookFormValidation();">
             base: [],
             selected: [],
 
+            get btnStyle() {
+                return this.buttonHeight ? `min-height: ${this.buttonHeight}` : '';
+            },
             get options() {
                 return this.base;
             },

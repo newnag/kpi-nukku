@@ -5,9 +5,11 @@
 <div {{ $attributes->merge(['class' => 'rounded-2xl border border-slate-200 bg-white shadow-sm p-4 sm:p-5 md:p-6']) }}
     x-data="{
         labels: @js(array_values($options)),
-        get allList() { return Array.from({ length: this.labels.length }, (_, i) => i + 1) },
         selected: checklistData?.required_items || [],
         score: checklistData?.score || '',
+        getAllList() { 
+            return Array.from({ length: this.labels.length }, (_, i) => i + 1);
+        }
     }" x-init="labels = (window.__criteriaTitles && window.__criteriaTitles.length) ? window.__criteriaTitles.slice() : labels"
     @criteria-updated.window="
   labels = ($event.detail?.name ?? []);
@@ -41,7 +43,10 @@
             <div class="flex items-center gap-2">
                 <button type="button"
                     class="px-3 py-1 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs"
-                    @click="selected = allList.slice()">เลือกทั้งหมด</button>
+                    @click="selected = getAllList()">เลือกทั้งหมด</button>
+                <button type="button"
+                    class="px-3 py-1 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs"
+                    @click="selected = []">ล้างทั้งหมด</button>
             </div>
         </div>
 
