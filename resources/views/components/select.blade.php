@@ -15,9 +15,22 @@
     // ทำให้เป็น format เดียว [{value, label}]
     $norm = collect($options)
         ->map(function ($v, $k) use ($optionValue, $optionLabel) {
-            return is_array($v)
-                ? ['value' => $v[$optionValue] ?? $k, 'label' => $v[$optionLabel] ?? $k]
-                : ['value' => $k, 'label' => $v];
+            // ถ้าเป็น object (Eloquent model หรือ stdClass)
+            if (is_object($v)) {
+                return [
+                    'value' => $v->{$optionValue} ?? $v->id ?? $k,
+                    'label' => $v->{$optionLabel} ?? $v->name ?? (string)$v
+                ];
+            }
+            // ถ้าเป็น array
+            if (is_array($v)) {
+                return [
+                    'value' => $v[$optionValue] ?? $k,
+                    'label' => $v[$optionLabel] ?? $k
+                ];
+            }
+            // ถ้าเป็น scalar (string, number)
+            return ['value' => $k, 'label' => $v];
         })
         ->values();
 @endphp
