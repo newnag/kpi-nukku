@@ -134,8 +134,8 @@
                     class="block w-full border rounded px-2 py-1 text-xs sm:text-sm focus:ring focus:ring-green-200">
 
                 <!-- เลือกปี -->
-                <label for="year-import" class="block text-xs sm:text-sm font-medium text-gray-700">ปีที่ต้องการนำเข้า</label>
-                <input type="number" id="year-import" name="year-import" value="{{ now()->year }}" min="2000" max="2100"
+                <label for="year" class="block text-xs sm:text-sm font-medium text-gray-700">ปีที่ต้องการนำเข้า</label>
+                <input type="number" id="year" name="year" value="{{ now()->year }}" min="2000" max="2100"
                     class="block w-full border rounded px-2 py-1 text-xs sm:text-sm focus:ring focus:ring-green-200"
                     required>
 
@@ -244,3 +244,4 @@
         });
     });
 </script>
+
