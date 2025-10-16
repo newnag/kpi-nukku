@@ -17,7 +17,7 @@
                 </div>
 
                 <button type="submit" class="btn btn-primary">
-                    <i data-lucide="save"></i> บันทึก
+                    <i class="fa fa-save"></i> บันทึก
                 </button>
             </form>
         </x-card>
@@ -84,12 +84,12 @@
                                 <div class="categories-actions">
                                     <button class="btn btn-outline"
                                         onclick="openEditModal({{ $item->id }}, '{{ $item->name }}')">
-                                        <i data-lucide="edit-3" style="width:15px;"></i> แก้ไข
+                                        <i class="fa fa-edit"></i> แก้ไข
                                     </button>
 
                                     <button class="btn btn-outline !text-red-500 !border-red-500"
                                         onclick="openDeleteModal({{ $item->id }}, '{{ $item->name }}')">
-                                        <i data-lucide="trash-2" style="width:15px;"></i> ลบ
+                                        <i class="fa fa-trash"></i> ลบ
                                     </button>
                                 </div>
                         </tr>
@@ -122,12 +122,12 @@
             @error('name')
                 <div class="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">{{ $message }}</div>
             @enderror
-            <div class="flex gap-2 justify-end">
-                <button type="button" class="btn btn-secondary" @click="$dispatch('modal:close')">
-                    <i data-lucide="undo-2" class="w-4 h-4 mr-1"></i>กลับ
+            <div class="flex gap-2 justify-between">
+                <button type="button" class="btn btn-outline" @click="$dispatch('modal:close')">
+                    <i class="fa fa-undo"></i>ยกเลิก
                 </button>
                 <button type="submit" class="btn btn-primary">
-                    <i data-lucide="save" class="w-4 h-4 mr-1"></i>บันทึก
+                    <i class="fa fa-save"></i>บันทึก
                 </button>
             </div>
         </form>
@@ -149,12 +149,12 @@
         <form id="deleteForm" method="POST">
             @csrf
             @method('DELETE')
-            <div class="flex gap-2 justify-end">
-                <button type="button" class="btn btn-secondary" @click="$dispatch('modal:close')">
-                    <i data-lucide="undo-2" class="w-4 h-4 mr-1"></i>กลับ
+            <div class="flex gap-2 justify-between">
+                <button type="button" class="btn btn-outline" @click="$dispatch('modal:close')">
+                    <i class="fa fa-undo"></i>ยกเลิก
                 </button>
                 <button type="submit" class="btn btn-danger">
-                    <i data-lucide="x" class="w-4 h-4 mr-1"></i>ยืนยันการลบ
+                    <i class="fa fa-trash"></i>ยืนยันการลบ
                 </button>
             </div>
         </form>

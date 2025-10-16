@@ -128,7 +128,11 @@
                                 "
                                 class="space-y-4">
                                 <template x-for="(it, i) in items" :key="it.id">
-                                    <div x-data="{ sequence: i + 1, prefix: 'criteria[' + i + ']' }"
+                                    <div x-data="{ 
+                                        sequence: i + 1, 
+                                        prefix: 'criteria[' + i + ']',
+                                        criteriaData: null
+                                    }"
                                         x-effect="sequence = i + 1; prefix = 'criteria[' + i + ']'">
                                         <x-card-criteria :show-controls="true" />
                                     </div>
@@ -226,7 +230,11 @@
                                     }" @criteria-remove="remove($event.detail.index - 1)"
                                         class="space-y-4">
                                         <template x-for="(it, i) in items" :key="it.id">
-                                            <div x-data="{ sequence: i + 1, prefix: 'multiSelected[' + i + ']' }"
+                                            <div x-data="{ 
+                                                sequence: i + 1, 
+                                                prefix: 'multiSelected[' + i + ']',
+                                                checklistData: null
+                                            }"
                                                 x-effect="sequence = i + 1; prefix = 'multiSelected[' + i + ']'">
                                                 <x-multichoice-score-selected :options="$criteriaOptions ?? []" />
                                             </div>

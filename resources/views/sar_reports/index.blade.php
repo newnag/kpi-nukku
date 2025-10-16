@@ -148,8 +148,8 @@
                                         <div class="py-1 text-gray-800 text-sm font-medium">
                                             <!-- ปุ่มแก้ไข -->
                                             <a href="{{ route('sar_reports.edit', $r->id) }}"
-                                                class="flex items-center px-4 py-2 hover:bg-gray-100 transition">
-                                                <i data-lucide="edit-3" class="w-4 h-4 mr-2 text-gray-600"></i>
+                                                class="flex items-center px-4 py-2 hover:bg-gray-100 transition gap-2">
+                                                <i class="fa fa-edit"></i>
                                                 แก้ไขเอกสาร
                                             </a>
 
@@ -164,23 +164,28 @@
                                                 <x-modal title="ยืนยันการลบข้อมูล" size="sm">
                                                     <x-slot:trigger>
                                                         <button type="button"
-                                                            class="flex items-center w-full px-4 py-2 text-red-700 hover:bg-red-50 transition cursor-pointer">
-                                                            <i data-lucide="trash-2" class="w-4 h-4 mr-2"></i>
+                                                            class="flex items-center w-full px-4 py-2 text-red-700 hover:bg-red-50 transition cursor-pointer gap-2">
+                                                            <i class="fa fa-trash"></i>
                                                             ลบเอกสาร
                                                         </button>
                                                     </x-slot:trigger>
 
-                                                    <div class="space-y-2">
-                                                        <p class="text-slate-700">คุณแน่ใจหรือไม่ว่าต้องการลบข้อมูลนี้?
+                                                    <div class=" text-center text-gray-700 text-sm">
+                                                        <p>คุณต้องการลบเอกสาร </p>
+                                                        <p>"<span
+                                                                class="font-semibold text-red-600 text-pretty">{{ $r->title }}</span>"
                                                         </p>
+                                                        <p>หรือไม่?</p>
                                                     </div>
 
                                                     <x-slot:footer>
                                                         <div class="flex justify-between gap-5">
                                                             <button type="button" class="btn btn-outline"
-                                                                @click="$dispatch('modal:close')">ยกเลิก</button>
+                                                                @click="$dispatch('modal:close')"><i
+                                                                    class="fa fa-undo"></i>ยกเลิก</button>
                                                             <button type="button" class="btn btn-danger"
-                                                                onclick="document.getElementById('del-sar-{{ $r->id }}').submit()">ยืนยันการลบ</button>
+                                                                onclick="document.getElementById('del-sar-{{ $r->id }}').submit()"><i
+                                                                    class="fa fa-trash"></i>ยืนยันการลบ</button>
                                                         </div>
                                                     </x-slot:footer>
                                                 </x-modal>
@@ -192,8 +197,8 @@
                                             <!-- ปุ่ม Export (Dropdown ซ้อน) -->
                                             <div x-data="{ open: false }" class="relative">
                                                 <button type="button" @click="open = !open"
-                                                    class="flex items-center w-full px-4 py-2 hover:bg-gray-100 transition cursor-pointer">
-                                                    <i data-lucide="download" class="w-4 h-4 mr-2 text-gray-600"></i>
+                                                    class="flex items-center w-full px-4 py-2 hover:bg-gray-100 transition cursor-pointer gap-2">
+                                                    <i class="fa fa-download"></i>
                                                     ส่งออกเอกสาร
                                                 </button>
 
