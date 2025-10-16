@@ -182,7 +182,8 @@
 
                                     <div class="flex items-center justify-center">
                                         {{-- Modal ลบหลักฐาน --}}
-                                        <x-modal title="ยืนยันการลบหลักฐาน" size="sm" :context="'delete-evidence-' . $evidence->id">
+                                        <x-modal title="ยืนยันการลบหลักฐาน" size="md" :context="'delete-evidence-' . $evidence->id"
+                                            :closeOnBg="false">
                                             <x-slot:trigger>
                                                 <button type="button" class="btn-delete" title="ลบหลักฐาน"
                                                     @if ($locked) hidden @endif>
@@ -190,35 +191,36 @@
                                                 </button>
                                             </x-slot:trigger>
 
-                                            <div class="space-y-2">
-                                                <p class="text-slate-700">
-                                                    ต้องการลบหลักฐาน <span
-                                                        class="font-semibold">{{ $evidence->name }}</span> ใช่หรือไม่?
+                                            <div class="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                                                <p class="text-sm text-yellow-800">
+                                                    <strong>คำเตือน:</strong> การลบหลักฐานนี้จะไม่สามารถกู้คืนได้
                                                 </p>
-
-                                                {{-- ฟอร์มลบ (DELETE) --}}
-                                                <form x-ref="delForm" method="POST"
-                                                    action="{{ route('evidences.destroy', $evidence->id) }}">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    {{-- ถ้าต้องการกลับมาหน้าปัจจุบันหลังลบ --}}
-                                                    <input type="hidden" name="redirect"
-                                                        value="{{ url()->current() }}">
-                                                </form>
                                             </div>
 
-                                            <x-slot:footer>
-                                                <div class="flex justify-between gap-5">
+                                            <div class="mb-6 text-center text-gray-700 text-sm">
+                                                <p>คุณต้องการลบหลักฐาน </p>
+                                                <p>"<span
+                                                        class="font-semibold text-red-600 text-pretty">{{ $evidence->name }}</span>
+                                                "</p>
+                                                <p>หรือไม่?</p>
+                                            </div>
+
+                                            <form x-ref="delForm" method="POST"
+                                                action="{{ route('evidences.destroy', $evidence->id) }}">
+                                                @csrf
+                                                @method('DELETE')
+                                                <input type="hidden" name="redirect" value="{{ url()->current() }}">
+
+                                                <div class="flex gap-2 justify-between">
                                                     <button type="button" class="btn btn-outline"
                                                         @click="$dispatch('modal:close')">
-                                                        ยกเลิก
+                                                        <i class="fa fa-undo"></i>ยกเลิก
                                                     </button>
-                                                    <button type="button" class="btn btn-danger"
-                                                        @click="$refs.delForm.submit()">
-                                                        ยืนยันการลบ
+                                                    <button type="submit" class="btn btn-danger">
+                                                        <i class="fa fa-trash"></i>ยืนยันการลบ
                                                     </button>
                                                 </div>
-                                            </x-slot:footer>
+                                            </form>
                                         </x-modal>
                                     </div>
                                 </div>
@@ -367,9 +369,9 @@
 
             <form id="notify-form" action="{{ route('notify', $indicator->id) }}" method="POST">
                 @csrf
-            
+
                 <!-- ✅ hidden status -->
-               
+
                 <button type="submit" class="btn btn-warning" form="notify-form"
                     @if ($indicator->status === 2 || $locked) disabled @endif>
                     <i class="fa-solid fa-bell"></i>
@@ -1346,8 +1348,8 @@
         }
 
         /* .evidence-form {
-            padding: 20px
-        } */
+                padding: 20px
+            } */
 
         /* Upload */
         .upload-section {
@@ -1791,8 +1793,8 @@
             }
 
             /* .evidence-form {
-                padding: 20px;
-            } */
+                    padding: 20px;
+                } */
 
             .action-buttons {
                 flex-direction: column;

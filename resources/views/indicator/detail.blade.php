@@ -394,18 +394,47 @@ $showChecklistSection = $type === 'checklist' || ($type !== 'variable_formula' &
                     </a>
 
                     <div class="flex flex-col sm:flex-row gap-3 order-1 sm:order-2">
-                        <form action="{{ route('indicator.delete', $dg('id')) }}" method="POST"
-                            onsubmit="return confirm('ต้องการลบตัวบ่งชี้นี้ใช่หรือไม่?')">
+                        <form id="del-indicator-{{ $indicatorId }}"
+                            action="{{ route('indicator.delete', $dg('id')) }}" method="POST"
+                            style="display:inline;">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="btn btn-danger">
-                                ลบตัวบ่งชี้
-                            </button>
+                            <x-modal title="ยืนยันการลบตัวบ่งชี้" size="sm">
+                                <x-slot:trigger>
+                                    <button type="button" class="btn btn-danger">
+                                        <i class="fa fa-trash"></i> ลบตัวบ่งชี้
+                                    </button>
+                                </x-slot:trigger>
+                                <div class="space-y-3">
+                                    <p class="text-slate-700">
+                                        ต้องการลบตัวบ่งชี้ <span
+                                            class="font-semibold text-pretty">{{ $name }}</span> หรือไม่?
+                                    </p>
+                                    <div class="p-3 bg-red-50 border border-red-200 rounded-lg">
+                                        <p class="text-sm text-red-700">
+                                            <i class="fa fa-exclamation-triangle mr-1"></i>
+                                            <strong>คำเตือน:</strong> การลบจะไม่สามารถย้อนกลับได้ และจะส่งผลต่อข้อมูลที่เกี่ยวข้องทั้งหมด
+                                        </p>
+                                    </div>
+                                </div>
+                                <x-slot:footer>
+                                    <div class="flex justify-between gap-3 w-full">
+                                        <button type="button" class="btn btn-outline flex-1"
+                                            @click="$dispatch('modal:close')">
+                                            <i class="fa fa-times mr-1"></i> ยกเลิก
+                                        </button>
+                                        <button type="button" class="btn btn-danger flex-1"
+                                            onclick="document.getElementById('del-indicator-{{ $indicatorId }}').submit()">
+                                            <i class="fa fa-trash mr-1"></i> ยืนยันการลบ
+                                        </button>
+                                    </div>
+                                </x-slot:footer>
+                            </x-modal>
                         </form>
 
                         {{-- Enable when edit route is ready --}}
                         <a href="{{ route('indicator.edit', $indicatorId) }}" class="btn btn-warning">
-                            แก้ไข
+                            <i class="fa fa-edit"></i> แก้ไข
                         </a>
                         @can('edit-indicator')
                             @php $indicatorId = ($data['data']['id'] ?? ($data['id'] ?? ($indicator->id ?? null))); @endphp

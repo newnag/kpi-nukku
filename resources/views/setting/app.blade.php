@@ -72,11 +72,11 @@
             <div class="action-bts">
                 <!-- Submit -->
                 <button type="submit" class="btn btn-primary">
-                    <i data-lucide="save" style="width: 20px;"></i> บันทึก
+                    <i class="fa fa-save"></i> บันทึกข้อมูลการตั้งค่า
                 </button>
                 <button type="submit" name="send_now" value="1" formaction="{{ route('settings.sendNow') }}"
                     class="btn btn-secondary">
-                    <i data-lucide="send" style="width: 20px;"></i> บันทึกและส่งแจ้งเตือนทันที
+                    <i class="fa fa-paper-plane"></i> บันทึกและส่งแจ้งเตือนทันที
                 </button>
             </div>
         </form>

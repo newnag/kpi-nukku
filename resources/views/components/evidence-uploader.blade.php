@@ -130,10 +130,10 @@
             <!-- Sticky Actions -->
             <footer class="eu-actions">
                 <button type="button" class="btn btn-outline" @click="closeModal()">
-                    <i data-lucide="undo-2"></i> กลับ
+                    <i class="fa fa-undo"></i> ยกเลิก
                 </button>
                 <button type="submit" class="btn btn-primary">
-                    <i data-lucide="save"></i> บันทึก
+                    <i class="fa fa-save"></i> บันทึก
                 </button>
             </footer>
             </form>
