@@ -90,7 +90,7 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    command: ["sh","-lc","./docker/setup.sh"]
+    command: ["sh","-lc","chmod +x docker/setup.sh || true; sed -i 's/\\r$//' docker/setup.sh 2>/dev/null || true; ./docker/setup.sh"]
     restart: "no"
 
   # One-off service to build frontend assets with Vite
