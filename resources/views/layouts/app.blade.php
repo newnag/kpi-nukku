@@ -20,6 +20,37 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
         integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!-- Polyfill: crypto.randomUUID for non-secure contexts -->
+    <script>
+        (function () {
+            try {
+                if (!window.crypto) window.crypto = {};
+                if (typeof window.crypto.randomUUID !== 'function') {
+                    window.crypto.randomUUID = function () {
+                        try {
+                            if (window.crypto && window.crypto.getRandomValues) {
+                                const buf = new Uint8Array(16);
+                                window.crypto.getRandomValues(buf);
+                                buf[6] = (buf[6] & 0x0f) | 0x40; // version 4
+                                buf[8] = (buf[8] & 0x3f) | 0x80; // variant 10
+                                const hex = Array.from(buf, b => b.toString(16).padStart(2, '0')).join('');
+                                return `${hex.substring(0, 8)}-${hex.substring(8, 12)}-${hex.substring(12, 16)}-${hex.substring(16, 20)}-${hex.substring(20)}`;
+                            }
+                        } catch (e) { /* noop */ }
+                        // Math.random fallback
+                        let d = Date.now();
+                        let d2 = (typeof performance !== 'undefined' && performance.now) ? performance.now() * 1000 : 0;
+                        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+                            let r = Math.random() * 16;
+                            if (d > 0) { r = (d + r) % 16 | 0; d = Math.floor(d / 16); }
+                            else { r = (d2 + r) % 16 | 0; d2 = Math.floor(d2 / 16); }
+                            return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+                        });
+                    }
+                }
+            } catch (e) { /* noop */ }
+        })();
+    </script>
     <script src="//unpkg.com/alpinejs" defer></script>
     @stack('styles')
 

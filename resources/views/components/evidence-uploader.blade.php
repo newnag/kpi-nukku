@@ -471,11 +471,35 @@
                 open: false,
                 dragging: false,
                 files: [],
-                urlRows: [{
-                    _id: crypto.randomUUID(),
-                    name: '',
-                    url: ''
-                }],
+                urlRows: [],
+
+                // Safe UUID generator that works without secure context (HTTP)
+                uuid() {
+                    try {
+                        if (window.crypto && typeof window.crypto.randomUUID === 'function') {
+                            return window.crypto.randomUUID();
+                        }
+                    } catch (e) { /* noop */ }
+                    try {
+                        if (window.crypto && window.crypto.getRandomValues) {
+                            const buf = new Uint8Array(16);
+                            window.crypto.getRandomValues(buf);
+                            buf[6] = (buf[6] & 0x0f) | 0x40; // version 4
+                            buf[8] = (buf[8] & 0x3f) | 0x80; // variant 10
+                            const hex = Array.from(buf, b => b.toString(16).padStart(2, '0')).join('');
+                            return `${hex.substring(0, 8)}-${hex.substring(8, 12)}-${hex.substring(12, 16)}-${hex.substring(16, 20)}-${hex.substring(20)}`;
+                        }
+                    } catch (e) { /* noop */ }
+                    // Math.random fallback
+                    let d = Date.now();
+                    let d2 = (typeof performance !== 'undefined' && performance.now) ? performance.now() * 1000 : 0;
+                    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+                        let r = Math.random() * 16;
+                        if (d > 0) { r = (d + r) % 16 | 0; d = Math.floor(d / 16); }
+                        else { r = (d2 + r) % 16 | 0; d2 = Math.floor(d2 / 16); }
+                        return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+                    });
+                },
 
                 init() {
                     this.$nextTick(() => {
@@ -496,6 +520,10 @@
                                 ['removeformat']
                             ]
                         });
+                        // Ensure at least one URL row exists
+                        if (!this.urlRows.length) {
+                            this.urlRows.push({ _id: this.uuid(), name: '', url: '' });
+                        }
                         this.refreshIcons();
                     });
                 },
@@ -532,7 +560,7 @@
                         const ext = (f.name.split('.').pop() || '').toLowerCase();
                         if (!accept.includes(ext)) continue;
 
-                        f._id = crypto.randomUUID();
+                        f._id = this.uuid();
                         f._isImage = ['jpg', 'jpeg', 'png'].includes(ext);
                         if (f._isImage) f._objectURL = URL.createObjectURL(f);
 
@@ -569,7 +597,7 @@
 
                 addUrl() {
                     this.urlRows.push({
-                        _id: crypto.randomUUID(),
+                        _id: this.uuid(),
                         name: '',
                         url: ''
                     });
