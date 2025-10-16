@@ -1,62 +1,50 @@
 @extends('layouts.app')
 @section('title', 'แก้ไขผู้ใช้งาน')
 @section('content')
-    <div class="user-container">
-        <div class="user-containers">
-            <div class="header-contatainers">แก้ไขผู้ใช้งาน</div>
-            <div class="user-form">
-                @if ($errors->any())
-                    <div class="error-message" style="margin-bottom:16px;">
-                        <ul style="margin-left:18px;">
-                            @foreach ($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
-                @endif
+    <div class="user-containers">
+        <div class="header-contatainers">แก้ไขผู้ใช้งาน</div>
+        <div class="user-form">
+            @if ($errors->any())
+                <div class="error-message" style="margin-bottom:16px;">
+                    <ul style="margin-left:18px;">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
 
-                <form action="{{ route('users.update', $user->id) }}" method="POST">
-                    @csrf
-                    @method('PUT')
-
-                    <div class="form-section">
-                        <div class="section-title">ข้อมูลส่วนตัว</div>
+            <form action="{{ route('users.update', $user->id) }}" method="POST">
+                @csrf
+                @method('PUT')
+                <div class="form-group-container">
+                    <x-card>
+                        <div class="card-title">ข้อมูลส่วนตัว</div>
                         <div class="form-row">
-                            <div class="form-group third-width">
-                                <label class="form-label">คำนำหน้าชื่อ</label>
-                                <select name="title" class="form-input">
-                                    <option value="">-- เลือกคำนำหน้า --</option>
-                                    <option value="นาย" {{ old('title', $user->title) == 'นาย' ? 'selected' : '' }}>นาย
-                                    </option>
-                                    <option value="นาง" {{ old('title', $user->title) == 'นาง' ? 'selected' : '' }}>นาง
-                                    </option>
-                                    <option value="นางสาว" {{ old('title', $user->title) == 'นางสาว' ? 'selected' : '' }}>
-                                        นางสาว</option>
-                                    <option value="ผศ." {{ old('title', $user->title) == 'ผศ.' ? 'selected' : '' }}>ผศ.
-                                    </option>
-                                    <option value="รศ." {{ old('title', $user->title) == 'รศ.' ? 'selected' : '' }}>รศ.
-                                    </option>
-                                    <option value="ศ." {{ old('title', $user->title) == 'ศ.' ? 'selected' : '' }}>ศ.
-                                    </option>
-                                </select>
+                            <div class="form-group">
+                                <x-select name="title" label="คำนำหน้าชื่อ" :options="[
+                                    'นาย' => 'นาย',
+                                    'นาง' => 'นาง',
+                                    'นางสาว' => 'นางสาว',
+                                    'ผศ.' => 'ผศ.',
+                                    'รศ.' => 'รศ.',
+                                    'ศ.' => 'ศ.',
+                                ]"
+                                    placeholder="-- เลือกคำนำหน้า --" :value="$user->title" />
                                 @error('title')
                                     <div class="error-message">{{ $message }}</div>
                                 @enderror
                             </div>
-                            <div class="form-group third-width">
-                                <label class="form-label">ชื่อจริง <span class="required">*</span></label>
-                                <input id="first_name" type="text" name="first_name" class="form-input"
-                                    value="{{ old('first_name', $user->first_name) }}" placeholder="กรุณากรอกชื่อจริง"
-                                    required>
+                            <div class="form-group">
+                                <x-input name="first_name" label="ชื่อจริง" placeholder="กรุณากรอกชื่อจริง"
+                                    :value="$user->first_name" :required="true" />
                                 @error('first_name')
                                     <div class="error-message">{{ $message }}</div>
                                 @enderror
                             </div>
-                            <div class="form-group third-width">
-                                <label class="form-label">นามสกุล <span class="required">*</span></label>
-                                <input id="last_name" type="text" name="last_name" class="form-input"
-                                    value="{{ old('last_name', $user->last_name) }}" placeholder="กรุณากรอกนามสกุล"
-                                    required>
+                            <div class="form-group">
+                                <x-input name="last_name" label="นามสกุล" placeholder="กรุณากรอกนามสกุล" :value="$user->last_name"
+                                    :required="true" />
                                 @error('last_name')
                                     <div class="error-message">{{ $message }}</div>
                                 @enderror
@@ -64,168 +52,129 @@
                         </div>
 
                         <div class="form-row">
-                            <div class="form-group half-width">
-                                <label class="form-label">อีเมล <span class="required">*</span></label>
-                                <input type="email" name="email" class="form-input"
-                                    value="{{ old('email', $user->email) }}" placeholder="กรุณากรอกอีเมล" required>
+                            <div class="form-group">
+                                <x-input name="email" type="email" label="อีเมล" placeholder="กรุณากรอกอีเมล"
+                                    :value="$user->email" :required="true" />
                                 @error('email')
                                     <div class="error-message">{{ $message }}</div>
                                 @enderror
                             </div>
-                            <div class="form-group half-width">
-                                <label class="form-label">เบอร์โทรศัพท์</label>
-                                <input type="text" name="phone" class="form-input"
-                                    value="{{ old('phone', $user->phone) }}" placeholder="กรุณากรอกเบอร์โทรศัพท์">
+                            <div class="form-group">
+                                <x-input name="phone" label="เบอร์โทรศัพท์" placeholder="กรุณากรอกเบอร์โทรศัพท์"
+                                    :value="$user->phone" />
                                 @error('phone')
                                     <div class="error-message">{{ $message }}</div>
                                 @enderror
                             </div>
                         </div>
-                    </div>
-
-                    <div class="form-section">
-                        <div class="section-title">ข้อมูลการทำงาน</div>
+                    </x-card>
+                    <x-card>
+                        <div class="card-title">ข้อมูลการทำงาน</div>
                         <div class="form-row">
-                            <div class="form-group half-width">
-                                <label class="form-label">หน่วยงาน <span class="required">*</span></label>
-                                <select name="department_id" class="form-input" required>
-                                    <option value="">กรุณาเลือกหน่วยงาน</option>
-                                    @foreach ($departments as $department)
-                                        <option value="{{ $department->id }}"
-                                            {{ (string) old('department_id', $user->department_id) === (string) $department->id ? 'selected' : '' }}>
-                                            {{ $department->name }}</option>
-                                    @endforeach
-                                </select>
+                            <div class="form-group">
+                                <x-select name="department_id" label="หน่วยงาน" :options="$departments" option-value="id"
+                                    option-label="name" placeholder="กรุณาเลือกหน่วยงาน" :searchable="true"
+                                    :required="true" :value="$user->department_id" />
                                 @error('department_id')
                                     <div class="error-message">{{ $message }}</div>
                                 @enderror
                             </div>
                         </div>
                         <div class="form-row">
-                            <div class="form-group half-width">
-                                <label class="form-label">ประเภทบุคลากร</label>
-                                <input type="text" name="positype" class="form-input"
-                                    value="{{ old('positype', $user->positype) }}"
-                                    placeholder="เช่น พนักงานมหาวิทยาลัย, ข้าราชการ">
+                            <div class="form-group">
+                                <x-input name="positype" label="ประเภทบุคลากร"
+                                    placeholder="เช่น พนักงานมหาวิทยาลัย, ข้าราชการ" :value="$user->positype" />
                                 @error('positype')
                                     <div class="error-message">{{ $message }}</div>
                                 @enderror
                             </div>
-                            <div class="form-group half-width">
-                                <label class="form-label">สายงาน</label>
-                                <input type="text" name="workline" class="form-input"
-                                    value="{{ old('workline', $user->workline) }}"
-                                    placeholder="เช่น สนับสนุน, วิชาการ">
+                            <div class="form-group">
+                                <x-input name="workline" label="สายงาน" placeholder="เช่น สนับสนุน, วิชาการ"
+                                    :value="$user->workline" />
                                 @error('workline')
                                     <div class="error-message">{{ $message }}</div>
                                 @enderror
                             </div>
                         </div>
                         <div class="form-row">
-                            <div class="form-group half-width">
-                                <label class="form-label">ตำแหน่ง</label>
-                                <input type="text" name="posi" class="form-input"
-                                    value="{{ old('posi', $user->posi) }}" placeholder="เช่น นักวิชาการคอมพิวเตอร์">
+                            <div class="form-group">
+                                <x-input name="posi" label="ตำแหน่ง" placeholder="เช่น นักวิชาการคอมพิวเตอร์"
+                                    :value="$user->posi" />
                                 @error('posi')
                                     <div class="error-message">{{ $message }}</div>
                                 @enderror
                             </div>
-                            <div class="form-group half-width">
-                                <label class="form-label">ระดับ</label>
-                                <input type="text" name="level" class="form-input"
-                                    value="{{ old('level', $user->level) }}"
-                                    placeholder="เช่น ปฏิบัติการ, ชำนาญการ, เชี่ยวชาญ">
+                            <div class="form-group">
+                                <x-input name="level" label="ระดับ" placeholder="เช่น ปฏิบัติการ, ชำนาญการ, เชี่ยวชาญ"
+                                    :value="$user->level" />
                                 @error('level')
                                     <div class="error-message">{{ $message }}</div>
                                 @enderror
                             </div>
                         </div>
-                    </div>
+                    </x-card>
 
-                    <div class="form-section">
-                        <div class="section-title">ความปลอดภัย</div>
+                    <x-card>
+                        <div class="card-title">ความปลอดภัย</div>
                         <div class="form-row">
-                            <div class="form-group half-width">
-                                <label class="form-label">รหัสผ่านใหม่ (ถ้าไม่เปลี่ยน ปล่อยว่าง)</label>
-                                <input id="password" type="password" name="password" class="form-input"
-                                    placeholder="ใส่รหัสผ่านใหม่ (อย่างน้อย 8 ตัวอักษร)">
+                            <div class="form-group">
+                                <x-input name="password" type="password" label="รหัสผ่านใหม่ (ถ้าไม่เปลี่ยน ปล่อยว่าง)"
+                                    placeholder="ใส่รหัสผ่านใหม่ (อย่างน้อย 8 ตัวอักษร)" />
                                 @error('password')
                                     <div class="error-message">{{ $message }}</div>
                                 @enderror
                             </div>
-                            <div class="form-group half-width">
-                                <label class="form-label">ยืนยันรหัสผ่านใหม่</label>
-                                <input id="password_confirmation" type="password" name="password_confirmation"
-                                    class="form-input" placeholder="พิมพ์รหัสผ่านใหม่อีกครั้ง">
+                            <div class="form-group">
+                                <x-input name="password_confirmation" type="password" label="ยืนยันรหัสผ่านใหม่"
+                                    placeholder="พิมพ์รหัสผ่านใหม่อีกครั้ง" />
                             </div>
                         </div>
-                    </div>
 
-                    <div class="form-section">
-                        <div class="section-title">สิทธิ์การใช้งาน</div>
                         <div class="form-row">
-                            <div class="form-group half-width">
-                                <label class="form-label">บทบาท (Role) <span class="required">*</span></label>
+                            <div class="form-group">
                                 @php $currentRole = old('role', $user->getRoleNames()->first()); @endphp
-                                <select name="role" class="form-input" required>
-                                    <option value="">กรุณาเลือกบทบาท</option>
-                                    @foreach ($roles as $role)
-                                        <option value="{{ $role }}"
-                                            {{ $currentRole === $role ? 'selected' : '' }}>{{ $role }}</option>
-                                    @endforeach
-                                </select>
+                                <x-select name="role" label="บทบาท (Role)" :options="collect($roles)->mapWithKeys(fn($r) => [$r => $r])->toArray()"
+                                    placeholder="กรุณาเลือกบทบาท" :searchable="true" :required="true"
+                                    :value="$currentRole" />
                                 @error('role')
                                     <div class="error-message">{{ $message }}</div>
                                 @enderror
                             </div>
-                            <div class="form-group half-width">
-                                <label class="form-label">สถานะระบบ <span class="required">*</span></label>
-                                <select name="status" class="form-input" required>
-                                    <option value="1"
-                                        {{ old('status', $user->status ? 1 : 0) == 1 ? 'selected' : '' }}>
-                                        Active</option>
-                                    <option value="0"
-                                        {{ old('status', $user->status ? 1 : 0) == 0 ? 'selected' : '' }}>
-                                        Inactive</option>
-                                </select>
+                            <div class="form-group">
+                                <x-select name="status" label="สถานะระบบ" :options="[
+                                    '1' => 'Active',
+                                    '0' => 'Inactive',
+                                ]" :value="$user->status ? 1 : 0"
+                                    placeholder="เลือกสถานะ" :required="true" />
                                 @error('status')
                                     <div class="error-message">{{ $message }}</div>
                                 @enderror
                             </div>
                         </div>
-                    </div>
-
+                    </x-card>
                     <div class="form-actions">
                         <a href="{{ route('users.index') }}" class="btn btn-outline"><i data-lucide="arrow-left"
                                 class="btn-icon"></i> ยกเลิก</a>
                         <button type="submit" class="btn btn-primary"><i data-lucide="save" class="btn-icon"></i>
                             บันทึก</button>
                     </div>
-                </form>
-            </div>
+
+                </div>
+            </form>
         </div>
     </div>
+@endsection
 
-    <script>
-        // ไม่จำเป็นต้องมี script สร้าง name field แล้ว
-        // เพราะ display_name จะถูกสร้างใน Model ผ่าน Accessor
-    </script>
-
+@push('styles')
     <style>
-        .user-container {
-            max-width: 1500px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
         .user-containers {
             width: 100%;
-            max-width: 1500px;
+            /* max-width: 1500px; */
             margin: 0 auto;
             background: #fff;
             border-radius: 10px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
+            margin-bottom: 30px;
         }
 
         .header-contatainers {
@@ -237,44 +186,16 @@
             font-size: 30px;
             background: linear-gradient(90deg, #a9c6ff 0%, #fff3d4 100%);
             color: #222;
-        }
-
-        .user-form {
-            background: #fff;
-            border-radius: 10px;
-            padding: 40px;
-            margin: 40px 60px;
-            border: 2px solid #C2D9EB;
-        }
-
-        .form-section {
-            margin-bottom: 40px;
-        }
-
-        .section-title {
-            color: #2196f3;
-            font-size: 18px;
-            font-weight: bold;
-            margin-bottom: 20px;
-            text-decoration: underline;
+            border-top-left-radius: 16px;
+            border-top-right-radius: 16px;
         }
 
         .form-row {
             display: flex;
             gap: 30px;
-            margin-bottom: 20px;
         }
 
         .form-group {
-            flex: 1;
-        }
-
-        .form-group.third-width {
-            flex: 1;
-            min-width: 200px;
-        }
-
-        .form-group.half-width {
             flex: 1;
         }
 
@@ -282,23 +203,11 @@
             display: block;
             margin-bottom: 8px;
             color: #333;
+            font-weight: normal;
         }
 
         .required {
             color: red;
-        }
-
-        .form-input {
-            width: 100%;
-            padding: 12px 15px;
-            border: 2px solid #ddd;
-            border-radius: 5px;
-            font-size: 16px;
-        }
-
-        .form-input:focus {
-            outline: none;
-            border-color: #2196f3;
         }
 
         .error-message {
@@ -311,9 +220,37 @@
             display: flex;
             gap: 20px;
             justify-content: center;
-            margin-top: 40px;
-            padding-top: 20px;
-            border-top: 1px solid #eee;
+            margin-top: 20px;
+        }
+
+        .form-group-container {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            color: var(--blue-default);
+            margin: 0 0 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            position: relative;
+            padding-left: 10px;
+        }
+
+        .card-title::before {
+            content: "";
+            width: 4px;
+            height: 20px;
+            border-radius: 8px;
+            background: var(--blue-default);
+            position: absolute;
+            left: 0;
+            top: 2px;
+            opacity: .25;
         }
     </style>
-@endsection
+@endpush
