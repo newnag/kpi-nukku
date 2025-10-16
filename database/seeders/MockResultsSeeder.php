@@ -13,8 +13,9 @@ class MockResultsSeeder extends Seeder
     {
         try {
             if (DB::getDriverName() === 'pgsql') {
+                // Canonical sequence realignment: set last_value = MAX(id), is_called = true
                 DB::statement(
-                    "SELECT setval(pg_get_serial_sequence('" . $table . "','" . $column . "'), COALESCE((SELECT MAX(" . $column . ") FROM " . $table . "), 0) + 1, false)"
+                    "SELECT setval(pg_get_serial_sequence('" . $table . "','" . $column . "'), COALESCE((SELECT MAX(" . $column . ") FROM " . $table . "), 0), true)"
                 );
             }
         } catch (\Throwable $e) {

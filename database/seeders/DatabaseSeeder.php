@@ -8,6 +8,29 @@ use Spatie\Permission\PermissionRegistrar;
 
 class DatabaseSeeder extends Seeder
 {
+    private function realignSequence(string $table, string $column = 'id'): void
+    {
+        try {
+            // Align Postgres sequence to MAX(id) so next inserts won't collide
+            DB::statement(
+                "SELECT setval(pg_get_serial_sequence('" . $table . "','" . $column . "'), COALESCE((SELECT MAX(" . $column . ") FROM " . $table . "), 0), true)"
+            );
+        } catch (\Throwable $e) {
+            // Ignore for tables without sequences or on non‑pgsql drivers
+        }
+    }
+
+    private function realignAllSequences(): void
+    {
+        $tables = [
+            'departments', 'users',
+            'standards', 'categories', 'indicators', 'criterias',
+            'evidence', 'checklist_items', 'formulas', 'variables',
+        ];
+        foreach ($tables as $t) {
+            $this->realignSequence($t);
+        }
+    }
     /**
      * Seed the application's database.
      */
@@ -70,5 +93,8 @@ class DatabaseSeeder extends Seeder
         // cascaded-deleted earlier. Seed them again to ensure UI loads formulas.
         $this->call(FormulasTableSeeder::class);
         $this->call(VariableFormulasTableSeeder::class);
+
+        // After inserting explicit IDs in many seeders, ensure sequences are aligned
+        $this->realignAllSequences();
     }
 }

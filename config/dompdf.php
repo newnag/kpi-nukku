@@ -19,7 +19,8 @@ return [
     'options' => [
         'font_dir'   => storage_path('fonts'),
         'font_cache' => storage_path('fonts'),
-        'default_font' => 'SarabunLocal',
+        // Prefer NotoSansThai if available; falls back to SarabunLocal via view logic
+        'default_font' => 'NotoSansThai',
         'enable_font_subsetting' => true,
         'isHtml5ParserEnabled' => true,
         'isRemoteEnabled' => true,

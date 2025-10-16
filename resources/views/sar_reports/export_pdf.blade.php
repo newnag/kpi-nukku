@@ -5,30 +5,33 @@
     <title>SAR Report {{ $report->year }}</title>
     <style>
         @php
-            $sarRegPath  = storage_path('fonts/Sarabun-Regular.ttf');
-            $sarBoldPath = storage_path('fonts/Sarabun-Bold.ttf');
+            $notoRegPath  = storage_path('fonts/NotoSansThai-Regular.ttf');
+            $notoBoldPath = storage_path('fonts/NotoSansThai-Bold.ttf');
+            $sarRegPath   = storage_path('fonts/Sarabun-Regular.ttf');
+            $sarBoldPath  = storage_path('fonts/Sarabun-Bold.ttf');
+
+            $notoOk = file_exists($notoRegPath) && file_exists($notoBoldPath);
+            $sarOk  = file_exists($sarRegPath) && file_exists($sarBoldPath);
+
+            $useFamily = $notoOk ? 'NotoSansThai' : ($sarOk ? 'SarabunLocal' : 'DejaVu Sans');
+
+            $notoReg = str_replace('\\\\', '/', $notoRegPath);
+            $notoBold = str_replace('\\\\', '/', $notoBoldPath);
             $sarReg  = str_replace('\\\\', '/', $sarRegPath);
             $sarBold = str_replace('\\\\', '/', $sarBoldPath);
-            $hasLocalFonts = file_exists($sarRegPath) && file_exists($sarBoldPath);
         @endphp
 
-        @if ($hasLocalFonts)
-        @font-face {
-            font-family: 'SarabunLocal';
-            font-style: normal;
-            font-weight: 400;
-            src: url('{{ $sarReg }}') format('truetype');
-        }
-        @font-face {
-            font-family: 'SarabunLocal';
-            font-style: normal;
-            font-weight: 700;
-            src: url('{{ $sarBold }}') format('truetype');
-        }
-        body, * { font-family: "SarabunLocal", sans-serif !important; }
+        @if ($notoOk)
+        @font-face { font-family: 'NotoSansThai'; font-style: normal; font-weight: 400; src: url('{{ $notoReg }}') format('truetype'); }
+        @font-face { font-family: 'NotoSansThai'; font-style: normal; font-weight: 700; src: url('{{ $notoBold }}') format('truetype'); }
+        body, * { font-family: 'NotoSansThai', sans-serif !important; }
+        @elseif ($sarOk)
+        @font-face { font-family: 'SarabunLocal'; font-style: normal; font-weight: 400; src: url('{{ $sarReg }}') format('truetype'); }
+        @font-face { font-family: 'SarabunLocal'; font-style: normal; font-weight: 700; src: url('{{ $sarBold }}') format('truetype'); }
+        body, * { font-family: 'SarabunLocal', sans-serif !important; }
         @else
-        /* Fallback if fonts missing in storage/fonts */
-        body, * { font-family: DejaVu Sans, sans-serif !important; }
+        /* Last resort fallback; may not fully support Thai */
+        body, * { font-family: 'DejaVu Sans', sans-serif !important; }
         @endif
         body { font-size: 13px; line-height: 1.4; }
 
