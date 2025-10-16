@@ -5,10 +5,14 @@
     <title>SAR Report {{ $report->year }}</title>
     <style>
         @php
-            $sarReg  = str_replace('\\\\', '/', storage_path('fonts/Sarabun-Regular.ttf'));
-            $sarBold = str_replace('\\\\', '/', storage_path('fonts/Sarabun-Bold.ttf'));
+            $sarRegPath  = storage_path('fonts/Sarabun-Regular.ttf');
+            $sarBoldPath = storage_path('fonts/Sarabun-Bold.ttf');
+            $sarReg  = str_replace('\\\\', '/', $sarRegPath);
+            $sarBold = str_replace('\\\\', '/', $sarBoldPath);
+            $hasLocalFonts = file_exists($sarRegPath) && file_exists($sarBoldPath);
         @endphp
 
+        @if ($hasLocalFonts)
         @font-face {
             font-family: 'SarabunLocal';
             font-style: normal;
@@ -21,8 +25,11 @@
             font-weight: 700;
             src: url('{{ $sarBold }}') format('truetype');
         }
-
         body, * { font-family: "SarabunLocal", sans-serif !important; }
+        @else
+        /* Fallback if fonts missing in storage/fonts */
+        body, * { font-family: DejaVu Sans, sans-serif !important; }
+        @endif
         body { font-size: 13px; line-height: 1.4; }
 
         h2 { text-align: center; font-size: 20px; margin-bottom: 20px; }

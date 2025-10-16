@@ -95,6 +95,8 @@ services:
       # Run DB migrations and seeds
       php artisan migrate --force &&
       php artisan db:seed --force &&
+      # Ensure Dompdf fonts available
+      php artisan fonts:copy || true &&
       # Cache config/routes/views
       php artisan config:cache && php artisan route:cache && php artisan view:cache
       "
