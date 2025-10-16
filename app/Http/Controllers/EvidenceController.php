@@ -572,7 +572,17 @@ class EvidenceController extends Controller
 
                 if ($rel && Storage::disk('public')->exists($rel)) {
                     $absolutePath = Storage::disk('public')->path($rel);
-                    $downloadName = $file['original_name'] ?? basename($rel);
+                    // Prefer user-defined custom_name; fall back to original_name
+                    $downloadName = $file['custom_name'] ?? $file['original_name'] ?? basename($rel);
+                    $downloadName = trim((string) $downloadName) !== '' ? (string) $downloadName : basename($rel);
+                    // Ensure extension present
+                    $nameExt = pathinfo($downloadName, PATHINFO_EXTENSION);
+                    if ($nameExt === '' || $nameExt === null) {
+                        $fallbackExt = $e->type ?? pathinfo($rel, PATHINFO_EXTENSION) ?? null;
+                        if ($fallbackExt) {
+                            $downloadName .= '.' . ltrim((string) $fallbackExt, '.');
+                        }
+                    }
                     $mime = $this->determineMime($absolutePath, $file['mime_type'] ?? null, $e->type ?? null);
 
                     if ($this->shouldOpenInline($mime, $e->type ?? null)) {
@@ -598,10 +608,28 @@ class EvidenceController extends Controller
                     return response()->json(['success' => false, 'message' => 'ไม่สามารถสร้างไฟล์ ZIP ได้'], 500);
                 }
 
+                $used = [];
                 foreach ($files as $f) {
                     $rel = $this->normalizePath($f['path'] ?? null);
                     if ($rel && Storage::disk('public')->exists($rel)) {
-                        $zip->addFile(Storage::disk('public')->path($rel), $f['original_name'] ?? basename($rel));
+                        $entry = $f['custom_name'] ?? $f['original_name'] ?? basename($rel);
+                        $entry = trim((string) $entry) !== '' ? (string) $entry : basename($rel);
+                        $ext = pathinfo($entry, PATHINFO_EXTENSION);
+                        if ($ext === '' || $ext === null) {
+                            $fallbackExt = pathinfo($rel, PATHINFO_EXTENSION) ?? ($e->type ?? null);
+                            if ($fallbackExt) {
+                                $entry .= '.' . ltrim((string) $fallbackExt, '.');
+                            }
+                        }
+                        if (isset($used[$entry])) {
+                            $i = ++$used[$entry];
+                            $nameOnly = pathinfo($entry, PATHINFO_FILENAME);
+                            $extPart = pathinfo($entry, PATHINFO_EXTENSION);
+                            $entry = $nameOnly . " (" . $i . ")." . $extPart;
+                        } else {
+                            $used[$entry] = 0;
+                        }
+                        $zip->addFile(Storage::disk('public')->path($rel), $entry);
                     }
                 }
                 $zip->close();

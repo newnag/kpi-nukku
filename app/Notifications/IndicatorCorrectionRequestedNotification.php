@@ -28,7 +28,7 @@ class IndicatorCorrectionRequestedNotification extends Notification
 
         $mail = (new MailMessage)
             ->subject($title)
-            ->greeting('แจ้งเตือน QA')
+            ->greeting('แจ้งเตือน เจ้าหน้าที่')
             ->line('มีการร้องขอการแก้ไขจากผู้ใช้ในตัวชี้วัดต่อไปนี้')
             ->line(sprintf('ตัวชี้วัด: %s (%s)', (string) ($indicator->name ?? '-'), (string) ($indicator->code ?? '-')))
             ->action('เปิดดูตัวชี้วัด', $url);

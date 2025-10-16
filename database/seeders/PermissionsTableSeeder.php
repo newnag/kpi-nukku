@@ -106,6 +106,8 @@ class PermissionsTableSeeder extends Seeder
             'view-indicator',
             'edit-indicator',
             'delete-indicator',
+            'export-indicator',
+            'import-indicator',
 
             // ===== Users =====
             'view-users',
@@ -167,6 +169,8 @@ class PermissionsTableSeeder extends Seeder
             'view-indicator',
             'edit-indicator',
             'delete-indicator',
+            'export-indicator',
+            'import-indicator',
 
             // ===== Users =====
             'view-users',
@@ -218,6 +222,8 @@ class PermissionsTableSeeder extends Seeder
             'create-indicator',
             'edit-indicator',
             'delete-indicator',
+            'export-indicator',
+            'import-indicator',
 
             // ===== Users =====
             'view-users',

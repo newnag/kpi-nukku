@@ -29,7 +29,7 @@ class IndicatorFinalSubmittedNotification extends Notification
 
         $mail = (new MailMessage)
             ->subject($title)
-            ->greeting('แจ้งเตือน QA')
+            ->greeting('แจ้งเตือน เจ้าหน้าที่')
             ->line('มีการบันทึกฉบับจริงของตัวชี้วัดในระบบ KPI')
             ->line(sprintf('ตัวชี้วัด: %s (%s)', (string) ($indicator->name ?? '-'), (string) ($indicator->code ?? '-')))
             ->action('ตรวจสอบตัวชี้วัด', $url);
