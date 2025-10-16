@@ -61,7 +61,8 @@
         ],
         "dev": [
             "Composer\\Config::disableProcessTimeout",
-            "npm exec -- concurrently -c \"#93c5fd,#c4b5fd,#fdba74\" \"php artisan serve\" \"php artisan queue:listen --tries=1\" \"npm run dev\" --names=server,queue,vite"
+            
+            "node node_modules/concurrently/dist/bin/concurrently.js -c \"#93c5fd,#c4b5fd,#fdba74\" \"php artisan serve\" \"php artisan queue:listen --tries=1\" \"npm run dev\" --names=server,queue,vite"
         ],
         "test": [
             "@php artisan config:clear --ansi",

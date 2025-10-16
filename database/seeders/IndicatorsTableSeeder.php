@@ -1084,7 +1084,16 @@ class IndicatorsTableSeeder extends Seeder
         'categorie_id' => 2,
     ),
 ));
-        
-        
+
+        // Ensure the PostgreSQL sequence for indicators.id is aligned
+        // with the current MAX(id) so new inserts don't collide.
+        try {
+            $maxId = (int) \DB::table('indicators')->max('id');
+            // Two-arg setval sets is_called = true, so nextval returns maxId+1
+            \DB::statement("SELECT setval(pg_get_serial_sequence('indicators','id'), {$maxId})");
+        } catch (\Throwable $e) {
+            // Non-Postgres or missing sequence: ignore silently
+        }
+
     }
 }
