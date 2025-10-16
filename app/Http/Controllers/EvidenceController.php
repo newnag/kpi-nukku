@@ -572,8 +572,8 @@ class EvidenceController extends Controller
 
                 if ($rel && Storage::disk('public')->exists($rel)) {
                     $absolutePath = Storage::disk('public')->path($rel);
-                    // Prefer user-defined custom_name; fall back to original_name
-                    $downloadName = $file['custom_name'] ?? $file['original_name'] ?? basename($rel);
+                    // Prefer renamed Evidence name for single-file entries, otherwise per-file custom/original
+                    $downloadName = $e->name ?: ($file['custom_name'] ?? $file['original_name'] ?? basename($rel));
                     $downloadName = trim((string) $downloadName) !== '' ? (string) $downloadName : basename($rel);
                     // Ensure extension present
                     $nameExt = pathinfo($downloadName, PATHINFO_EXTENSION);

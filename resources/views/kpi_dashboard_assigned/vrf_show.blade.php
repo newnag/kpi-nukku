@@ -146,7 +146,14 @@
                                             @else
                                                 {{-- Word, Excel, PPT → ดาวน์โหลด --}}
                                                 <span id="evidence-link-{{ $evidence->id }}">
-                                                    <a href="{{ route('evidences.download', $evidence->id) }}" download
+                                                    @php
+                                                        $ext = $evidence->type ? ('.' . ltrim($evidence->type, '.')) : '';
+                                                        $downloadName = $evidence->name;
+                                                        if ($ext && !\Illuminate\Support\Str::endsWith(strtolower($downloadName), strtolower($ext))) {
+                                                            $downloadName .= $ext;
+                                                        }
+                                                    @endphp
+                                                    <a href="{{ route('evidences.download', $evidence->id) }}" download="{{ $downloadName }}"
                                                         class="text-blue-600 underline hover:text-blue-800">
                                                         <span
                                                             id="evidence-name-text-{{ $evidence->id }}">{{ $evidence->name }}</span>
