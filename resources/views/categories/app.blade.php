@@ -83,12 +83,12 @@
                                 <div class="categories-actions">
                                     <button class="btn btn-outline"
                                         onclick="openEditModalStandards({{ $item->id }}, '{{ $item->name }}')">
-                                        <i data-lucide="edit-3" style="width:15px;"></i> แก้ไข
+                                        <i class="fa fa-edit"></i> แก้ไข
                                     </button>
 
                                     <button class="btn btn-outline !text-red-500 !border-red-500"
                                         onclick="openDeleteModalStandards({{ $item->id }}, '{{ $item->name }}')">
-                                        <i data-lucide="trash-2" style="width:15px;"></i> ลบ
+                                        <i class="fa fa-trash"></i> ลบ
                                     </button>
                                 </div>
                             </td>
@@ -202,12 +202,12 @@
                                     <div class="categories-actions">
                                         <button class="btn btn-outline"
                                             onclick="openEditModalCat({{ $cat->id }}, '{{ $cat->name }}', '{{ $cat->max_score }}', '{{ $cat->standard_id }}', '{{ $cat->standard->name }}')">
-                                            <i data-lucide="edit-3" style="width:15px;"></i> แก้ไข
+                                            <i class="fa fa-edit"></i> แก้ไข
                                         </button>
 
                                         <button class="btn btn-outline !text-red-500 !border-red-500"
                                             onclick="openDeleteModalCat({{ $cat->id }}, '{{ $cat->name }}', '{{ $cat->max_score }}', '{{ $cat->standard->name }}')">
-                                            <i data-lucide="trash-2" style="width:15px;"></i> ลบ
+                                            <i class="fa fa-trash"></i> ลบ
                                         </button>
                                     </div>
                                 </td>
@@ -243,12 +243,12 @@
                 </div>
             @enderror
 
-            <div class="flex gap-2 justify-end">
-                <button type="button" class="btn btn-secondary" @click="$dispatch('modal:close')">
-                    <i data-lucide="undo-2" class="w-4 h-4 mr-1"></i>กลับ
+            <div class="flex gap-2 justify-between">
+                <button type="button" class="btn btn-outline" @click="$dispatch('modal:close')">
+                    <i class="fa fa-undo"></i>กลับ
                 </button>
                 <button type="submit" class="btn btn-primary">
-                    <i data-lucide="save" class="w-4 h-4 mr-1"></i>บันทึก
+                    <i class="fa fa-save"></i>บันทึก
                 </button>
             </div>
         </form>
@@ -271,12 +271,12 @@
         <form id="deleteFormStandards" method="POST">
             @csrf
             @method('DELETE')
-            <div class="flex gap-2 justify-end">
-                <button type="button" class="btn btn-secondary" @click="$dispatch('modal:close')">
-                    <i data-lucide="undo-2" class="w-4 h-4 mr-1"></i>กลับ
+            <div class="flex gap-2 justify-between">
+                <button type="button" class="btn btn-outline" @click="$dispatch('modal:close')">
+                    <i class="fa fa-undo"></i>กลับ
                 </button>
                 <button type="submit" class="btn btn-danger">
-                    <i data-lucide="x" class="w-4 h-4 mr-1"></i>ยืนยันการลบ
+                    <i class="fa fa-trash"></i>ยืนยันการลบ
                 </button>
             </div>
         </form>
@@ -339,12 +339,12 @@
                 </div>
             @enderror
 
-            <div class="flex gap-2 justify-end">
-                <button type="button" class="btn btn-secondary" @click="$dispatch('modal:close')">
-                    <i data-lucide="undo-2" class="w-4 h-4 mr-1"></i>กลับ
+            <div class="flex gap-2 justify-between">
+                <button type="button" class="btn btn-outline" @click="$dispatch('modal:close')">
+                    <i class="fa fa-undo"></i>กลับ
                 </button>
                 <button type="submit" class="btn btn-primary">
-                    <i data-lucide="save" class="w-4 h-4 mr-1"></i>บันทึก
+                    <i class="fa fa-save"></i>บันทึก
                 </button>
             </div>
         </form>
@@ -369,12 +369,12 @@
         <form id="deleteFormCategories" method="POST">
             @csrf
             @method('DELETE')
-            <div class="flex gap-2 justify-end">
-                <button type="button" class="btn btn-secondary" @click="$dispatch('modal:close')">
-                    <i data-lucide="undo-2" class="w-4 h-4 mr-1"></i>กลับ
+            <div class="flex gap-2 justify-between">
+                <button type="button" class="btn btn-outline" @click="$dispatch('modal:close')">
+                    <i class="fa fa-undo"></i>กลับ
                 </button>
                 <button type="submit" class="btn btn-danger">
-                    <i data-lucide="x" class="w-4 h-4 mr-1"></i>ยืนยันการลบ
+                    <i class="fa fa-trash"></i>ยืนยันการลบ
                 </button>
             </div>
         </form>
