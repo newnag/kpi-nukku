@@ -443,7 +443,7 @@ $showChecklistSection = $type === 'checklist' || ($type !== 'variable_formula' &
                                 <form method="POST" action="{{ route('notify', ['id' => $indicatorId]) }}">
                                     @csrf
                                     <button type="submit" class="btn btn-primary">
-                                        ส่งแจ้งเตือนผู้รับมอบหมาย
+                                        <i class="fa fa-paper-plane"></i>ส่งแจ้งเตือนผู้รับมอบหมาย
                                     </button>
                                 </form>
                                 {{-- @endif --}}
