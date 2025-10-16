@@ -206,7 +206,7 @@
             display: flex;
             gap: 20px;
             justify-content: center;
-            margin-top: 20px;
+            margin-top: 30px;
         }
 
         .form-group-container {
@@ -237,6 +237,214 @@
             left: 0;
             top: 2px;
             opacity: .25;
+        }
+
+        /* ================ Responsive Design ================ */
+        /* < 640px (Mobile) */
+        @media (max-width: 639px) {
+            .user-containers {
+                border-radius: 8px;
+                margin-bottom: 16px;
+            }
+
+            .header-contatainers {
+                padding: 12px 16px;
+                font-size: 20px;
+                border-top-left-radius: 8px;
+                border-top-right-radius: 8px;
+            }
+
+            .form-group-container {
+                padding: 12px;
+                gap: 12px;
+            }
+
+            .form-row {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .form-group {
+                width: 100%;
+            }
+
+            .card-title {
+                font-size: 16px;
+                margin-bottom: 12px;
+            }
+
+            .form-actions {
+                flex-direction: column;
+                gap: 12px;
+                margin-top: 20px;
+            }
+
+            .form-actions .btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .error-message {
+                font-size: 12px;
+            }
+        }
+
+        /* 640px–767px (Small Tablet) */
+        @media (min-width: 640px) and (max-width: 767px) {
+            .user-containers {
+                border-radius: 8px;
+                margin-bottom: 20px;
+            }
+
+            .header-contatainers {
+                padding: 12px 18px;
+                font-size: 24px;
+                border-top-left-radius: 8px;
+                border-top-right-radius: 8px;
+            }
+
+            .form-group-container {
+                padding: 16px;
+                gap: 16px;
+            }
+
+            .form-row {
+                flex-direction: column;
+                gap: 16px;
+            }
+
+            .form-group {
+                width: 100%;
+            }
+
+            .card-title {
+                font-size: 17px;
+                margin-bottom: 14px;
+            }
+
+            .form-actions {
+                gap: 16px;
+                margin-top: 20px;
+            }
+
+            .form-actions .btn {
+                flex: 1;
+                justify-content: center;
+            }
+
+            .error-message {
+                font-size: 13px;
+            }
+        }
+
+        /* 768px–1023px (Tablet) */
+        @media (min-width: 768px) and (max-width: 1023px) {
+            .user-containers {
+                border-radius: 10px;
+                margin-bottom: 24px;
+            }
+
+            .header-contatainers {
+                padding: 14px 20px;
+                font-size: 26px;
+                border-top-left-radius: 10px;
+                border-top-right-radius: 10px;
+            }
+
+            .form-group-container {
+                padding: 18px;
+                gap: 18px;
+            }
+
+            .form-row {
+                gap: 20px;
+            }
+
+            .card-title {
+                font-size: 17px;
+                margin-bottom: 14px;
+            }
+
+            .form-actions {
+                gap: 18px;
+                margin-top: 25px;
+            }
+
+            .error-message {
+                font-size: 13px;
+            }
+        }
+
+        /* 1024px–1279px (Desktop) */
+        @media (min-width: 1024px) and (max-width: 1279px) {
+            .user-containers {
+                border-radius: 10px;
+                margin-bottom: 28px;
+            }
+
+            .header-contatainers {
+                padding: 15px 20px;
+                font-size: 28px;
+            }
+
+            .form-group-container {
+                padding: 20px;
+                gap: 20px;
+            }
+
+            .form-row {
+                gap: 24px;
+            }
+
+            .card-title {
+                font-size: 18px;
+                margin-bottom: 16px;
+            }
+
+            .form-actions {
+                gap: 20px;
+                margin-top: 28px;
+            }
+
+            .error-message {
+                font-size: 14px;
+            }
+        }
+
+        /* 1280px–1535px (Large Desktop) */
+        @media (min-width: 1280px) and (max-width: 1535px) {
+            .user-containers {
+                border-radius: 10px;
+                margin-bottom: 30px;
+            }
+
+            .header-contatainers {
+                padding: 15px 20px;
+                font-size: 30px;
+            }
+
+            .form-group-container {
+                padding: 20px;
+                gap: 20px;
+            }
+
+            .form-row {
+                gap: 30px;
+            }
+
+            .card-title {
+                font-size: 18px;
+                margin-bottom: 16px;
+            }
+
+            .form-actions {
+                gap: 20px;
+                margin-top: 28px;
+            }
+
+            .error-message {
+                font-size: 14px;
+            }
         }
     </style>
 @endpush
