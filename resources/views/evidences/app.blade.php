@@ -65,12 +65,11 @@
                                 d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
                         </svg>
                     </button>
-
                     <div id="filter-dropdown" class="dropdown-menus hidden">
                         <div class="filter-grid">
                             <div class="filter-section">
                                 {{-- Section: ปี --}}
-                                <span class="dropdown-title">ปี</span>
+                                <h3 class="dropdown-title">ปี</h3>
                                 <div class="dropdown-multiselect" id="yearDropdown">
                                     <div class="dropdown-btn" onclick="toggleDropdown('yearDropdown')">
                                         <span id="year-label">เลือกปี</span>
@@ -82,9 +81,9 @@
                                                 placeholder="ค้นหา..." aria-label="ค้นหาปี">
                                             <div class="tools-actions">
                                                 <button type="button" class="tool-btn"
-                                                    data-action="select-all">ทั้งหมด</button>
+                                                    data-action="select-all">เลือกทั้งหมด</button>
                                                 <button type="button" class="tool-btn"
-                                                    data-action="clear-all">ล้าง</button>
+                                                    data-action="clear-all">ล้างทั้งหมด</button>
                                             </div>
                                         </div>
                                         @foreach ($years as $year)
@@ -97,10 +96,9 @@
                                     </div>
                                 </div>
                             </div>
-
                             <div class="filter-section">
                                 {{-- Section: มาตรฐาน --}}
-                                <span class="dropdown-title">มาตรฐาน</span>
+                                <h3 class="dropdown-title">มาตรฐาน</h3>
                                 <div class="dropdown-multiselect" id="standardDropdown">
                                     <div class="dropdown-btn" onclick="toggleDropdown('standardDropdown')">
                                         <span id="standard-label">เลือกมาตรฐาน</span>
@@ -112,9 +110,9 @@
                                                 placeholder="ค้นหา..." aria-label="ค้นหามาตรฐาน">
                                             <div class="tools-actions">
                                                 <button type="button" class="tool-btn"
-                                                    data-action="select-all">ทั้งหมด</button>
+                                                    data-action="select-all">เลือกทั้งหมด</button>
                                                 <button type="button" class="tool-btn"
-                                                    data-action="clear-all">ล้าง</button>
+                                                    data-action="clear-all">ล้างทั้งหมด</button>
                                             </div>
                                         </div>
                                         @foreach ($standards as $std)
@@ -129,7 +127,7 @@
                             </div>
                             <div class="filter-section">
                                 {{-- Section: ด้าน --}}
-                                <span class="dropdown-title">ด้าน</span>
+                                <h3 class="dropdown-title">ด้าน</h3>
                                 <div class="dropdown-multiselect" id="dimensionDropdown">
                                     <div class="dropdown-btn" onclick="toggleDropdown('dimensionDropdown')">
                                         <span id="dimension-label">เลือกด้าน</span>
@@ -141,9 +139,9 @@
                                                 placeholder="ค้นหา..." aria-label="ค้นหาด้าน">
                                             <div class="tools-actions">
                                                 <button type="button" class="tool-btn"
-                                                    data-action="select-all">ทั้งหมด</button>
+                                                    data-action="select-all">เลือกทั้งหมด</button>
                                                 <button type="button" class="tool-btn"
-                                                    data-action="clear-all">ล้าง</button>
+                                                    data-action="clear-all">ล้างทั้งหมด</button>
                                             </div>
                                         </div>
                                         @foreach ($dimensions as $dim)
@@ -156,11 +154,9 @@
                                     </div>
                                 </div>
                             </div>
-
-
                             <div class="filter-section">
                                 {{-- Section: ผู้รับผิดชอบ --}}
-                                <span class="dropdown-title">ผู้รับผิดชอบ</span>
+                                <h3 class="dropdown-title">ผู้รับผิดชอบ</h3>
                                 <div class="dropdown-multiselect" id="collectorDropdown">
                                     <div class="dropdown-btn" onclick="toggleDropdown('collectorDropdown')">
                                         <span id="collector-label">เลือกผู้รับผิดชอบ</span>
@@ -172,9 +168,9 @@
                                                 placeholder="ค้นหา..." aria-label="ค้นหาผู้รับผิดชอบ">
                                             <div class="tools-actions">
                                                 <button type="button" class="tool-btn"
-                                                    data-action="select-all">ทั้งหมด</button>
+                                                    data-action="select-all">เลือกทั้งหมด</button>
                                                 <button type="button" class="tool-btn"
-                                                    data-action="clear-all">ล้าง</button>
+                                                    data-action="clear-all">ล้างทั้งหมด</button>
                                             </div>
                                         </div>
                                         @foreach ($collectors as $collector)
@@ -190,7 +186,7 @@
 
                             <div class="filter-section">
                                 {{-- Section: หน่วยงาน --}}
-                                <span class="dropdown-title">หน่วยงาน</span>
+                                <h3 class="dropdown-title">หน่วยงาน</h3>
                                 <div class="dropdown-multiselect" id="deptDropdown">
                                     <div class="dropdown-btn" onclick="toggleDropdown('deptDropdown')">
                                         <span id="dept-label">เลือกหน่วยงาน</span>
@@ -202,9 +198,9 @@
                                                 placeholder="ค้นหา..." aria-label="ค้นหาหน่วยงาน">
                                             <div class="tools-actions">
                                                 <button type="button" class="tool-btn"
-                                                    data-action="select-all">ทั้งหมด</button>
+                                                    data-action="select-all">เลือกทั้งหมด</button>
                                                 <button type="button" class="tool-btn"
-                                                    data-action="clear-all">ล้าง</button>
+                                                    data-action="clear-all">ล้างทั้งหมด</button>
                                             </div>
                                         </div>
                                         @foreach ($departments as $dept)
@@ -220,7 +216,7 @@
 
                             <div class="filter-section">
                                 {{-- Section: ประเภทไฟล์ --}}
-                                <span class="dropdown-title">ประเภทไฟล์</span>
+                                <h3 class="dropdown-title">ประเภทไฟล์</h3>
                                 <div class="dropdown-multiselect" id="typeDropdown">
                                     <div class="dropdown-btn" onclick="toggleDropdown('typeDropdown')">
                                         <span id="type-label">เลือกประเภทไฟล์</span>
@@ -232,9 +228,9 @@
                                                 placeholder="ค้นหา..." aria-label="ค้นหาประเภทไฟล์">
                                             <div class="tools-actions">
                                                 <button type="button" class="tool-btn"
-                                                    data-action="select-all">ทั้งหมด</button>
+                                                    data-action="select-all">เลือกทั้งหมด</button>
                                                 <button type="button" class="tool-btn"
-                                                    data-action="clear-all">ล้าง</button>
+                                                    data-action="clear-all">ล้างทั้งหมด</button>
                                             </div>
                                         </div>
                                         @foreach ($fileTypes as $type)
@@ -247,11 +243,10 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="filters-actions">
-                                {{-- Buttons --}}
-                                <button id="clear-filters" class="btn px-1.5 py-2.5">ล้างตัวกรอง</button>
-                                <button id="apply-filters" class="btn btn-primary px-1.5 py-2.5">ใช้ตัวกรอง</button>
-                            </div>
+                        </div>
+                        <div class="filters-actions">
+                            <button id="clear-filters" class="btn">ล้างตัวกรอง</button>
+                            <button id="apply-filters" class="btn btn-primary">ใช้ตัวกรอง</button>
                         </div>
                     </div>
                 </div>
@@ -437,25 +432,25 @@
 
                         <td class="text-center w-fit">
                             {{-- <div class="evidence-actions"> --}}
-                                @if ($evidence->type === 'url' && !empty($evidence->path['urls'][0]))
-                                    <button type="button"
-                                        class="inline-flex items-center justify-center gap-1 px-2 py-1.5 sm:px-3 sm:py-2 text-xs sm:text-sm font-medium text-purple-700 bg-purple-100 border border-purple-200 rounded-md hover:bg-purple-200 hover:border-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-1 transition-all duration-200 "
-                                        onclick="window.open('{{ $evidence->path['urls'][0] }}', '_blank')"
-                                        title="เปิดลิงก์ในแท็บใหม่">
-                                        <i data-lucide="external-link" class="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0"></i>
-                                        <span class="hidden sm:inline whitespace-nowrap">เปิดลิงก์</span>
-                                        <span class="inline sm:hidden">เปิด</span>
-                                    </button>
-                                @else
-                                    <button type="button"
-                                        class="inline-flex items-center justify-center gap-1 px-2 py-1.5 sm:px-3 sm:py-2 text-xs sm:text-sm font-medium text-blue-700 bg-blue-100 border border-blue-200 rounded-md hover:bg-blue-200 hover:border-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition-all duration-200"
-                                        onclick="window.location.href='{{ route('evidences.download', $evidence->id) }}'"
-                                        title="ดาวน์โหลดไฟล์">
-                                        <i data-lucide="download" class="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0"></i>
-                                        <span class="hidden sm:inline whitespace-nowrap">ดาวน์โหลด</span>
-                                        <span class="inline sm:hidden">โหลด</span>
-                                    </button>
-                                @endif
+                            @if ($evidence->type === 'url' && !empty($evidence->path['urls'][0]))
+                                <button type="button"
+                                    class="inline-flex items-center justify-center gap-1 px-2 py-1.5 sm:px-3 sm:py-2 text-xs sm:text-sm font-medium text-purple-700 bg-purple-100 border border-purple-200 rounded-md hover:bg-purple-200 hover:border-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-1 transition-all duration-200 "
+                                    onclick="window.open('{{ $evidence->path['urls'][0] }}', '_blank')"
+                                    title="เปิดลิงก์ในแท็บใหม่">
+                                    <i data-lucide="external-link" class="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0"></i>
+                                    <span class="hidden sm:inline whitespace-nowrap">เปิดลิงก์</span>
+                                    <span class="inline sm:hidden">เปิด</span>
+                                </button>
+                            @else
+                                <button type="button"
+                                    class="inline-flex items-center justify-center gap-1 px-2 py-1.5 sm:px-3 sm:py-2 text-xs sm:text-sm font-medium text-blue-700 bg-blue-100 border border-blue-200 rounded-md hover:bg-blue-200 hover:border-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition-all duration-200"
+                                    onclick="window.location.href='{{ route('evidences.download', $evidence->id) }}'"
+                                    title="ดาวน์โหลดไฟล์">
+                                    <i data-lucide="download" class="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0"></i>
+                                    <span class="hidden sm:inline whitespace-nowrap">ดาวน์โหลด</span>
+                                    <span class="inline sm:hidden">โหลด</span>
+                                </button>
+                            @endif
                             {{-- </div> --}}
                         </td>
 
@@ -760,13 +755,13 @@
 
         /* Override DataTables default alignment */
         /* #evidenceTable thead th {
-            text-align: center !important;
-        } */
+                        text-align: center !important;
+                    } */
 
         /* Keep filename column left-aligned */
         /* #evidenceTable thead th:nth-child(2) {
-            text-align: left !important;
-        } */
+                        text-align: left !important;
+                    } */
 
         .dataTables_wrapper .dataTables_info {
             color: #4b5563;
@@ -927,6 +922,7 @@
             grid-template-columns: 1fr 1fr;
             gap: 12px;
             height: 310px;
+            overflow-y: auto;
         }
 
         .filter-section {
@@ -1049,13 +1045,13 @@
 
         /* ================ Action Buttons ================ */
         /* .evidence-actions {
-            display: flex;
-            gap: 6px;
-            flex-wrap: wrap;
-            justify-content: center;
-            align-items: center;
+                        display: flex;
+                        gap: 6px;
+                        flex-wrap: wrap;
+                        justify-content: center;
+                        align-items: center;
 
-        } */
+                    } */
 
         .btn-download,
         .btn-link,
@@ -1221,7 +1217,6 @@
 
             .filter-grid {
                 grid-template-columns: 1fr;
-                height: 310px;
                 overflow-y: auto;
             }
 
@@ -1306,10 +1301,6 @@
             .btns {
                 font-size: 12px;
             }
-
-            .filters-actions {
-                font-size: 13px;
-            }
         }
 
         /* 768px–1023px */
@@ -1334,7 +1325,6 @@
 
             .filter-grid {
                 grid-template-columns: 1fr;
-                height: 310px;
                 overflow-y: auto;
             }
 
