@@ -53,6 +53,11 @@ services:
       - "5432:5432"
     volumes:
       - dbdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
 
   redis:
     image: redis:7-alpine
@@ -83,23 +88,9 @@ services:
       DB_PASSWORD: ${DB_PASSWORD:-password}
       REDIS_HOST: ${REDIS_HOST:-redis}
     depends_on:
-      - db
-    command: >
-      sh -lc "
-      composer install --no-interaction --prefer-dist --optimize-autoloader &&
-      php artisan key:generate --force || true &&
-      # Ensure storage symlink and write perms for uploads
-      php artisan storage:link || true &&
-      chown -R www-data:www-data storage bootstrap/cache public/storage || true &&
-      chmod -R ug+rwX storage bootstrap/cache public/storage || true &&
-      # Run DB migrations and seeds
-      php artisan migrate --force &&
-      php artisan db:seed --force &&
-      # Ensure Dompdf fonts available
-      php artisan fonts:copy || true &&
-      # Cache config/routes/views
-      php artisan config:cache && php artisan route:cache && php artisan view:cache
-      "
+      db:
+        condition: service_healthy
+    command: ["sh","-lc","./docker/setup.sh"]
     restart: "no"
 
   # One-off service to build frontend assets with Vite
