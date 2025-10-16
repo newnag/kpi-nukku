@@ -15,7 +15,7 @@
                     <input type="text" name="name" class="form-input" required>
                 </div>
                 <button type="submit" class="btn btn-primary">
-                    <i data-lucide="save" class="btn-icon"></i> บันทึก
+                    <i class="fa fa-save"></i> บันทึก
                 </button>
             </form>
         </x-card>
@@ -121,7 +121,7 @@
                 </div>
 
                 <button type="submit" class="btn btn-primary">
-                    <i data-lucide="save"></i> บันทึก
+                    <i class="fa fa-save"></i> บันทึก
                 </button>
             </form>
         </x-card>
@@ -245,7 +245,7 @@
 
             <div class="flex gap-2 justify-between">
                 <button type="button" class="btn btn-outline" @click="$dispatch('modal:close')">
-                    <i class="fa fa-undo"></i>กลับ
+                    <i class="fa fa-undo"></i>ยกเลิก
                 </button>
                 <button type="submit" class="btn btn-primary">
                     <i class="fa fa-save"></i>บันทึก
@@ -273,7 +273,7 @@
             @method('DELETE')
             <div class="flex gap-2 justify-between">
                 <button type="button" class="btn btn-outline" @click="$dispatch('modal:close')">
-                    <i class="fa fa-undo"></i>กลับ
+                    <i class="fa fa-undo"></i>ยกเลิก
                 </button>
                 <button type="submit" class="btn btn-danger">
                     <i class="fa fa-trash"></i>ยืนยันการลบ
@@ -341,7 +341,7 @@
 
             <div class="flex gap-2 justify-between">
                 <button type="button" class="btn btn-outline" @click="$dispatch('modal:close')">
-                    <i class="fa fa-undo"></i>กลับ
+                    <i class="fa fa-undo"></i>ยกเลิก
                 </button>
                 <button type="submit" class="btn btn-primary">
                     <i class="fa fa-save"></i>บันทึก
@@ -371,7 +371,7 @@
             @method('DELETE')
             <div class="flex gap-2 justify-between">
                 <button type="button" class="btn btn-outline" @click="$dispatch('modal:close')">
-                    <i class="fa fa-undo"></i>กลับ
+                    <i class="fa fa-undo"></i>ยกเลิก
                 </button>
                 <button type="submit" class="btn btn-danger">
                     <i class="fa fa-trash"></i>ยืนยันการลบ
