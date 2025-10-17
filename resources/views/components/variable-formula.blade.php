@@ -58,6 +58,10 @@
     newLabel: '',
     newType: 'defined',
     newValue: '',
+    
+    // Validation errors
+    labelError: '',
+    outputError: '',
 
     get hasOutputVariable() {
         return this.vars.some(v => v.type === 'output');
@@ -71,13 +75,18 @@
     },
 
     add() {
+        // Reset errors
+        this.labelError = '';
+        this.outputError = '';
+        
         const label = (this.newLabel || '').trim();
         if (!label) { 
-            alert('กรุณากรอกป้ายชื่อ (label_name)'); 
+            this.labelError = 'กรุณากรอกป้ายชื่อ (label_name)';
+            this.$nextTick(() => this.$refs.newLabel?.focus());
             return; 
         }
         if (this.newType === 'output' && this.hasOutputVariable) {
-            alert('สามารถมีตัวแปรประเภท Output ได้เพียง 1 ตัวเท่านั้น');
+            this.outputError = 'สามารถมีตัวแปรประเภท Output ได้เพียง 1 ตัวเท่านั้น';
             return;
         }
 
@@ -150,8 +159,12 @@
         const form = this.$el.closest('form');
         if (!form) return;
         form.addEventListener('submit', (e) => {
-            if (this.unknownVars.length) { e.preventDefault();
-                alert('พบตัวแปรที่ยังไม่ได้ประกาศ: ' + this.unknownVars.join(', ')); }
+            if (this.unknownVars.length) { 
+                e.preventDefault();
+                // Scroll to condition textarea
+                this.$refs.condition?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                this.$refs.condition?.focus();
+            }
         });
     }
 }" x-init="initSubmitGuard();
@@ -159,23 +172,62 @@ initializeVariableNames();" class="space-y-5">
 
     {{-- ROW: Add Variable (mobile-first, stacks; spreads at md+) --}}
     <div class="grid grid-cols-1 gap-3 md:grid-cols-[1fr,minmax(200px,380px),auto] md:items-center">
-        <label class="block text-slate-800 font-medium">สร้างตัวแปร</label>
+        <p class="block text-slate-800 font-medium">สร้างตัวแปร</p>
 
         <div class="flex flex-col gap-2 min-w-0">
-            <input x-ref="newLabel" x-model="newLabel" type="text" placeholder="ป้ายชื่อ (เช่น statA, input1)"
-                class="p-2 w-full bg-white rounded-xl border border-slate-300 placeholder-slate-400 text-sm md:text-base hover:border-blue-400 transition" />
+            <div class="flex flex-col gap-1">
+                <input x-ref="newLabel" 
+                    x-model="newLabel" 
+                    type="text" 
+                    id="variable_new_label"
+                    name="variable_new_label"
+                    placeholder="ป้ายชื่อ (เช่น statA, input1)"
+                    autocomplete="off"
+                    :class="labelError ? 'border-red-500 focus:border-red-500 focus:ring-red-200' : 'border-slate-300 hover:border-blue-400'"
+                    class="p-2 w-full bg-white rounded-xl border placeholder-slate-400 text-sm md:text-base transition"
+                    @input="labelError = ''" />
+                <div x-show="labelError" 
+                    x-transition
+                    class="text-red-600 text-xs mt-1 flex items-center gap-1">
+                    <svg class="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                    </svg>
+                    <span x-text="labelError"></span>
+                </div>
+            </div>
 
             {{-- Type + (Value when defined) — inline on md+, stacked on mobile --}}
             <div class="flex flex-col sm:flex-row gap-2">
-                <select x-model="newType"
-                    class="p-2 w-full sm:w-48 bg-white rounded-xl border border-slate-300 text-sm md:text-base hover:border-blue-400 transition">
-                    <option value="defined">Defined</option>
-                    <option value="output" x-show="!hasOutputVariable || newType === 'output'">Output</option>
-                    <option value="input">Input</option>
-                </select>
+                <div class="flex flex-col gap-1 w-full sm:w-48">
+                    <select x-model="newType"
+                        id="variable_new_type"
+                        name="variable_new_type"
+                        autocomplete="off"
+                        :class="outputError ? 'border-red-500 focus:border-red-500 focus:ring-red-200' : 'border-slate-300 hover:border-blue-400'"
+                        class="p-2 w-full bg-white rounded-xl border text-sm md:text-base transition"
+                        @change="outputError = ''">
+                        <option value="defined">Defined</option>
+                        <option value="output" x-show="!hasOutputVariable || newType === 'output'">Output</option>
+                        <option value="input">Input</option>
+                    </select>
+                    <div x-show="outputError" 
+                        x-transition
+                        class="text-red-600 text-xs mt-1 flex items-center gap-1">
+                        <svg class="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                        </svg>
+                        <span x-text="outputError"></span>
+                    </div>
+                </div>
 
                 <template x-if="newType === 'defined'">
-                    <input x-model="newValue" type="number" inputmode="decimal" placeholder="ค่า"
+                    <input x-model="newValue" 
+                        type="number" 
+                        inputmode="decimal" 
+                        id="variable_new_value"
+                        name="variable_new_value"
+                        placeholder="ค่า"
+                        autocomplete="off"
                         class="p-2 w-full bg-white rounded-xl border border-slate-300 text-sm md:text-base hover:border-blue-400 transition">
                 </template>
             </div>
@@ -187,58 +239,175 @@ initializeVariableNames();" class="space-y-5">
         </button>
     </div>
 
-    {{-- LIST: Variables (each row wraps gracefully) --}}
+    {{-- LIST: Variables (consistent layout with defined widths) --}}
     <template x-for="(v, i) in vars" :key="v.id">
-        <div
-            class="flex flex-col md:flex-row md:items-center gap-3 bg-white rounded-2xl border border-slate-200 px-4 py-3">
-            <div class="flex flex-col gap-1 flex-1 min-w-0">
-                <div class="text-xs text-slate-500">Variable Name (Auto-generated)</div>
-                <div class="text-blue-700 font-medium text-sm md:text-base truncate" x-text="v.variable_name"></div>
+        <div class="bg-white rounded-2xl border border-slate-200 p-4">
+            {{-- Mobile: Stack vertically --}}
+            <div class="flex flex-col gap-3 md:hidden">
+                <div class="flex flex-col gap-1">
+                    <div class="text-xs font-medium text-slate-500">Variable Name (Auto-generated)</div>
+                    <div class="text-blue-700 font-semibold text-sm px-3 py-2 bg-blue-50 rounded-lg" x-text="v.variable_name"></div>
+                </div>
+
+                <div class="flex flex-col gap-1">
+                    <label :for="`${prefix}_var_${i}_label`" class="text-xs font-medium text-slate-700">Label Name</label>
+                    <input x-model="v.label_name"
+                        :id="`${prefix}_var_${i}_label`"
+                        :name="`${prefix}_var_${i}_label_display`"
+                        autocomplete="off"
+                        class="w-full rounded-lg border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 text-slate-700 text-sm p-2"
+                        placeholder="ป้ายชื่อ" />
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <div class="flex-1">
+                        <div class="text-xs font-medium text-slate-500 mb-1">Type</div>
+                        <div class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium"
+                            :class="{
+                                'bg-purple-100 text-purple-700': v.type === 'defined',
+                                'bg-blue-100 text-blue-700': v.type === 'input',
+                                'bg-green-100 text-green-700': v.type === 'output'
+                            }"
+                            x-text="v.type === 'defined' ? 'Defined' : (v.type === 'input' ? 'Input' : 'Output')">
+                        </div>
+                    </div>
+
+                    <div class="flex-1" x-show="v.type === 'defined'">
+                        <label :for="`${prefix}_var_${i}_value`" class="text-xs font-medium text-slate-700 block mb-1">Value</label>
+                        <input x-model.number="v.value" 
+                            type="number" 
+                            inputmode="decimal"
+                            :id="`${prefix}_var_${i}_value`"
+                            :name="`${prefix}_var_${i}_value_display`"
+                            autocomplete="off"
+                            class="w-full rounded-lg border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 text-sm p-2" />
+                    </div>
+
+                    <button type="button" @click="remove(i)" 
+                        class="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition"
+                        aria-label="ลบตัวแปร" title="ลบตัวแปร">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="text-xs text-slate-400" x-show="v.type === 'input'">
+                    ℹ️ ค่านี้จะถูกกรอกโดยผู้ใช้
+                </div>
+                <div class="text-xs text-slate-400" x-show="v.type === 'output'">
+                    ℹ️ ค่านี้จะถูกคำนวณจากสูตร
+                </div>
             </div>
 
-            <div class="flex flex-col gap-1 flex-1 min-w-0">
-                <div class="text-xs text-slate-500">Label Name</div>
-                <input x-model="v.label_name"
-                    class="bg-white rounded-lg border border-slate-200 focus:border-blue-500 focus:ring-blue-500 text-slate-700 text-sm md:text-base p-2"
-                    placeholder="label_name" />
-            </div>
+            {{-- Desktop: Grid layout with consistent columns --}}
+            <div class="hidden md:grid md:grid-cols-[180px_1fr_100px_140px_40px] md:gap-4 md:items-center">
+                {{-- Variable Name --}}
+                <div class="flex flex-col gap-1">
+                    <div class="text-xs font-medium text-slate-500">Variable Name</div>
+                    <div class="text-blue-700 font-semibold text-sm px-3 py-2 bg-blue-50 rounded-lg truncate" 
+                        x-text="v.variable_name" 
+                        :title="v.variable_name"></div>
+                </div>
 
-            <span class="md:w-28 text-sm text-slate-600 md:text-left">
-                <span x-text="v.type === 'defined' ? 'defined' : (v.type === 'input' ? 'input' : 'output')"></span>
-            </span>
+                {{-- Label Name --}}
+                <div class="flex flex-col gap-1">
+                    <label :for="`${prefix}_var_${i}_label`" class="text-xs font-medium text-slate-700">Label Name</label>
+                    <input x-model="v.label_name"
+                        :id="`${prefix}_var_${i}_label`"
+                        :name="`${prefix}_var_${i}_label_display`"
+                        autocomplete="off"
+                        class="w-full rounded-lg border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 text-slate-700 text-sm p-2"
+                        placeholder="ป้ายชื่อ" />
+                </div>
 
-            <div class="flex items-center gap-2">
-                <template x-if="v.type === 'defined'">
-                    <input x-model.number="v.value" type="number" inputmode="decimal"
-                        class="w-28 rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500 text-sm md:text-base" />
-                </template>
-                <template x-if="v.type === 'input'">
-                    <span class="text-slate-500 text-sm">ผู้ใช้กรอก</span>
-                </template>
-                <template x-if="v.type === 'output'">
-                    <span class="text-slate-500 text-sm">คำนวณจากสูตร</span>
-                </template>
+                {{-- Type Badge --}}
+                <div class="flex flex-col gap-1">
+                    <div class="text-xs font-medium text-slate-500">Type</div>
+                    <div class="inline-flex items-center justify-center px-3 py-1.5 rounded-full text-xs font-medium"
+                        :class="{
+                            'bg-purple-100 text-purple-700': v.type === 'defined',
+                            'bg-blue-100 text-blue-700': v.type === 'input',
+                            'bg-green-100 text-green-700': v.type === 'output'
+                        }"
+                        x-text="v.type === 'defined' ? 'Defined' : (v.type === 'input' ? 'Input' : 'Output')">
+                    </div>
+                </div>
 
-                <button type="button" @click="remove(i)" class="text-slate-500 hover:text-red-600 text-sm md:text-base"
-                    aria-label="ลบตัวแปร" title="ลบตัวแปร">✕</button>
+                {{-- Value / Info --}}
+                <div class="flex flex-col gap-1">
+                    <div x-show="v.type === 'defined'" class="flex flex-col gap-1">
+                        <label :for="`${prefix}_var_${i}_value`" class="text-xs font-medium text-slate-700">Value</label>
+                        <input x-model.number="v.value" 
+                            type="number" 
+                            inputmode="decimal"
+                            :id="`${prefix}_var_${i}_value`"
+                            :name="`${prefix}_var_${i}_value_display`"
+                            autocomplete="off"
+                            class="w-full rounded-lg border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 text-sm p-2" />
+                    </div>
+                    <div x-show="v.type === 'input'" class="flex flex-col gap-1">
+                        <div class="text-xs font-medium text-slate-500">Value</div>
+                        <div class="text-slate-400 text-xs px-3 py-2 bg-slate-50 rounded-lg">ผู้ใช้กรอก</div>
+                    </div>
+                    <div x-show="v.type === 'output'" class="flex flex-col gap-1">
+                        <div class="text-xs font-medium text-slate-500">Value</div>
+                        <div class="text-slate-400 text-xs px-3 py-2 bg-slate-50 rounded-lg">คำนวณจากสูตร</div>
+                    </div>
+                </div>
+
+                {{-- Delete Button --}}
+                <div class="flex items-center justify-center">
+                    <button type="button" @click="remove(i)" 
+                        class="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition"
+                        aria-label="ลบตัวแปร" title="ลบตัวแปร">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
             </div>
 
             {{-- Hidden fields for POST --}}
-            <input type="hidden" :name="`${prefix}[variables][${i}][variable_name]`" :value="v.variable_name">
-            <input type="hidden" :name="`${prefix}[variables][${i}][label_name]`" :value="v.label_name">
-            <input type="hidden" :name="`${prefix}[variables][${i}][type]`" :value="v.type">
-            <input type="hidden" :name="`${prefix}[variables][${i}][value]`" :value="v.value ?? ''">
-            <template x-if="v.dbId">
-                <input type="hidden" :name="`${prefix}[variables][${i}][id]`" :value="v.dbId">
-            </template>
+            <input type="hidden" 
+                :id="`${prefix}_variables_${i}_variable_name`"
+                :name="`${prefix}[variables][${i}][variable_name]`" 
+                :value="v.variable_name"
+                autocomplete="off">
+            <input type="hidden" 
+                :id="`${prefix}_variables_${i}_label_name`"
+                :name="`${prefix}[variables][${i}][label_name]`" 
+                :value="v.label_name"
+                autocomplete="off">
+            <input type="hidden" 
+                :id="`${prefix}_variables_${i}_type`"
+                :name="`${prefix}[variables][${i}][type]`" 
+                :value="v.type"
+                autocomplete="off">
+            <input type="hidden" 
+                :id="`${prefix}_variables_${i}_value`"
+                :name="`${prefix}[variables][${i}][value]`" 
+                :value="v.value ?? ''"
+                autocomplete="off">
+            <input type="hidden" 
+                x-show="v.dbId"
+                :id="`${prefix}_variables_${i}_id`"
+                :name="`${prefix}[variables][${i}][id]`" 
+                :value="v.dbId"
+                autocomplete="off">
         </div>
     </template>
 
     {{-- CONDITION: Editor + helpers --}}
     <div class="space-y-3">
-        <label class="block text-slate-800 font-medium">สร้างเงื่อนไขการคำนวณ</label>
+        <label for="{{ $prefix }}_condition" class="block text-slate-800 font-medium">สร้างเงื่อนไขการคำนวณ</label>
 
-        <textarea x-ref="condition" x-model="condition" rows="5"
+        <textarea x-ref="condition" 
+            x-model="condition" 
+            rows="5"
+            id="{{ $prefix }}_condition"
+            name="{{ $prefix }}_condition_display"
+            autocomplete="off"
             class="w-full bg-white rounded-2xl border border-blue-200 focus:border-blue-500 focus:ring-blue-500 p-3 text-sm md:text-base"
             placeholder="ตัวอย่าง: defined_1 * input_1"></textarea>
 
@@ -287,10 +456,18 @@ initializeVariableNames();" class="space-y-5">
         </div>
 
         {{-- Hidden field for POST --}}
-        <input type="hidden" :name="`${prefix}[condition]`" :value="condition">
+        <input type="hidden" 
+            id="{{ $prefix }}_condition_hidden"
+            :name="`${prefix}[condition]`" 
+            :value="condition"
+            autocomplete="off">
 
         @if ($formulaId)
-            <input type="hidden" name="{{ $prefix }}[formula_id]" value="{{ $formulaId }}">
+            <input type="hidden" 
+                id="{{ $prefix }}_formula_id"
+                name="{{ $prefix }}[formula_id]" 
+                value="{{ $formulaId }}"
+                autocomplete="off">
         @endif
     </div>
 </div>
