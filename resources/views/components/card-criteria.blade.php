@@ -22,21 +22,34 @@
         @endif
     </div>
 
-    <input type="hidden" :name="(prefix || '{{ $prefix }}') + '[sequence]'"
-        :value="sequence ?? {{ $index }}">
+    <input type="hidden" 
+        :id="(prefix || '{{ $prefix }}') + '_sequence'"
+        :name="(prefix || '{{ $prefix }}') + '[sequence]'"
+        :value="sequence ?? {{ $index }}"
+        autocomplete="off">
     
     <!-- Hidden input for existing criteria ID -->
     <template x-if="criteriaData?.id">
-        <input type="hidden" :name="(prefix || '{{ $prefix }}') + '[id]'" :value="criteriaData.id">
+        <input type="hidden" 
+            :id="(prefix || '{{ $prefix }}') + '_id'"
+            :name="(prefix || '{{ $prefix }}') + '[id]'" 
+            :value="criteriaData.id"
+            autocomplete="off">
     </template>
 
     <div class="space-y-4">
         <div>
-            <label class="block text-sm font-medium text-slate-700 mb-1">ชื่อเกณฑ์ <span
-                    class="text-red-500">*</span></label>
-            <input type="text" data-criteria-name :name="(prefix || '{{ $prefix }}') + '[name]'" 
-                :value="criteriaData?.name || ''" required
+            <label :for="(prefix || '{{ $prefix }}') + '_name'" class="block text-sm font-medium text-slate-700 mb-1">
+                ชื่อเกณฑ์ <span class="text-red-500">*</span>
+            </label>
+            <input type="text" 
+                data-criteria-name 
+                :id="(prefix || '{{ $prefix }}') + '_name'"
+                :name="(prefix || '{{ $prefix }}') + '[name]'" 
+                :value="criteriaData?.name || ''" 
+                required
                 placeholder="กรุณากรอกชื่อเกณฑ์"
+                autocomplete="off"
                 class="p-2 mt-1 w-full rounded-xl border border-slate-300 
         placeholder-slate-400 text-sm md:text-base 
         hover:shadow-md hover:border-blue-400 transition
@@ -45,9 +58,14 @@
         </div>
 
         <div>
-            <label class="block text-sm font-medium text-slate-700 mb-1">รายละเอียด</label>
-            <textarea rows="3" :name="(prefix || '{{ $prefix }}') + '[description]'"
+            <label :for="(prefix || '{{ $prefix }}') + '_description'" class="block text-sm font-medium text-slate-700 mb-1">
+                รายละเอียด
+            </label>
+            <textarea rows="3" 
+                :id="(prefix || '{{ $prefix }}') + '_description'"
+                :name="(prefix || '{{ $prefix }}') + '[description]'"
                 placeholder="กรุณากรอกรายละเอียด เช่น แสดงรายชื่ออาจารย์"
+                autocomplete="off"
                 class="p-2 mt-1 w-full rounded-xl border border-slate-300 
         placeholder-slate-400 text-sm md:text-base 
         hover:shadow-md hover:border-blue-400 transition
