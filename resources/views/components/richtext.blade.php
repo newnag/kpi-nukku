@@ -206,22 +206,32 @@
 
 <div x-data="{ html: @js(old($name, $value)), showPreview: false }" class="block">
     @if ($label)
-        <span class="text-sm font-medium text-slate-700 mb-1 block">{{ $label }}</span>
+        <label for="{{ $inputId }}" class="text-sm font-medium text-slate-700 mb-1 block">{{ $label }}</label>
     @endif
 
     <input id="{{ $inputId }}" type="hidden" name="{{ $name }}" x-model="html"
-        value="{{ old($name, $value) }}">
+        value="{{ old($name, $value) }}" autocomplete="off">
 
     <div id="{{ $editorId }}"
-        class="rounded-b-2xl w-full h-full border border-slate-200 bg-white shadow-sm overflow-hidden"
+        @class([
+            'rounded-b-2xl w-full h-full border bg-white shadow-sm overflow-hidden',
+            'border-red-500' => $errors->has($name),
+            'border-slate-200' => !$errors->has($name),
+        ])
         style="--rte-min-h: {{ (int) $height }}px"></div>
+    
+    <x-input-error :name="$name" />
 
     @if ($preview)
         <div class="mt-3" x-data="{ placeholder: 'พิมพ์เพื่อดูตัวอย่าง…' }">
             <div class="flex items-center justify-between mb-1">
                 <span class="text-sm font-medium text-slate-700">ตัวอย่าง (Preview)</span>
                 <label class="text-xs text-slate-600 flex items-center gap-2">
-                    <input type="checkbox" x-model="showPreview" class="rounded border-slate-300">
+                    <input type="checkbox" x-model="showPreview" 
+                        id="{{ $name }}_preview_toggle" 
+                        name="{{ $name }}_preview_toggle" 
+                        class="rounded border-slate-300" 
+                        autocomplete="off">
                     แสดงตัวอย่าง
                 </label>
             </div>
