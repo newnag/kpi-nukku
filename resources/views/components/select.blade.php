@@ -107,9 +107,11 @@
         <button x-ref="btn" type="button" @click="open = !open; $nextTick(() => searchable && $refs.search?.focus())"
             @keydown.arrow-down.prevent="open=true; move(1)" @keydown.arrow-up.prevent="open=true; move(-1)"
             @keydown.enter.prevent="submitKey($event)"
-            class="p-2 mt-1 w-full rounded-xl border border-slate-300 text-left
-             hover:shadow-md hover:border-blue-400 transition
-             focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-500"
+            @class([
+                'p-2 mt-1 w-full rounded-xl border text-left transition',
+                'border-red-500 focus:border-red-500 focus:ring-red-200' => $errors->has($name),
+                'border-slate-300 hover:shadow-md hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-500' => !$errors->has($name),
+            ])
             {{ $attributes }}>
             <span x-text="selected ? selected.label : '{{ $placeholder }}'"
                 :class="selected ? '' : 'text-slate-400'"></span>
@@ -122,6 +124,7 @@
                 </svg>
             </span>
         </button>
+        <x-input-error :name="$name" />
     </label>
 
     <!-- แผงดรอปดาวน์ -->
@@ -130,8 +133,15 @@
         <!-- กล่องค้นหา (โชว์เฉพาะเมื่อ searchable=true) -->
         @if ($searchable)
             <div class="p-2 border-b border-slate-200">
-                <input x-ref="search" x-model="q" @keydown.arrow-down.prevent="move(1)"
-                    @keydown.arrow-up.prevent="move(-1)" @keydown.enter.prevent="submitKey($event)" type="text"
+                <input x-ref="search" 
+                    id="{{ $name }}_search" 
+                    name="{{ $name }}_search"
+                    x-model="q" 
+                    @keydown.arrow-down.prevent="move(1)"
+                    @keydown.arrow-up.prevent="move(-1)" 
+                    @keydown.enter.prevent="submitKey($event)" 
+                    type="text"
+                    autocomplete="off"
                     class="p-2 mt-1 w-full bg-white rounded-xl border border-slate-300 
                 placeholder-slate-400 text-sm md:text-base 
                 hover:shadow-md hover:border-blue-400 transition
@@ -163,5 +173,5 @@
     </div>
 
     <!-- ค่าที่ส่งไปกับฟอร์ม (note: browser ไม่ validate hidden; เราเช็กด้วย Alpine แทน) -->
-    <input type="hidden" name="{{ $name }}" :value="value">
+    <input type="hidden" id="{{ $name }}" name="{{ $name }}" :value="value" autocomplete="off">
 </div>
