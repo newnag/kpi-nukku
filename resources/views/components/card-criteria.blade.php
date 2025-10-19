@@ -46,7 +46,8 @@
                 data-criteria-name 
                 :id="(prefix || '{{ $prefix }}') + '_name'"
                 :name="(prefix || '{{ $prefix }}') + '[name]'" 
-                :value="criteriaData?.name || ''" 
+                x-model="criteriaData.name"
+                x-init="if (!criteriaData) criteriaData = { name: '', description: '' }"
                 required
                 placeholder="กรุณากรอกชื่อเกณฑ์"
                 autocomplete="off"
@@ -64,14 +65,14 @@
             <textarea rows="3" 
                 :id="(prefix || '{{ $prefix }}') + '_description'"
                 :name="(prefix || '{{ $prefix }}') + '[description]'"
+                x-model="criteriaData.description"
                 placeholder="กรุณากรอกรายละเอียด เช่น แสดงรายชื่ออาจารย์"
                 autocomplete="off"
                 class="p-2 mt-1 w-full rounded-xl border border-slate-300 
         placeholder-slate-400 text-sm md:text-base 
         hover:shadow-md hover:border-blue-400 transition
                 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-500"
-                @input.debounce.200ms="$dispatch('criteria-description-change', { idx: (sequence ?? {{ $index }}) - 1, description: $event.target.value })"
-                x-text="criteriaData?.description || ''"></textarea>
+                @input.debounce.200ms="$dispatch('criteria-description-change', { idx: (sequence ?? {{ $index }}) - 1, description: $event.target.value })"></textarea>
         </div>
     </div>
 

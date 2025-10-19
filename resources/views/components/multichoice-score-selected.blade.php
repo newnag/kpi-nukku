@@ -6,15 +6,19 @@
     x-data="{
         labels: @js(array_values($options)),
         selected: checklistData?.required_items || [],
-        score: checklistData?.score || '',
-        getAllList() {
-            return Array.from({ length: this.labels.length }, (_, i) => i + 1);
+        score: checklistData?.score || ''
+    }" 
+    x-init="
+        labels = (window.__criteriaTitles && window.__criteriaTitles.length) ? window.__criteriaTitles.slice() : labels;
+        if (checklistData) {
+            selected = Array.isArray(checklistData.required_items) ? checklistData.required_items : [];
+            score = checklistData.score || '';
         }
-    }" x-init="labels = (window.__criteriaTitles && window.__criteriaTitles.length) ? window.__criteriaTitles.slice() : labels"
+    "
     @criteria-updated.window="
-  labels = ($event.detail?.name ?? []);
-  selected = selected.filter(v => v <= labels.length);
-">
+        labels = ($event.detail?.name ?? []);
+        selected = selected.filter(v => v <= labels.length);
+    ">
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3 md:mb-4">
         <h3 class="text-base md:text-lg font-semibold text-slate-900">
             เกณฑ์ที่ <span x-text="sequence ?? {{ $index }}">{{ $index }}</span>
@@ -45,7 +49,7 @@
             <div class="flex items-center gap-2">
                 <button type="button"
                     class="px-3 py-1 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs"
-                    @click="selected = getAllList()">เลือกทั้งหมด</button>
+                    @click="selected = Array.from({ length: labels.length }, (_, i) => i + 1)">เลือกทั้งหมด</button>
                 <button type="button"
                     class="px-3 py-1 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs"
                     @click="selected = []">ล้างทั้งหมด</button>
@@ -86,9 +90,12 @@
                 class="block text-sm font-medium text-slate-700">
                 คะแนน <span class="text-red-500">*</span>
             </label>
-            <input type="number" step="1" required :id="(prefix || '{{ $prefix }}') + '_score'"
-                :name="(prefix || '{{ $prefix }}') + '[score]'" x-model="score"
-                placeholder="กรุณากรอกคะแนนเป็นตัวเลข เช่น 0" autocomplete="off"
+            <input type="number" step="1" required 
+                :id="(prefix || '{{ $prefix }}') + '_score'"
+                :name="(prefix || '{{ $prefix }}') + '[score]'" 
+                x-model="score"
+                placeholder="กรุณากรอกคะแนนเป็นตัวเลข เช่น 0" 
+                autocomplete="off"
                 class="w-full rounded-xl border bg-white py-1 px-3 border-slate-300 focus:border-blue-500 focus:ring-blue-500 sm:text-sm md:text-base">
         </div>
     </div>

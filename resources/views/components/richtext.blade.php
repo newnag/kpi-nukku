@@ -22,7 +22,7 @@
                 border: 1px solid #e5e7eb;
                 /* slate-200 */
                 box-shadow: 0 1px 2px rgba(0, 0, 0, .04);
-                overflow: hidden;
+                /* overflow: hidden; */
                 background: #fff;
             }
 
@@ -32,7 +32,10 @@
                 flex-wrap: wrap;
                 gap: .25rem .375rem;
                 padding: .375rem .5rem;
-                background: #fff;
+                /* background: #fff; */
+                border-top-left-radius: 1rem;
+                border-top-right-radius: 1rem;
+
             }
 
             .trumbowyg-box .trumbowyg-button-pane::before,
@@ -95,9 +98,7 @@
             .trumbowyg-box .trumbowyg-editor {
                 padding: .75rem;
                 font-size: .9375rem;
-                min-height: var(--rte-min-h, 260px);
                 position: relative;
-                /* anchor for placeholder */
             }
 
             /* Lists (เหมือนในหน้า create) */
@@ -218,7 +219,7 @@
             'border-red-500' => $errors->has($name),
             'border-slate-200' => !$errors->has($name),
         ])
-        style="--rte-min-h: {{ (int) $height }}px"></div>
+        ></div>
     
     <x-input-error :name="$name" />
 
