@@ -1771,7 +1771,16 @@ array (
             return !isset($r['indicator_id']) || !in_array($r['indicator_id'], [57, 58]);
         }));
         \DB::table('criterias')->insert($rows);
-        
-        
+
+        $sequence = \DB::selectOne("SELECT pg_get_serial_sequence(?, 'id') AS seq", ['criterias']);
+        if ($sequence && !empty($sequence->seq)) {
+            $maxId = \DB::table('criterias')->max('id');
+            $value = $maxId ?? 0;
+            $isCalled = $maxId !== null;
+
+            \DB::select("SELECT setval(?, ?, ?)", [$sequence->seq, $value, $isCalled]);
+        }
+
+
     }
 }
