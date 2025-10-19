@@ -64,6 +64,50 @@
     $select_scoringMethod = determineScoring($vfInitial, $checklist);
     $scoringMethodFormValue = old('scoring_method', $select_scoringMethod);
 
+    $criteriaInitialItems = [];
+    $criteriaInitialNames = [];
+    $oldCriteria = old('criteria');
+
+    if (is_array($oldCriteria) && count($oldCriteria)) {
+        $index = 0;
+        foreach ($oldCriteria as $row) {
+            $criteriaInitialItems[] = [
+                'id' => isset($row['id']) ? 'criteria_' . $row['id'] : 'old_' . ($index + 1),
+                'dbId' => $row['id'] ?? null,
+                'name' => $row['name'] ?? '',
+                'description' => $row['description'] ?? '',
+                'sequence' => $row['sequence'] ?? ($index + 1),
+                'data' => $row,
+            ];
+            $criteriaInitialNames[] = $row['name'] ?? '';
+            $index++;
+        }
+    } else {
+        foreach ($criterias as $index => $criteriaRow) {
+            $criteriaInitialItems[] = [
+                'id' => isset($criteriaRow['id']) ? 'criteria_' . $criteriaRow['id'] : 'criteria_new_' . ($index + 1),
+                'dbId' => $criteriaRow['id'] ?? null,
+                'name' => $criteriaRow['name'] ?? '',
+                'description' => $criteriaRow['description'] ?? '',
+                'sequence' => $criteriaRow['sequence'] ?? ($index + 1),
+                'data' => $criteriaRow,
+            ];
+            $criteriaInitialNames[] = $criteriaRow['name'] ?? '';
+        }
+    }
+
+    if (empty($criteriaInitialItems)) {
+        $criteriaInitialItems[] = [
+            'id' => 'new_1',
+            'dbId' => null,
+            'name' => '',
+            'description' => '',
+            'sequence' => 1,
+            'data' => null,
+        ];
+        $criteriaInitialNames[] = '';
+    }
+
 @endphp
 
 @section('content')
@@ -166,25 +210,8 @@
                     <x-card number="4" title="เกณฑ์การพิจารณา" class="space-y-6">
                         <x-card-box title="รายการเกณฑ์การพิจารณา" icon="📋">
                             <div x-data="{
-                                items: @js(
-    count($criterias) > 0
-        ? array_map(
-            function ($criteria, $index) {
-                return [
-                    'id' => 'criteria_' . ($criteria['id'] ?? 'new_' . ($index + 1)),
-                    'dbId' => $criteria['id'] ?? null,
-                    'name' => $criteria['name'] ?? '',
-                    'description' => $criteria['description'] ?? '',
-                    'sequence' => $criteria['sequence'] ?? $index + 1,
-                    'data' => $criteria,
-                ];
-            },
-            $criterias,
-            array_keys($criterias),
-        )
-        : [['id' => 'new_1', 'dbId' => null, 'name' => '', 'description' => '', 'sequence' => 1, 'data' => null]],
-),
-                                name: [],
+                                items: @js($criteriaInitialItems),
+                                name: @js($criteriaInitialNames),
                                 add() {
                                     const newIndex = this.items.length + 1;
                                     this.items = [...this.items, {
