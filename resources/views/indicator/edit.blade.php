@@ -344,7 +344,7 @@
                         </x-card-box>
 
                         <div class="w-full">
-                            <label for="scoring_method" class="block mb-3 text-sm font-medium text-slate-700">เลือกวิธีการให้คะแนน</label>
+                            <p for="scoring_method" class="block mb-3 text-sm font-medium text-slate-700">เลือกวิธีการให้คะแนน</p>
                             <select id="scoring_method" name="scoring_method" x-model="scoringMethod"
                                 autocomplete="off"
                                 class="p-2 mt-1 w-full bg-white rounded-xl border border-slate-300
@@ -484,7 +484,7 @@
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/trumbowyg@2.31.0/dist/trumbowyg.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/trumbowyg@2.31.0/dist/plugins/justify/trumbowyg.justify.min.js"></script>
+    {{-- <script src="https://cdn.jsdelivr.net/npm/trumbowyg@2.31.0/dist/plugins/justify/trumbowyg.justify.min.js"></script> --}}
     <script src="https://cdn.jsdelivr.net/npm/trumbowyg@2.31.0/dist/plugins/table/trumbowyg.table.min.js"></script>
 @endpush
 

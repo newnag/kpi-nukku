@@ -250,9 +250,9 @@ initializeVariableNames();" class="space-y-5">
                 </div>
 
                 <div class="flex flex-col gap-1">
-                    <label :for="`${prefix}_var_${i}_label`" class="text-xs font-medium text-slate-700">Label Name</label>
+                    <label :for="`${prefix}_var_${i}_label_mobile`" class="text-xs font-medium text-slate-700">Label Name</label>
                     <input x-model="v.label_name"
-                        :id="`${prefix}_var_${i}_label`"
+                        :id="`${prefix}_var_${i}_label_mobile`"
                         :name="`${prefix}_var_${i}_label_display`"
                         autocomplete="off"
                         class="w-full rounded-lg border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 text-slate-700 text-sm p-2"
@@ -273,11 +273,11 @@ initializeVariableNames();" class="space-y-5">
                     </div>
 
                     <div class="flex-1" x-show="v.type === 'defined'">
-                        <label :for="`${prefix}_var_${i}_value`" class="text-xs font-medium text-slate-700 block mb-1">Value</label>
+                        <label :for="`${prefix}_var_${i}_value_mobile`" class="text-xs font-medium text-slate-700 block mb-1">Value</label>
                         <input x-model.number="v.value" 
                             type="number" 
                             inputmode="decimal"
-                            :id="`${prefix}_var_${i}_value`"
+                            :id="`${prefix}_var_${i}_value_mobile`"
                             :name="`${prefix}_var_${i}_value_display`"
                             autocomplete="off"
                             class="w-full rounded-lg border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 text-sm p-2" />
@@ -312,9 +312,9 @@ initializeVariableNames();" class="space-y-5">
 
                 {{-- Label Name --}}
                 <div class="flex flex-col gap-1">
-                    <label :for="`${prefix}_var_${i}_label`" class="text-xs font-medium text-slate-700">Label Name</label>
+                    <label :for="`${prefix}_var_${i}_label_desktop`" class="text-xs font-medium text-slate-700">Label Name</label>
                     <input x-model="v.label_name"
-                        :id="`${prefix}_var_${i}_label`"
+                        :id="`${prefix}_var_${i}_label_desktop`"
                         :name="`${prefix}_var_${i}_label_display`"
                         autocomplete="off"
                         class="w-full rounded-lg border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 text-slate-700 text-sm p-2"
@@ -337,11 +337,11 @@ initializeVariableNames();" class="space-y-5">
                 {{-- Value / Info --}}
                 <div class="flex flex-col gap-1">
                     <div x-show="v.type === 'defined'" class="flex flex-col gap-1">
-                        <label :for="`${prefix}_var_${i}_value`" class="text-xs font-medium text-slate-700">Value</label>
+                        <label :for="`${prefix}_var_${i}_value_desktop`" class="text-xs font-medium text-slate-700">Value</label>
                         <input x-model.number="v.value" 
                             type="number" 
                             inputmode="decimal"
-                            :id="`${prefix}_var_${i}_value`"
+                            :id="`${prefix}_var_${i}_value_desktop`"
                             :name="`${prefix}_var_${i}_value_display`"
                             autocomplete="off"
                             class="w-full rounded-lg border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 text-sm p-2" />

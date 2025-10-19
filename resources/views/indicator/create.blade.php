@@ -225,7 +225,7 @@
                                 <x-richtext name="comment" placeholder="คำอธิบายเกณฑ์ให้คะแนน" />
                                 <label class="block">
                                     <span class="text-sm font-medium text-slate-700">คะแนนเต็มทั้งหมดของตัวบ่งชี้</span>
-                                    <input type="text" :value="score_acc" readonly
+                                    <input name="max_score" type="text" :value="score_acc" readonly
                                         class="p-2 mt-1 w-full bg-gray-100 rounded-xl border border-slate-300 text-sm md:text-base cursor-not-allowed"
                                         placeholder="คะแนนจะปรากฏที่นี่">
                                 </label>
@@ -233,7 +233,7 @@
                         </x-card-box>
 
                         <div class="w-full">
-                            <label class="block mb-3 text-sm font-medium text-slate-700">เลือกวิธีการให้คะแนน</label>
+                            <p class="block mb-3 text-sm font-medium text-slate-700">เลือกวิธีการให้คะแนน</p>
 
                             <select x-model="scoringMethod" name="scoring_method" id="scoring_method"
                                 class="p-2 mt-1 w-full bg-white rounded-xl border border-slate-300 
@@ -333,7 +333,7 @@
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/trumbowyg@2.31.0/dist/trumbowyg.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/trumbowyg@2.31.0/dist/plugins/justify/trumbowyg.justify.min.js"></script>
+    {{-- <script src="https://cdn.jsdelivr.net/npm/trumbowyg@2.31.0/dist/plugins/justify/trumbowyg.justify.min.js"></script> --}}
     <script src="https://cdn.jsdelivr.net/npm/trumbowyg@2.31.0/dist/plugins/table/trumbowyg.table.min.js"></script>
 @endpush
 
