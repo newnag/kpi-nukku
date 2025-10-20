@@ -176,7 +176,7 @@ initializeVariableNames();" class="space-y-5">
 
         <div class="flex flex-col gap-2 min-w-0">
             <div class="flex flex-col gap-1">
-                <input x-ref="newLabel" 
+        <input x-ref="newLabel" aria-label="ป้ายแปรผัน"
                     x-model="newLabel" 
                     type="text" 
                     id="variable_new_label"
@@ -199,7 +199,7 @@ initializeVariableNames();" class="space-y-5">
             {{-- Type + (Value when defined) — inline on md+, stacked on mobile --}}
             <div class="flex flex-col sm:flex-row gap-2">
                 <div class="flex flex-col gap-1 w-full sm:w-48">
-                    <select x-model="newType"
+        <select x-model="newType" aria-label="ชนิดแปรผัน"
                         id="variable_new_type"
                         name="variable_new_type"
                         autocomplete="off"
@@ -221,7 +221,7 @@ initializeVariableNames();" class="space-y-5">
                 </div>
 
                 <template x-if="newType === 'defined'">
-                    <input x-model="newValue" 
+        <input x-model="newValue" aria-label="ค่าตั้งต้น"
                         type="number" 
                         inputmode="decimal" 
                         id="variable_new_value"
@@ -251,7 +251,7 @@ initializeVariableNames();" class="space-y-5">
 
                 <div class="flex flex-col gap-1">
                     <label :for="`${prefix}_var_${i}_label_mobile`" class="text-xs font-medium text-slate-700">Label Name</label>
-                    <input x-model="v.label_name"
+        <input x-model="v.label_name" aria-label="ชื่อแสดงผล"
                         :id="`${prefix}_var_${i}_label_mobile`"
                         :name="`${prefix}_var_${i}_label_display`"
                         autocomplete="off"
@@ -274,7 +274,7 @@ initializeVariableNames();" class="space-y-5">
 
                     <div class="flex-1" x-show="v.type === 'defined'">
                         <label :for="`${prefix}_var_${i}_value_mobile`" class="text-xs font-medium text-slate-700 block mb-1">Value</label>
-                        <input x-model.number="v.value" 
+        <input x-model.number="v.value" aria-label="ค่า"
                             type="number" 
                             inputmode="decimal"
                             :id="`${prefix}_var_${i}_value_mobile`"
@@ -313,7 +313,7 @@ initializeVariableNames();" class="space-y-5">
                 {{-- Label Name --}}
                 <div class="flex flex-col gap-1">
                     <label :for="`${prefix}_var_${i}_label_desktop`" class="text-xs font-medium text-slate-700">Label Name</label>
-                    <input x-model="v.label_name"
+        <input x-model="v.label_name" aria-label="ชื่อแสดงผล"
                         :id="`${prefix}_var_${i}_label_desktop`"
                         :name="`${prefix}_var_${i}_label_display`"
                         autocomplete="off"
@@ -338,7 +338,7 @@ initializeVariableNames();" class="space-y-5">
                 <div class="flex flex-col gap-1">
                     <div x-show="v.type === 'defined'" class="flex flex-col gap-1">
                         <label :for="`${prefix}_var_${i}_value_desktop`" class="text-xs font-medium text-slate-700">Value</label>
-                        <input x-model.number="v.value" 
+        <input x-model.number="v.value" aria-label="ค่า"
                             type="number" 
                             inputmode="decimal"
                             :id="`${prefix}_var_${i}_value_desktop`"
@@ -402,7 +402,7 @@ initializeVariableNames();" class="space-y-5">
     <div class="space-y-3">
         <label for="{{ $prefix }}_condition" class="block text-slate-800 font-medium">สร้างเงื่อนไขการคำนวณ</label>
 
-        <textarea x-ref="condition" 
+        <textarea x-ref="condition" aria-label="สูตรคำนวณ"
             x-model="condition" 
             rows="5"
             id="{{ $prefix }}_condition"

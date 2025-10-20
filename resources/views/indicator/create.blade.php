@@ -235,7 +235,7 @@
                         <div class="w-full">
                             <p class="block mb-3 text-sm font-medium text-slate-700">เลือกวิธีการให้คะแนน</p>
 
-                            <select x-model="scoringMethod" name="scoring_method" id="scoring_method"
+                            <select x-model="scoringMethod" name="scoring_method" id="scoring_method" aria-label="Scoring method"
                                 class="p-2 mt-1 w-full bg-white rounded-xl border border-slate-300 
                 placeholder-slate-400 text-sm md:text-base 
                 hover:shadow-md hover:border-blue-400 transition

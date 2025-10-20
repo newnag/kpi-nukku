@@ -11,19 +11,19 @@
             <!-- Title -->
             <div class="form-group">
                 <label class="form-label">หัวข้อการแจ้งเตือน <span class="required">*</span></label>
-                <input form="notification-settings-form" type="text" name="title" class="form-input"
+                <input form="notification-settings-form" type="text" name="title" class="form-input" aria-label="ชื่อประกาศ/เรื่อง"
                     value="{{ old('title', $setting->title ?? '') }}">
             </div>
 
             <div class="form-group">
                 <label class="form-label">วันที่แจ้งเตือนรอบที่ 1</label>
-                <input form="notification-settings-form" type="date" name="notify_date1" class="form-input2"
+                <input form="notification-settings-form" type="date" name="notify_date1" class="form-input2" aria-label="วันที่แจ้งเตือน 1"
                     value="{{ old('notify_date1', $setting?->notify_date1?->format('Y-m-d')) }}">
             </div>
 
             <div class="form-group">
                 <label class="form-label">วันที่แจ้งเตือนรอบที่ 2</label>
-                <input form="notification-settings-form" type="date" name="notify_date2" class="form-input2"
+                <input form="notification-settings-form" type="date" name="notify_date2" class="form-input2" aria-label="วันที่แจ้งเตือน 2"
                     value="{{ old('notify_date2', $setting?->notify_date2?->format('Y-m-d')) }}">
             </div>
 
@@ -36,13 +36,13 @@
             <!-- เพิ่มเวลาในการแจ้งเตือน และตัวเลือกเตือนอัตโนมัติ -->
             <div class="form-group">
                 <label class="form-label">เวลาแจ้งเตือน (รอบที่ 1)</label>
-                <input form="notification-settings-form" type="time" name="notify_time1" class="form-input2"
+                <input form="notification-settings-form" type="time" name="notify_time1" class="form-input2" aria-label="เวลาแจ้งเตือน 1"
                     style="width:140px;" value="{{ old('notify_time1', $setting->notify_time1 ?? '09:00') }}">
             </div>
 
             <div class="form-group">
                 <label class="form-label">เวลาแจ้งเตือน (รอบที่ 2)</label>
-                <input form="notification-settings-form" type="time" name="notify_time2" class="form-input2"
+                <input form="notification-settings-form" type="time" name="notify_time2" class="form-input2" aria-label="เวลาแจ้งเตือน 2"
                     style="width:140px;" value="{{ old('notify_time2', $setting->notify_time2 ?? '09:00') }}">
             </div>
 

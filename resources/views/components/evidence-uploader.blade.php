@@ -45,7 +45,7 @@
                         <!-- Upload -->
                         <div class="eu-block">
                             <div class="eu-section-title">รายงานผลการดำเนินงาน</div>
-                            <textarea id="detailEditor-{{ $cid }}" name="detail" class="eu-editor" rows="6">{!! old('detail') !!}</textarea>
+                            <textarea id="detailEditor-{{ $cid }}" name="detail" class="eu-editor" rows="6" aria-label="รายละเอียดหลักฐาน">{!! old('detail') !!}</textarea>
                         </div>
                         <div class="eu-block">
                             <div class="eu-dropzone" :class="{ 'is-dragover': dragging }"
@@ -63,7 +63,7 @@
                                     วางไฟล์ที่นี่ หรือ <span class="eu-link">คลิกเพื่อเลือกไฟล์</span>
                                 </p>
                                 <input type="file" id="fileInput-{{ $cid }}" name="files[]" multiple
-                                    accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" class="eu-file-input"
+                                    accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" class="eu-file-input" aria-label="เลือกไฟล์แนบหลักฐาน"
                                     @change="handleFileInput($event)">
                             </div>
                             <div class="eu-files" x-show="files.length">
@@ -74,7 +74,7 @@
                                         </div>
                                         <div class="eu-file-info">
                                             <!-- input สำหรับแก้ชื่อไฟล์ -->
-                                            <input type="text" class="eu-input eu-file-rename" :name="`file_names[]`"
+                                            <input type="text" class="eu-input eu-file-rename" :name="`file_names[]`" aria-label="ชื่อไฟล์ที่อัปโหลด"
                                                 x-model="f._customName" :placeholder="f.name">
 
                                             <div class="eu-file-meta pl-2">
@@ -108,9 +108,9 @@
 
                             <template x-for="(row, i) in urlRows" :key="row._id">
                                 <div class="eu-url-row">
-                                    <input type="text" class="eu-input" :name="`url_names[]`"
+                                    <input type="text" class="eu-input" :name="`url_names[]`" aria-label="ชื่อ URL"
                                         placeholder="ชื่อหลักฐาน URL" x-model="row.name">
-                                    <input type="url" class="eu-input" :name="`additional_urls[]`"
+                                    <input type="url" class="eu-input" :name="`additional_urls[]`" aria-label="ที่อยู่ URL"
                                         placeholder="วาง URL เพิ่มเติม" x-model="row.url">
                                     <button type="button" class="eu-icon-btn danger cursor-pointer"
                                         @click="removeUrl(i)" aria-label="ลบ URL">

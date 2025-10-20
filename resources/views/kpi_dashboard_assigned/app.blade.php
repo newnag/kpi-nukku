@@ -81,7 +81,7 @@
                                     </div>
                                     <div class="dropdown-content">
                                         <div class="dropdown-tools" data-section="yearDropdown">
-                                            <input type="text" name="year_search" class="filter-search"
+                                            <input type="text" name="year_search" class="filter-search" aria-label="ค้นหาปี"
                                                 placeholder="ค้นหา..." aria-label="ค้นหาปี">
                                             <div class="tools-actions">
                                                 <button type="button" class="tool-btn"
@@ -114,7 +114,7 @@
 
                                     <div class="dropdown-content">
                                         <div class="dropdown-tools" data-section="standardDropdown">
-                                            <input type="text" name="standard_search" class="filter-search"
+                                            <input type="text" name="standard_search" class="filter-search" aria-label="ค้นหามาตรฐาน"
                                                 placeholder="ค้นหา..." aria-label="ค้นหามาตรฐาน">
                                             <div class="tools-actions">
                                                 <button type="button" class="tool-btn"
@@ -145,7 +145,7 @@
                                     </div>
                                     <div class="dropdown-content">
                                         <div class="dropdown-tools" data-section="dimensionDropdown">
-                                            <input type="text" name="dimension_search" class="filter-search"
+                                            <input type="text" name="dimension_search" class="filter-search" aria-label="ค้นหามิติ"
                                                 placeholder="ค้นหา..." aria-label="ค้นหาด้าน">
                                             <div class="tools-actions">
                                                 <button type="button" class="tool-btn"
@@ -176,7 +176,7 @@
                                     </div>
                                     <div class="dropdown-content">
                                         <div class="dropdown-tools" data-section="deptDropdown">
-                                            <input type="text" name="dept_search" class="filter-search"
+                                            <input type="text" name="dept_search" class="filter-search" aria-label="ค้นหาภาควิชา/หน่วยงาน"
                                                 placeholder="ค้นหา..." aria-label="ค้นหาหน่วยงานที่รับผิดชอบ">
                                             <div class="tools-actions">
                                                 <button type="button" class="tool-btn"
@@ -216,7 +216,7 @@
                                     </div>
                                     <div class="dropdown-content">
                                         <div class="dropdown-tools" data-section="typeDropdown">
-                                            <input type="text" name="type_search" class="filter-search"
+                                            <input type="text" name="type_search" class="filter-search" aria-label="ค้นหาประเภท"
                                                 placeholder="ค้นหา..." aria-label="ค้นหาประเภทตัวบ่งชี้">
                                             <div class="tools-actions">
                                                 <button type="button" class="tool-btn"
@@ -259,7 +259,7 @@
                                     @endphp
                                     <div class="dropdown-content">
                                         <div class="dropdown-tools" data-section="statusDropdown">
-                                            <input type="text" name="status_search" class="filter-search"
+                                            <input type="text" name="status_search" class="filter-search" aria-label="ค้นหาสถานะ"
                                                 placeholder="ค้นหา..." aria-label="ค้นหาสถานะตัวบ่งชี้">
                                             <div class="tools-actions">
                                                 <button type="button" class="tool-btn"
@@ -294,7 +294,7 @@
                                     @endphp
                                     <div class="dropdown-content">
                                         <div class="dropdown-tools" data-section="statusEnvDropdown">
-                                            <input type="text" name="doc_status_search" class="filter-search"
+                                            <input type="text" name="doc_status_search" class="filter-search" aria-label="ค้นหาสถานะแอกสาร"
                                                 placeholder="ค้นหา..." aria-label="ค้นหาสถานะเอกสาร">
                                             <div class="tools-actions">
                                                 <button type="button" class="tool-btn"

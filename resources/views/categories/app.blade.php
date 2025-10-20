@@ -12,7 +12,7 @@
                 @csrf
                 <div class="form-group">
                     <label class="form-label">ชื่อมาตรฐานการประเมิน <span class="required">*</span></label>
-                    <input type="text" name="name" class="form-input" required>
+                    <input type="text" name="name" class="form-input" required aria-label="ชื่อมาตรฐาน">
                 </div>
                 <button type="submit" class="btn btn-primary">
                     <i class="fa fa-save"></i> บันทึก
@@ -32,7 +32,7 @@
                                 d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                         </svg>
                     </div>
-                    <input type="text" id="custom-search-standards"
+                    <input type="text" id="custom-search-standards" aria-label="ค้นหามาตรฐาน"
                         class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/40"
                         placeholder="ค้นหามาตรฐาน">
                 </div>
@@ -104,15 +104,15 @@
                 @csrf
                 <div class="form-group">
                     <label class="form-label">ชื่อด้านการประเมิน <span class="required">*</span></label>
-                    <input type="text" name="name" class="form-input" required>
+                    <input type="text" name="name" class="form-input" required aria-label="ชื่อหมวดหมู่">
                 </div>
                 <div class="form-group">
                     <label class="form-label">ตะแนนเต็มของด้านการประเมิน <span class="required">*</span></label>
-                    <input type="text" name="max_score" class="form-input" required>
+                    <input type="text" name="max_score" class="form-input" required aria-label="คะแนนสูงสุด">
                 </div>
                 <div class="form-group">
                     <label class="form-label">เลือกมาตรของด้านการประเมิน <span class="required">*</span></label>
-                    <select name="standard_id" class="form-input" required>
+                    <select name="standard_id" class="form-input" required aria-label="มาตรฐาน">
                         <option value="">-- เลือกมาตรฐาน --</option>
                         @foreach ($standards as $standard)
                             <option value="{{ $standard->id }}">{{ $standard->name }}</option>
@@ -140,7 +140,7 @@
                                 d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                         </svg>
                     </div>
-                    <input type="text" id="custom-search-categories"
+                    <input type="text" id="custom-search-categories" aria-label="ค้นหาหมวดหมู่"
                         class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/40"
                         placeholder="ค้นหารายการชื่อผู้ใช้">
                 </div>
@@ -234,7 +234,7 @@
                 <label class="block text-sm font-medium text-gray-700 mb-2">
                     ชื่อมาตรฐานการประเมิน <span class="text-red-500">*</span>
                 </label>
-                <input type="text" id="editNameStandards" name="name"
+                <input type="text" id="editNameStandards" name="name" aria-label="ชื่อมาตรฐาน"
                     class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     required value="{{ old('name') }}">
             </div>
@@ -299,7 +299,7 @@
                 <label class="block text-sm font-medium text-gray-700 mb-2">
                     ชื่อด้านการประเมิน <span class="text-red-500">*</span>
                 </label>
-                <input type="text" id="editNameCategories" name="name"
+                <input type="text" id="editNameCategories" name="name" aria-label="ชื่อหมวดหมู่"
                     class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     required value="{{ old('name') }}">
             </div>
@@ -312,7 +312,7 @@
                 <label class="block text-sm font-medium text-gray-700 mb-2">
                     คะแนนเต็ม <span class="text-red-500">*</span>
                 </label>
-                <input type="number" id="editMaxScore" name="max_score"
+                <input type="number" id="editMaxScore" name="max_score" aria-label="คะแนนสูงสุด"
                     class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     required value="{{ old('max_score') }}">
             </div>
@@ -325,7 +325,7 @@
                 <label class="block text-sm font-medium text-gray-700 mb-2">
                     เลือกมาตรฐาน <span class="text-red-500">*</span>
                 </label>
-                <select id="editStandardId" name="standard_id"
+                <select id="editStandardId" name="standard_id" aria-label="มาตรฐาน"
                     class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     required>
                     <option value="">-- เลือกมาตรฐาน --</option>

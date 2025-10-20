@@ -58,7 +58,7 @@
                 class="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-gray-50 p-3 sm:p-4 rounded-lg shadow">
                 <div>
                     <label for="year-filter-{{ $modalId }}" class="block text-xs sm:text-sm font-medium text-gray-700 mb-1">กรองตามปี</label>
-                    <select id="year-filter-{{ $modalId }}"
+                    <select id="year-filter-{{ $modalId }}" aria-label="กรองตามปี"
                         class="w-full border rounded px-2 py-1 text-xs sm:text-sm focus:ring focus:ring-green-200">
                         <option value="">-- แสดงทั้งหมด --</option>
                         @foreach ($years as $y)
@@ -69,7 +69,7 @@
 
                 <div>
                     <label for="standard-filter-{{ $modalId }}" class="block text-xs sm:text-sm font-medium text-gray-700 mb-1">กรองตามมาตรฐาน</label>
-                    <select id="standard-filter-{{ $modalId }}"
+                    <select id="standard-filter-{{ $modalId }}" aria-label="กรองตามมาตรฐาน"
                         class="w-full border rounded px-2 py-1 text-xs sm:text-sm focus:ring focus:ring-green-200">
                         <option value="">-- แสดงทั้งหมด --</option>
                         @foreach ($standards as $std)
@@ -89,7 +89,7 @@
 
         <!-- ✅ Select All -->
         <div class="flex items-center space-x-2 mb-3">
-            <input type="checkbox" id="select-all-{{ $modalId }}" class="rounded border-gray-300">
+            <input type="checkbox" id="select-all-{{ $modalId }}" class="rounded border-gray-300" aria-label="เลือกทั้งหมด">
             <label for="select-all-{{ $modalId }}" class="text-xs sm:text-sm font-medium">เลือกทั้งหมด</label>
         </div>
 
@@ -244,4 +244,3 @@
         });
     });
 </script>
-

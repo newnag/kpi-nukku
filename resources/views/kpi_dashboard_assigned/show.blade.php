@@ -211,7 +211,7 @@
                                                 class="evidence-edit flex flex-wrap sm:flex-nowrap items-center gap-2 w-full sm:w-auto"
                                                 style="display:none"
                                                 data-update-url="{{ route('evidences.update', $evidence->id) }}">
-                                                <input type="text" id="evidence-input-{{ $evidence->id }}"
+                                                <input type="text" id="evidence-input-{{ $evidence->id }}" aria-label="ชื่อไฟล์หลักฐาน"
                                                     value="{{ $evidence->name }}"
                                                     class="border rounded px-2 py-1 text-[13px] min-w-0 w-full sm:w-60" />
                                                 <div class="button-group flex space-x-2">
@@ -312,10 +312,10 @@
                 @endphp
                 @forelse($inputVariables as $variable)
                     <div class="variable-row">
-                        <label class="variable-label">
+                        <label class="variable-label" for="variable-{{ $variable->id }}">
                             {{ $variable->label_name ?? $variable->variable_name }}
                         </label>
-                        <input type="number" name="variables[{{ $variable->id }}]"
+                        <input type="number" id="variable-{{ $variable->id }}" name="variables[{{ $variable->id }}]"
                             value="{{ old('variables.' . $variable->id, $variable->value) }}"
                             placeholder="กรุณากรอกร้อยละเป็นตัวเลข" class="variable-input" form="variables-form"
                             {{ $indicator->status == 2 ? 'readonly' : '' }}>
@@ -734,10 +734,10 @@
                     const row = document.createElement('div');
                     row.className = `form-group url-row`;
                     row.innerHTML = `
-                    <input type="text" name="url_names[]" 
+                    <input type="text" name="url_names[]" aria-label="ชื่อ URL" 
                         class="form-input url-name url-name-${this.criteriaId}" 
                         placeholder="ชื่อหลักฐาน URL">
-                    <input type="url" name="additional_urls[]" 
+                    <input type="url" name="additional_urls[]" aria-label="ที่อยู่ URL" 
                         class="form-input url-input url-input-${this.criteriaId}" 
                         placeholder="วาง URL เพิ่มเติม">
                     <button type="button" 

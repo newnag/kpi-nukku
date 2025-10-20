@@ -30,7 +30,7 @@
                 <!-- ปีการประเมิน -->
                 <div class="field">
                     <label for="filter-year">ปีการประเมิน</label>
-                    <select id="filter-year" name="year">
+                    <select id="filter-year" name="year" aria-label="กรองตามปี">
                         <option value="">ทั้งหมด</option>
                         @foreach ($years as $y)
                             <option value="{{ $y }}"
@@ -46,7 +46,7 @@
                 <!-- Codes -->
                 <div class="field">
                     <label for="filter-code">รหัสตัวบ่งชี้</label>
-                    <select id="filter-code" name="code">
+                    <select id="filter-code" name="code" aria-label="กรองตามรหัสตัวชี้วัด">
                         <option value="">ทั้งหมด</option>
                         @foreach ($filters['codes'] ?? [] as $code)
                             @php
@@ -63,7 +63,7 @@
                     <!-- มาตรฐานตัวบ่งชี้ -->
                     <div class="field">
                         <label for="filter-standard">มาตรฐานตัวบ่งชี้</label>
-                        <select id="filter-standard" name="standard_id">
+                        <select id="filter-standard" name="standard_id" aria-label="กรองตามมาตรฐาน">
                             <option value="">ทั้งหมด</option>
                             @foreach ($standards as $std)
                                 @php
@@ -90,7 +90,7 @@
                     <!-- ด้านตัวบ่งชี้ -->
                     <div class="field">
                         <label for="filter-dimension">ด้านตัวบ่งชี้</label>
-                        <select id="filter-dimension" name="category_id">
+                        <select id="filter-dimension" name="category_id" aria-label="กรองตามมิติ">
                             <option value="">ทั้งหมด</option>
                             @foreach ($dimensions as $dim)
                                 @php
@@ -144,7 +144,7 @@
                     <!-- ผู้รับผิดชอบในการรวบรวมข้อมูล -->
                     <div class="field">
                         <label for="filter-collector">ผู้รับผิดชอบในการรวบรวมข้อมูล</label>
-                        <select id="filter-collector" name="collector">
+                        <select id="filter-collector" name="collector" aria-label="กรองตามผู้รวบรวม">
                             <option value="">ทั้งหมด</option>
                             @foreach ($collectors as $col)
                                 @php
@@ -171,7 +171,7 @@
                     <!-- ประเภทตัวบ่งชี้ (new UI field; client-side filter) -->
                     <div class="field">
                         <label for="filter-type">ประเภทตัวบ่งชี้</label>
-                        <select id="filter-type" name="type">
+                        <select id="filter-type" name="type" aria-label="กรองตามประเภท">
                             <option value="">ทั้งหมด</option>
                             @foreach ($filters['types'] ?? [] as $type)
                                 @php

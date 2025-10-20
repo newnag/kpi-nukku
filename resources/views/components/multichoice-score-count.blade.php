@@ -45,7 +45,7 @@
         <template x-for="(r, i) in rules" :key="r.id">
             <div class="space-y-2 sm:space-y-0 sm:grid sm:grid-cols-3 sm:items-center gap-3">
                 {{-- จำนวนที่เลือก --}}
-                <input type="number" 
+                <input type="number" aria-label="จำนวนรายการ"
                     min="0" 
                     step="1" 
                     x-model.number="r.count"
@@ -55,7 +55,7 @@
                     class="rounded-xl border bg-white py-1 px-3 border-slate-300 focus:border-blue-500 focus:ring-blue-500 w-full text-sm md:text-base">
 
                 {{-- คะแนนที่ได้ --}}
-                <input type="number" 
+                <input type="number" aria-label="คะแนน"
                     step="1" 
                     x-model.number="r.score"
                     :id="'{{ $base }}' + '_score_' + i"

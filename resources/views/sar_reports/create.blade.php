@@ -1,4 +1,4 @@
-﻿@extends('layouts.app')
+@extends('layouts.app')
 
 @section('content')
     <div class="sar-container">
@@ -26,13 +26,13 @@
                     {{-- ส่วนที่ 1 --}}
                     <div class="bg-white shadow rounded-lg p-6">
                         <h3 class="text-lg font-semibold border-b pb-2 mb-4">ส่วนที่ 1: ข้อมูลทั่วไปคณะพยาบาลศาสตร์</h3>
-                        <textarea name="section1" id="section1" class="trumbowyg-textarea w-full">{{ old('section1') }}</textarea>
+                        <textarea name="section1" id="section1" class="trumbowyg-textarea w-full" aria-label="ส่วนที่ 1">{{ old('section1') }}</textarea>
                     </div>
 
                     {{-- ส่วนที่ 2 --}}
                     <div class="bg-white shadow rounded-lg p-6">
                         <h3 class="text-lg font-semibold border-b pb-2 mb-4">ส่วนที่ 2: ข้อมูลด้านคุณภาพ</h3>
-                        <textarea name="section2" id="section2" class="trumbowyg-textarea w-full">{{ old('section2') }}</textarea>
+                        <textarea name="section2" id="section2" class="trumbowyg-textarea w-full" aria-label="ส่วนที่ 2">{{ old('section2') }}</textarea>
                     </div>
 
                     {{-- ส่วนที่ 3 --}}
@@ -325,7 +325,7 @@
                     <div class="bg-white shadow rounded-lg p-6">
                         <h3 class="text-lg font-semibold border-b pb-2 mb-4">ส่วนที่ 4:
                             สรุปผลการประเมินตนเองตามเกณฑ์ของสภาการพยาบาล</h3>
-                        <textarea name="section4" id="section4" class="trumbowyg-textarea w-full">{{ old('section4') }}</textarea>
+                        <textarea name="section4" id="section4" class="trumbowyg-textarea w-full" aria-label="ส่วนที่ 4">{{ old('section4') }}</textarea>
                     </div>
 
                     <div class="flex justify-end gap-3">

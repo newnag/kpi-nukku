@@ -52,7 +52,7 @@
 hookFormValidation();">
     <label class="block">
         @if ($label)
-            <span class="text-sm font-medium text-slate-700">
+            <span id="{{ $name }}_label" class="text-sm font-medium text-slate-700">
                 {{ $label }} @if ($required)
                     <span class="text-red-500">*</span>
                 @endif
@@ -63,6 +63,10 @@ hookFormValidation();">
         <button type="button" x-ref="btn" @click="toggle()" @keydown.arrow-down.prevent="open=true; move(1)"
             @keydown.arrow-up.prevent="open=true; move(-1)" @keydown.enter.prevent="submitKey($event)"
             :style="btnStyle"
+            aria-haspopup="listbox"
+            :aria-expanded="open ? 'true' : 'false'"
+            :aria-labelledby="'{{ $name }}_label'"
+            :aria-controls="name + '_listbox'"
             @class([
                 'relative p-2 pr-8 mt-1 w-full rounded-xl border text-left transition min-h-[42px]',
                 'border-red-500 focus:border-red-500 focus:ring-red-200' => $errors->has($name),
@@ -117,7 +121,7 @@ hookFormValidation();">
         :style="{ top: '75px' }">
         <!-- Search + actions -->
         <div class="p-2 border-b border-slate-200 flex items-center gap-2" x-show="searchable || selectAllEnabled">
-            <input x-show="searchable" 
+          <input x-show="searchable" aria-label="ค้นหา"
                 x-ref="search" 
                 :id="name + '_search'"
                 :name="name + '_search'"
@@ -141,9 +145,9 @@ hookFormValidation();">
         </div>
 
         <!-- Options -->
-        <ul class="max-h-64 overflow-auto py-1 overflow-x-hidden">
+        <ul :id="name + '_listbox'" role="listbox" aria-multiselectable="true" class="max-h-64 overflow-auto py-1 overflow-x-hidden">
             <template x-for="(o, i) in filtered" :key="o.value">
-                <li :ref="'opt-' + i" @mouseenter="hi = i" @mouseleave="hi = -1"
+                <li :ref="'opt-' + i"role="option" :aria-selected="isSelected(o.value) ? 'true' : 'false'"  @mouseenter="hi = i" @mouseleave="hi = -1"
                     class="px-3 py-2 cursor-pointer flex items-start gap-2"
                     :class="[(isSelected(o.value) ? 'bg-blue-50' : ''), (hi === i) ? 'bg-slate-50' : '']"
                     @click="toggleValue(o.value)">

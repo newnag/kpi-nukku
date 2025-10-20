@@ -77,7 +77,7 @@
                                     </div>
                                     <div class="dropdown-content">
                                         <div class="dropdown-tools" data-section="yearDropdown">
-                                            <input type="text" name="year_search" class="filter-search"
+                                            <input type="text" name="year_search" class="filter-search" aria-label="ค้นหาปี"
                                                 placeholder="ค้นหา..." aria-label="ค้นหาปี">
                                             <div class="tools-actions">
                                                 <button type="button" class="tool-btn"
@@ -106,7 +106,7 @@
                                     </div>
                                     <div class="dropdown-content">
                                         <div class="dropdown-tools" data-section="standardDropdown">
-                                            <input type="text" name="standard_search" class="filter-search"
+                                            <input type="text" name="standard_search" class="filter-search" aria-label="ค้นหามาตรฐาน"
                                                 placeholder="ค้นหา..." aria-label="ค้นหามาตรฐาน">
                                             <div class="tools-actions">
                                                 <button type="button" class="tool-btn"
@@ -135,7 +135,7 @@
                                     </div>
                                     <div class="dropdown-content">
                                         <div class="dropdown-tools" data-section="dimensionDropdown">
-                                            <input type="text" name="dimension_search" class="filter-search"
+                                            <input type="text" name="dimension_search" class="filter-search" aria-label="ค้นหามิติ"
                                                 placeholder="ค้นหา..." aria-label="ค้นหาด้าน">
                                             <div class="tools-actions">
                                                 <button type="button" class="tool-btn"
@@ -164,7 +164,7 @@
                                     </div>
                                     <div class="dropdown-content">
                                         <div class="dropdown-tools" data-section="collectorDropdown">
-                                            <input type="text" name="collector_search" class="filter-search"
+                                            <input type="text" name="collector_search" class="filter-search" aria-label="ค้นหาผู้รวบรวม"
                                                 placeholder="ค้นหา..." aria-label="ค้นหาผู้รับผิดชอบ">
                                             <div class="tools-actions">
                                                 <button type="button" class="tool-btn"
@@ -194,7 +194,7 @@
                                     </div>
                                     <div class="dropdown-content">
                                         <div class="dropdown-tools" data-section="deptDropdown">
-                                            <input type="text" name="dept_search" class="filter-search"
+                                            <input type="text" name="dept_search" class="filter-search" aria-label="ค้นหาภาควิชา/หน่วยงาน"
                                                 placeholder="ค้นหา..." aria-label="ค้นหาหน่วยงาน">
                                             <div class="tools-actions">
                                                 <button type="button" class="tool-btn"
@@ -224,7 +224,7 @@
                                     </div>
                                     <div class="dropdown-content">
                                         <div class="dropdown-tools" data-section="typeDropdown">
-                                            <input type="text" name="type_search" class="filter-search"
+                                            <input type="text" name="type_search" class="filter-search" aria-label="ค้นหาประเภท"
                                                 placeholder="ค้นหา..." aria-label="ค้นหาประเภทไฟล์">
                                             <div class="tools-actions">
                                                 <button type="button" class="tool-btn"
