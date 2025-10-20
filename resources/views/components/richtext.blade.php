@@ -22,7 +22,7 @@
                 border: 1px solid #e5e7eb;
                 /* slate-200 */
                 box-shadow: 0 1px 2px rgba(0, 0, 0, .04);
-                overflow: hidden;
+                /* overflow: hidden; */
                 background: #fff;
             }
 
@@ -32,7 +32,10 @@
                 flex-wrap: wrap;
                 gap: .25rem .375rem;
                 padding: .375rem .5rem;
-                background: #fff;
+                /* background: #fff; */
+                border-top-left-radius: 1rem;
+                border-top-right-radius: 1rem;
+
             }
 
             .trumbowyg-box .trumbowyg-button-pane::before,
@@ -95,9 +98,7 @@
             .trumbowyg-box .trumbowyg-editor {
                 padding: .75rem;
                 font-size: .9375rem;
-                min-height: var(--rte-min-h, 260px);
                 position: relative;
-                /* anchor for placeholder */
             }
 
             /* Lists (เหมือนในหน้า create) */
@@ -206,22 +207,32 @@
 
 <div x-data="{ html: @js(old($name, $value)), showPreview: false }" class="block">
     @if ($label)
-        <span class="text-sm font-medium text-slate-700 mb-1 block">{{ $label }}</span>
+        <label for="{{ $inputId }}" class="text-sm font-medium text-slate-700 mb-1 block">{{ $label }}</label>
     @endif
 
     <input id="{{ $inputId }}" type="hidden" name="{{ $name }}" x-model="html"
-        value="{{ old($name, $value) }}">
+        value="{{ old($name, $value) }}" autocomplete="off">
 
     <div id="{{ $editorId }}"
-        class="rounded-b-2xl w-full h-full border border-slate-200 bg-white shadow-sm overflow-hidden"
-        style="--rte-min-h: {{ (int) $height }}px"></div>
+        @class([
+            'rounded-b-2xl w-full h-full border bg-white shadow-sm overflow-hidden',
+            'border-red-500' => $errors->has($name),
+            'border-slate-200' => !$errors->has($name),
+        ])
+        ></div>
+    
+    <x-input-error :name="$name" />
 
     @if ($preview)
         <div class="mt-3" x-data="{ placeholder: 'พิมพ์เพื่อดูตัวอย่าง…' }">
             <div class="flex items-center justify-between mb-1">
                 <span class="text-sm font-medium text-slate-700">ตัวอย่าง (Preview)</span>
                 <label class="text-xs text-slate-600 flex items-center gap-2">
-                    <input type="checkbox" x-model="showPreview" class="rounded border-slate-300">
+                    <input type="checkbox" x-model="showPreview" 
+                        id="{{ $name }}_preview_toggle" 
+                        name="{{ $name }}_preview_toggle" 
+                        class="rounded border-slate-300" 
+                        autocomplete="off">
                     แสดงตัวอย่าง
                 </label>
             </div>

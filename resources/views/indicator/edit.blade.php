@@ -62,11 +62,66 @@
     }
 
     $select_scoringMethod = determineScoring($vfInitial, $checklist);
+    $scoringMethodFormValue = old('scoring_method', $select_scoringMethod);
+
+    $criteriaInitialItems = [];
+    $criteriaInitialNames = [];
+    $oldCriteria = old('criteria');
+
+    if (is_array($oldCriteria) && count($oldCriteria)) {
+        $index = 0;
+        foreach ($oldCriteria as $row) {
+            $criteriaInitialItems[] = [
+                'id' => isset($row['id']) ? 'criteria_' . $row['id'] : 'old_' . ($index + 1),
+                'dbId' => $row['id'] ?? null,
+                'name' => $row['name'] ?? '',
+                'description' => $row['description'] ?? '',
+                'sequence' => $row['sequence'] ?? ($index + 1),
+                'data' => $row,
+            ];
+            $criteriaInitialNames[] = $row['name'] ?? '';
+            $index++;
+        }
+    } else {
+        foreach ($criterias as $index => $criteriaRow) {
+            $criteriaInitialItems[] = [
+                'id' => isset($criteriaRow['id']) ? 'criteria_' . $criteriaRow['id'] : 'criteria_new_' . ($index + 1),
+                'dbId' => $criteriaRow['id'] ?? null,
+                'name' => $criteriaRow['name'] ?? '',
+                'description' => $criteriaRow['description'] ?? '',
+                'sequence' => $criteriaRow['sequence'] ?? ($index + 1),
+                'data' => $criteriaRow,
+            ];
+            $criteriaInitialNames[] = $criteriaRow['name'] ?? '';
+        }
+    }
+
+    if (empty($criteriaInitialItems)) {
+        $criteriaInitialItems[] = [
+            'id' => 'new_1',
+            'dbId' => null,
+            'name' => '',
+            'description' => '',
+            'sequence' => 1,
+            'data' => null,
+        ];
+        $criteriaInitialNames[] = '';
+    }
 
 @endphp
 
 @section('content')
-    <form action="{{ route('indicator.update', $id) }}" method="POST" x-data="{ score_acc: @js(old('max_score', $maxScore)), scoringMethod: @js(old('scoring_method', $select_scoringMethod)) }">
+    <form action="{{ route('indicator.update', $id) }}" method="POST"
+        x-data="{
+            score_acc: '',
+            scoringMethod: '',
+            init() {
+                this.score_acc = this.$el.dataset.initialScoreAcc ?? '';
+                this.scoringMethod = this.$el.dataset.defaultScoringMethod || '';
+            }
+        }"
+        data-initial-score-acc="{{ old('max_score', $maxScore) }}"
+        data-default-scoring-method="{{ $scoringMethodFormValue }}">
         @csrf
         @method('PUT')
         <div class="w-full mx-auto">
@@ -155,25 +210,8 @@
                     <x-card number="4" title="เกณฑ์การพิจารณา" class="space-y-6">
                         <x-card-box title="รายการเกณฑ์การพิจารณา" icon="📋">
                             <div x-data="{
-                                items: @js(
-    count($criterias) > 0
-        ? array_map(
-            function ($criteria, $index) {
-                return [
-                    'id' => 'criteria_' . ($criteria['id'] ?? 'new_' . ($index + 1)),
-                    'dbId' => $criteria['id'] ?? null,
-                    'name' => $criteria['name'] ?? '',
-                    'description' => $criteria['description'] ?? '',
-                    'sequence' => $criteria['sequence'] ?? $index + 1,
-                    'data' => $criteria,
-                ];
-            },
-            $criterias,
-            array_keys($criterias),
-        )
-        : [['id' => 'new_1', 'dbId' => null, 'name' => '', 'description' => '', 'sequence' => 1, 'data' => null]],
-),
-                                name: [],
+                                items: @js($criteriaInitialItems),
+                                name: @js($criteriaInitialNames),
                                 add() {
                                     const newIndex = this.items.length + 1;
                                     this.items = [...this.items, {
@@ -322,9 +360,10 @@
 
                             <div>
                                 <x-richtext name="comment" :value="$comment" placeholder="คำอธิบายเกณฑ์ให้คะแนน" />
-                                <label class="block">
+                                <label for="total_score_display" class="block">
                                     <span class="text-sm font-medium text-slate-700">คะแนนเต็มทั้งหมดของตัวบ่งชี้</span>
-                                    <input type="text" :value="score_acc" readonly
+                                    <input type="text" id="total_score_display" name="total_score_display" :value="score_acc" readonly
+                                        autocomplete="off"
                                         class="p-2 mt-1 w-full bg-gray-100 rounded-xl border border-slate-300 text-sm md:text-base cursor-not-allowed"
                                         placeholder="คะแนนจะปรากฏที่นี่">
                                 </label>
@@ -332,16 +371,17 @@
                         </x-card-box>
 
                         <div class="w-full">
-                            <label class="block mb-3 text-sm font-medium text-slate-700">เลือกวิธีการให้คะแนน</label>
-                            <select name="scoring_method" x-model="scoringMethod"
+                            <p for="scoring_method" class="block mb-3 text-sm font-medium text-slate-700">เลือกวิธีการให้คะแนน</p>
+                            <select id="scoring_method" name="scoring_method" x-model="scoringMethod"
+                                autocomplete="off"
                                 class="p-2 mt-1 w-full bg-white rounded-xl border border-slate-300
                                            placeholder-slate-400 text-sm md:text-base
                                            hover:shadow-md hover:border-blue-400 transition
                                            focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-500">
-                                <option value="">-- กรุณาเลือกวิธีการให้คะแนน --</option>
-                                <option value="count">หลายตัวเลือก - ตามจำนวนข้อที่เลือก</option>
-                                <option value="selected">หลายตัวเลือก - คะแนนตามข้อที่เลือก</option>
-                                <option value="custom">ปรับแต่งอิสระ</option>
+                                <option value="" @selected($scoringMethodFormValue === '')>-- กรุณาเลือกวิธีการให้คะแนน --</option>
+                                <option value="count" @selected($scoringMethodFormValue === 'count')>หลายตัวเลือก - ตามจำนวนข้อที่เลือก</option>
+                                <option value="selected" @selected($scoringMethodFormValue === 'selected')>หลายตัวเลือก - คะแนนตามข้อที่เลือก</option>
+                                <option value="custom" @selected($scoringMethodFormValue === 'custom')>ปรับแต่งอิสระ</option>
                             </select>
                         </div>
 
@@ -471,7 +511,7 @@
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/trumbowyg@2.31.0/dist/trumbowyg.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/trumbowyg@2.31.0/dist/plugins/justify/trumbowyg.justify.min.js"></script>
+    {{-- <script src="https://cdn.jsdelivr.net/npm/trumbowyg@2.31.0/dist/plugins/justify/trumbowyg.justify.min.js"></script> --}}
     <script src="https://cdn.jsdelivr.net/npm/trumbowyg@2.31.0/dist/plugins/table/trumbowyg.table.min.js"></script>
 @endpush
 

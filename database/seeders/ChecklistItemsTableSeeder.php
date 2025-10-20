@@ -1649,7 +1649,16 @@ class ChecklistItemsTableSeeder extends Seeder
                 'description' => NULL,
             ),
         ));
-        
-        
+
+        $sequence = \DB::selectOne("SELECT pg_get_serial_sequence(?, 'id') AS seq", ['checklist_items']);
+        if ($sequence && !empty($sequence->seq)) {
+            $maxId = \DB::table('checklist_items')->max('id');
+            $value = $maxId ?? 0;
+            $isCalled = $maxId !== null;
+
+            \DB::select("SELECT setval(?, ?, ?)", [$sequence->seq, $value, $isCalled]);
+        }
+
+
     }
 }

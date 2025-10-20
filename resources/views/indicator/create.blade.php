@@ -3,7 +3,14 @@
 @section('title', 'เพิ่มตัวบ่งชี้')
 
 @section('content')
-    <form action="{{ route('indicator.store') }}" method="POST" x-data="{ score_acc: @js(old('max_score', '')) }">
+    <form action="{{ route('indicator.store') }}" method="POST"
+        x-data="{
+            score_acc: '',
+            init() {
+                this.score_acc = this.$el.dataset.initialScoreAcc ?? '';
+            }
+        }"
+        data-initial-score-acc="{{ old('max_score', '') }}">
         @csrf
         <div class="w-full mx-auto">
             <div class="banner rounded-t-2xl border border-slate-200 p-5 ">
@@ -82,10 +89,24 @@
                     <x-card number="4" title="เกณฑ์การพิจารณา" class="space-y-6">
                         <x-card-box title="รายการเกณฑ์การพิจารณา" icon="📋">
                             <div x-data="{
-                                items: [{ id: Date.now() }],
+                                oldCriteria: @js(old('criteria', [])),
+                                items: [],
                                 name: [],
+                                init() {
+                                    // โหลด old data ถ้ามี, ถ้าไม่มีให้เริ่มต้นด้วย 1 item
+                                    if (this.oldCriteria && this.oldCriteria.length > 0) {
+                                        this.items = this.oldCriteria.map((c, idx) => ({ 
+                                            id: Date.now() + idx,
+                                            data: c
+                                        }));
+                                        this.name = this.oldCriteria.map(c => c.name || '');
+                                    } else {
+                                        this.items = [{ id: Date.now(), data: null }];
+                                    }
+                                    this.$nextTick(() => this.broadcast());
+                                },
                                 add() {
-                                    this.items = [...this.items, { id: Date.now() + this.items.length }];
+                                    this.items = [...this.items, { id: Date.now() + this.items.length, data: null }];
                                     this.$nextTick(() => this.broadcast())
                                 },
                                 remove(i) {
@@ -117,7 +138,7 @@
                                     $dispatch('criteria-updated', { name: this.name });
                                     window.dispatchEvent(new CustomEvent('criteria-updated', { detail: { name: this.name } }));
                                 }
-                            }" x-init="$nextTick(() => broadcast())"
+                            }"
                                 @criteria-remove="remove($event.detail.index-1)"
                                 @criteria-move-up="up($event.detail.index-1)"
                                 @criteria-move-down="down($event.detail.index-1)"
@@ -128,10 +149,10 @@
                                 "
                                 class="space-y-4">
                                 <template x-for="(it, i) in items" :key="it.id">
-                                    <div x-data="{ 
-                                        sequence: i + 1, 
+                                    <div x-data="{
+                                        sequence: i + 1,
                                         prefix: 'criteria[' + i + ']',
-                                        criteriaData: null
+                                        criteriaData: it.data
                                     }"
                                         x-effect="sequence = i + 1; prefix = 'criteria[' + i + ']'">
                                         <x-card-criteria :show-controls="true" />
@@ -153,11 +174,28 @@
                     </x-card>
 
                     {{-- Card 5: Scoring --}}
-                    <x-card number="5" title="เกณฑ์การให้คะแนน" class="space-y-6" x-data="{
-                        scoringMethod() {
-                            return document.querySelector('input[name=scoring_method]')?.value || '';
+                    @php
+                        $scoringMethodInitial = old('scoring_method');
+                        if ($scoringMethodInitial === null || $scoringMethodInitial === '') {
+                            if (! empty(old('multiCounts'))) {
+                                $scoringMethodInitial = 'count';
+                            } elseif (! empty(old('multiSelected'))) {
+                                $scoringMethodInitial = 'selected';
+                            } elseif (! empty(old('scoring.variables'))) {
+                                $scoringMethodInitial = 'custom';
+                            } else {
+                                $scoringMethodInitial = '';
+                            }
                         }
-                    }">
+                    @endphp
+                    <x-card number="5" title="เกณฑ์การให้คะแนน" class="space-y-6"
+                        x-data="{
+                            scoringMethod: '',
+                            init() {
+                                this.scoringMethod = this.$el.dataset.defaultScoringMethod || '';
+                            }
+                        }"
+                        data-default-scoring-method="{{ $scoringMethodInitial }}">
                         <x-card-box icon="📋">
                             <x-slot name="title">
                                 <div class="flex items-center space-x-2 font-bold">
@@ -187,7 +225,7 @@
                                 <x-richtext name="comment" placeholder="คำอธิบายเกณฑ์ให้คะแนน" />
                                 <label class="block">
                                     <span class="text-sm font-medium text-slate-700">คะแนนเต็มทั้งหมดของตัวบ่งชี้</span>
-                                    <input type="text" :value="score_acc" readonly
+                                    <input name="max_score" type="text" :value="score_acc" readonly
                                         class="p-2 mt-1 w-full bg-gray-100 rounded-xl border border-slate-300 text-sm md:text-base cursor-not-allowed"
                                         placeholder="คะแนนจะปรากฏที่นี่">
                                 </label>
@@ -195,17 +233,17 @@
                         </x-card-box>
 
                         <div class="w-full">
-                            <label class="block mb-3 text-sm font-medium text-slate-700">เลือกวิธีการให้คะแนน</label>
+                            <p class="block mb-3 text-sm font-medium text-slate-700">เลือกวิธีการให้คะแนน</p>
 
-                            <select x-model="scoringMethod"
+                            <select x-model="scoringMethod" name="scoring_method" id="scoring_method"
                                 class="p-2 mt-1 w-full bg-white rounded-xl border border-slate-300 
                 placeholder-slate-400 text-sm md:text-base 
                 hover:shadow-md hover:border-blue-400 transition
                 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-500">
-                                <option value="">-- กรุณาเลือกวิธีการให้คะแนน --</option>
-                                <option value="count">หลายตัวเลือก - ตามจำนวนข้อที่เลือก</option>
-                                <option value="selected">หลายตัวเลือก - คะแนนตามข้อที่เลือก</option>
-                                <option value="custom">ปรับแต่งอิสระ</option>
+                                <option value="" @selected($scoringMethodInitial === '')>-- กรุณาเลือกวิธีการให้คะแนน --</option>
+                                <option value="count" @selected($scoringMethodInitial === 'count')>หลายตัวเลือก - ตามจำนวนข้อที่เลือก</option>
+                                <option value="selected" @selected($scoringMethodInitial === 'selected')>หลายตัวเลือก - คะแนนตามข้อที่เลือก</option>
+                                <option value="custom" @selected($scoringMethodInitial === 'custom')>ปรับแต่งอิสระ</option>
                             </select>
 
                         </div>
@@ -220,20 +258,33 @@
                             <template x-if="scoringMethod === 'selected'">
                                 <x-card-box title="เกณฑ์ให้คะแนนแบบหลายตัวเลือก-คะแนนตามข้อที่เลือก" icon="📋">
                                     <div x-data="{
-                                        items: [{ id: Date.now() }],
-                                        add() { this.items = [...this.items, { id: Date.now() + this.items.length }] },
+                                        oldMultiSelected: @js(old('multiSelected', [])),
+                                        items: [],
+                                        init() {
+                                            if (this.oldMultiSelected && this.oldMultiSelected.length > 0) {
+                                                this.items = this.oldMultiSelected.map((c, idx) => ({ 
+                                                    id: Date.now() + idx,
+                                                    data: c
+                                                }));
+                                            } else {
+                                                this.items = [{ id: Date.now(), data: null }];
+                                            }
+                                        },
+                                        add() { 
+                                            this.items = [...this.items, { id: Date.now() + this.items.length, data: null }] 
+                                        },
                                         remove(i) {
                                             const a = [...this.items];
                                             a.splice(i, 1);
-                                            this.items = a.length ? a : [{ id: Date.now() }]
+                                            this.items = a.length ? a : [{ id: Date.now(), data: null }]
                                         }
                                     }" @criteria-remove="remove($event.detail.index - 1)"
                                         class="space-y-4">
                                         <template x-for="(it, i) in items" :key="it.id">
-                                            <div x-data="{ 
-                                                sequence: i + 1, 
+                                            <div x-data="{
+                                                sequence: i + 1,
                                                 prefix: 'multiSelected[' + i + ']',
-                                                checklistData: null
+                                                checklistData: it.data
                                             }"
                                                 x-effect="sequence = i + 1; prefix = 'multiSelected[' + i + ']'">
                                                 <x-multichoice-score-selected :options="$criteriaOptions ?? []" />
@@ -282,7 +333,7 @@
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/trumbowyg@2.31.0/dist/trumbowyg.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/trumbowyg@2.31.0/dist/plugins/justify/trumbowyg.justify.min.js"></script>
+    {{-- <script src="https://cdn.jsdelivr.net/npm/trumbowyg@2.31.0/dist/plugins/justify/trumbowyg.justify.min.js"></script> --}}
     <script src="https://cdn.jsdelivr.net/npm/trumbowyg@2.31.0/dist/plugins/table/trumbowyg.table.min.js"></script>
 @endpush
 

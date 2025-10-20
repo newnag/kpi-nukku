@@ -206,8 +206,17 @@ array (
 'updated_at' => '2025-09-30 04:00:02',
 'indicator_id' => 37,
 ),
-));
-        
-        
+        ));
+
+        $sequence = \DB::selectOne("SELECT pg_get_serial_sequence(?, 'id') AS seq", ['formulas']);
+        if ($sequence && !empty($sequence->seq)) {
+            $maxId = \DB::table('formulas')->max('id');
+            $value = $maxId ?? 0;
+            $isCalled = $maxId !== null;
+
+            \DB::select("SELECT setval(?, ?, ?)", [$sequence->seq, $value, $isCalled]);
+        }
+
+
     }
 }

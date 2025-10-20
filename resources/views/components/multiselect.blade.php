@@ -63,10 +63,11 @@ hookFormValidation();">
         <button type="button" x-ref="btn" @click="toggle()" @keydown.arrow-down.prevent="open=true; move(1)"
             @keydown.arrow-up.prevent="open=true; move(-1)" @keydown.enter.prevent="submitKey($event)"
             :style="btnStyle"
-            class="relative p-2 pr-8 mt-1 w-full rounded-xl border border-slate-300 text-left
-         hover:shadow-md hover:border-blue-400 transition
-         focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-500
-         min-h-[42px]">
+            @class([
+                'relative p-2 pr-8 mt-1 w-full rounded-xl border text-left transition min-h-[42px]',
+                'border-red-500 focus:border-red-500 focus:ring-red-200' => $errors->has($name),
+                'border-slate-300 hover:shadow-md hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-500' => !$errors->has($name),
+            ])>
             <template x-if="!selectedOptions.length">
                 <span class="block text-slate-400 truncate" x-text="placeholder"></span>
             </template>
@@ -86,6 +87,7 @@ hookFormValidation();">
                 </svg>
             </span>
         </button>
+        <x-input-error :name="$name" />
     </label>
 
     <!-- Optional below-the-trigger vertical list -->
@@ -115,8 +117,16 @@ hookFormValidation();">
         :style="{ top: '75px' }">
         <!-- Search + actions -->
         <div class="p-2 border-b border-slate-200 flex items-center gap-2" x-show="searchable || selectAllEnabled">
-            <input x-show="searchable" x-ref="search" x-model="q" @keydown.arrow-down.prevent="move(1)"
-                @keydown.arrow-up.prevent="move(-1)" @keydown.enter.prevent="submitKey($event)" type="text"
+            <input x-show="searchable" 
+                x-ref="search" 
+                :id="name + '_search'"
+                :name="name + '_search'"
+                x-model="q" 
+                @keydown.arrow-down.prevent="move(1)"
+                @keydown.arrow-up.prevent="move(-1)" 
+                @keydown.enter.prevent="submitKey($event)" 
+                type="text"
+                autocomplete="off"
                 class="p-2 mt-1 w-full bg-white rounded-xl border border-slate-300 
                 placeholder-slate-400 text-sm md:text-base 
                 hover:shadow-md hover:border-blue-400 transition
@@ -137,7 +147,12 @@ hookFormValidation();">
                     class="px-3 py-2 cursor-pointer flex items-start gap-2"
                     :class="[(isSelected(o.value) ? 'bg-blue-50' : ''), (hi === i) ? 'bg-slate-50' : '']"
                     @click="toggleValue(o.value)">
-                    <input type="checkbox" class="mt-0.5 rounded text-blue-600" :checked="isSelected(o.value)">
+                    <input type="checkbox" 
+                        :id="name + '_checkbox_' + i"
+                        :name="name + '_checkbox_' + i"
+                        class="mt-0.5 rounded text-blue-600" 
+                        :checked="isSelected(o.value)"
+                        autocomplete="off">
                     <span class="text-sm break-words leading-snug" x-text="o.label"></span>
                 </li>
             </template>
@@ -147,15 +162,19 @@ hookFormValidation();">
             </template>
         </ul>
 
-        <div class="flex justify-end px-3 py-2 border-t border-slate-200">
+        {{-- <div class="flex justify-end px-3 py-2 border-t border-slate-200">
             <button type="button" class="text-sm text-white bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded"
                 @click="open=false">เสร็จสิ้น</button>
-        </div>
+        </div> --}}
     </div>
 
     <!-- Hidden inputs -->
-    <template x-for="val in selected" :key="val">
-        <input type="hidden" name="{{ $name }}[]" :value="val">
+    <template x-for="(val, idx) in selected" :key="val">
+        <input type="hidden" 
+            :id="name + '_value_' + idx"
+            :name="name + '[]'" 
+            :value="val"
+            autocomplete="off">
     </template>
 </div>
 

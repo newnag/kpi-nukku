@@ -45,11 +45,22 @@
         <template x-for="(r, i) in rules" :key="r.id">
             <div class="space-y-2 sm:space-y-0 sm:grid sm:grid-cols-3 sm:items-center gap-3">
                 {{-- จำนวนที่เลือก --}}
-                <input type="number" min="0" step="1" x-model.number="r.count"
+                <input type="number" 
+                    min="0" 
+                    step="1" 
+                    x-model.number="r.count"
+                    :id="'{{ $base }}' + '_count_' + i"
+                    :name="'{{ $base }}' + '_count_' + i"
+                    autocomplete="off"
                     class="rounded-xl border bg-white py-1 px-3 border-slate-300 focus:border-blue-500 focus:ring-blue-500 w-full text-sm md:text-base">
 
                 {{-- คะแนนที่ได้ --}}
-                <input type="number" step="1" x-model.number="r.score"
+                <input type="number" 
+                    step="1" 
+                    x-model.number="r.score"
+                    :id="'{{ $base }}' + '_score_' + i"
+                    :name="'{{ $base }}' + '_score_' + i"
+                    autocomplete="off"
                     class="rounded-xl border bg-white py-1 px-3 border-slate-300 focus:border-blue-500 focus:ring-blue-500 w-full text-sm md:text-base">
 
                 <div class="flex sm:justify-end">
@@ -58,8 +69,16 @@
                 </div>
 
                 {{-- Hidden fields for POST (flat array) --}}
-                <input type="hidden" :name="'{{ $base }}' + `[${i}][count]`" :value="r.count">
-                <input type="hidden" :name="'{{ $base }}' + `[${i}][score]`" :value="r.score">
+                <input type="hidden" 
+                    :id="'{{ $base }}' + '_count_hidden_' + i"
+                    :name="'{{ $base }}' + `[${i}][count]`" 
+                    :value="r.count"
+                    autocomplete="off">
+                <input type="hidden" 
+                    :id="'{{ $base }}' + '_score_hidden_' + i"
+                    :name="'{{ $base }}' + `[${i}][score]`" 
+                    :value="r.score"
+                    autocomplete="off">
             </div>
         </template>
 
