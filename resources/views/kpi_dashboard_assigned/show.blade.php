@@ -97,6 +97,38 @@
                                 {!! $criteria->description !!}
                             </div>
                         @endif
+
+                        @php
+                            $detailEvidence = $criteria->evidences
+                                ->sortByDesc(function($e){ return $e->created_at; })
+                                ->first(function($e){ return filled($e->detail); });
+                        @endphp
+
+                        @if ($detailEvidence)
+                            @php $detailId = $detailEvidence?->id; @endphp
+                            <div class="criteria-detail mb-3" data-criteria-id="{{ $criteria->id }}" data-evidence-id="{{ $detailId }}"
+                                data-store-url="{{ route('evidences.store') }}"
+                                @if($detailId) data-update-url="{{ route('evidences.update', $detailId) }}" @endif>
+                                <div class="flex items-center justify-between mb-1">
+                                    <div class="font-semibold text-gray-800">รายงานผลการดำเนินงาน</div>
+                                    @if (!$locked)
+                                        <div class="flex gap-2 text-sm">
+                                            <button type="button" class="btn btn-xs btn-outline detail-edit-btn">แก้ไข</button>
+                                            <button type="button" class="btn btn-xs btn-primary detail-save-btn" style="display:none">บันทึก</button>
+                                            <button type="button" class="btn btn-xs btn-outline detail-cancel-btn" style="display:none">ยกเลิก</button>
+                                        </div>
+                                    @endif
+                                </div>
+                                <div class="prose max-w-none text-sm text-gray-800 criteria-detail-view">
+                                    {!! $detailEvidence->detail !!}
+                                </div>
+                                @if (!$locked)
+                                    <textarea class="criteria-detail-editor eu-editor" rows="6" style="display:none">{!! $detailEvidence->detail !!}</textarea>
+                                @endif
+                            </div>
+                        @endif
+
+                        @if ($criteria->evidences->isNotEmpty())
                         <div class="evidence-list evidence-list-{{ $criteria->id }}">
                             @forelse($criteria->evidences as $evidence)
                                 @php
@@ -240,10 +272,9 @@
                                     </div>
                                 </div>
                             @empty
-                                <div class="text-sm text-center text-gray-500 opacity-75">----- ยังไม่มีหลักฐานแนบ
-                                    -----</div>
                             @endforelse
                         </div>
+                        @endif
                     </div>
                 </div>
             @empty
@@ -412,6 +443,107 @@
         href="https://cdnjs.cloudflare.com/ajax/libs/Trumbowyg/2.27.3/plugins/colors/ui/trumbowyg.colors.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Trumbowyg/2.27.3/plugins/colors/trumbowyg.colors.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Trumbowyg/2.27.3/plugins/fontsize/trumbowyg.fontsize.min.js">
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const csrf = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+
+            document.querySelectorAll('.criteria-detail').forEach(section => {
+                const view = section.querySelector('.criteria-detail-view');
+                const editor = section.querySelector('.criteria-detail-editor');
+                const editBtn = section.querySelector('.detail-edit-btn');
+                const saveBtn = section.querySelector('.detail-save-btn');
+                const cancelBtn = section.querySelector('.detail-cancel-btn');
+                const criteriaId = section.getAttribute('data-criteria-id');
+                const storeUrl = section.getAttribute('data-store-url');
+
+                if (!editBtn || !editor) return; // locked or missing
+
+                let trumboReady = false;
+                let editorBox = null; // Trumbowyg wrapper
+                try {
+                    editorBox = section.querySelector('.trumbowyg-box');
+                    const hasDetail = (section.getAttribute('data-evidence-id') || '').length > 0;
+                    if (editorBox && hasDetail) editorBox.style.display = 'none';
+                } catch (e) {}
+
+                const ensureEditor = () => {
+                    if (trumboReady) return;
+                    try {
+                        if (window.$ && typeof $.fn.trumbowyg === 'function') {
+                            $(editor).trumbowyg({
+                                lang: 'th',
+                                resetCss: true,
+                                removeformatPasted: true,
+                                btns: [
+                                    ['viewHTML'], ['undo', 'redo'], ['formatting'], ['strong', 'em', 'del'],
+                                    ['fontsize', 'foreColor'], ['link'], ['unorderedList', 'orderedList'],
+                                    ['justifyLeft','justifyCenter','justifyRight','justifyFull'], ['horizontalRule'], ['removeformat']
+                                ]
+                            });
+                            editorBox = section.querySelector('.trumbowyg-box');
+                            trumboReady = true;
+                        }
+                    } catch (e) {}
+                };
+
+                const toEditMode = () => {
+                    ensureEditor();
+                    if (view) view.style.display = 'none';
+                    editor.style.display = '';
+                    if (editorBox) editorBox.style.display = '';
+                    editBtn.style.display = 'none';
+                    if (saveBtn) saveBtn.style.display = '';
+                    if (cancelBtn) cancelBtn.style.display = '';
+                };
+                const toViewMode = () => {
+                    if (view) view.style.display = '';
+                    editor.style.display = 'none';
+                    if (!editorBox) editorBox = section.querySelector('.trumbowyg-box');
+                    if (editorBox) editorBox.style.display = 'none';
+                    editBtn.style.display = '';
+                    if (saveBtn) saveBtn.style.display = 'none';
+                    if (cancelBtn) cancelBtn.style.display = 'none';
+                };
+
+                editBtn.addEventListener('click', () => toEditMode());
+                cancelBtn?.addEventListener('click', () => toViewMode());
+
+                saveBtn?.addEventListener('click', async () => {
+                    let html = editor.value || editor.innerHTML;
+                    try { if (window.$ && $(editor).trumbowyg) html = $(editor).trumbowyg('html'); } catch (e) {}
+
+                    const evidenceId = section.getAttribute('data-evidence-id');
+                    const updateUrl = section.getAttribute('data-update-url');
+                    try {
+                        saveBtn.disabled = true; editBtn.disabled = true; if (cancelBtn) cancelBtn.disabled = true;
+                        if (evidenceId && updateUrl) {
+                            const resp = await fetch(updateUrl, {
+                                method: 'PUT',
+                                headers: { 'X-CSRF-TOKEN': csrf, 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json', 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ detail: html })
+                            });
+                            const text = await resp.text(); let data; try { data = JSON.parse(text); } catch (_) { data = null; }
+                            if (resp.ok && (data?.success !== false)) { if (view) view.innerHTML = html || ''; toViewMode(); }
+                            else { alert((data && data.message) || 'บันทึกไม่สำเร็จ'); }
+                        } else {
+                            const resp = await fetch(storeUrl, {
+                                method: 'POST',
+                                headers: { 'X-CSRF-TOKEN': csrf, 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json', 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ criteria_id: Number(criteriaId), detail: html })
+                            });
+                            const text = await resp.text(); let data; try { data = JSON.parse(text); } catch (_) { data = null; }
+                            if (resp.ok && (data?.success !== false)) { window.location.reload(); }
+                            else { alert((data && data.message) || 'บันทึกไม่สำเร็จ'); }
+                        }
+                    } catch (e) {
+                        alert('เกิดข้อผิดพลาดในการบันทึก');
+                    } finally {
+                        saveBtn.disabled = false; editBtn.disabled = false; if (cancelBtn) cancelBtn.disabled = false;
+                    }
+                });
+            });
+        });
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Trumbowyg/2.27.3/plugins/fontfamily/trumbowyg.fontfamily.min.js">
     </script>

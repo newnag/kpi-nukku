@@ -96,6 +96,22 @@
                                 {!! $criteria->description !!}
                             </div>
                         @endif
+
+                        @php
+                            $detailEvidence = $criteria->evidences
+                                ->sortByDesc(function($e){ return $e->created_at; })
+                                ->first(function($e){ return filled($e->detail); });
+                        @endphp
+                        @if ($detailEvidence)
+                            <div class="criteria-detail mb-3">
+                                <div class="font-semibold text-gray-800 mb-1">รายงานผลการดำเนินงาน</div>
+                                <div class="prose max-w-none text-sm text-gray-800">
+                                    {!! $detailEvidence->detail !!}
+                                </div>
+                            </div>
+                        @endif
+
+                        @if ($criteria->evidences->isNotEmpty())
                         <div class="evidence-list evidence-list-{{ $criteria->id }}">
                             @forelse($criteria->evidences as $evidence)
                                 @php
@@ -171,10 +187,9 @@
                                     </div>
                                 </div>
                             @empty
-                                <div class="text-sm text-center text-gray-500 opacity-75">----- ยังไม่มีหลักฐานแนบ
-                                    -----</div>
                             @endforelse
                         </div>
+                        @endif
                     </div>
                 </div>
             @empty

@@ -168,6 +168,7 @@ class EvidenceController extends Controller
             $hasFiles  = $request->hasFile('files');
             $hasUrls   = $urlEntries->isNotEmpty();
             $hasDetail = filled($request->input('detail'));
+            $detailAssigned = false; // one detail per criteria
 
             if (!$hasFiles && !$hasUrls && !$hasDetail) {
                 if ($request->expectsJson()) {
@@ -242,7 +243,13 @@ class EvidenceController extends Controller
 
                     $evidence = new Evidence();
                     $evidence->path        = $payload;
-                    $evidence->detail      = null;
+                    // Assign detail only once per criteria (first file or first URL)
+                    if ($hasDetail && !$detailAssigned) {
+                        $evidence->detail = $request->input('detail');
+                        $detailAssigned = true;
+                    } else {
+                        $evidence->detail = null;
+                    }
                     $evidence->status      = false;
                     $evidence->criteria_id = $criteria->id;
                     $evidence->user_id     = Auth::id();
@@ -261,7 +268,13 @@ class EvidenceController extends Controller
 
                     $evidence = new Evidence();
                     $evidence->path        = $payload;
-                    $evidence->detail      = $request->input('detail');
+                    // Assign detail only once per criteria (first URL if not used by files)
+                    if ($hasDetail && !$detailAssigned) {
+                        $evidence->detail = $request->input('detail');
+                        $detailAssigned = true;
+                    } else {
+                        $evidence->detail = null;
+                    }
                     $evidence->status      = true;
                     $evidence->criteria_id = $criteria->id;
                     $evidence->user_id     = Auth::id();
@@ -278,7 +291,7 @@ class EvidenceController extends Controller
             }
 
             // ========== 3) ถ้ามีแค่ Detail ==========
-            if (!$hasUrls && $hasDetail) {
+            if (!$hasUrls && !$hasFiles && $hasDetail) {
                 $evidence = new Evidence();
                 $evidence->path        = [];
                 $evidence->detail      = $request->input('detail');

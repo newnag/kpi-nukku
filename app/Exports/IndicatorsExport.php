@@ -172,6 +172,23 @@ class IndicatorsExport implements FromCollection, WithEvents
                                 'criterias.evidences', // ดึงมาหมด
                             ])->whereIn('id', $ids)->get()->keyBy('id');
 
+                            // helper: extract plain text from evidence.detail for a criteria
+                            $extractDetail = function ($criteria) {
+                                try {
+                                    if ($criteria && $criteria->relationLoaded('evidences')) {
+                                        foreach ($criteria->evidences as $ev) {
+                                            $html = (string) ($ev->detail ?? '');
+                                            $htmlTrim = trim(strip_tags(html_entity_decode($html)));
+                                            if ($htmlTrim !== '') {
+                                                $text = preg_replace('/[\x{00A0}\s]+/u', ' ', $htmlTrim);
+                                                return trim((string) $text);
+                                            }
+                                        }
+                                    }
+                                } catch (\Throwable $e) {}
+                                return '';
+                            };
+
                             // แล้วค่อย filter ตอนใช้งาน
 
 
@@ -204,6 +221,7 @@ class IndicatorsExport implements FromCollection, WithEvents
                                 }
 
                                 foreach ($criterias as $c) {
+                                    $critRow = $row; // remember row for this criteria
                                     // --- เก็บค่าหลัก ๆ ของ criteria ---
                                     $s->setCellValue("A{$row}", $ci);
                                     $s->setCellValue("B{$row}", $c->name ?? '');
@@ -211,7 +229,9 @@ class IndicatorsExport implements FromCollection, WithEvents
                                     $has = (bool) ($c->status ?? false);
                                     $s->setCellValue("C{$row}", $has ? '✓' : '');
                                     $s->setCellValue("D{$row}", $has ? '' : '✓');
-                                    $s->setCellValue("E{$row}", '');
+                                    // Column E: รายงานผลการดำเนินงาน (จาก evidence.detail)
+                                    $detailText = $extractDetail($c);
+                                    $s->setCellValue("E{$row}", $detailText);
 
                                     // --- ถ้ามี evidences ---
                                     if ($has && $c->evidences->isNotEmpty()) {
@@ -239,6 +259,10 @@ class IndicatorsExport implements FromCollection, WithEvents
                                         $s->setCellValue("F{$row}", '-');
                                     }
 
+                                    // Re-assert detail text to guard against later merges overwriting E cell
+                                    if (isset($detailText) && $detailText !== '') {
+                                        try { $s->setCellValue("E{$critRow}", $detailText); } catch (\Throwable $ex) {}
+                                    }
                                     $row++;
                                     $ci++;
                                 }

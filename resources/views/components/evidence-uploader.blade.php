@@ -21,13 +21,17 @@
         <section class="eu-modal" role="dialog" aria-modal="true" aria-labelledby="eu-title-{{ $cid }}"
             x-trap.inert.noscroll="open">
             <!-- Header -->
-            <header class="eu-modal-header">
-                <h2 id="eu-title-{{ $cid }}">เพิ่มหลักฐานใหม่</h2>
-                <button type="button" class="btn btn-delete !w-fit !text-gray-500 hover:!text-red-500 btn btn-xs hover:!shadow-none"
+            <header class="eu-modal-header flex items-center justify-between">
+                <h2 id="eu-title-{{ $cid }}" class="flex-1 text-center font-semibold">
+                    เพิ่มหลักฐานใหม่
+                </h2>
+                <button type="button"
+                    class="btn btn-delete !w-fit !text-gray-500 hover:!text-red-500 btn btn-xs hover:!shadow-none"
                     @click="closeModal()" aria-label="ปิด">
                     <i data-lucide="x"></i>
                 </button>
             </header>
+
             <div
                 class="p-1 md:p-2 lg:p-3 overflow-y-auto max-w-auto min-h-[160px] sm:min-h-[200px] max-h-[70vh] sm:max-h-[75vh] md:max-h-[80vh]">
                 <form action="{{ $storeRoute ?? route('evidences.store') }}" method="POST"
@@ -39,6 +43,10 @@
                     <!-- Single column content -->
                     <div class="eu-stack">
                         <!-- Upload -->
+                        <div class="eu-block">
+                            <div class="eu-section-title">รายงานผลการดำเนินงาน</div>
+                            <textarea id="detailEditor-{{ $cid }}" name="detail" class="eu-editor" rows="6">{!! old('detail') !!}</textarea>
+                        </div>
                         <div class="eu-block">
                             <div class="eu-dropzone" :class="{ 'is-dragover': dragging }"
                                 @dragenter.prevent="dragging = true" @dragover.prevent="dragging = true"
@@ -120,10 +128,7 @@
                         </div>
 
                         <!-- Details -->
-                        <div class="eu-block">
-                            <div class="eu-section-title">รายละเอียดเพิ่มเติม</div>
-                            <textarea id="detailEditor-{{ $cid }}" name="detail" class="eu-editor" rows="6">{!! old('detail') !!}</textarea>
-                        </div>
+
                     </div>
             </div>
 
@@ -479,7 +484,9 @@
                         if (window.crypto && typeof window.crypto.randomUUID === 'function') {
                             return window.crypto.randomUUID();
                         }
-                    } catch (e) { /* noop */ }
+                    } catch (e) {
+                        /* noop */
+                    }
                     try {
                         if (window.crypto && window.crypto.getRandomValues) {
                             const buf = new Uint8Array(16);
@@ -489,14 +496,21 @@
                             const hex = Array.from(buf, b => b.toString(16).padStart(2, '0')).join('');
                             return `${hex.substring(0, 8)}-${hex.substring(8, 12)}-${hex.substring(12, 16)}-${hex.substring(16, 20)}-${hex.substring(20)}`;
                         }
-                    } catch (e) { /* noop */ }
+                    } catch (e) {
+                        /* noop */
+                    }
                     // Math.random fallback
                     let d = Date.now();
                     let d2 = (typeof performance !== 'undefined' && performance.now) ? performance.now() * 1000 : 0;
                     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
                         let r = Math.random() * 16;
-                        if (d > 0) { r = (d + r) % 16 | 0; d = Math.floor(d / 16); }
-                        else { r = (d2 + r) % 16 | 0; d2 = Math.floor(d2 / 16); }
+                        if (d > 0) {
+                            r = (d + r) % 16 | 0;
+                            d = Math.floor(d / 16);
+                        } else {
+                            r = (d2 + r) % 16 | 0;
+                            d2 = Math.floor(d2 / 16);
+                        }
                         return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
                     });
                 },
@@ -522,7 +536,11 @@
                         });
                         // Ensure at least one URL row exists
                         if (!this.urlRows.length) {
-                            this.urlRows.push({ _id: this.uuid(), name: '', url: '' });
+                            this.urlRows.push({
+                                _id: this.uuid(),
+                                name: '',
+                                url: ''
+                            });
                         }
                         this.refreshIcons();
                     });

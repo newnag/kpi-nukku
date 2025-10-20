@@ -77,8 +77,14 @@
                                                                         -
                                                                     @endif
                                                                 </td>
+                                                                @php
+                                                                    $__detailEv = $cri->evidences
+                                                                        ->sortByDesc(function($e){ return $e->created_at; })
+                                                                        ->first(function($e){ return filled($e->detail); });
+                                                                    $__initialReport = $__detailEv->detail ?? '';
+                                                                @endphp
                                                                 <td class="border px-2 text-center cursor-pointer hover:bg-blue-50"
-                                                                    x-data="{ open: false, text: @js($cri->report ?? ''), saving: false, saved: false, showPreview: false }" @click="open = true"
+                                                                    x-data="{ open: false, text: @js($__initialReport), saving: false, saved: false, showPreview: false }" @click="open = true"
                                                                     tabindex="0" role="button"
                                                                     @keydown.enter.prevent="open = true"
                                                                     @keydown.space.prevent="open = true"
@@ -153,7 +159,7 @@
                                                                             </h3>
 
                                                                             <!-- Rich Text Editor -->
-                                                                            <textarea id="editor-{{ $cri->id }}" x-ref="editor">{{ $cri->report }}</textarea>
+                                                                            <textarea id="editor-{{ $cri->id }}" x-ref="editor">{!! $__initialReport !!}</textarea>
 
                                                                             <div class="mt-4 flex justify-end space-x-2">
                                                                                 <button type="button"

@@ -119,7 +119,16 @@
                                 <td class="score">{{ $i + 1 }}</td>
                                 <td>{{ $cri->name }}</td>
                                 <td class="score">{{ $cri->status ? '✓' : '-' }}</td>
-                                <td>{!! $cri->report ?? '-' !!}</td>
+                                @php
+                                    $detailHtml = '';
+                                    if ($cri->relationLoaded('evidences')) {
+                                        foreach ($cri->evidences as $ev) {
+                                            $h = (string) ($ev->detail ?? '');
+                                            if (trim(strip_tags(html_entity_decode($h))) !== '') { $detailHtml = $h; break; }
+                                        }
+                                    }
+                                @endphp
+                                <td>{!! $detailHtml !== '' ? $detailHtml : '-' !!}</td>
                                 <td>
                                     @if ($cri->evidences->isNotEmpty())
                                         <ul>

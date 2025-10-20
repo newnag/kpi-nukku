@@ -200,13 +200,39 @@ class SarReportController extends Controller
         ]);
 
         $criteria = Criteria::findOrFail($id);
-        $criteria->report = $request->input('report');
-        $criteria->save();
+        $reportHtml = $request->input('report');
+
+        // Write to evidence.detail only (no longer storing in criterias.report)
+        try {
+            $evi = Evidence::where('criteria_id', $criteria->id)
+                ->whereNotNull('detail')
+                ->orderByDesc('id')
+                ->first();
+
+            if ($evi) {
+                $evi->detail = $reportHtml;
+                $evi->save();
+            } else {
+                if (filled($reportHtml)) {
+                    $evi = new Evidence();
+                    $evi->path        = [];
+                    $evi->detail      = $reportHtml;
+                    $evi->status      = true;
+                    $evi->criteria_id = $criteria->id;
+                    $evi->user_id     = Auth::id();
+                    $evi->name        = 'รายงานผลการดำเนินงาน';
+                    $evi->type        = 'note';
+                    $evi->save();
+                }
+            }
+        } catch (\Throwable $e) {
+            // Non-fatal: keep criteria.report saved even if evidence sync fails
+        }
 
         return response()->json([
             'success' => true,
             'message' => 'บันทึกสำเร็จ',
-            'report'  => $criteria->report,
+            'report'  => $reportHtml,
         ]);
     }
 
@@ -473,6 +499,21 @@ class SarReportController extends Controller
         };
 
 
+        // helper to get first non-empty evidence.detail HTML for a criteria
+        $getEvidenceDetailHtml = function ($cri) {
+            try {
+                if ($cri && $cri->relationLoaded('evidences')) {
+                    foreach ($cri->evidences as $ev) {
+                        $html = (string) ($ev->detail ?? '');
+                        if (trim(strip_tags(html_entity_decode($html))) !== '') {
+                            return $html;
+                        }
+                    }
+                }
+            } catch (\Throwable $e) {}
+            return '';
+        };
+
         // Clone object for rendering and scrub HTML fields
         $reportToRender = clone $report;
         $reportToRender->section1 = $stripFonts($reportToRender->section1);
@@ -480,7 +521,7 @@ class SarReportController extends Controller
         $reportToRender->section4 = $stripFonts($reportToRender->section4);
         if ($reportToRender->indicator && $reportToRender->indicator->criterias) {
             foreach ($reportToRender->indicator->criterias as $cri) {
-                $cri->report = $stripFonts($cri->report);
+                $cri->report = $stripFonts($getEvidenceDetailHtml($cri));
             }
         }
 
@@ -585,7 +626,8 @@ class SarReportController extends Controller
                             $has = (bool)($cri->status ?? false);
                             $sheet->setCellValue("C{$row}", $has ? '✓' : '');
                             $sheet->setCellValue("D{$row}", $has ? '' : '✓');
-                            $sheet->setCellValue("E{$row}", trim(strip_tags((string)($cri->report ?? '-'))));
+                            $detailHtml = $getEvidenceDetailHtml($cri);
+                            $sheet->setCellValue("E{$row}", trim(strip_tags(html_entity_decode((string)$detailHtml))) ?: '-');
 
                             $evList = $cri->evidences->pluck('name')->implode(', ');
                             $sheet->setCellValue("F{$row}", $evList ?: '-');
@@ -724,7 +766,7 @@ class SarReportController extends Controller
                         $table->addCell(500)->addText('ข้อ', ['bold' => true]);
                         $table->addCell(3000)->addText('เกณฑ์มาตรฐาน', ['bold' => true]);
                         $table->addCell(1500)->addText('ผลการดำเนินงาน', ['bold' => true]);
-                        $table->addCell(2500)->addText('รายงานผล', ['bold' => true]);
+                        $table->addCell(2500)->addText('รายงานผลการดำเนินงาน', ['bold' => true]);
                         $table->addCell(2000)->addText('เอกสารหลักฐาน', ['bold' => true]);
 
                         foreach ($ind->criterias as $i => $cri) {
@@ -734,7 +776,7 @@ class SarReportController extends Controller
                             $table->addCell(1500)->addText($cri->status ? '✓' : '-');
 
                             $cell = $table->addCell(2500);
-                            $this->addHtmlSafe($cell, $cri->report ?? '-');
+                            $this->addHtmlSafe($cell, $stripFonts($getEvidenceDetailHtml($cri) ?: '-'));
 
                             $evList = $cri->evidences->pluck('name')->implode(', ');
                             $table->addCell(2000)->addText($this->sanitizeWordText($evList ?: '-'));
