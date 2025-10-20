@@ -1,4 +1,4 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 
 @section('title', 'แก้ไขตัวบ่งชี้')
 
@@ -167,25 +167,49 @@
                         <div x-data="{
                             usersAll: @js($usersForAssign),
                             depSelected: (@js(old('department_ids', $depSelected)) || []).map(v => String(v)),
-                            usersEl() { return this.$refs.usersMulti },
+                            init() {
+                                // Re-filter whenever department selection changes
+                                this.$watch('depSelected', () => this.refreshUsers());
+                            },
+                            getMS(el) {
+                                if (!el) return null;
+                                if (el.__x?.$data) return el.__x.$data;
+                                if (typeof Alpine !== 'undefined' && Alpine.$data) return Alpine.$data(el);
+                                if (el._x_dataStack?.[0]) return el._x_dataStack[0];
+                                return null;
+                            },
+                            usersEl() { return this.getMS(this.$refs.usersMulti) },
                             filteredUsers() {
                                 if (!this.depSelected?.length) return this.usersAll;
                                 const set = new Set(this.depSelected.map(String));
-                                return this.usersAll.filter(u => set.has(String(u.department_id)));
+                                return this.usersAll.filter(u => {
+                                    const depId = String(u?.department_id ?? u?.department?.id ?? u?.dept_id ?? u?.departmentId ?? '');
+                                    return depId && set.has(depId);
+                                });
                             },
                             refreshUsers() {
                                 const filtered = this.filteredUsers();
-                                this.usersEl()?.setOptions?.(filtered);
-                                const allowed = new Set(filtered.map(u => String(u.id)));
-                                const current = (this.usersEl()?.selected || []).map(String);
-                                const keep = current.filter(v => allowed.has(v));
-                                this.usersEl()?.setSelected?.(keep);
+                                const u = this.usersEl?.();
+                                // Keep only selections that are still allowed
+                                const allowed = new Set(filtered.map(x => String(x.id)));
+                                const keep = (u?.selected || []).map(String).filter(v => allowed.has(v));
+
+                                // Ask users multiselect to update via event (same pattern as create)
+                                window.dispatchEvent(new CustomEvent('multiselect-update-options', {
+                                    detail: { name: 'user_ids', options: filtered, keep }
+                                }));
+
+                                if (u) { u.open = true; }
                             }
-                        }" x-init="$nextTick(() => { refreshUsers(); })"
+                        }" x-init="$nextTick(() => setTimeout(() => refreshUsers(), 100))"
                             @multiselect-change.window="
                                     if ($event.detail?.name === 'department_ids') {
                                         depSelected = ($event.detail.values || []).map(String);
                                         refreshUsers();
+                                        // Open users dropdown and focus search
+                                        const u = usersEl?.();
+                                        if (u) { u.open = true; }
+                                        $nextTick(() => { document.getElementById('user_ids_search')?.focus(); });
                                     }
                                 "
                             class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">

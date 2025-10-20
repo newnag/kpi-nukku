@@ -1,19 +1,19 @@
 ﻿@extends('layouts.app')
-@section('title', 'à¸à¸£à¸²à¸Ÿà¸œà¸¥à¸¥à¸±à¸žà¸˜à¹Œ')
+@section('title', 'กราฟผลลัพธ์')
 
 @section('header')
-    à¸à¸£à¸²à¸Ÿà¸œà¸¥à¸¥à¸±à¸žà¸˜à¹Œà¸à¸²à¸£à¸›à¸£à¸°à¹€à¸¡à¸´à¸™
+    กราฟผลลัพธ์การประเมิน
 @endsection
 
 @section('subheader')
-    à¸£à¸°à¸šà¸šà¸šà¸£à¸´à¸«à¸²à¸£à¸ˆà¸±à¸”à¸à¸²à¸£à¸‚à¹‰à¸­à¸¡à¸¹à¸¥à¸à¸²à¸£à¸£à¸±à¸šà¸£à¸­à¸‡à¸ªà¸–à¸²à¸šà¸±à¸™à¸ˆà¸²à¸à¸ªà¸ à¸²à¸à¸²à¸£à¸žà¸¢à¸²à¸šà¸²à¸¥
+    ระบบบริหารจัดการข้อมูลการรับรองสถาบันจากสภาการพยาบาล
 @endsection
 
 @section('content')
     <div class="space-y-6">
         <div class="card-container">
-            <h2 class="card-title">à¸„à¸°à¹à¸™à¸™à¸£à¸§à¸¡à¸•à¸²à¸¡à¸›à¸µ</h2>
-            <!-- âœ… Checkbox à¹€à¸¥à¸·à¸­à¸à¸›à¸µ -->
+            <h2 class="card-title">คะแนนรวมตามปี</h2>
+            <!-- ✅ Checkbox เลือกปี -->
             <div id="year-filters" style="margin-bottom:10px;margin-left: 20px;">
                 @foreach ($filters['years'] as $y)
                     <label style="margin-right:10px;">
@@ -23,15 +23,15 @@
                 @endforeach
             </div>
 
-            <!-- à¹€à¸›à¸¥à¸µà¹ˆà¸¢à¸™à¸ˆà¸²à¸ canvas à¹€à¸›à¹‡à¸™ div à¸ªà¸³à¸«à¸£à¸±à¸š ApexCharts -->
+            <!-- เปลี่ยนจาก canvas เป็น div สำหรับ ApexCharts -->
             <div class="chart-card">
                 <div id="scoreLineChart"></div>
             </div>
         </div>
         <div class="card-container">
-            <h2 class="card-title">à¸„à¸°à¹à¸™à¸™à¸£à¸§à¸¡à¸¡à¸²à¸•à¸£à¸à¸²à¸™à¸•à¸²à¸¡à¸›à¸µ</h2>
+            <h2 class="card-title">คะแนนรวมมาตรฐานตามปี</h2>
 
-            <!-- âœ… Checkbox à¸›à¸µ -->
+            <!-- ✅ Checkbox ปี -->
             <div id="year-filters-standard" style="margin-bottom:10px;margin-left: 20px;">
                 @foreach ($filters['years'] as $y)
                     <label style="margin-right:10px;">
@@ -40,7 +40,7 @@
                     </label>
                 @endforeach
             </div>
-            <!-- âœ… Grid 3 à¸„à¸­à¸¥à¸±à¸¡à¸™à¹Œ -->
+            <!-- ✅ Grid 3 คอลัมน์ -->
             <div class="charts-of-standards">
                 @foreach ($chartsStandardBars as $chart)
                     <div class="chart-card standard-card">
@@ -59,8 +59,8 @@
             </div>
         </div>
         <div class="card-container">
-            <h2 class="card-title">à¸„à¸°à¹à¸™à¸™à¸£à¸§à¸¡à¸•à¸²à¸¡à¸”à¹‰à¸²à¸™</h2>
-            <!-- âœ… Checkbox à¸›à¸µ -->
+            <h2 class="card-title">คะแนนรวมตามด้าน</h2>
+            <!-- ✅ Checkbox ปี -->
             <div id="year-filters-dim" style="margin-bottom:10px;margin-left: 20px;">
                 @foreach ($filters['years'] as $y)
                     <label style="margin-right:10px;">
@@ -92,11 +92,11 @@
                 <input name="filter-checkbox" type="checkbox" id="toggle-filter">
                 <span class="slider round"></span>
             </label>
-            <span>à¸à¸£à¸­à¸‡à¸‚à¹‰à¸­à¸¡à¸¹à¸¥</span>
+            <span>กรองข้อมูล</span>
         </div>
         <!-- Filter Component -->
         <x-filter :years="$filters['years'] ?? []" :standards="$filters['standards'] ?? []" :departments="[]" :collectors="[]" :dimensions="$filters['dimensions'] ?? []"
-            :filters="$filters" :action="route('dashboard.getData')" title="à¸à¸£à¸­à¸‡à¸‚à¹‰à¸­à¸¡à¸¹à¸¥à¸à¸²à¸£à¸›à¸£à¸°à¹€à¸¡à¸´à¸™" filterId="filter-panel"
+            :filters="$filters" :action="route('dashboard.getData')" title="กรองข้อมูลการประเมิน" filterId="filter-panel"
             formId="result-filter-form" :showFields="[
                 'year' => true,
                 'codes' => true,
@@ -107,9 +107,9 @@
                 'type' => true,
             ]">
             <script>
-                // Custom JavaScript à¸ªà¸³à¸«à¸£à¸±à¸šà¸«à¸™à¹‰à¸² result
+                // Custom JavaScript สำหรับหน้า result
                 document.addEventListener('DOMContentLoaded', function() {
-                    // à¸£à¸­à¹ƒà¸«à¹‰ FilterComponent à¹‚à¸«à¸¥à¸”à¹€à¸ªà¸£à¹‡à¸ˆ
+                    // รอให้ FilterComponent โหลดเสร็จ
                     setTimeout(function() {
                         if (typeof window.FilterComponent !== 'undefined') {
                             window.FilterComponent.init({
@@ -117,14 +117,14 @@
                                 formId: 'result-filter-form',
                                 onApply: function() {
                                     console.log('Filter applied in result page');
-                                    // à¹€à¸£à¸µà¸¢à¸à¹ƒà¸Šà¹‰à¸Ÿà¸±à¸‡à¸à¹Œà¸Šà¸±à¸™ applyFilters à¸‚à¸­à¸‡à¸«à¸™à¹‰à¸² result
+                                    // เรียกใช้ฟังก์ชัน applyFilters ของหน้า result
                                     if (typeof window.applyResultFilters === 'function') {
                                         window.applyResultFilters();
                                     }
                                 },
                                 onReset: function() {
                                     console.log('Filter reset in result page');
-                                    // à¹€à¸£à¸µà¸¢à¸à¹ƒà¸Šà¹‰à¸Ÿà¸±à¸‡à¸à¹Œà¸Šà¸±à¸™ resetFilters à¸‚à¸­à¸‡à¸«à¸™à¹‰à¸² result
+                                    // เรียกใช้ฟังก์ชัน resetFilters ของหน้า result
                                     if (typeof window.resetResultFilters === 'function') {
                                         window.resetResultFilters();
                                     }
@@ -136,7 +136,7 @@
             </script>
         </x-filter>
         <div class="card-container">
-            <h2 class="card-title">à¸„à¸°à¹à¸™à¸™à¸•à¸²à¸¡à¸•à¸±à¸§à¸Šà¸µà¹‰à¸§à¸±à¸”</h2>
+            <h2 class="card-title">คะแนนตามตัวชี้วัด</h2>
 
             <div class="search-box flex-1 max-w-[420px]">
                 <div class="icon">
@@ -147,12 +147,12 @@
                             d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
                 </div>
-                <input name="custom-search" type="text" id="custom-search" class="search-input" placeholder="à¸„à¹‰à¸™à¸«à¸²à¸£à¸²à¸¢à¸à¸²à¸£à¸•à¸±à¸§à¸šà¹ˆà¸‡à¸Šà¸µà¹‰">
+                <input name="custom-search" type="text" id="custom-search" class="search-input" placeholder="ค้นหารายการตัวบ่งชี้">
             </div>
             <div class="charts-grid">
                 @foreach ($standards as $standard)
                     <div class="text-center border-y border-gray-400 border-dashed py-1 mt-3">
-                        <h3>à¸à¸£à¸²à¸Ÿà¸œà¸¥à¸¥à¸±à¸žà¸˜à¹Œ {{ $standard->name }}</h3>
+                        <h3>กราฟผลลัพธ์ {{ $standard->name }}</h3>
                     </div>
                     @php $bucket = $chartsByStandard[$standard->id] ?? null; @endphp
                     @if ($bucket && !empty($bucket['indicators']))
@@ -167,7 +167,7 @@
                                 padding:20px;box-shadow:0 4px 20px rgba(0,0,0,.08);position:relative;
                                 border: 1px solid rgba(0,0,0,0.05);">
 
-                                    {{-- à¸«à¸±à¸§à¸‚à¹‰à¸­ --}}
+                                    {{-- หัวข้อ --}}
                                     <div class="chart-header"
                                         style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
                                         <div class="chart-title" style="font-weight:700;color:#1f2937;font-size:14px;">
@@ -189,7 +189,7 @@
                                             </svg>
                                         </button>
                                     </div>
-                                    {{-- à¸à¸£à¸²à¸Ÿ --}}
+                                    {{-- กราฟ --}}
                                     <div class="chart-wrapper" style="position:relative;margin-bottom:10px;">
                                         <div id="chart-{{ $standard->id }}-{{ $c['indicator_id'] }}"
                                             class="responsive-chart-individual">
@@ -212,13 +212,13 @@
                             <div class="divider-btn" data-standard-id="{{ $standard->id }}">
                                 <span class="divider-line"></span>
                                 <button type="button" class="btn-show-more" data-standard-id="{{ $standard->id }}">
-                                    à¹à¸ªà¸”à¸‡à¹€à¸žà¸´à¹ˆà¸¡à¹€à¸•à¸´à¸¡ â–¼
+                                    แสดงเพิ่มเติม ▼
                                 </button>
                                 <span class="divider-line"></span>
                             </div>
                         @endif
                     @else
-                        <div style="color:#6b7280;margin-bottom:16px;">à¹„à¸¡à¹ˆà¸¡à¸µà¸‚à¹‰à¸­à¸¡à¸¹à¸¥à¸•à¸±à¸§à¸šà¹ˆà¸‡à¸Šà¸µà¹‰à¸—à¸µà¹ˆà¸¡à¸µà¸à¸²à¸£à¸šà¸±à¸™à¸—à¸¶à¸à¸œà¸¥à¸¥à¸±à¸žà¸˜à¹Œ</div>
+                        <div style="color:#6b7280;margin-bottom:16px;">ไม่มีข้อมูลตัวบ่งชี้ที่มีการบันทึกผลลัพธ์</div>
                     @endif
                 @endforeach
             </div>
@@ -232,10 +232,10 @@
     <script src="https://cdn.jsdelivr.net/npm/lucide@0.469.0/dist/umd/lucide.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-    <!-- âœ… à¹‚à¸«à¸¥à¸” html2canvas à¸—à¸µà¹ˆà¸™à¸µà¹ˆ -->
+    <!-- ✅ โหลด html2canvas ที่นี่ -->
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
-    <!-- à¹‚à¸«à¸¥à¸” ApexCharts -->
+    <!-- โหลด ApexCharts -->
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <script>
         // Responsive chart height function
@@ -269,19 +269,19 @@
                         }
                     },
                     series: [{
-                            name: "à¸„à¸°à¹à¸™à¸™à¸—à¸µà¹ˆà¹„à¸”à¹‰",
+                            name: "คะแนนที่ได้",
                             data: (payload.scores || []).map(v => Number(v) || 0)
 
                         },
                         {
-                            name: "à¸„à¸°à¹à¸™à¸™à¹€à¸•à¹‡à¸¡",
+                            name: "คะแนนเต็ม",
                             data: payload.max
                         }
                     ],
                     xaxis: {
                         categories: payload.labels,
                         title: {
-                            text: "à¸›à¸µà¸à¸²à¸£à¸›à¸£à¸°à¹€à¸¡à¸´à¸™",
+                            text: "ปีการประเมิน",
                             style: {
                                 fontSize: window.innerWidth <= 639 ? '11px' : '12px'
                             }
@@ -294,7 +294,7 @@
                     },
                     yaxis: {
                         title: {
-                            text: "à¸„à¸°à¹à¸™à¸™",
+                            text: "คะแนน",
                             style: {
                                 fontSize: window.innerWidth <= 639 ? '11px' : '12px'
                             }
@@ -409,11 +409,11 @@
                             categories: newLabels
                         },
                         series: [{
-                                name: "à¸„à¸°à¹à¸™à¸™à¸—à¸µà¹ˆà¹„à¸”à¹‰",
+                                name: "คะแนนที่ได้",
                                 data: newScores
                             },
                             {
-                                name: "à¸„à¸°à¹à¸™à¸™à¹€à¸•à¹‡à¸¡",
+                                name: "คะแนนเต็ม",
                                 data: newMax
                             }
                         ]
@@ -447,18 +447,18 @@
                         }
                     },
                     series: [{
-                            name: "à¸„à¸°à¹à¸™à¸™à¸—à¸µà¹ˆà¹„à¸”à¹‰",
+                            name: "คะแนนที่ได้",
                             data: payload.scores
                         },
                         {
-                            name: "à¸„à¸°à¹à¸™à¸™à¹€à¸•à¹‡à¸¡",
+                            name: "คะแนนเต็ม",
                             data: payload.max
                         }
                     ],
                     xaxis: {
                         categories: payload.labels,
                         title: {
-                            text: "à¸›à¸µà¸à¸²à¸£à¸›à¸£à¸°à¹€à¸¡à¸´à¸™",
+                            text: "ปีการประเมิน",
                             style: {
                                 fontSize: window.innerWidth <= 639 ? '11px' : '12px'
                             }
@@ -471,7 +471,7 @@
                     },
                     yaxis: {
                         title: {
-                            text: "à¸„à¸°à¹à¸™à¸™",
+                            text: "คะแนน",
                             style: {
                                 fontSize: window.innerWidth <= 639 ? '11px' : '12px'
                             }
@@ -489,7 +489,7 @@
                             fontSize: window.innerWidth <= 639 ? '9px' : '10px'
                         }
                     },
-                    colors: ['#10b981', '#9ca3af'], // à¹€à¸‚à¸µà¸¢à¸§ + à¹€à¸—à¸²
+                    colors: ['#10b981', '#9ca3af'], // เขียว + เทา
                     legend: {
                         position: 'top',
                         fontSize: window.innerWidth <= 639 ? '10px' : '12px'
@@ -586,11 +586,11 @@
                             categories: newLabels
                         },
                         series: [{
-                                name: "à¸„à¸°à¹à¸™à¸™à¸—à¸µà¹ˆà¹„à¸”à¹‰",
+                                name: "คะแนนที่ได้",
                                 data: newScores
                             },
                             {
-                                name: "à¸„à¸°à¹à¸™à¸™à¹€à¸•à¹‡à¸¡",
+                                name: "คะแนนเต็ม",
                                 data: newMax
                             }
                         ]
@@ -606,7 +606,7 @@
         document.addEventListener("DOMContentLoaded", () => {
             const chartsMain = {};
             const originalsMain = {};
-            // === à¹‚à¸«à¸¥à¸”à¸‚à¹‰à¸­à¸¡à¸¹à¸¥à¸ˆà¸²à¸ blade ===
+            // === โหลดข้อมูลจาก blade ===
             const payload = @json($yearlyTotals);
             originalsMain['scoreLine'] = payload;
 
@@ -633,18 +633,18 @@
                     }
                 },
                 series: [{
-                        name: "à¸„à¸°à¹à¸™à¸™à¸—à¸µà¹ˆà¹„à¸”à¹‰",
+                        name: "คะแนนที่ได้",
                         data: payload.map(r => Number(r.score) || 0)
                     },
                     {
-                        name: "à¸„à¸°à¹à¸™à¸™à¹€à¸•à¹‡à¸¡",
+                        name: "คะแนนเต็ม",
                         data: payload.map(r => Number(r.max) || 0)
                     }
                 ],
                 xaxis: {
                     categories: payload.map(r => r.year),
                     title: {
-                        text: "à¸›à¸µà¸à¸²à¸£à¸›à¸£à¸°à¹€à¸¡à¸´à¸™",
+                        text: "ปีการประเมิน",
                         style: {
                             fontSize: window.innerWidth <= 639 ? '12px' : '14px'
                         }
@@ -659,7 +659,7 @@
                     min: 0,
                     max: payload.length ? Math.max(...payload.map(r => r.max)) * 1.15 : 100,
                     title: {
-                        text: "à¸„à¸°à¹à¸™à¸™",
+                        text: "คะแนน",
                         style: {
                             fontSize: window.innerWidth <= 639 ? '12px' : '14px'
                         }
@@ -803,11 +803,11 @@
                         categories: newLabels
                     },
                     series: [{
-                            name: "à¸„à¸°à¹à¸™à¸™à¸—à¸µà¹ˆà¹„à¸”à¹‰",
+                            name: "คะแนนที่ได้",
                             data: newScores
                         },
                         {
-                            name: "à¸„à¸°à¹à¸™à¸™à¹€à¸•à¹‡à¸¡",
+                            name: "คะแนนเต็ม",
                             data: newMax
                         }
                     ],
@@ -815,7 +815,7 @@
                         min: 0,
                         max: newMax.length ? Math.max(...newMax) * 1.15 : 100,
                         title: {
-                            text: "à¸„à¸°à¹à¸™à¸™"
+                            text: "คะแนน"
                         }
                     }
                 }, true, true);
@@ -858,10 +858,10 @@
                 card.style.display = title.includes(q) ? '' : 'none';
             });
         });
-        // ==== à¹€à¸à¹‡à¸š instance à¸‚à¸­à¸‡ ApexCharts (à¸¢à¹‰à¸²à¸¢à¸­à¸­à¸à¸¡à¸²à¸‚à¹‰à¸²à¸‡à¸™à¸­à¸) ====
+        // ==== เก็บ instance ของ ApexCharts (ย้ายออกมาข้างนอก) ====
         window.chartInstances = window.chartInstances || {};
         window.chartOriginals = window.chartOriginals || {};
-        // ==== init ApexCharts (à¸¢à¹‰à¸²à¸¢à¸­à¸­à¸à¸¡à¸²à¸‚à¹‰à¸²à¸‡à¸™à¸­à¸) ====
+        // ==== init ApexCharts (ย้ายออกมาข้างนอก) ====
         window.initChartsFromInlineJSON = function() {
             document.querySelectorAll('div[id^="chart-"]').forEach(container => {
                 const key = container.id.replace(/^chart-/, '');
@@ -878,7 +878,7 @@
                 const years = (payload.years || []).map(y => String(y));
                 const values = (payload.values || []).map(v => Number(v));
                 const maxValues = (payload.max_values || []).map(v => Number(v));
-                // ðŸ”¥ à¹€à¸à¹‡à¸šà¸‚à¹‰à¸­à¸¡à¸¹à¸¥à¸•à¹‰à¸™à¸‰à¸šà¸±à¸š
+                // 🔥 เก็บข้อมูลต้นฉบับ
                 window.chartOriginals[container.id] = {
                     years,
                     values,
@@ -896,14 +896,14 @@
 
                 const options = {
                     series: [{
-                            name: "à¸„à¸°à¹à¸™à¸™à¸—à¸µà¹ˆà¹„à¸”à¹‰",
+                            name: "คะแนนที่ได้",
                             data: years.map((x, i) => ({
                                 x,
                                 y: values[i] ?? null
                             }))
                         },
                         {
-                            name: "à¸„à¸°à¹à¸™à¸™à¹€à¸•à¹‡à¸¡",
+                            name: "คะแนนเต็ม",
                             data: years.map((x, i) => ({
                                 x,
                                 y: maxValues[i] ?? null
@@ -939,7 +939,7 @@
                     },
                     yaxis: {
                         title: {
-                            text: 'à¸„à¸°à¹à¸™à¸™',
+                            text: 'คะแนน',
                             style: {
                                 fontSize: window.innerWidth <= 639 ? '11px' : '12px'
                             }
@@ -970,7 +970,7 @@
                 const chart = new ApexCharts(container, options);
                 chart.render();
 
-                // ðŸ”¥ à¹€à¸à¹‡à¸š instance à¸‚à¸­à¸‡ chart
+                // 🔥 เก็บ instance ของ chart
                 window.chartInstances[container.id] = chart;
 
                 // Window resize handler for individual charts
@@ -1037,7 +1037,7 @@
                 });
             });
         };
-        // ==== à¸Ÿà¸±à¸‡à¸à¹Œà¸Šà¸±à¸™ Show More (à¸¢à¹‰à¸²à¸¢à¸­à¸­à¸à¸¡à¸²à¸‚à¹‰à¸²à¸‡à¸™à¸­à¸) ====
+        // ==== ฟังก์ชัน Show More (ย้ายออกมาข้างนอก) ====
         window.bindShowMore = function() {
             document.querySelectorAll('.btn-show-more').forEach(btn => {
                 btn.addEventListener('click', function() {
@@ -1049,14 +1049,14 @@
                     const isExpanded = this.classList.contains('expanded');
                     if (!isExpanded) {
                         cards.forEach(c => c.style.display = '');
-                        this.textContent = 'à¹à¸ªà¸”à¸‡à¸™à¹‰à¸­à¸¢à¸¥à¸‡';
+                        this.textContent = 'แสดงน้อยลง';
                         this.classList.add('expanded');
                     } else {
                         cards.forEach(c => {
                             const idx = parseInt(c.dataset.index, 10);
                             c.style.display = idx < 5 ? '' : 'none';
                         });
-                        this.textContent = 'à¹à¸ªà¸”à¸‡à¹€à¸žà¸´à¹ˆà¸¡à¹€à¸•à¸´à¸¡';
+                        this.textContent = 'แสดงเพิ่มเติม';
                         this.classList.remove('expanded');
                     }
                 });
@@ -1064,10 +1064,10 @@
         };
 
         (function() {
-            // à¸«à¸¢à¸¸à¸”à¸à¸²à¸£à¸—à¸³à¸‡à¸²à¸™à¸–à¹‰à¸² FilterComponent à¸¡à¸µà¸­à¸¢à¸¹à¹ˆà¹à¸¥à¹‰à¸§
+            // หยุดการทำงานถ้า FilterComponent มีอยู่แล้ว
             if (typeof window.FilterComponent !== 'undefined') {
                 console.log('FilterComponent detected, initializing with proper integration');
-                // à¹à¸•à¹ˆà¸¢à¸±à¸‡à¸•à¹‰à¸­à¸‡à¸ªà¸£à¹‰à¸²à¸‡ global functions à¸ªà¸³à¸«à¸£à¸±à¸š FilterComponent
+                // แต่ยังต้องสร้าง global functions สำหรับ FilterComponent
                 window.applyResultFilters = function() {
                     const $year = document.getElementById('filter-year');
                     const $code = document.getElementById('filter-codes');
@@ -1102,7 +1102,7 @@
                             }
 
                             if (show) {
-                                // âœ… limit à¹à¸„à¹ˆ 5 à¸•à¸±à¸§à¹à¸£à¸
+                                // ✅ limit แค่ 5 ตัวแรก
                                 if (visibleCount < 5) {
                                     card.style.display = '';
                                 } else {
@@ -1114,16 +1114,16 @@
                             }
                         });
 
-                        // âœ… reset à¸›à¸¸à¹ˆà¸¡ show more
+                        // ✅ reset ปุ่ม show more
                         const btn = container.parentElement.querySelector('.btn-show-more');
                         if (btn) {
                             btn.classList.remove('expanded');
-                            btn.textContent = 'à¹à¸ªà¸”à¸‡à¹€à¸žà¸´à¹ˆà¸¡à¹€à¸•à¸´à¸¡ â–¼';
+                            btn.textContent = 'แสดงเพิ่มเติม ▼';
                             btn.style.display = visibleCount > 5 ? '' : 'none';
                         }
                     });
 
-                    // === update charts à¸•à¸²à¸¡ year filter ===
+                    // === update charts ตาม year filter ===
                     Object.entries(window.chartInstances || {}).forEach(([id, chart]) => {
                         const orig = window.chartOriginals[id];
                         if (!orig) return;
@@ -1148,14 +1148,14 @@
                                 categories: newYears
                             },
                             series: [{
-                                    name: 'à¸„à¸°à¹à¸™à¸™à¸—à¸µà¹ˆà¹„à¸”à¹‰',
+                                    name: 'คะแนนที่ได้',
                                     data: newYears.map((x, i) => ({
                                         x,
                                         y: newValues[i]
                                     }))
                                 },
                                 {
-                                    name: 'à¸„à¸°à¹à¸™à¸™à¹€à¸•à¹‡à¸¡',
+                                    name: 'คะแนนเต็ม',
                                     data: newYears.map((x, i) => ({
                                         x,
                                         y: newMax[i]
@@ -1177,7 +1177,7 @@
                         if (sel) sel.selectedIndex = 0;
                     });
 
-                    // à¸£à¸µà¹€à¸‹à¹‡à¸•à¸à¸²à¸£à¹Œà¸”à¸‚à¸­à¸‡à¸—à¸¸à¸ standard
+                    // รีเซ็ตการ์ดของทุก standard
                     document.querySelectorAll('.charts-of-standard-inds').forEach(container => {
                         const cards = container.querySelectorAll('.chart-card[data-index]');
                         cards.forEach(c => {
@@ -1186,7 +1186,7 @@
                         });
                     });
 
-                    // à¸£à¸µà¹€à¸‹à¹‡à¸• chart à¸à¸¥à¸±à¸šà¹€à¸›à¹‡à¸™à¸‚à¹‰à¸­à¸¡à¸¹à¸¥à¸•à¹‰à¸™à¸‰à¸šà¸±à¸š
+                    // รีเซ็ต chart กลับเป็นข้อมูลต้นฉบับ
                     Object.entries(window.chartInstances || {}).forEach(([id, chart]) => {
                         const orig = window.chartOriginals[id];
                         if (!orig) return;
@@ -1195,14 +1195,14 @@
                                 categories: orig.years
                             },
                             series: [{
-                                    name: 'à¸„à¸°à¹à¸™à¸™à¸—à¸µà¹ˆà¹„à¸”à¹‰',
+                                    name: 'คะแนนที่ได้',
                                     data: orig.years.map((x, i) => ({
                                         x,
                                         y: orig.values[i]
                                     }))
                                 },
                                 {
-                                    name: 'à¸„à¸°à¹à¸™à¸™à¹€à¸•à¹‡à¸¡',
+                                    name: 'คะแนนเต็ม',
                                     data: orig.years.map((x, i) => ({
                                         x,
                                         y: orig.maxValues[i]
@@ -1212,10 +1212,10 @@
                         }, false, true);
                     });
 
-                    // à¸£à¸µà¹€à¸‹à¹‡à¸•à¸›à¸¸à¹ˆà¸¡ show more à¸—à¸¸à¸à¸•à¸±à¸§
+                    // รีเซ็ตปุ่ม show more ทุกตัว
                     document.querySelectorAll('.btn-show-more').forEach(btn => {
                         btn.classList.remove('expanded');
-                        btn.textContent = 'à¹à¸ªà¸”à¸‡à¹€à¸žà¸´à¹ˆà¸¡à¹€à¸•à¸´à¸¡ â–¼';
+                        btn.textContent = 'แสดงเพิ่มเติม ▼';
                     });
 
                     if (typeof window.applyResultFilters === 'function') {
@@ -1223,7 +1223,7 @@
                     }
                 };
 
-                return; // à¸­à¸­à¸à¸ˆà¸²à¸ function à¹€à¸žà¸·à¹ˆà¸­à¹„à¸¡à¹ˆà¹ƒà¸«à¹‰à¸—à¸³à¸‡à¸²à¸™à¸•à¹ˆà¸­
+                return; // ออกจาก function เพื่อไม่ให้ทำงานต่อ
             }
             const FILTERS = @json($filters, JSON_UNESCAPED_UNICODE);
             const $year = document.getElementById('filter-year');
@@ -1231,7 +1231,7 @@
             const $std = document.getElementById('filter-standard');
             const $dim = document.getElementById('filter-dimension');
             const $type = document.getElementById('filter-type');
-            // ==== Helper à¸ªà¸³à¸«à¸£à¸±à¸š select ====
+            // ==== Helper สำหรับ select ====
             function fillSelect(sel, items, mapper) {
                 [...sel.querySelectorAll('option')].forEach(o => {
                     if (o.value) o.remove();
@@ -1274,7 +1274,7 @@
                 }));
             fillSelect($dim, (FILTERS.dimensions || []).slice().sort());
             fillSelect($type, (FILTERS.types || []).slice().sort());
-            // ==== à¸Ÿà¸´à¸¥à¹€à¸•à¸­à¸£à¹Œ ====
+            // ==== ฟิลเตอร์ ====
             async function applyFilters() {
                 const vYear = String($year.value || '');
                 const vCode = $code.value,
@@ -1301,7 +1301,7 @@
                         }
 
                         if (show) {
-                            // âœ… limit à¹à¸„à¹ˆ 5 à¸•à¸±à¸§à¹à¸£à¸
+                            // ✅ limit แค่ 5 ตัวแรก
                             if (visibleCount < 5) {
                                 card.style.display = '';
                             } else {
@@ -1313,16 +1313,16 @@
                         }
                     });
 
-                    // âœ… reset à¸›à¸¸à¹ˆà¸¡ show more
+                    // ✅ reset ปุ่ม show more
                     const btn = container.parentElement.querySelector('.btn-show-more');
                     if (btn) {
                         btn.classList.remove('expanded');
-                        btn.textContent = 'à¹à¸ªà¸”à¸‡à¹€à¸žà¸´à¹ˆà¸¡à¹€à¸•à¸´à¸¡ â–¼';
+                        btn.textContent = 'แสดงเพิ่มเติม ▼';
                         btn.style.display = visibleCount > 5 ? '' : 'none';
                     }
                 });
 
-                // === update charts à¸•à¸²à¸¡ year filter ===
+                // === update charts ตาม year filter ===
                 Object.entries(window.chartInstances).forEach(([id, chart]) => {
                     const orig = window.chartOriginals[id];
                     if (!orig) return;
@@ -1347,14 +1347,14 @@
                             categories: newYears
                         },
                         series: [{
-                                name: 'à¸„à¸°à¹à¸™à¸™à¸—à¸µà¹ˆà¹„à¸”à¹‰',
+                                name: 'คะแนนที่ได้',
                                 data: newYears.map((x, i) => ({
                                     x,
                                     y: newValues[i]
                                 }))
                             },
                             {
-                                name: 'à¸„à¸°à¹à¸™à¸™à¹€à¸•à¹‡à¸¡',
+                                name: 'คะแนนเต็ม',
                                 data: newYears.map((x, i) => ({
                                     x,
                                     y: newMax[i]
@@ -1370,16 +1370,16 @@
                     if (sel) sel.selectedIndex = 0;
                 });
 
-                // à¸£à¸µà¹€à¸‹à¹‡à¸•à¸à¸²à¸£à¹Œà¸”à¸‚à¸­à¸‡à¸—à¸¸à¸ standard
+                // รีเซ็ตการ์ดของทุก standard
                 document.querySelectorAll('.charts-of-standard-inds').forEach(container => {
                     const cards = container.querySelectorAll('.chart-card[data-index]');
                     cards.forEach(c => {
                         const idx = parseInt(c.dataset.index, 10);
-                        c.style.display = idx < 5 ? '' : 'none'; // âœ… à¹‚à¸Šà¸§à¹Œà¹€à¸‰à¸žà¸²à¸° 5 à¸à¸²à¸£à¹Œà¸”à¹à¸£à¸
+                        c.style.display = idx < 5 ? '' : 'none'; // ✅ โชว์เฉพาะ 5 การ์ดแรก
                     });
                 });
 
-                // à¸£à¸µà¹€à¸‹à¹‡à¸• chart à¸à¸¥à¸±à¸šà¹€à¸›à¹‡à¸™à¸‚à¹‰à¸­à¸¡à¸¹à¸¥à¸•à¹‰à¸™à¸‰à¸šà¸±à¸š
+                // รีเซ็ต chart กลับเป็นข้อมูลต้นฉบับ
                 Object.entries(window.chartInstances).forEach(([id, chart]) => {
                     const orig = window.chartOriginals[id];
                     chart.updateOptions({
@@ -1387,14 +1387,14 @@
                             categories: orig.years
                         },
                         series: [{
-                                name: 'à¸„à¸°à¹à¸™à¸™à¸—à¸µà¹ˆà¹„à¸”à¹‰',
+                                name: 'คะแนนที่ได้',
                                 data: orig.years.map((x, i) => ({
                                     x,
                                     y: orig.values[i]
                                 }))
                             },
                             {
-                                name: 'à¸„à¸°à¹à¸™à¸™à¹€à¸•à¹‡à¸¡',
+                                name: 'คะแนนเต็ม',
                                 data: orig.years.map((x, i) => ({
                                     x,
                                     y: orig.maxValues[i]
@@ -1404,14 +1404,14 @@
                     }, false, true);
                 });
 
-                // à¸£à¸µà¹€à¸‹à¹‡à¸•à¸›à¸¸à¹ˆà¸¡ show more à¸—à¸¸à¸à¸•à¸±à¸§
+                // รีเซ็ตปุ่ม show more ทุกตัว
                 document.querySelectorAll('.btn-show-more').forEach(btn => {
                     btn.classList.remove('expanded');
-                    btn.textContent = 'à¹à¸ªà¸”à¸‡à¹€à¸žà¸´à¹ˆà¸¡à¹€à¸•à¸´à¸¡ â–¼';
+                    btn.textContent = 'แสดงเพิ่มเติม ▼';
                 });
             }
 
-            // à¸ªà¸£à¹‰à¸²à¸‡ global functions à¸ªà¸³à¸«à¸£à¸±à¸š FilterComponent
+            // สร้าง global functions สำหรับ FilterComponent
             window.applyResultFilters = applyFilters;
             window.resetResultFilters = function() {
                 resetFilters();
@@ -1427,13 +1427,13 @@
 
             // ==== init ====
             if (typeof window.FilterComponent === 'undefined') {
-                // à¹€à¸‰à¸žà¸²à¸°à¹€à¸¡à¸·à¹ˆà¸­à¹„à¸¡à¹ˆà¸¡à¸µ FilterComponent à¹€à¸—à¹ˆà¸²à¸™à¸±à¹‰à¸™
+                // เฉพาะเมื่อไม่มี FilterComponent เท่านั้น
                 window.initChartsFromInlineJSON();
                 window.bindShowMore();
             }
         })();
 
-        // ==== à¹€à¸£à¸´à¹ˆà¸¡à¸•à¹‰à¸™ FilterComponent (à¸¢à¹‰à¸²à¸¢à¸­à¸­à¸à¸¡à¸²à¸‚à¹‰à¸²à¸‡à¸™à¸­à¸) ====
+        // ==== เริ่มต้น FilterComponent (ย้ายออกมาข้างนอก) ====
         document.addEventListener('DOMContentLoaded', function() {
             if (typeof window.FilterComponent !== 'undefined') {
                 window.FilterComponent.init({
@@ -1451,7 +1451,7 @@
                     }
                 });
 
-                // Initialize charts à¹€à¸¡à¸·à¹ˆà¸­à¹ƒà¸Šà¹‰ FilterComponent
+                // Initialize charts เมื่อใช้ FilterComponent
                 setTimeout(function() {
                     if (typeof window.initChartsFromInlineJSON === 'function') {
                         window.initChartsFromInlineJSON();
@@ -1461,7 +1461,7 @@
                     }
                 }, 100);
             } else {
-                // Fallback à¸ªà¸³à¸«à¸£à¸±à¸šà¹€à¸¡à¸·à¹ˆà¸­à¹„à¸¡à¹ˆà¸¡à¸µ FilterComponent
+                // Fallback สำหรับเมื่อไม่มี FilterComponent
                 if (typeof window.initChartsFromInlineJSON === 'function') {
                     window.initChartsFromInlineJSON();
                 }
@@ -1475,7 +1475,7 @@
         document.addEventListener("DOMContentLoaded", function() {
             // Initialize FilterComponent toggle if available
             if (typeof window.FilterComponent !== 'undefined') {
-                // FilterComponent à¸ˆà¸°à¸ˆà¸±à¸”à¸à¸²à¸£ toggle à¹€à¸­à¸‡
+                // FilterComponent จะจัดการ toggle เอง
                 const toggle = document.getElementById('toggle-filter');
                 if (toggle) {
                     toggle.addEventListener('change', function() {

@@ -1,15 +1,14 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 
 @section('title', 'เพิ่มตัวบ่งชี้')
 
 @section('content')
-    <form action="{{ route('indicator.store') }}" method="POST"
-        x-data="{
-            score_acc: '',
-            init() {
-                this.score_acc = this.$el.dataset.initialScoreAcc ?? '';
-            }
-        }"
+    <form action="{{ route('indicator.store') }}" method="POST" x-data="{
+        score_acc: '',
+        init() {
+            this.score_acc = this.$el.dataset.initialScoreAcc ?? '';
+        }
+    }"
         data-initial-score-acc="{{ old('max_score', '') }}">
         @csrf
         <div class="w-full mx-auto">
@@ -40,45 +39,59 @@
                     {{-- Card 2: Responsible --}}
                     <x-card number="2" title="ผู้รับผิดชอบ">
                         <div x-data="{
-                            usersAll: @js($usersForAssign ?? []), // [{id,name,department_id}]
+                            usersAll: @js($usersForAssign),
                             depSelected: (@js(old('department_ids', [])) || []).map(v => String(v)),
-                        
-                            usersEl() { return this.$refs.usersMulti },
-                            deptEl() { return this.$refs.deptMulti },
-                        
-                            filteredUsers() {
-                                if (!this.depSelected?.length) return this.usersAll;
-                                const set = new Set(this.depSelected.map(String));
-                                return this.usersAll.filter(u => set.has(String(u.department_id)));
+                            init() {
+                                this.$nextTick(() => setTimeout(() => this.refreshUsers(), 100));
                             },
-                        
+                            getMS(el) {
+                                if (!el) return null;
+                                if (el.__x?.$data) return el.__x.$data;
+                                if (typeof Alpine !== 'undefined' && Alpine.$data) return Alpine.$data(el);
+                                if (el._x_dataStack?.[0]) return el._x_dataStack[0];
+                                return null;
+                            },
+                            usersEl() { return this.getMS(this.$refs.usersMulti) },
+                            filteredUsers() {
+                                if (!this.depSelected.length) return this.usersAll;
+                                const set = new Set(this.depSelected.map(String));
+                                return this.usersAll.filter(u => {
+                                    const depId = String(u?.department_id ?? u?.department?.id ?? u?.dept_id ?? u?.departmentId ?? '');
+                                    return depId && set.has(depId);
+                                });
+                            },
                             refreshUsers() {
                                 const filtered = this.filteredUsers();
-                                this.usersEl()?.setOptions?.(filtered);
-                        
-                                const allowed = new Set(filtered.map(u => String(u.id)));
-                                const current = (this.usersEl()?.selected || []).map(String);
-                                const keep = current.filter(v => allowed.has(v));
-                                this.usersEl()?.setSelected?.(keep);
-                            }
-                        }" x-init="$nextTick(() => setTimeout(() => refreshUsers(), 50))"
-                            @multiselect-change.window="
-                            if ($event.detail?.name === 'department_ids') {
-                              depSelected = ($event.detail.values || []).map(String);
-                              refreshUsers();
-                            }
-                          "
-                            class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-                            {{-- Departments (multi) --}}
-                            <x-multiselect x-ref="deptMulti" name="department_ids" label="หน่วยงานที่รับผิดชอบ"
-                                :options="$departments ?? []" placeholder="กรุณาเลือกหน่วยงาน" searchable select-all />
+                                // Keep selections that are still allowed based on multiselect state
+                                const allowed = new Set(filtered.map(x => String(x.id)));
+                                const u = (this.usersEl?.() || this.getMS?.(this.$refs?.usersMulti) || null);
+                                const keep = (u?.selected || []).map(String).filter(v => allowed.has(v));
 
-                            {{-- Users (multi, filtered by departments) --}}
+                                // Ask multiselect(user_ids) to update its options/selections via window event
+                                window.dispatchEvent(new CustomEvent('multiselect-update-options', {
+                                    detail: { name: 'user_ids', options: filtered, keep }
+                                }));
+
+                                // Open users dropdown for visibility
+                                if (u) u.open = true;
+                            }
+                        }" x-init="init()"
+                            @multiselect-change.window="
+            if ($event.detail?.name === 'department_ids') {
+                depSelected = ($event.detail.values || []).map(String);
+                refreshUsers();
+            }
+        "
+                            class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+                            <x-multiselect name="department_ids" label="หน่วยงานที่รับผิดชอบ" :options="$departments"
+                                placeholder="กรุณาเลือกหน่วยงาน" searchable select-all />
+
                             <x-multiselect x-ref="usersMulti" name="user_ids" label="ผู้รับผิดชอบในการรวบรวมข้อมูล"
-                                :options="$usersForAssign ?? []" optionValue="id" optionLabel="name" placeholder="กรุณาเลือกผู้รับผิดชอบ"
+                                :options="$usersForAssign" optionValue="id" optionLabel="name" placeholder="กรุณาเลือกผู้รับผิดชอบ"
                                 searchable select-all required />
                         </div>
                     </x-card>
+
 
                     {{-- Card 3: Description --}}
                     <x-card number="3" title="คำอธิบายตัวบ่งชี้">
@@ -95,7 +108,7 @@
                                 init() {
                                     // โหลด old data ถ้ามี, ถ้าไม่มีให้เริ่มต้นด้วย 1 item
                                     if (this.oldCriteria && this.oldCriteria.length > 0) {
-                                        this.items = this.oldCriteria.map((c, idx) => ({ 
+                                        this.items = this.oldCriteria.map((c, idx) => ({
                                             id: Date.now() + idx,
                                             data: c
                                         }));
@@ -138,8 +151,7 @@
                                     $dispatch('criteria-updated', { name: this.name });
                                     window.dispatchEvent(new CustomEvent('criteria-updated', { detail: { name: this.name } }));
                                 }
-                            }"
-                                @criteria-remove="remove($event.detail.index-1)"
+                            }" @criteria-remove="remove($event.detail.index-1)"
                                 @criteria-move-up="up($event.detail.index-1)"
                                 @criteria-move-down="down($event.detail.index-1)"
                                 @criteria-name-change="
@@ -177,24 +189,23 @@
                     @php
                         $scoringMethodInitial = old('scoring_method');
                         if ($scoringMethodInitial === null || $scoringMethodInitial === '') {
-                            if (! empty(old('multiCounts'))) {
+                            if (!empty(old('multiCounts'))) {
                                 $scoringMethodInitial = 'count';
-                            } elseif (! empty(old('multiSelected'))) {
+                            } elseif (!empty(old('multiSelected'))) {
                                 $scoringMethodInitial = 'selected';
-                            } elseif (! empty(old('scoring.variables'))) {
+                            } elseif (!empty(old('scoring.variables'))) {
                                 $scoringMethodInitial = 'custom';
                             } else {
                                 $scoringMethodInitial = '';
                             }
                         }
                     @endphp
-                    <x-card number="5" title="เกณฑ์การให้คะแนน" class="space-y-6"
-                        x-data="{
-                            scoringMethod: '',
-                            init() {
-                                this.scoringMethod = this.$el.dataset.defaultScoringMethod || '';
-                            }
-                        }"
+                    <x-card number="5" title="เกณฑ์การให้คะแนน" class="space-y-6" x-data="{
+                        scoringMethod: '',
+                        init() {
+                            this.scoringMethod = this.$el.dataset.defaultScoringMethod || '';
+                        }
+                    }"
                         data-default-scoring-method="{{ $scoringMethodInitial }}">
                         <x-card-box icon="📋">
                             <x-slot name="title">
@@ -235,14 +246,18 @@
                         <div class="w-full">
                             <p class="block mb-3 text-sm font-medium text-slate-700">เลือกวิธีการให้คะแนน</p>
 
-                            <select x-model="scoringMethod" name="scoring_method" id="scoring_method" aria-label="Scoring method"
+                            <select x-model="scoringMethod" name="scoring_method" id="scoring_method"
+                                aria-label="Scoring method"
                                 class="p-2 mt-1 w-full bg-white rounded-xl border border-slate-300 
                 placeholder-slate-400 text-sm md:text-base 
                 hover:shadow-md hover:border-blue-400 transition
                 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-500">
-                                <option value="" @selected($scoringMethodInitial === '')>-- กรุณาเลือกวิธีการให้คะแนน --</option>
-                                <option value="count" @selected($scoringMethodInitial === 'count')>หลายตัวเลือก - ตามจำนวนข้อที่เลือก</option>
-                                <option value="selected" @selected($scoringMethodInitial === 'selected')>หลายตัวเลือก - คะแนนตามข้อที่เลือก</option>
+                                <option value="" @selected($scoringMethodInitial === '')>-- กรุณาเลือกวิธีการให้คะแนน --
+                                </option>
+                                <option value="count" @selected($scoringMethodInitial === 'count')>หลายตัวเลือก - ตามจำนวนข้อที่เลือก
+                                </option>
+                                <option value="selected" @selected($scoringMethodInitial === 'selected')>หลายตัวเลือก - คะแนนตามข้อที่เลือก
+                                </option>
                                 <option value="custom" @selected($scoringMethodInitial === 'custom')>ปรับแต่งอิสระ</option>
                             </select>
 
@@ -262,7 +277,7 @@
                                         items: [],
                                         init() {
                                             if (this.oldMultiSelected && this.oldMultiSelected.length > 0) {
-                                                this.items = this.oldMultiSelected.map((c, idx) => ({ 
+                                                this.items = this.oldMultiSelected.map((c, idx) => ({
                                                     id: Date.now() + idx,
                                                     data: c
                                                 }));
@@ -270,8 +285,8 @@
                                                 this.items = [{ id: Date.now(), data: null }];
                                             }
                                         },
-                                        add() { 
-                                            this.items = [...this.items, { id: Date.now() + this.items.length, data: null }] 
+                                        add() {
+                                            this.items = [...this.items, { id: Date.now() + this.items.length, data: null }]
                                         },
                                         remove(i) {
                                             const a = [...this.items];
