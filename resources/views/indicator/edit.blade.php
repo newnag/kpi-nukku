@@ -196,7 +196,7 @@
 
                                 // Ask users multiselect to update via event (same pattern as create)
                                 window.dispatchEvent(new CustomEvent('multiselect-update-options', {
-                                    detail: { name: 'user_ids', options: filtered, keep }
+                                    detail: { name: 'user_ids', options: filtered, keep, open: !!(this.depSelected && this.depSelected.length) }
                                 }));
 
                                 if (u) { u.open = true; }

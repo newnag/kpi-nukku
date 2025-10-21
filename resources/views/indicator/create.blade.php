@@ -69,7 +69,7 @@
 
                                 // Ask multiselect(user_ids) to update its options/selections via window event
                                 window.dispatchEvent(new CustomEvent('multiselect-update-options', {
-                                    detail: { name: 'user_ids', options: filtered, keep }
+                                    detail: { name: 'user_ids', options: filtered, keep, open: !!(this.depSelected && this.depSelected.length) }
                                 }));
 
                                 // Open users dropdown for visibility

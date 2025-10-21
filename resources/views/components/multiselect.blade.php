@@ -53,9 +53,12 @@
     {{-- 🧩 NEW: ฟัง event จากภายนอก --}}
     @multiselect-update-options.window="
         if ($event.detail?.name === name) {
-          
             setOptions($event.detail.options || []);
             setSelected($event.detail.keep || []);
+            if ($event.detail?.open) {
+                open = true;
+                if (searchable) $nextTick(() => $refs.search?.focus());
+            }
         }
     "
 >
