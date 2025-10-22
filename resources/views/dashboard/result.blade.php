@@ -17,7 +17,8 @@
             <div id="year-filters" style="margin-bottom:10px;margin-left: 20px;">
                 @foreach ($filters['years'] as $y)
                     <label style="margin-right:10px;">
-                        <input name="year-checkbox-overall" type="checkbox" class="year-checkbox" value="{{ $y }}" checked>
+                        <input name="year-checkbox-overall" type="checkbox" class="year-checkbox" value="{{ $y }}"
+                            checked>
                         {{ $y }}
                     </label>
                 @endforeach
@@ -27,7 +28,8 @@
             <div class="chart-card" id="scoreLineCard" style="position:relative;">
                 <button data-html2canvas-ignore="true" type="button" class="btn-download" data-target="scoreLineCard"
                     style="background:#fff;border:1px solid #ddd;padding:6px;border-radius:8px;cursor:pointer;line-height:1;display:flex;align-items:center;justify-content:center;transition:all .2s ease;position:absolute;top:10px;right:10px;z-index:2;">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v12m0 0l-4-4m4 4l4-4M4 20h16" />
                     </svg>
                 </button>
@@ -41,7 +43,8 @@
             <div id="year-filters-standard" style="margin-bottom:10px;margin-left: 20px;">
                 @foreach ($filters['years'] as $y)
                     <label style="margin-right:10px;">
-                        <input name="year-checkbox-std" type="checkbox" class="year-checkbox-std" value="{{ $y }}" checked>
+                        <input name="year-checkbox-std" type="checkbox" class="year-checkbox-std"
+                            value="{{ $y }}" checked>
                         {{ $y }}
                     </label>
                 @endforeach
@@ -53,8 +56,10 @@
                         <button data-html2canvas-ignore="true" type="button" class="btn-download"
                             data-target="stdCard-{{ $chart['id'] }}"
                             style="background:#fff;border:1px solid #ddd;padding:6px;border-radius:8px;cursor:pointer;line-height:1;display:flex;align-items:center;justify-content:center;transition:all .2s ease;position:absolute;top:10px;right:10px;z-index:2;">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v12m0 0l-4-4m4 4l4-4M4 20h16" />
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M12 4v12m0 0l-4-4m4 4l4-4M4 20h16" />
                             </svg>
                         </button>
                         <h3 style="margin-bottom:10px;">{{ $chart['name'] }}</h3>
@@ -77,7 +82,8 @@
             <div id="year-filters-dim" style="margin-bottom:10px;margin-left: 20px;">
                 @foreach ($filters['years'] as $y)
                     <label style="margin-right:10px;">
-                        <input name="year-checkbox-dim" type="checkbox" class="year-checkbox-dim" value="{{ $y }}" checked>
+                        <input name="year-checkbox-dim" type="checkbox" class="year-checkbox-dim"
+                            value="{{ $y }}" checked>
                         {{ $y }}
                     </label>
                 @endforeach
@@ -88,8 +94,10 @@
                         <button data-html2canvas-ignore="true" type="button" class="btn-download"
                             data-target="dimCard-{{ $chart['id'] }}"
                             style="background:#fff;border:1px solid #ddd;padding:6px;border-radius:8px;cursor:pointer;line-height:1;display:flex;align-items:center;justify-content:center;transition:all .2s ease;position:absolute;top:10px;right:10px;z-index:2;">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v12m0 0l-4-4m4 4l4-4M4 20h16" />
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M12 4v12m0 0l-4-4m4 4l4-4M4 20h16" />
                             </svg>
                         </button>
                         <h3 style="margin-bottom:10px;">{{ $chart['name'] }}</h3>
@@ -107,13 +115,14 @@
             </div>
         </div>
         <!-- Toggle Switch -->
-        <div class="text-right">
+        <div class="flex items-center justify-end gap-2">
             <label class="switch">
                 <input name="filter-checkbox" type="checkbox" id="toggle-filter">
                 <span class="slider round"></span>
             </label>
             <span>กรองข้อมูล</span>
         </div>
+
         <!-- Filter Component -->
         <x-filter :years="$filters['years'] ?? []" :standards="$filters['standards'] ?? []" :departments="[]" :collectors="[]" :dimensions="$filters['dimensions'] ?? []"
             :filters="$filters" :action="route('dashboard.getData')" title="กรองข้อมูลการประเมิน" filterId="filter-panel"
@@ -161,13 +170,14 @@
             <div class="search-box flex-1 max-w-[420px]">
                 <div class="icon">
                     <!-- search icon -->
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor" style="color:#9ca3af;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor" style="color:#9ca3af;">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
                 </div>
-                <input name="custom-search" type="text" id="custom-search" class="search-input" placeholder="ค้นหารายการตัวบ่งชี้">
+                <input name="custom-search" type="text" id="custom-search" class="search-input"
+                    placeholder="ค้นหารายการตัวบ่งชี้">
             </div>
             <div class="charts-grid">
                 @foreach ($standards as $standard)
@@ -203,7 +213,8 @@
            justify-content:center;transition:all .2s ease;">
                                             <!-- SVG icon -->
                                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
-                                                fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                                                stroke-width="2">
                                                 <path stroke-linecap="round" stroke-linejoin="round"
                                                     d="M12 4v12m0 0l-4-4m4 4l4-4M4 20h16" />
                                             </svg>

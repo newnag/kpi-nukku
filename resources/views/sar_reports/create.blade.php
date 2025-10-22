@@ -175,24 +175,24 @@
                                                                                 <button type="button"
                                                                                     class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
                                                                                     @click.stop="
-                    saving = true;
-                    fetch('{{ route('sar_reports.criterias.updateReport', $cri->id) }}', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                            'Accept': 'application/json'
-                        },
-                        body: JSON.stringify({ report: text })
-                    })
-                    .then(res => res.json())
-                    .then(data => {
-                        saving = false;
-                        saved = true;
-                        open = false;
-                    })
-                    .catch(() => { saving = false; });
-                ">
+                                                                                     saving = true;
+                                                                                     fetch('{{ route('sar_reports.criterias.updateReport', $cri->id) }}', {
+                                                                                         method: 'POST',
+                                                                                         headers: {
+                                                                                             'Content-Type': 'application/json',
+                                                                                             'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                                                                             'Accept': 'application/json'
+                                                                                         },
+                                                                                         body: JSON.stringify({ report: text })
+                                                                                     })
+                                                                                     .then(res => res.json())
+                                                                                     .then(data => {
+                                                                                         saving = false;
+                                                                                         saved = true;
+                                                                                         open = false;
+                                                                                     })
+                                                                                     .catch(() => { saving = false; });
+                                                                                 ">
                                                                                     <span x-show="!saving">บันทึก</span>
                                                                                     <span
                                                                                         x-show="saving">กำลังบันทึก...</span>
