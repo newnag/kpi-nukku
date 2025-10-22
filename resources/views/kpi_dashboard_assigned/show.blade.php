@@ -119,7 +119,7 @@
                                         </div>
                                     @endif
                                 </div>
-                                <div class="prose max-w-none text-sm text-gray-800 criteria-detail-view">
+                                <div class="prose max-w-none text-sm text-gray-800 break-words criteria-detail-view">
                                     {!! $detailEvidence->detail !!}
                                 </div>
                                 @if (!$locked)
