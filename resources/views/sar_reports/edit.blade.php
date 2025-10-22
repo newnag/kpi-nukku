@@ -92,9 +92,13 @@
                                                                     $watch('open', value => {
                                                                         if (value) {
                                                                             setTimeout(() => {
-                                                                                if ($('#editor-{{ $cri->id }}').data('trumbowyg')) $('#editor-{{ $cri->id }}').trumbowyg('destroy');
-                                                                                $('#editor-{{ $cri->id }}').trumbowyg({
-                                                                                    svgPath: 'https://cdnjs.cloudflare.com/ajax/libs/Trumbowyg/2.27.3/ui/icons.svg',
+                                                                                const $el = $('#editor-{{ $cri->id }}');
+                                                                                if ($el.data('trumbowyg')) $el.trumbowyg('destroy');
+                                                                                // preload current text and hide raw HTML until initialized
+                                                                                $el.val(text || '');
+                                                                                $el.css('visibility','hidden');
+                                                                                $el.trumbowyg({
+                                                                                    svgPath: 'https://cdn.jsdelivr.net/npm/trumbowyg@2.31.0/dist/ui/icons.svg',
                                                                                     btns: [
                                                                                         ['viewHTML'],
                                                                                         ['undo', 'redo'],
@@ -114,7 +118,25 @@
                                                                                         }
                                                                                     },
                                                                                     autogrow: true,
-                                                                                }).on('tbwchange', function() { text = $(this).trumbowyg('html'); });
+                                                                                    semantic: true,
+                                                                                })
+                                                                                .on('tbwinit', function(){
+                                                                                    $(this).css('visibility','visible');
+                                                                                    // Ensure Enter inserts newline correctly
+                                                                                    const $box = $(this).closest('.trumbowyg-box');
+                                                                                    const $editor = $box.find('.trumbowyg-editor');
+                                                                                    $editor.off('keydown.customEnter').on('keydown.customEnter', function(e){
+                                                                                        if (e.key === 'Enter') {
+                                                                                            if (e.shiftKey) {
+                                                                                                document.execCommand('insertLineBreak');
+                                                                                            } else {
+                                                                                                document.execCommand('insertParagraph');
+                                                                                            }
+                                                                                            e.preventDefault();
+                                                                                        }
+                                                                                    });
+                                                                                })
+                                                                                .on('tbwchange', function() { text = $(this).trumbowyg('html'); });
                                                                             }, 200);
                                                                         }
                                                                     })">

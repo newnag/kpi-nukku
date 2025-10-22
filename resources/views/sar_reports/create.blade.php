@@ -494,6 +494,21 @@
                 autogrow: true,
                 semantic: true,
                 resetCss: true
+            })
+            .on('tbwinit', function(){
+                // Ensure Enter adds new paragraph (Shift+Enter = line break)
+                const $box = $(this).closest('.trumbowyg-box');
+                const $editor = $box.find('.trumbowyg-editor');
+                $editor.off('keydown.customEnter').on('keydown.customEnter', function(e){
+                    if (e.key === 'Enter') {
+                        if (e.shiftKey) {
+                            document.execCommand('insertLineBreak');
+                        } else {
+                            document.execCommand('insertParagraph');
+                        }
+                        e.preventDefault();
+                    }
+                });
             });
         });
     </script>

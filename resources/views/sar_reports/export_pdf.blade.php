@@ -13,7 +13,8 @@
             $notoOk = file_exists($notoRegPath) && file_exists($notoBoldPath);
             $sarOk  = file_exists($sarRegPath) && file_exists($sarBoldPath);
 
-            $useFamily = $notoOk ? 'NotoSansThai' : ($sarOk ? 'SarabunLocal' : 'DejaVu Sans');
+            // Prefer Sarabun to match in‑app editor; fallback to Noto
+            $useFamily = $sarOk ? 'SarabunLocal' : ($notoOk ? 'NotoSansThai' : 'DejaVu Sans');
 
             $notoReg = str_replace('\\\\', '/', $notoRegPath);
             $notoBold = str_replace('\\\\', '/', $notoBoldPath);
@@ -21,24 +22,26 @@
             $sarBold = str_replace('\\\\', '/', $sarBoldPath);
         @endphp
 
-        @if ($notoOk)
-        @font-face { font-family: 'NotoSansThai'; font-style: normal; font-weight: 400; src: url('{{ $notoReg }}') format('truetype'); }
-        @font-face { font-family: 'NotoSansThai'; font-style: normal; font-weight: 700; src: url('{{ $notoBold }}') format('truetype'); }
-        body, * { font-family: 'NotoSansThai', sans-serif !important; }
-        @elseif ($sarOk)
+        @if ($sarOk)
         @font-face { font-family: 'SarabunLocal'; font-style: normal; font-weight: 400; src: url('{{ $sarReg }}') format('truetype'); }
         @font-face { font-family: 'SarabunLocal'; font-style: normal; font-weight: 700; src: url('{{ $sarBold }}') format('truetype'); }
         body, * { font-family: 'SarabunLocal', sans-serif !important; }
+        @elseif ($notoOk)
+        @font-face { font-family: 'NotoSansThai'; font-style: normal; font-weight: 400; src: url('{{ $notoReg }}') format('truetype'); }
+        @font-face { font-family: 'NotoSansThai'; font-style: normal; font-weight: 700; src: url('{{ $notoBold }}') format('truetype'); }
+        body, * { font-family: 'NotoSansThai', sans-serif !important; }
         @else
         /* Last resort fallback; may not fully support Thai */
         body, * { font-family: 'DejaVu Sans', sans-serif !important; }
         @endif
-        body { font-size: 13px; line-height: 1.4; }
+        @page { margin: 20mm 15mm; }
+        body { font-size: 13px; line-height: 1.45; color: #111; }
 
-        h2 { text-align: center; font-size: 20px; margin-bottom: 20px; }
-        h3 { font-size: 18px; margin-top: 20px; border-bottom: 1px solid #000; }
-        h4 { font-size: 16px; margin-top: 12px; }
-        h5 { font-size: 15px; margin-top: 10px; }
+        h2 { text-align: center; font-size: 20px; margin-bottom: 20px; font-weight: 700; }
+        h3 { font-size: 18px; margin-top: 20px; border-bottom: 1px solid #000; font-weight: 600; }
+        h4 { font-size: 16px; margin-top: 12px; font-weight: 600; }
+        h5 { font-size: 15px; margin-top: 10px; font-weight: 600; }
+        strong, b { font-weight: 600; }
 
         p { margin: 0 0 6px 0; }
         ul { margin: 0; padding-left: 18px; }
@@ -59,7 +62,17 @@
             word-break: break-word;
             white-space: pre-line; /* keep line breaks but collapse spaces */
         }
-        th { background: #f0f0f0; text-align: center; }
+        th { background: #f5f7fa; text-align: center; }
+
+        /* Zebra rows for readability */
+        tbody tr:nth-child(odd) { background: #fbfbfd; }
+
+        /* Make lists tidy inside cells */
+        td ul { margin: 0; padding-left: 16px; }
+        td ol { margin: 0; padding-left: 18px; }
+
+        /* Scale images if any appear in rich text */
+        td img { max-width: 100%; height: auto; }
 
         .score { text-align: center; font-weight: bold; }
         .tick-img { height: 12px; vertical-align: middle; }
@@ -114,7 +127,7 @@
                 <p><strong>[{{ $ind->code }}] {{ $ind->name }}</strong></p>
 
                 {{-- ✅ ตารางเกณฑ์ (แยกทีละ indicator) --}}
-                <table>
+                <table class="criteria-table">
                     <thead>
                         <tr>
                             <th style="width:40px">ข้อ</th>
@@ -131,9 +144,11 @@
                                 <td>{{ $cri->name }}</td>
                                 <td class="score">{!! $cri->status ? $tickImg : '-' !!}</td>
                                 @php
+                                    // Pick the most recent non-empty detail
                                     $detailHtml = '';
                                     if ($cri->relationLoaded('evidences')) {
-                                        foreach ($cri->evidences as $ev) {
+                                        $ordered = $cri->evidences->sortByDesc(function($e){ return $e->created_at; });
+                                        foreach ($ordered as $ev) {
                                             $h = (string) ($ev->detail ?? '');
                                             if (trim(strip_tags(html_entity_decode($h))) !== '') { $detailHtml = $h; break; }
                                         }
@@ -171,7 +186,7 @@
     $score = $ind->self_score ?? ($ind->score_acc ?? null);
 @endphp
 
-<table>
+<table class="score-table">
     <thead>
         <tr>
             <th>เกณฑ์การให้คะแนน</th>
