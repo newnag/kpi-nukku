@@ -24,7 +24,13 @@
             </div>
 
             <!-- เปลี่ยนจาก canvas เป็น div สำหรับ ApexCharts -->
-            <div class="chart-card">
+            <div class="chart-card" id="scoreLineCard" style="position:relative;">
+                <button data-html2canvas-ignore="true" type="button" class="btn-download" data-target="scoreLineCard"
+                    style="background:#fff;border:1px solid #ddd;padding:6px;border-radius:8px;cursor:pointer;line-height:1;display:flex;align-items:center;justify-content:center;transition:all .2s ease;position:absolute;top:10px;right:10px;z-index:2;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v12m0 0l-4-4m4 4l4-4M4 20h16" />
+                    </svg>
+                </button>
                 <div id="scoreLineChart"></div>
             </div>
         </div>
@@ -43,7 +49,14 @@
             <!-- ✅ Grid 3 คอลัมน์ -->
             <div class="charts-of-standards">
                 @foreach ($chartsStandardBars as $chart)
-                    <div class="chart-card standard-card">
+                    <div class="chart-card standard-card" id="stdCard-{{ $chart['id'] }}" style="position:relative;">
+                        <button data-html2canvas-ignore="true" type="button" class="btn-download"
+                            data-target="stdCard-{{ $chart['id'] }}"
+                            style="background:#fff;border:1px solid #ddd;padding:6px;border-radius:8px;cursor:pointer;line-height:1;display:flex;align-items:center;justify-content:center;transition:all .2s ease;position:absolute;top:10px;right:10px;z-index:2;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v12m0 0l-4-4m4 4l4-4M4 20h16" />
+                            </svg>
+                        </button>
                         <h3 style="margin-bottom:10px;">{{ $chart['name'] }}</h3>
                         <div id="stdChart-{{ $chart['id'] }}" style="height:auto;"></div>
 
@@ -71,7 +84,14 @@
             </div>
             <div class="charts-of-dimensions">
                 @foreach ($chartDimensions as $chart)
-                    <div class="chart-card dim-card">
+                    <div class="chart-card dim-card" id="dimCard-{{ $chart['id'] }}" style="position:relative;">
+                        <button data-html2canvas-ignore="true" type="button" class="btn-download"
+                            data-target="dimCard-{{ $chart['id'] }}"
+                            style="background:#fff;border:1px solid #ddd;padding:6px;border-radius:8px;cursor:pointer;line-height:1;display:flex;align-items:center;justify-content:center;transition:all .2s ease;position:absolute;top:10px;right:10px;z-index:2;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v12m0 0l-4-4m4 4l4-4M4 20h16" />
+                            </svg>
+                        </button>
                         <h3 style="margin-bottom:10px;">{{ $chart['name'] }}</h3>
                         <div id="dimChart-{{ $chart['id'] }}" style="height:auto;"></div>
 
