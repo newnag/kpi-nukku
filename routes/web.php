@@ -1,7 +1,8 @@
 ﻿<?php
 
-use App\Http\Controllers\Auth\Auth_ssoController;
+// use App\Http\Controllers\Auth\Auth_ssoController; // deprecated
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\Auth\AuthSSOController;
 use App\Http\Controllers\CategorieController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DashboardExportController;
@@ -46,10 +47,11 @@ Route::middleware('guest')->group(function () {
         Route::post('/login', 'login');
     });
 
-    Route::get('/sso/login', [Auth_ssoController::class, 'redirectToSSO'])->name('sso.login');
-    // รองรับทั้ง /auth/callback (เดิม) และ /sso/callback (ตาม .env/SSO พอยต์ปัจจุบัน)
-    Route::get('/auth/callback', [Auth_ssoController::class, 'callback'])->name('sso.callback');
-    Route::get('/sso/callback', [Auth_ssoController::class, 'callback'])->name('sso.callback.alt');
+Route::get('/auth/sso/login', [AuthSSOController::class, 'redirectToSSO'])->name('sso.login');
+Route::get('/auth/callback/login', [AuthSSOController::class, 'callback'])->name('sso.callback');
+// Additional callback path to match SSO-UAT config (https://nusarnc.kku.ac.th/auth)
+Route::get('/auth', [AuthSSOController::class, 'callback'])->name('sso.callback.alt');
+Route::get('/auth/sso/logout', [AuthSSOController::class, 'logout'])->name('sso.logout');
 });
 
 /*

@@ -104,6 +104,13 @@
                         </svg>
                     </button>
                 </form>
+<div class="mt-6 text-center">
+    <a href="{{ route('sso.login') }}"
+       class="inline-flex items-center justify-center w-full px-4 py-2 text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition">
+        <i class="fa-solid fa-right-to-bracket mr-2"></i>
+        เข้าสู่ระบบด้วยบัญชี KKU (SSO)
+    </a>
+</div>
 
                 <!-- Footer -->
                 {{-- <div class="mt-8 text-center">
