@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use App\Models\User;
+use App\Models\Department;
 use Illuminate\Support\Str;
 use Spatie\Permission\Models\Role;
 
@@ -112,6 +113,10 @@ class AuthSSOController extends Controller
         }
 
         if (!$user) {
+            // Ensure a valid department exists (users.department_id is not-null)
+            $deptName = $profile['facultyName'] ?? ($profile['departmentName'] ?? 'Unassigned');
+            $department = Department::firstOrCreate(['name' => $deptName ?: 'Unassigned']);
+
             $user = User::create([
                 'title' => $profile['title'] ?? null,
                 'first_name' => $profile['firstname'] ?? ($profile['firstName'] ?? ''),
@@ -119,6 +124,7 @@ class AuthSSOController extends Controller
                 'email' => $email,
                 'password' => Str::random(32), // hashed by User casts
                 'status' => true,
+                'department_id' => $department->id,
             ]);
             try {
                 if (method_exists($user, 'assignRole')) {
