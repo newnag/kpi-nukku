@@ -268,6 +268,10 @@ Route::middleware(['auth'])->group(function () {
         // View
         Route::get('/', [EvidenceController::class, 'index'])->name('index');
         Route::get('criteria/{criteriaId}/evidences', [EvidenceController::class, 'getByCriteria']);
+        // Show (JSON for AJAX detail fetching)
+        Route::get('/{id}', [EvidenceController::class, 'show'])
+            ->name('show')
+            ->whereNumber('id');
 
         // Create
         Route::get('/create/{criteria}', [EvidenceController::class, 'create'])

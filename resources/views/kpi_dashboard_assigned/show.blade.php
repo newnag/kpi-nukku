@@ -102,31 +102,31 @@
                             $detailEvidence = $criteria->evidences
                                 ->sortByDesc(function($e){ return $e->created_at; })
                                 ->first(function($e){ return filled($e->detail); });
+                            $detailId = $detailEvidence?->id;
+                            $detailHtml = $detailEvidence->detail ?? '';
                         @endphp
 
-                        @if ($detailEvidence)
-                            @php $detailId = $detailEvidence?->id; @endphp
-                            <div class="criteria-detail mb-3" data-criteria-id="{{ $criteria->id }}" data-evidence-id="{{ $detailId }}"
-                                data-store-url="{{ route('evidences.store') }}"
-                                @if($detailId) data-update-url="{{ route('evidences.update', $detailId) }}" @endif>
-                                <div class="flex items-center justify-between mb-1">
-                                    <div class="font-semibold text-gray-800">รายงานผลการดำเนินงาน</div>
-                                    @if (!$locked)
-                                        <div class="flex gap-2 text-sm">
-                                            <button type="button" class="btn btn-xs btn-outline detail-edit-btn">แก้ไข</button>
-                                            <button type="button" class="btn btn-xs btn-primary detail-save-btn" style="display:none">บันทึก</button>
-                                            <button type="button" class="btn btn-xs btn-outline detail-cancel-btn" style="display:none">ยกเลิก</button>
-                                        </div>
-                                    @endif
-                                </div>
-                                <div class="prose max-w-none text-sm text-gray-800 break-words criteria-detail-view">
-                                    {!! $detailEvidence->detail !!}
-                                </div>
+                        <div class="criteria-detail mb-3"
+                             data-criteria-id="{{ $criteria->id }}"
+                             data-evidence-id="{{ $detailId }}"
+                             data-store-url="{{ route('evidences.store') }}">
+                            <div class="flex items-center justify-between mb-1">
+                                <div class="font-semibold text-gray-800">รายงานผลการดำเนินงาน</div>
                                 @if (!$locked)
-                                    <textarea class="criteria-detail-editor eu-editor" rows="6" style="display:none">{!! $detailEvidence->detail !!}</textarea>
+                                    <div class="flex gap-2 text-sm">
+                                        <button type="button" class="btn btn-xs btn-outline detail-edit-btn">แก้ไข</button>
+                                        <button type="button" class="btn btn-xs btn-primary detail-save-btn" style="display:none">บันทึก</button>
+                                        <button type="button" class="btn btn-xs btn-outline detail-cancel-btn" style="display:none">ยกเลิก</button>
+                                    </div>
                                 @endif
                             </div>
-                        @endif
+                            <div class="prose max-w-none text-sm text-gray-800 break-words criteria-detail-view">
+                                {!! $detailHtml !!}
+                            </div>
+                            @if (!$locked)
+                                <textarea class="criteria-detail-editor eu-editor" rows="6" style="display:none">{!! $detailHtml !!}</textarea>
+                            @endif
+                        </div>
 
                         @if ($criteria->evidences->isNotEmpty())
                         <div class="evidence-list evidence-list-{{ $criteria->id }}">
@@ -135,7 +135,7 @@
                                     $type = strtolower($evidence->type ?? '');
                                     $name = strtolower($evidence->name ?? '');
                                 @endphp
-                                <div class="evidence-item" id="evidence-{{ $evidence->id }}">
+                                <div class="evidence-item" id="evidence-{{ $evidence->id }}" data-evidence-id="{{ $evidence->id }}">
                                     <div class="flex items-center space-x-2">
                                         <span class="evidence-icon">
                                             @if (Str::endsWith($type, 'pdf'))
@@ -546,6 +546,66 @@
         });
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Trumbowyg/2.27.3/plugins/fontfamily/trumbowyg.fontfamily.min.js">
+    </script>
+    <script>
+        // When clicking an evidence row, load its detail into the panel
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('.evidence-list .evidence-item').forEach(item => {
+                item.addEventListener('click', async function (e) {
+                    if (e.target.closest('a, button, .btn-delete, input, textarea, label, [role="button"]')) return;
+                    const idMatch = this.getAttribute('data-evidence-id') || (this.id.match(/evidence-(\d+)/)?.[1] ?? '');
+                    if (!idMatch) return;
+                    try {
+                        const resp = await fetch(`/evidences/${idMatch}`, { headers: { 'Accept': 'application/json' } });
+                        const raw = await resp.text();
+                        let data = null; try { data = JSON.parse(raw); } catch (_) {}
+                        if (!resp.ok || !data || data.success === false) return;
+
+                        const detail = data.data?.detail || '';
+                        const criteriaBox = this.closest('.criteria-box');
+                        if (!criteriaBox) return;
+                        const detailSection = criteriaBox.querySelector('.criteria-detail');
+                        const view = criteriaBox.querySelector('.criteria-detail-view');
+                        const editor = criteriaBox.querySelector('.criteria-detail-editor');
+                        if (!detailSection || !view) return;
+
+                        detailSection.setAttribute('data-evidence-id', String(idMatch));
+                        detailSection.setAttribute('data-update-url', `/evidences/${idMatch}`);
+
+                        view.innerHTML = detail;
+                        if (editor) {
+                            try {
+                                if (window.$ && typeof $.fn.trumbowyg === 'function' && $(editor).data('trumbowyg')) {
+                                    $(editor).trumbowyg('html', detail);
+                                } else if (editor.tagName === 'TEXTAREA') {
+                                    editor.value = detail;
+                                } else {
+                                    editor.innerHTML = detail;
+                                }
+                            } catch (_) {}
+                        }
+
+                        // Ensure view mode
+                        const editBtn = criteriaBox.querySelector('.detail-edit-btn');
+                        const saveBtn = criteriaBox.querySelector('.detail-save-btn');
+                        const cancelBtn = criteriaBox.querySelector('.detail-cancel-btn');
+                        view.style.display = '';
+                        if (editor) {
+                            editor.style.display = 'none';
+                            const editorBox = criteriaBox.querySelector('.trumbowyg-box');
+                            if (editorBox) editorBox.style.display = 'none';
+                        }
+                        if (editBtn) editBtn.style.display = '';
+                        if (saveBtn) saveBtn.style.display = 'none';
+                        if (cancelBtn) cancelBtn.style.display = 'none';
+
+                        detailSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    } catch (err) {
+                        // ignore
+                    }
+                });
+            });
+        });
     </script>
 
     <script>
