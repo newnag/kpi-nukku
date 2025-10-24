@@ -16,8 +16,8 @@
     </div>
 
     <!-- Filter Card (component) -->
-    <x-filter :years="$yearsForFilter" :standards="$allStandards" :departments="$departments" :collectors="$collectors" 
-        :dimensions="$dimensionStats" :filters="$filters" :action="route('dashboard.index')" :selectedYear="$displayYear" />
+    <x-filter :years="$yearsForFilter" :standards="$allStandards" :departments="$departments" :collectors="$collectors" :dimensions="$dimensionStats" :filters="$filters"
+        :action="route('dashboard.index')" :selectedYear="$displayYear" />
 
     <!-- Stats Cards -->
     <div class="stats-grid">
@@ -100,15 +100,18 @@
                 </div>
 
                 <!-- ปุ่ม Export -->
-                <button id="exportExell" type="button"
-                    class="btn btn-primary  !bg-green-500 hover:!bg-green-600 hover:!border-green-600">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 sm:h-5 sm:w-5" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0l-4 4m4-4v12" />
-                    </svg>
-                    <span class="inline">EXPORT</span>
-                </button>
+                @if (!auth()->user()->hasRole('administration_admin'))
+                    <button id="exportExell" type="button"
+                        class="btn btn-primary !bg-green-500 hover:!bg-green-600 hover:!border-green-600">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 sm:h-5 sm:w-5" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0l-4 4m4-4v12" />
+                        </svg>
+                        <span class="inline">EXPORT</span>
+                    </button>
+                @endif
+
             </div>
 
             <div style="margin: 10px">
