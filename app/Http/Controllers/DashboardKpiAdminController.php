@@ -85,13 +85,13 @@ class DashboardKpiAdminController extends Controller
             if ($newStatus !== $previousStatus) {
                 $indicator->loadMissing(['assignments.collectorUser']);
                 $changedBy = optional(\Illuminate\Support\Facades\Auth::user())->name;
-                // 1) From final (2) -> draft (1)
-                if ($previousStatus === 2 && $newStatus === 1) {
+                // 1) Any -> draft (1): notify assignees they can edit again
+                if ($newStatus === 1 && $previousStatus !== 1) {
                     foreach ($indicator->assignments as $assignment) {
                         if ($assignment->collectorUser) {
                             $recipient = $assignment->collectorUser;
                             $email = (string) ($recipient->email ?? '');
-                            \Illuminate\Support\Facades\Log::info('Notify assignee about status change (2->1)', [
+                            \Illuminate\Support\Facades\Log::info('Notify assignee about status change (*->1)', [
                                 'indicator_id' => $indicator->id,
                                 'recipient_id' => $recipient->id ?? null,
                                 'email' => $email,

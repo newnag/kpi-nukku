@@ -35,4 +35,14 @@ return [
         ],
     ],
 
+    // KKU APIs
+    'kku' => [
+        'api_base' => env('KKU_API_BASE', 'https://api.kku.ac.th/v3'),
+        'client_id' => env('KKU_CLIENT_ID'),
+        'secret_key' => env('KKU_SECRET_KEY'),
+        // Token cache key and TTL in minutes (default ~23h)
+        'token_cache_key' => 'kku_api_token',
+        'token_ttl_minutes' => env('KKU_TOKEN_TTL_MINUTES', 23 * 60),
+    ],
+
 ];

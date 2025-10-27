@@ -27,11 +27,11 @@ class IndicatorStatusChangedForAssignees extends Notification
     private function statusLabel(int|string|null $status): string
     {
         $map = [
-            0 => 'ร่างกำลังดำเนินการ',
-            1 => 'ร่าง',
-            2 => 'ฉบับจริง (ส่งให้ QA)',
-            3 => 'ผ่าน (เสร็จสิ้น)',
-            4 => 'ไม่ผ่าน (ต้องแก้ไข)',
+            0 => 'ยังไม่กำหนด',
+            1 => 'บันทึกเป็นฉบับร่าง',
+            2 => 'ส่งตรวจ (รอ QA ตรวจ)',
+            3 => 'ผ่านการตรวจ (อนุมัติ)',
+            4 => 'ไม่ผ่านการตรวจ (ต้องแก้ไข)',
         ];
         if (is_numeric($status)) {
             $key = (int) $status;
@@ -50,7 +50,7 @@ class IndicatorStatusChangedForAssignees extends Notification
 
         $mail = (new MailMessage)
             ->subject($title)
-            ->greeting('แจ้งเตือนผู้รับมอบหมาย')
+            ->greeting('สวัสดี')
             ->line('มีการเปลี่ยนสถานะตัวชี้วัดของคุณในระบบ KPI')
             ->line(sprintf('ตัวชี้วัด: %s (%s)', (string) ($indicator->name ?? '-'), (string) ($indicator->code ?? '-')))
             ->line('สถานะใหม่: ' . $newLabel)
@@ -60,10 +60,14 @@ class IndicatorStatusChangedForAssignees extends Notification
             $mail->line('สถานะเดิม: ' . $prevLabel);
         }
         if ($this->changedBy) {
-            $mail->line('ปรับโดย: ' . $this->changedBy);
+            $mail->line('เปลี่ยนโดย: ' . $this->changedBy);
         }
 
-        return $mail->line('ขอบคุณค่ะ/ครับ')->salutation(' ');
+        if ((int) $this->newStatus === 1) {
+            $mail->line('หมายเหตุ: ขณะนี้คุณสามารถแก้ไขตัวชี้วัดนี้ได้แล้ว');
+        }
+
+        return $mail->salutation(' ');
     }
 }
 

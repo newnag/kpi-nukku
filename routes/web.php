@@ -19,6 +19,7 @@ use App\Http\Controllers\SarReportController;
 use App\Http\Controllers\SarReportExportController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\StandardController;
+use App\Http\Controllers\KKUApiController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use SebastianBergmann\CodeCoverage\Report\Html\Dashboard;
@@ -261,6 +262,19 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/{id}', [SettingController::class, 'update'])
             ->name('update')
             ->middleware('permission:edit-settings');
+    });
+
+    // ===== KKU API TEST ROUTES (Auth required) =====
+    Route::prefix('kku')->name('kku.')->group(function () {
+        // Get or refresh token
+        // GET /kku/token?refresh=1
+        Route::get('/token', [KKUApiController::class, 'getKKUToken'])
+            ->name('token');
+
+        // Send a test email via KKU API
+        // POST JSON/Form: from, fromName, to, subject, message, [cc], [bcc]
+        Route::post('/mail-test', [KKUApiController::class, 'sendTestMail'])
+            ->name('mail.test');
     });
 
     // ===== EVIDENCE ROUTES =====

@@ -37,6 +37,10 @@ return [
 
     'mailers' => [
 
+        'kku' => [
+            'transport' => 'kku',
+        ],
+
         'smtp' => [
             'transport' => 'smtp',
             'scheme' => env('MAIL_SCHEME'),

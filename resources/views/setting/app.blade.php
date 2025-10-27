@@ -48,7 +48,7 @@
 
         </x-card>
 
-        <x-card>
+        {{-- <x-card>
             <div class="card-title">ตัวเลือกแจ้งเตือนอัตโนมัติ (ก่อนวันกำหนด)</div>
             <div class="form-group">
                 <label class="form-label">เปิดใช้งาน</label>
@@ -65,7 +65,7 @@
                 <input form="notification-settings-form" type="time" name="remind_time" class="form-input2"
                     style="width:140px;" value="{{ old('remind_time', $setting->remind_time ?? '09:00') }}">
             </div>
-        </x-card>
+        </x-card> --}}
 
         <form id="notification-settings-form" action="{{ route('settings.store') }}" method="POST">
             @csrf

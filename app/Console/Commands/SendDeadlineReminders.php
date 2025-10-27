@@ -45,7 +45,6 @@ class SendDeadlineReminders extends Command
 
     private function sendByFixedDate(Setting $setting, Carbon $now): void
     {
-        $allowDup = (bool) env('REMINDER_ALLOW_DUPLICATES', false);
         $pairs = [
             ['date' => $setting->notify_date1, 'time' => $setting->notify_time1, 'key' => 'd1'],
             ['date' => $setting->notify_date2, 'time' => $setting->notify_time2, 'key' => 'd2'],
@@ -61,22 +60,13 @@ class SendDeadlineReminders extends Command
             $trigger = $now->copy()->setTime((int)$hh, (int)$mm, 0);
             if ($now->lt($trigger)) { Log::info("[reminder] fixed: now < trigger {$time}"); continue; }
 
-            $cacheKey = sprintf('reminder:fixed:%s:%s', $p['key'], $dateStr);
-            if (!$allowDup && Cache::get($cacheKey)) { Log::info("[reminder] fixed: cached {$cacheKey}"); continue; }
-
             $count = $this->sendToAssignees($setting);
             Log::info("[reminder] fixed: sent to {$count} users");
-            if (!$allowDup) {
-                Cache::put($cacheKey, true, $now->copy()->endOfDay());
-            } else {
-                Log::info('[reminder] fixed: dedupe disabled, not caching');
-            }
         }
     }
 
     private function sendByDaysBefore(Setting $setting, Carbon $now): void
     {
-        $allowDup = (bool) env('REMINDER_ALLOW_DUPLICATES', false);
         $time = $setting->remind_time ?: '09:00';
         [$hh,$mm] = array_pad(explode(':', $time), 2, '00');
         $trigger = $now->copy()->setTime((int)$hh, (int)$mm, 0);
@@ -104,16 +94,8 @@ class SendDeadlineReminders extends Command
             $diff = $now->copy()->startOfDay()->diffInDays($deadlineDate, false);
             if (!$days->contains($diff)) continue;
 
-            $cacheKey = sprintf('reminder:before:%d:%s', $ind->id, $now->toDateString());
-            if (!$allowDup && Cache::get($cacheKey)) { Log::info("[reminder] before: cached {$cacheKey}"); continue; }
-
             $count = $this->sendToAssignees($setting, $ind->id);
             Log::info("[reminder] before: ind {$ind->id} -> sent to {$count} users");
-            if (!$allowDup) {
-                Cache::put($cacheKey, true, $now->copy()->endOfDay());
-            } else {
-                Log::info('[reminder] before: dedupe disabled, not caching');
-            }
         }
     }
 
