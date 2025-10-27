@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 // use App\Http\Controllers\Auth\Auth_ssoController; // deprecated
 use App\Http\Controllers\Auth\AuthController;
@@ -363,6 +363,11 @@ Route::middleware(['auth'])->group(function () {
             Route::put('/kpi/{id}/save-variables', [DashboardKpiAdminController::class, 'saveVariables'])->name('saveVariables');
             // Route::put('/kpi/{id}/update-status', [DashboardKpiAdminController::class, 'updateStatus'])->name('updateStatus');
         });
+    });
+
+    // ===== REPORTS ROUTES =====
+    Route::prefix('reports')->name('reports.')->middleware('permission:view-dashboard')->group(function () {
+        Route::get('/progress', [\App\Http\Controllers\ProgressReportController::class, 'index'])->name('progress');
     });
 });
 
