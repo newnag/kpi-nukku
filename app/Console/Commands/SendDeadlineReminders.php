@@ -26,7 +26,8 @@ class SendDeadlineReminders extends Command
             return self::SUCCESS;
         }
 
-        $now = Carbon::now('Asia/Bangkok');
+        // Use application timezone (config('app.timezone'))
+        $now = Carbon::now();
         $today = $now->toDateString();
 
         // 1) Fixed notify dates (round 1 and 2)
@@ -49,16 +50,27 @@ class SendDeadlineReminders extends Command
             ['date' => $setting->notify_date1, 'time' => $setting->notify_time1, 'key' => 'd1'],
             ['date' => $setting->notify_date2, 'time' => $setting->notify_time2, 'key' => 'd2'],
         ];
-
+        $inRunSent = [];
         foreach ($pairs as $p) {
             if (empty($p['date'])) { Log::info("[reminder] fixed: empty date for {$p['key']}"); continue; }
             $dateStr = Carbon::parse($p['date'])->toDateString();
             if ($now->toDateString() !== $dateStr) { Log::info("[reminder] fixed: today != {$dateStr}"); continue; }
 
-            $time = $p['time'] ?: '09:00';
+            if (empty($p['time'])) { Log::info("[reminder] fixed: empty time for {$p['key']}"); continue; }
+            $time = $p['time'];
             [$hh,$mm] = array_pad(explode(':', $time), 2, '00');
             $trigger = $now->copy()->setTime((int)$hh, (int)$mm, 0);
+            // Allow catch-up: if scheduler missed the exact minute, still send once later the same day.
+            // Only requirement: current time is at or past the trigger time for today.
             if ($now->lt($trigger)) { Log::info("[reminder] fixed: now < trigger {$time}"); continue; }
+
+            // Avoid duplicate sends within the day/time window and across d1/d2 with same time
+            $timeKey = sprintf('%s:%02d%02d', $dateStr, (int)$hh, (int)$mm);
+            if (isset($inRunSent[$timeKey])) { Log::info("[reminder] fixed: already sent in run for {$timeKey}"); continue; }
+            $cacheKey = sprintf('reminder:fixed:%s', $timeKey);
+            $ttl = $now->copy()->endOfDay()->addMinutes(5);
+            if (!Cache::add($cacheKey, 1, $ttl)) { Log::info("[reminder] fixed: already sent for {$cacheKey}"); continue; }
+            $inRunSent[$timeKey] = true;
 
             $count = $this->sendToAssignees($setting);
             Log::info("[reminder] fixed: sent to {$count} users");
@@ -94,12 +106,16 @@ class SendDeadlineReminders extends Command
             $diff = $now->copy()->startOfDay()->diffInDays($deadlineDate, false);
             if (!$days->contains($diff)) continue;
 
+            $cacheKey = sprintf('reminder:before:%s:ind:%d', $now->toDateString(), $ind->id);
+            $ttl = $now->copy()->endOfDay()->addMinutes(5);
+            if (!Cache::add($cacheKey, 1, $ttl)) { Log::info("[reminder] before: already sent for {$cacheKey}"); continue; }
+
             $count = $this->sendToAssignees($setting, $ind->id);
             Log::info("[reminder] before: ind {$ind->id} -> sent to {$count} users");
         }
     }
 
-    private function sendToAssignees(Setting $setting, ?int $onlyIndicatorId = null): void
+    private function sendToAssignees(Setting $setting, ?int $onlyIndicatorId = null): int
     {
         $title = $setting->title ?: '[KPI] แจ้งเตือนกำหนดส่ง';
         $msg = $setting->message ?: 'ใกล้ครบกำหนดส่งหลักฐาน โปรดตรวจสอบตัวชี้วัดที่รับผิดชอบ';
@@ -120,5 +136,6 @@ class SendDeadlineReminders extends Command
                 // ignore individual failures
             }
         }
+        return $uniqueUsers->count();
     }
 }

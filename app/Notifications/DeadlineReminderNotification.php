@@ -5,6 +5,7 @@ namespace App\Notifications;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use Illuminate\Support\HtmlString;
 
 class DeadlineReminderNotification extends Notification
 {
@@ -26,8 +27,12 @@ class DeadlineReminderNotification extends Notification
     {
         $mail = (new MailMessage)
             ->subject($this->title)
-            ->greeting('สวัสดีค่ะ/ครับ')
-            ->line($this->message ?: 'ใกล้ครบกำหนดส่งหลักฐาน โปรดตรวจสอบตัวชี้วัดที่รับผิดชอบ');
+            ->greeting('สวัสดีค่ะ/ครับ');
+
+        if ($this->message) {
+            // Render rich HTML content from the editor without escaping tags
+            $mail->line(new HtmlString($this->message));
+        }
 
         if ($this->actionUrl) {
             $mail->action('เปิดดูรายการตัวชี้วัดที่รับผิดชอบ', $this->actionUrl);

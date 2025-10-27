@@ -14,19 +14,24 @@ class SettingNotifyController extends Controller
 {
     public function sendNow(Request $request)
     {
-        $validated = $request->validate([
-            'title'        => ['nullable', 'string', 'max:255'],
-            'notify_date1' => ['nullable', 'date'],
-            'notify_time1' => ['nullable', 'date_format:H:i'],
-            'notify_date2' => ['nullable', 'date'],
-            'notify_time2' => ['nullable', 'date_format:H:i'],
-            'message'      => ['nullable', 'string', 'max:500'],
-            'remind_days'  => ['nullable', 'string', 'max:50'],
-            'remind_time'  => ['nullable', 'date_format:H:i'],
-            'remind_enabled' => ['nullable', 'boolean'],
+        Log::info('[settings] send_now requested', [
+            'user_id' => optional($request->user())->id,
         ]);
 
-        if (array_key_exists('title', $validated) && $validated['title'] === '') {
+        $validated = $request->validate([
+            'title'          => ['nullable', 'string', 'max:255'],
+            'notify_date1'   => ['nullable', 'date'],
+            'notify_time1'   => ['nullable', 'date_format:H:i'],
+            'notify_date2'   => ['nullable', 'date'],
+            'notify_time2'   => ['nullable', 'date_format:H:i'],
+            'message'        => ['nullable', 'string', 'max:500'],
+            'remind_days'    => ['nullable', 'string', 'max:50'],
+            'remind_time'    => ['nullable', 'date_format:H:i'],
+            'remind_enabled' => ['nullable', 'boolean'],
+            'indicator_id'   => ['nullable', 'integer'],
+        ]);
+
+        if (($validated['title'] ?? '') === '') {
             $validated['title'] = null;
         }
         $validated['remind_enabled'] = (bool) ($validated['remind_enabled'] ?? false);
@@ -42,30 +47,41 @@ class SettingNotifyController extends Controller
             // ignore
         }
 
-        $sent = $this->sendRemindersNow($setting);
+        $onlyIndicatorId = isset($validated['indicator_id']) ? (int) $validated['indicator_id'] : null;
+        $sent = $this->sendRemindersNow($setting, $onlyIndicatorId);
 
-        return redirect()->route('settings.index')->with('success', "บันทึกแล้ว และส่งแจ้งเตือนทันที จำนวนผู้รับ {$sent} คน");
+        return redirect()->route('settings.index')->with('success', 'บันทึกและส่งแจ้งเตือนแล้ว จำนวน ' . $sent . ' รายการ');
     }
 
-    private function sendRemindersNow(Setting $setting): int
+    private function sendRemindersNow(Setting $setting, ?int $onlyIndicatorId = null): int
     {
-        $title = $setting->title ?: '[KPI] แจ้งเตือนกำหนดส่ง';
-        $msg = $setting->message ?: 'ใกล้ครบกำหนดส่งหลักฐาน โปรดตรวจสอบตัวชี้วัดที่รับผิดชอบ';
+        $title = $setting->title ?: '[KPI] แจ้งเตือนกำหนดส่ง/อัปเดตสถานะ';
+        $msg = $setting->message ?: 'โปรดตรวจสอบและดำเนินการตามกำหนด';
 
-        $assignments = Assignment::with('collectorUser')->get();
-        $uniqueUsers = $assignments->pluck('collectorUser')->filter()->unique('id');
+        // Resolve recipients from assignments (collectors)
+        $assignments = Assignment::query()
+            ->when($onlyIndicatorId, fn($q) => $q->where('indicator_id', $onlyIndicatorId))
+            ->with('collectorUser')
+            ->get();
+
+        $users = $assignments->pluck('collectorUser')->filter()->unique('id')->values();
+        Log::info('[settings] send_now recipients resolved', [
+            'count' => $users->count(),
+            'indicator_id' => $onlyIndicatorId,
+        ]);
         $url = route('dashboardkpi.index');
 
         $sent = 0;
-        foreach ($uniqueUsers as $user) {
+        foreach ($users as $user) {
             try {
                 $user->notify(new DeadlineReminderNotification($title, $msg, $url));
                 $sent++;
             } catch (\Throwable $e) {
-                Log::warning('sendRemindersNow failed for user '.$user->id.' : '.$e->getMessage());
+                Log::warning('sendRemindersNow failed for user ' . ($user->id ?? '-') . ' : ' . $e->getMessage());
             }
         }
-        Log::info('[settings] send_now dispatched to '.$sent.' users');
+        Log::info('[settings] send_now dispatched to ' . $sent . ' users (assignees)');
         return $sent;
     }
 }
+
