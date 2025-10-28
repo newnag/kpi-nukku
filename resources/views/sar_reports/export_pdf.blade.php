@@ -13,13 +13,16 @@
             $notoOk = file_exists($notoRegPath) && file_exists($notoBoldPath);
             $sarOk  = file_exists($sarRegPath) && file_exists($sarBoldPath);
 
-            // Prefer Sarabun to match in‑app editor; fallback to Noto
-            $useFamily = $sarOk ? 'SarabunLocal' : ($notoOk ? 'NotoSansThai' : 'DejaVu Sans');
+            // Build file:/// URLs for Dompdf (reliable on Windows too)
+            $toFileUrl = function ($p) {
+                $n = str_replace('\\\\', '/', $p);
+                return 'file:///' . ltrim($n, '/'); // file:///C:/...
+            };
 
-            $notoReg = str_replace('\\\\', '/', $notoRegPath);
-            $notoBold = str_replace('\\\\', '/', $notoBoldPath);
-            $sarReg  = str_replace('\\\\', '/', $sarRegPath);
-            $sarBold = str_replace('\\\\', '/', $sarBoldPath);
+            $notoReg = $toFileUrl($notoRegPath);
+            $notoBold = $toFileUrl($notoBoldPath);
+            $sarReg  = $toFileUrl($sarRegPath);
+            $sarBold = $toFileUrl($sarBoldPath);
         @endphp
 
         @if ($sarOk)

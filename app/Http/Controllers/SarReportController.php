@@ -549,10 +549,11 @@ class SarReportController extends Controller
                 ->setOptions([
                     'isHtml5ParserEnabled'   => true,
                     'isRemoteEnabled'        => true,
-                    'defaultFont'            => 'SarabunLocal',
-                    'enableFontSubsetting'   => false,
-                    'fontDir'                => storage_path('fonts'),
-                    'fontCache'              => storage_path('fonts'),
+                    // Ensure Dompdf picks a Unicode Thai font
+                    'default_font'           => 'SarabunLocal',
+                    'enable_font_subsetting' => true,
+                    'font_dir'               => storage_path('fonts'),
+                    'font_cache'             => storage_path('fonts'),
                     'chroot'                 => base_path(),
                 ]);
 
