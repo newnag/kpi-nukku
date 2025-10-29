@@ -512,31 +512,31 @@
                     </div>
                      <div class="user-info2">
                             @hasrole('super_admin')
-                                <a href="{{ asset('manuals/Super_admin.pdf') }}" target="_blank" download
+                                <a href="{{ asset('manuals/Super_admin.pdf') }}" target="_blank"
                                     class="buttonNav-item">
                                     <i class="fa-solid fa-file-pdf"></i> คู่มือ Super Admin
                                 </a>
                             @endhasrole
                             @hasrole('system_admin')
-                                <a href="{{ asset('manuals/System_admin.pdf') }}" target="_blank" download
+                                <a href="{{ asset('manuals/System_admin.pdf') }}" target="_blank"
                                     class="buttonNav-item">
                                     <i class="fa-solid fa-file-pdf"></i> คู่มือ System Admin
                                 </a>
                             @endhasrole
                             @hasrole('administration_admin')
-                                <a href="{{ asset('manuals/Administration_Admin.pdf') }}" target="_blank" download
+                                <a href="{{ asset('manuals/Administration_Admin.pdf') }}" target="_blank"
                                     class="buttonNav-item">
                                     <i class="fa-solid fa-file-pdf"></i> คู่มือ Administration Admin
                                 </a>
                             @endhasrole
                             @hasrole('qa_admin')
-                                <a href="{{ asset('manuals/qa_admin.pdf') }}" target="_blank" download
+                                <a href="{{ asset('manuals/qa_admin.pdf') }}" target="_blank"
                                     class="buttonNav-item">
                                     <i class="fa-solid fa-file-pdf"></i> คู่มือ QA Admin
                                 </a>
                             @endhasrole
                             @hasrole('user')
-                                <a href="{{ asset('manuals/User.pdf') }}" target="_blank" download class="buttonNav-item">
+                                <a href="{{ asset('manuals/User.pdf') }}" target="_blank" class="buttonNav-item">
                                     <i class="fa-solid fa-file-pdf"></i> คู่มือผู้ใช้งาน (User)
                                 </a>
                             @endhasrole
